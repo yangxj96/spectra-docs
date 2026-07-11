@@ -1,5 +1,46 @@
 # AGENTS.md
 
+## 会话初始化（每次会话必须执行）
+
+在本项目工作时，**每次会话开始时**必须先读取以下文件建立完整上下文：
+
+### 1. 必读文件
+
+首先读取 `docs/00-项目总览.md`，了解系统架构、技术栈、模块导航。
+
+### 2. 按任务读取对应笔记
+
+| 任务涉及 | 读取笔记 |
+|---|---|
+| 后端架构/分层 | `docs/10-后端/10-架构分层.md` |
+| 用户/角色/权限 | `docs/10-后端/20-用户与权限.md` |
+| 部门/菜单/字典/日志 | `docs/10-后端/30-系统管理.md` |
+| OA 办公 | `docs/10-后端/40-OA模块.md` |
+| 文件上传 | `docs/10-后端/50-文件上传.md` |
+| 工作流 | `docs/10-后端/60-工作流.md` |
+| AI 相关 | `docs/10-后端/70-AI模块.md` |
+| 基础设施 | `docs/10-后端/80-基础设施.md` |
+| API 接口 | `docs/10-后端/90-API总览.md` |
+| Web 前端 | `docs/20-前端/10-spectra-ui.md` |
+| 移动端 | `docs/20-前端/20-spectra-app.md` |
+| 数据模型/数据库 | `docs/30-数据模型/10-ER图.md`、`docs/30-数据模型/20-实体清单.md` |
+
+### 3. 上下文加载顺序
+
+1. 读取 `docs/00-项目总览.md` ← 全局概览
+2. 读取任务相关的模块笔记 ← 领域知识
+3. 使用 `codegraph_explore` 查询具体代码 ← 实现细节
+4. 三者结合形成完整上下文后再开始编码
+
+## 知识图谱维护
+
+本项目使用 Obsidian 知识库（`docs/`）作为跨会话长期记忆。开发过程中必须同步维护：
+
+- **修改代码后**：更新对应笔记中的关键文件路径、API 端点、实体字段等变更
+- **新增模块/功能**：从 `docs/99-模板/T-模块笔记模板.md` 创建新笔记，在 `docs/00-项目总览.md` 中添加导航链接
+- **删除/重构模块**：同步归档或删除对应笔记，更新所有相关 `[[wikilink]]`
+- **笔记之间用 `[[wikilink]]` 连接**，保持知识图谱完整可遍历
+
 ## System Architecture
 
 Spectra is a full-stack system: one backend API serves two frontend clients. They live in separate directories with independent toolchains, but **they collaborate at runtime** — both frontends connect to `spectra-admin` as their API server.
