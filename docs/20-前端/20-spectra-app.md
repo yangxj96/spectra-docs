@@ -51,6 +51,7 @@ spectra-app/
 │   ├── static/       # 静态资源
 │   ├── stores/       # Pinia 状态管理
 │   ├── utils/        # 工具函数
+│   │   └── crypto/    # 加解密工具（H5 平台可用）
 │   ├── App.vue       # 根组件
 │   ├── main.ts       # 入口文件
 │   ├── manifest.json # uni-app 配置
@@ -69,6 +70,8 @@ spectra-app/
 
 开发环境通过 `.env.development` 中的 `VITE_API_BASE_URL` 指向 `spectra-admin` 的 `https://127.0.0.1:4004`。
 
+> 接口加解密（`VITE_CRYPTO_ENABLED`）基于 Web Crypto API，仅 H5 平台可用。小程序等非 H5 平台自动跳过加密。
+
 ## 关键文件路径
 
 | 文件 | 路径 |
@@ -80,6 +83,8 @@ spectra-app/
 | uni-app manifest | `spectra-app/src/manifest.json` |
 | 页面路由 | `spectra-app/src/pages.json` |
 | AGENTS.md | `spectra-app/AGENTS.md` |
+| 加密工具 | `spectra-app/src/utils/crypto/crypto-utils.ts` |
+| HTTP 加密拦截 | `spectra-app/src/services/http.ts` |
 
 ## 相关笔记
 
@@ -87,3 +92,4 @@ spectra-app/
 - [[10-spectra-ui]]
 - [[10-环境搭建]]
 - [[20-常见命令]]
+- [[85-接口加解密方案]]

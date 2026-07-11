@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。共 29 个 Controller。
+> spectra-admin 全部 REST API 控制器速查表。共 30 个 Controller。
 
 ## 认证与安全
 
@@ -39,6 +39,7 @@ tags:
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
+| `CryptoController` | spectra-core | `/system/crypto/**` | RSA 密钥对生成 / 公钥查询 |
 
 ## OA 模块
 
@@ -85,6 +86,7 @@ tags:
 | `CommonExceptionAdvice` | 通用业务异常处理 |
 | `KaptchaExceptionAdvice` | 验证码异常处理 |
 | `SqlExceptionAdvice` | 数据库异常处理 |
+| `EncryptException` | 加解密异常处理 |
 
 ## 响应格式
 
@@ -104,6 +106,7 @@ tags:
 - [[10-架构分层]] — 各 Controller 所在模块
 - [[20-用户与权限]] — 认证与权限 API
 - [[30-系统管理]] — 系统管理 API
+- [[85-接口加解密方案]] — 加解密密钥管理 API
 - [[40-OA模块]] — OA API
 - [[50-文件上传]] — 文件上传 API
 - [[60-工作流]] — 工作流 API

@@ -1,160 +1,40 @@
 {
-  "nodes": [
-    {
-      "id": "sys-arch",
-      "type": "text",
-      "x": 400,
-      "y": -250,
-      "width": 300,
-      "height": 60,
-      "text": "# Spectra 系统架构\n\n*光谱平台 — 全栈知识图谱*"
-    },
-    {
-      "id": "be-launch",
-      "type": "text",
-      "x": 400,
-      "y": -120,
-      "width": 280,
-      "height": 50,
-      "text": "## spectra-launch\n**启动入口 :4004**\nSpring Boot 4 + Java 25"
-    },
-    {
-      "id": "be-fw",
-      "type": "text",
-      "x": 0,
-      "y": -20,
-      "width": 220,
-      "height": 80,
-      "text": "## spectra-framework\n**框架层**\n- MVC/JSON/缓存\n- Redis/MyBatis-Plus\n- 验证码/密码编码"
-    },
-    {
-      "id": "be-common",
-      "type": "text",
-      "x": 260,
-      "y": -20,
-      "width": 200,
-      "height": 70,
-      "text": "## spectra-common\n**公共基础**\n- BaseEntity\n- DTO/VO\n- 工具类/常量"
-    },
-    {
-      "id": "be-core",
-      "type": "text",
-      "x": 500,
-      "y": -20,
-      "width": 200,
-      "height": 70,
-      "text": "## spectra-core\n**核心业务**\n- 用户/角色/权限\n- 菜单/部门/字典\n- 操作日志"
-    },
-    {
-      "id": "be-oa",
-      "type": "text",
-      "x": 740,
-      "y": -20,
-      "width": 200,
-      "height": 70,
-      "text": "## spectra-oa\n**OA 办公**\n- 资产/考勤/日历\n- 会议/文档/合同\n- 公告/报表/通讯录"
-    },
-    {
-      "id": "be-upload",
-      "type": "text",
-      "x": 500,
-      "y": 100,
-      "width": 200,
-      "height": 70,
-      "text": "## spectra-upload\n**文件上传**\n- 本地存储\n- S3 对象存储\n- 分片上传"
-    },
-    {
-      "id": "be-wf",
-      "type": "text",
-      "x": 740,
-      "y": 100,
-      "width": 200,
-      "height": 70,
-      "text": "## spectra-workflow\n**工作流**\n- Flowable 引擎\n- 流程定义/实例\n- 任务/历史记录"
-    },
-    {
-      "id": "be-ai",
-      "type": "text",
-      "x": 500,
-      "y": 220,
-      "width": 200,
-      "height": 60,
-      "text": "## spectra-ai\n**AI 集成**\nLangChain4j + RAG"
-    },
-    {
-      "id": "be-starter",
-      "type": "text",
-      "x": 140,
-      "y": 100,
-      "width": 220,
-      "height": 60,
-      "text": "## spectra-starter\n**自动配置**\nSecurity Starter / Log Starter"
-    },
-    {
-      "id": "fe-ui",
-      "type": "text",
-      "x": 0,
-      "y": 220,
-      "width": 220,
-      "height": 70,
-      "text": "## spectra-ui\n**Web 管理后台**\nVue 3 + Element Plus\nVite 8 + pnpm"
-    },
-    {
-      "id": "fe-app",
-      "type": "text",
-      "x": 800,
-      "y": 220,
-      "width": 220,
-      "height": 70,
-      "text": "## spectra-app\n**移动端/H5/小程序**\nVue 3 + uni-app\nVite 5 + pnpm"
-    },
-    {
-      "id": "infra-pg",
-      "type": "text",
-      "x": 280,
-      "y": 320,
-      "width": 200,
-      "height": 50,
-      "text": "## PostgreSQL 18\n关系数据库"
-    },
-    {
-      "id": "infra-redis",
-      "type": "text",
-      "x": 520,
-      "y": 320,
-      "width": 180,
-      "height": 50,
-      "text": "## Redis\n缓存 / Session"
-    },
-    {
-      "id": "infra-s3",
-      "type": "text",
-      "x": 740,
-      "y": 320,
-      "width": 200,
-      "height": 50,
-      "text": "## S3 对象存储\n文件存储"
-    }
-  ],
-  "edges": [
-    {"id": "e1",  "fromNode": "be-launch",  "fromSide": "bottom", "toNode": "be-core",       "toSide": "top"},
-    {"id": "e2",  "fromNode": "be-launch",  "fromSide": "bottom", "toNode": "be-oa",         "toSide": "top"},
-    {"id": "e3",  "fromNode": "be-launch",  "fromSide": "bottom", "toNode": "be-upload",     "toSide": "top"},
-    {"id": "e4",  "fromNode": "be-launch",  "fromSide": "bottom", "toNode": "be-wf",         "toSide": "top"},
-    {"id": "e5",  "fromNode": "be-launch",  "fromSide": "bottom", "toNode": "be-ai",         "toSide": "top"},
-    {"id": "e6",  "fromNode": "be-launch",  "fromSide": "left",   "toNode": "be-fw",         "toSide": "top"},
-    {"id": "e7",  "fromNode": "be-launch",  "fromSide": "left",   "toNode": "be-starter",    "toSide": "top"},
-    {"id": "e8",  "fromNode": "be-fw",      "fromSide": "right",  "toNode": "be-common",     "toSide": "left"},
-    {"id": "e9",  "fromNode": "be-core",    "fromSide": "left",   "toNode": "be-fw",         "toSide": "right"},
-    {"id": "e10", "fromNode": "be-oa",      "fromSide": "left",   "toNode": "be-fw",         "toSide": "right"},
-    {"id": "e11", "fromNode": "be-upload",  "fromSide": "left",   "toNode": "be-fw",         "toSide": "right"},
-    {"id": "e12", "fromNode": "be-wf",      "fromSide": "left",   "toNode": "be-fw",         "toSide": "right"},
-    {"id": "e13", "fromNode": "be-ai",      "fromSide": "left",   "toNode": "be-fw",         "toSide": "right"},
-    {"id": "e14", "fromNode": "be-starter", "fromSide": "left",   "toNode": "be-fw",         "toSide": "bottom"},
-    {"id": "e15", "fromNode": "fe-ui",      "fromSide": "right",  "toNode": "be-launch",     "toSide": "bottom", "label": "VITE_API_URL"},
-    {"id": "e16", "fromNode": "fe-app",     "fromSide": "left",   "toNode": "be-launch",     "toSide": "bottom", "label": "VITE_API_BASE_URL"},
-    {"id": "e17", "fromNode": "infra-pg",   "fromSide": "top",    "toNode": "be-fw",         "toSide": "bottom"},
-    {"id": "e18", "fromNode": "infra-redis","fromSide": "top",    "toNode": "be-fw",         "toSide": "bottom"},
-    {"id": "e19", "fromNode": "infra-s3",   "fromSide": "top",    "toNode": "be-upload",     "toSide": "bottom"}
-  ]
+	"nodes":[
+		{"id":"sys-arch","type":"text","x":400,"y":-250,"width":300,"height":60,"text":"# Spectra 系统架构\n\n*光谱平台 — 全栈知识图谱*"},
+		{"id":"be-launch","type":"text","x":400,"y":-120,"width":280,"height":50,"text":"## spectra-launch\n**启动入口 :4004**\nSpring Boot 4 + Java 25"},
+		{"id":"be-fw","type":"text","x":0,"y":-20,"width":220,"height":80,"text":"## spectra-framework\n**框架层**\n- MVC/JSON/缓存\n- Redis/MyBatis-Plus\n- 验证码/密码编码"},
+		{"id":"be-common","type":"text","x":260,"y":-20,"width":200,"height":70,"text":"## spectra-common\n**公共基础**\n- BaseEntity\n- DTO/VO\n- 工具类/常量"},
+		{"id":"be-core","type":"text","x":500,"y":-20,"width":200,"height":70,"text":"## spectra-core\n**核心业务**\n- 用户/角色/权限\n- 菜单/部门/字典\n- 操作日志"},
+		{"id":"be-oa","type":"text","x":740,"y":-20,"width":200,"height":70,"text":"## spectra-oa\n**OA 办公**\n- 资产/考勤/日历\n- 会议/文档/合同\n- 公告/报表/通讯录"},
+		{"id":"be-upload","type":"text","x":500,"y":100,"width":200,"height":70,"text":"## spectra-upload\n**文件上传**\n- 本地存储\n- S3 对象存储\n- 分片上传"},
+		{"id":"be-wf","type":"text","x":740,"y":100,"width":200,"height":70,"text":"## spectra-workflow\n**工作流**\n- Flowable 引擎\n- 流程定义/实例\n- 任务/历史记录"},
+		{"id":"be-ai","type":"text","x":500,"y":220,"width":200,"height":60,"text":"## spectra-ai\n**AI 集成**\nLangChain4j + RAG"},
+		{"id":"be-starter","type":"text","x":140,"y":100,"width":220,"height":60,"text":"## spectra-starter\n**自动配置**\nSecurity Starter / Log Starter"},
+		{"id":"fe-ui","type":"text","x":0,"y":220,"width":220,"height":70,"text":"## spectra-ui\n**Web 管理后台**\nVue 3 + Element Plus\nVite 8 + pnpm"},
+		{"id":"fe-app","type":"text","x":800,"y":220,"width":220,"height":70,"text":"## spectra-app\n**移动端/H5/小程序**\nVue 3 + uni-app\nVite 5 + pnpm"},
+		{"id":"infra-pg","type":"text","x":280,"y":320,"width":200,"height":50,"text":"## PostgreSQL 18\n关系数据库"},
+		{"id":"infra-redis","type":"text","x":520,"y":320,"width":180,"height":50,"text":"## Redis\n缓存 / Session"},
+		{"id":"infra-s3","type":"text","x":740,"y":320,"width":200,"height":50,"text":"## S3 对象存储\n文件存储"}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"be-launch","fromSide":"bottom","toNode":"be-core","toSide":"top"},
+		{"id":"e2","fromNode":"be-launch","fromSide":"bottom","toNode":"be-oa","toSide":"top"},
+		{"id":"e3","fromNode":"be-launch","fromSide":"bottom","toNode":"be-upload","toSide":"top"},
+		{"id":"e4","fromNode":"be-launch","fromSide":"bottom","toNode":"be-wf","toSide":"top"},
+		{"id":"e5","fromNode":"be-launch","fromSide":"bottom","toNode":"be-ai","toSide":"top"},
+		{"id":"e6","fromNode":"be-launch","fromSide":"left","toNode":"be-fw","toSide":"top"},
+		{"id":"e7","fromNode":"be-launch","fromSide":"left","toNode":"be-starter","toSide":"top"},
+		{"id":"e8","fromNode":"be-fw","fromSide":"right","toNode":"be-common","toSide":"left"},
+		{"id":"e9","fromNode":"be-core","fromSide":"left","toNode":"be-fw","toSide":"right"},
+		{"id":"e10","fromNode":"be-oa","fromSide":"left","toNode":"be-fw","toSide":"right"},
+		{"id":"e11","fromNode":"be-upload","fromSide":"left","toNode":"be-fw","toSide":"right"},
+		{"id":"e12","fromNode":"be-wf","fromSide":"left","toNode":"be-fw","toSide":"right"},
+		{"id":"e13","fromNode":"be-ai","fromSide":"left","toNode":"be-fw","toSide":"right"},
+		{"id":"e14","fromNode":"be-starter","fromSide":"left","toNode":"be-fw","toSide":"bottom"},
+		{"id":"e15","fromNode":"fe-ui","fromSide":"right","toNode":"be-launch","toSide":"bottom","label":"VITE_API_URL"},
+		{"id":"e16","fromNode":"fe-app","fromSide":"left","toNode":"be-launch","toSide":"bottom","label":"VITE_API_BASE_URL"},
+		{"id":"e17","fromNode":"infra-pg","fromSide":"top","toNode":"be-fw","toSide":"bottom"},
+		{"id":"e18","fromNode":"infra-redis","fromSide":"top","toNode":"be-fw","toSide":"bottom"},
+		{"id":"e19","fromNode":"infra-s3","fromSide":"top","toNode":"be-upload","toSide":"bottom"}
+	]
 }

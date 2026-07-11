@@ -4,24 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "5448242784872ac0",
+        "id": "279ec062f1bf9e22",
         "type": "tabs",
         "children": [
           {
-            "id": "dc71797e-b50f-4cec-b18d-7e3bd6ce5aeb",
-            "type": "leaf",
-            "state": {
-              "type": "file-explorer",
-              "state": {
-                "sortOrder": "alphabetical",
-                "autoReveal": false
-              },
-              "icon": "lucide-folder-closed",
-              "title": "文件列表"
-            }
-          },
-          {
-            "id": "38b6ab71a8d17c89",
+            "id": "159c503ba7a41272",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -34,8 +21,7 @@
               "title": "10-架构分层"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -52,10 +38,14 @@
             "id": "a0ff1b01-0f21-45d9-86b6-b12920d5001c",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "关系图谱"
+              "type": "markdown",
+              "state": {
+                "file": "docs/00-项目总览.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "00-项目总览"
             }
           },
           {
@@ -84,12 +74,26 @@
               "icon": "lucide-bookmark",
               "title": "书签"
             }
+          },
+          {
+            "id": "7948c0cac8597504",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 320
+    "width": 482.5,
+    "collapsed": true
   },
   "right": {
     "id": "60bfdc7268de73d7",
@@ -176,7 +180,8 @@
               "title": "添加笔记属性"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -193,6 +198,18 @@
       "bases:新建数据库": false
     }
   },
-  "active": "38b6ab71a8d17c89",
-  "lastOpenFiles": []
+  "active": "159c503ba7a41272",
+  "lastOpenFiles": [
+    "spectra-admin/spectra-framework.md",
+    "未命名.canvas",
+    "docs/Spectra 系统架构.canvas",
+    "docs/30-数据模型/10-ER图.md",
+    "docs/50-规范与参考/40-数据库命名规范.md",
+    "docs/10-后端/20-用户与权限.md",
+    "docs/00-项目总览.md",
+    "docs/50-规范与参考/30-MapStruct命名规范.md",
+    "docs/50-规范与参考/10-Git提交规范.md",
+    "spectra-app/AGENTS.md",
+    "docs/10-后端/10-架构分层.md"
+  ]
 }

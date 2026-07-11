@@ -54,6 +54,7 @@ spectra-ui/
 │   ├── stores/       # Pinia 状态管理
 │   ├── styles/       # 全局样式
 │   ├── utils/        # 工具函数
+│   │   └── crypto/    # 加解密工具（AES-GCM + RSA）
 │   ├── views/        # 页面组件
 │   ├── App.vue       # 根组件
 │   └── main.ts       # 入口文件
@@ -86,6 +87,8 @@ spectra-ui/
 | Prettier 配置 | `spectra-ui/.prettierrc.yml` |
 | 环境变量 | `spectra-ui/.env.development` |
 | AGENTS.md | `spectra-ui/AGENTS.md` |
+| 加密工具 | `spectra-ui/src/utils/crypto/crypto-utils.ts` |
+| HTTP 加密拦截 | `spectra-ui/src/plugin/request/http.ts` |
 
 ## 相关笔记
 
@@ -93,3 +96,4 @@ spectra-ui/
 - [[20-spectra-app]]
 - [[10-环境搭建]]
 - [[20-常见命令]]
+- [[85-接口加解密方案]]
