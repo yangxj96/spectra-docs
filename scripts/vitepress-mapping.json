@@ -1,0 +1,47 @@
+[
+    {
+        "source": "50-规范与参考/10-Git提交规范.md",
+        "target": "commit-convention.md",
+        "group": "使用指南"
+    },
+    {
+        "source": "50-规范与参考/20-前端命名规范.md",
+        "target": "fe-guide.md",
+        "group": "前端相关"
+    },
+    {
+        "source": "50-规范与参考/30-MapStruct命名规范.md",
+        "target": "be-mapstruct-guide.md",
+        "group": "后端相关"
+    },
+    {
+        "source": "10-后端/52-SSL证书配置.md",
+        "target": "be-ssl-scripts.md",
+        "group": "后端相关"
+    },
+    {
+        "source": "50-规范与参考/40-数据库命名规范.md",
+        "target": "database-guide.md",
+        "group": "数据库相关"
+    },
+    {
+        "source": "30-数据模型/30-数据库随笔.md",
+        "target": "database-explain.md",
+        "group": "数据库相关"
+    },
+    {
+        "source": "50-规范与参考/50-Redis使用规范.md",
+        "target": "be-redis-guide.md",
+        "group": "数据库相关"
+    },
+    {
+        "source": "10-后端/82-数据库连接池.md",
+        "target": "database-backups-hikari.md",
+        "group": "数据库配置备份"
+    },
+    {
+        "source": "50-规范与参考/60-行政区域编码.md",
+        "target": "misc-code.md",
+        "group": "杂项"
+    }
+]
