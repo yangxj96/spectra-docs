@@ -1,0 +1,17 @@
+{
+  "newFileLocation": "folder",
+  "newFileFolderPath": "docs",
+  "showLineNumber": true,
+  "spellcheck": false,
+  "trashOption": "local",
+  "alwaysUpdateLinks": true,
+  "useMarkdownLinks": false,
+  "showUnsupportedFiles": true,
+  "attachmentFolderPath": "docs/attachments",
+  "promptDelete": false,
+  "foldHeading": true,
+  "foldIndent": false,
+  "defaultViewMode": "source",
+  "livePreview": true,
+  "showIndentGuide": true
+}

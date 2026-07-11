@@ -1,0 +1,12 @@
+[submodule "spectra-admin"]
+	path = spectra-admin
+	url = git@github.com:yangxj96/spectra-admin.git
+	branch = master
+[submodule "spectra-ui"]
+	path = spectra-ui
+	url = git@github.com:yangxj96/spectra-ui.git
+	branch = master
+[submodule "spectra-app"]
+	path = spectra-app
+	url = git@github.com:yangxj96/spectra-app.git
+	branch = master

@@ -1,0 +1,58 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "tag:#backend",
+      "color": {
+        "a": 1,
+        "rgb": 8289430
+      }
+    },
+    {
+      "query": "tag:#frontend",
+      "color": {
+        "a": 1,
+        "rgb": 4555435
+      }
+    },
+    {
+      "query": "tag:#database",
+      "color": {
+        "a": 1,
+        "rgb": 11084553
+      }
+    },
+    {
+      "query": "tag:#devops",
+      "color": {
+        "a": 1,
+        "rgb": 14017105
+      }
+    },
+    {
+      "query": "tag:#guide",
+      "color": {
+        "a": 1,
+        "rgb": 10534553
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": true,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": false,
+  "centerStrength": 0.518713248970312,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 1.4019828977761024,
+  "close": true
+}

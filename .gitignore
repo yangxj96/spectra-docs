@@ -1,0 +1,14 @@
+# opencode npm 依赖
+.opencode/node_modules/
+
+# 代码智能索引（自动生成，可重建）
+.codegraph/
+
+# opencode 运行时
+.opencode/logs/
+.opencode/cache/
+
+# 系统文件
+Thumbs.db
+.DS_Store
+*.tmp
