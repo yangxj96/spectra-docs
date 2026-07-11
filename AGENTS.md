@@ -41,9 +41,9 @@
 - **删除/重构模块**：同步归档或删除对应笔记，更新所有相关 `[[wikilink]]`
 - **笔记之间用 `[[wikilink]]` 连接**，保持知识图谱完整可遍历
 
-## System Architecture
+## 系统架构
 
-Spectra is a full-stack system: one backend API serves two frontend clients. They live in separate directories with independent toolchains, but **they collaborate at runtime** — both frontends connect to `spectra-admin` as their API server.
+Spectra 是一个全栈系统：一个后端 API 服务两个前端客户端。它们位于各自独立的目录中，有各自的工具链，但**在运行时协作**——两个前端都连接 `spectra-admin` 作为 API 服务器。
 
 ```
 ┌─────────────────┐      ┌─────────────────┐
@@ -66,57 +66,57 @@ Spectra is a full-stack system: one backend API serves two frontend clients. The
           └─────────────────────┘
 ```
 
-| Directory | Role | Stack | Port (dev) |
+| 目录 | 角色 | 技术栈 | 端口（开发） |
 |---|---|---|---|
-| `spectra-admin/` | Backend API server | Java 25, Spring Boot 4, Maven, PostgreSQL, Redis | 4004 |
-| `spectra-ui/` | Web admin panel | Vue 3, Vite 8, Element Plus, pnpm | 5173 |
-| `spectra-app/` | Mobile app (H5 / WeChat Mini Program) | Vue 3, uni-app, Vite 5, pnpm | — |
+| `spectra-admin/` | 后端 API 服务 | Java 25, Spring Boot 4, Maven, PostgreSQL, Redis | 4004 |
+| `spectra-ui/` | Web 管理后台 | Vue 3, Vite 8, Element Plus, pnpm | 5173 |
+| `spectra-app/` | 移动端（H5 / 微信小程序） | Vue 3, uni-app, Vite 5, pnpm | — |
 
-**Each project has its own `AGENTS.md` — read it before working in that project.** This file covers only cross-project facts.
+**每个子项目有自己的 `AGENTS.md`——进入该目录工作时先读取。** 本文件只覆盖跨项目的事实信息。
 
-## How the Projects Connect
+## 项目连接方式
 
-Both frontends point to the same backend in development:
+两个前端在开发环境指向同一个后端：
 
 - `spectra-ui/.env` → `VITE_API_URL=https://127.0.0.1:4004/`
 - `spectra-app/.env.development` → `VITE_API_BASE_URL=https://127.0.0.1:4004`
 
-The backend default port is **4004** (set via `SERVER_PORT` in `.mise.local.toml`).
+后端默认端口为 **4004**（通过 `.mise.local.toml` 中的 `SERVER_PORT` 设置）。
 
-When working on a feature that spans frontend + backend:
-1. Start `spectra-admin` first (`./mvnw spring-boot:run -pl spectra-launch`)
-2. Then start the relevant frontend (`pnpm start` in `spectra-ui` or `spectra-app`)
+跨前后端功能开发时：
+1. 先启动 `spectra-admin`（`./mvnw spring-boot:run -pl spectra-launch`）
+2. 再启动对应的前端（在 `spectra-ui` 或 `spectra-app` 中执行 `pnpm start`）
 
-## Common Toolchain
+## 通用工具链
 
-- **Node**: 24.14.0, **pnpm**: 11.0.9 — managed via [mise](https://mise.jdx.dev/) (`mise.toml` / `.mise.local.toml`)
-- **Java**: JDK 25 (Temurin), **Maven**: 3.9.12 — wrapper included (`mvnw` / `mvnw.cmd`)
-- **npm registry**: taobao mirror (`registry.npmmirror.com`) configured in `.npmrc` for Vue projects
+- **Node**: 24.14.0, **pnpm**: 11.0.9 — 通过 [mise](https://mise.jdx.dev/) 管理（`mise.toml` / `.mise.local.toml`）
+- **Java**: JDK 25 (Temurin), **Maven**: 3.9.12 — 项目自带 wrapper（`mvnw` / `mvnw.cmd`）
+- **npm 镜像**: 淘宝镜像（`registry.npmmirror.com`），配置在 Vue 项目的 `.npmrc` 中
 
-## Quick Reference
+## 常用命令速查
 
 ```bash
-# spectra-admin (from spectra-admin/)
-./mvnw clean package -DskipTests          # build
-./mvnw spring-boot:run -pl spectra-launch # run API server
+# spectra-admin（在 spectra-admin/ 下执行）
+./mvnw clean package -DskipTests          # 构建
+./mvnw spring-boot:run -pl spectra-launch # 启动 API 服务
 
-# spectra-ui (from spectra-ui/)
-pnpm install && pnpm start                # dev server (auto format+lint+typecheck via prestart)
+# spectra-ui（在 spectra-ui/ 下执行）
+pnpm install && pnpm start                # 开发服务器（自动 format+lint+typecheck）
 
-# spectra-app (from spectra-app/)
-pnpm install && pnpm start                # H5 dev (auto typecheck+lint+format via prestart)
-pnpm dev:mp-weixin                        # WeChat Mini Program dev
+# spectra-app（在 spectra-app/ 下执行）
+pnpm install && pnpm start                # H5 开发（自动 typecheck+lint+format）
+pnpm dev:mp-weixin                        # 微信小程序开发
 ```
 
-## Environment Setup
+## 环境配置
 
-Before running anything, configure local environment:
+运行前需配置本地环境：
 
-- **spectra-admin**: copy `.mise.local.toml.example` to `.mise.local.toml`, fill in DB/Redis/S3/AI credentials
-- **spectra-ui**: create `.env` with `VITE_API_URL` (defaults to `https://127.0.0.1:4004/`)
-- **spectra-app**: create `.env` or use `.env.development` (defaults to `https://127.0.0.1:4004`)
+- **spectra-admin**: 复制 `.mise.local.toml.example` 为 `.mise.local.toml`，填入数据库/Redis/S3/AI 凭据
+- **spectra-ui**: 创建 `.env`，设置 `VITE_API_URL`（默认 `https://127.0.0.1:4004/`）
+- **spectra-app**: 创建 `.env` 或使用 `.env.development`（默认 `https://127.0.0.1:4004`）
 
-Required services: **PostgreSQL** + **Redis** (for spectra-admin).
+需要运行的服务：**PostgreSQL** + **Redis**（供 spectra-admin 使用）。
 
 ## 本地开发数据库（只读）
 
@@ -136,17 +136,16 @@ DB_USERNAME="ai"
 DB_PASSWORD="QuVsKppcWvwwX2Vv"
 ```
 
-## Code Style (shared across Vue projects)
+## 代码规范（Vue 项目共享）
 
-Both `spectra-ui` and `spectra-app` use identical Prettier config:
-- 4-space indent, double quotes, semicolons, 120 char width, LF line endings
-- No trailing commas, `arrowParens: avoid`, `bracketSameLine: true`
+`spectra-ui` 和 `spectra-app` 使用相同的 Prettier 配置：
+- 4 空格缩进，双引号，分号，120 字符行宽，LF 换行符
+- 无尾逗号，`arrowParens: avoid`，`bracketSameLine: true`
 
-## Git Conventions
+## Git 约定
 
-All projects use Conventional Commits: `type(scope): description`
-- Backend scopes: `ai`, `security`, `core`, `framework`, `log`, `project`
-- Use Chinese in commit body when the codebase is in Chinese
+所有项目使用 Conventional Commits：`type(scope): 中文描述`
+- 后端 scope：`ai`、`security`、`core`、`framework`、`log`、`project`
 
 ## CodeGraph
 
