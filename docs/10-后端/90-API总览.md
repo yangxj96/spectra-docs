@@ -39,7 +39,7 @@ tags:
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
-| `CryptoController` | spectra-core | `/system/crypto/**` | RSA 密钥对生成 / 公钥查询 |
+| `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 
 ## OA 模块
 

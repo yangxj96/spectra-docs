@@ -45,11 +45,18 @@ pnpm start      # 启动开发服务器（:5173），自动执行 format+lint+ty
 spectra-ui/
 ├── src/
 │   ├── api/          # API 请求封装
+│   │   └── system/
+│   │       └── crypto.ts       # 加解密管理 API + getter
 │   ├── assets/       # 静态资源
 │   ├── components/   # 公共组件
 │   ├── composables/  # 组合式函数
 │   ├── directives/   # 自定义指令
 │   ├── layout/       # 布局组件
+│   ├── plugin/
+│   │   ├── request/
+│   │   │   └── http.ts         # HTTP 客户端（集成加密/解密）
+│   │   └── store/modules/
+│   │       └── use-crypto-store.ts  # 加解密 Pinia store
 │   ├── router/       # 路由配置
 │   ├── stores/       # Pinia 状态管理
 │   ├── styles/       # 全局样式
@@ -88,7 +95,17 @@ spectra-ui/
 | 环境变量 | `spectra-ui/.env.development` |
 | AGENTS.md | `spectra-ui/AGENTS.md` |
 | 加密工具 | `spectra-ui/src/utils/crypto/crypto-utils.ts` |
+| 加解密 store | `spectra-ui/src/plugin/store/modules/use-crypto-store.ts` |
+| 加解密 API | `spectra-ui/src/api/system/crypto.ts` |
 | HTTP 加密拦截 | `spectra-ui/src/plugin/request/http.ts` |
+
+## 加解密说明
+
+密钥通过后端 API 动态获取，不再硬编码在 `.env` 中：
+
+- 应用启动：`initCrypto()` → `GET /api/system/crypto/config` → 获取 `enabled` + `serverPublicKey`
+- 登录成功：`fetchClientPrivateKey()` → `GET /api/system/keypair/client-private` → 获取 `clientPrivateKey`
+- 状态存储在 `use-crypto-store`，`enabled` + `serverPublicKey` 持久化，`clientPrivateKey` 仅内存
 
 ## 相关笔记
 

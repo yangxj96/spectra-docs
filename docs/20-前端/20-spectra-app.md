@@ -47,11 +47,15 @@ spectra-app/
 │   ├── api/          # API 请求封装
 │   ├── components/   # 公共组件
 │   ├── composables/  # 组合式函数
+│   ├── config/
+│   │   └── env.ts          # 环境变量统一导出（含 CRYPTO_ENABLED）
 │   ├── pages/        # 页面（uni-app 页面路由）
+│   ├── services/
+│   │   └── http.ts         # HTTP 客户端（H5 平台集成加密/解密）
 │   ├── static/       # 静态资源
 │   ├── stores/       # Pinia 状态管理
 │   ├── utils/        # 工具函数
-│   │   └── crypto/    # 加解密工具（H5 平台可用）
+│   │   └── crypto/    # 加解密工具（H5 平台可用，#ifdef 条件编译）
 │   ├── App.vue       # 根组件
 │   ├── main.ts       # 入口文件
 │   ├── manifest.json # uni-app 配置
@@ -70,7 +74,7 @@ spectra-app/
 
 开发环境通过 `.env.development` 中的 `VITE_API_BASE_URL` 指向 `spectra-admin` 的 `https://127.0.0.1:4004`。
 
-> 接口加解密（`VITE_CRYPTO_ENABLED`）基于 Web Crypto API，仅 H5 平台可用。小程序等非 H5 平台自动跳过加密。
+> 接口加解密（`VITE_CRYPTO_ENABLED`）基于 Web Crypto API，仅 H5 平台可用。密钥通过后端 API 动态获取（`initCrypto` + `fetchClientPrivateKey`），不再硬编码在 `.env` 中。
 
 ## 关键文件路径
 
@@ -83,6 +87,7 @@ spectra-app/
 | uni-app manifest | `spectra-app/src/manifest.json` |
 | 页面路由 | `spectra-app/src/pages.json` |
 | AGENTS.md | `spectra-app/AGENTS.md` |
+| 环境配置 | `spectra-app/src/config/env.ts` |
 | 加密工具 | `spectra-app/src/utils/crypto/crypto-utils.ts` |
 | HTTP 加密拦截 | `spectra-app/src/services/http.ts` |
 
