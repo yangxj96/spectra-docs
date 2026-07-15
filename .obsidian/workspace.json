@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/HOME.md",
+                "file": "docs/10-后端/90-API总览.md",
                 "mode": "source",
                 "source": false
               },
-              "icon": "lucide-home",
-              "title": "Spectra 知识库"
+              "icon": "lucide-file",
+              "title": "90-API总览"
             }
           }
         ]
@@ -88,8 +88,7 @@
               "title": "文件列表"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -129,12 +128,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "docs/MOC-后端.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "大纲"
+              "title": "MOC-后端 的大纲"
             }
           },
           {
@@ -185,7 +185,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 280
+    "width": 280,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -200,9 +201,12 @@
   },
   "active": "home-leaf",
   "lastOpenFiles": [
-    "docs/HOME.md",
-    "docs/00-项目总览.md",
     "docs/MOC-后端.md",
+    "docs/HOME.md",
+    "docs/40-开发指南/10-环境搭建.md",
+    "docs/40-开发指南/20-常见命令.md",
+    "docs/00-项目总览.md",
+    "docs/10-后端/70-AI模块.md",
     "docs/20-前端/00-前端总览.md",
     "docs/10-后端/90-API总览.md",
     "docs/10-后端/85-接口加解密方案.md",
