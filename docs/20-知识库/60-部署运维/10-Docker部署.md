@@ -1,14 +1,14 @@
 ---
 tags:
-  - guide
   - devops
   - docker
+  - deployment
 source: https://www.devops00.com/spectra-admin/ (Docker 部分)
 ---
 
 # Docker 部署
 
-> 来源：[[00-项目总览|项目 VitePress 文档]] + `spectra-admin/document/deploy/`
+> Docker 构建与部署配置。
 
 ## 验证码与字体
 
@@ -58,15 +58,8 @@ GitHub Actions 工作流：`.github/workflows/spectra-minimal-image.yml`
 - 手动触发（`workflow_dispatch`）
 - 构建 Maven 项目 → 创建 Docker 镜像 → 推送到 GHCR
 
-## 部署配置文件
+## 相关
 
-| 文件 | 路径 | 说明 |
-|---|---|---|
-| Docker Compose | `spectra-admin/document/deploy/spectra-admin.yml` | 容器编排配置 |
-| Nginx 配置 | `spectra-admin/document/deploy/spectra.conf` | 反向代理配置 |
-
-## 相关笔记
-
-- [[10-环境搭建]] — 本地开发环境
-- [[52-SSL证书配置]] — SSL 证书
-- [[80-基础设施]] — 基础设施配置
+- [[20-Nginx配置]] — Nginx 反向代理
+- [[30-DockerCompose]] — 容器编排
+- [[40-SSL证书配置]] — SSL 证书

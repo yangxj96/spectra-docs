@@ -8,7 +8,7 @@ source: https://www.devops00.com/spectra-admin/be-ssl-scripts
 
 # SSL 证书配置
 
-> 来源：[[00-项目总览|项目 VitePress 文档]] + `spectra-admin/document/scripts/ssl/`
+> 本地开发 HTTPS 证书生成与管理。
 
 ## 步骤概述
 
@@ -60,7 +60,7 @@ if ($Cert) {
 openssl genrsa -out localhost.key 2048
 
 # SAN 配置（支持 localhost + 127.0.0.1）
-# 见 document/scripts/ssl/generate-cert.ps1
+# 见 20-知识库/40-开发指南/20-脚本工具.md
 
 # 签发证书
 openssl x509 -req -in localhost.csr \
@@ -83,16 +83,16 @@ SSL_TYPE=PKCS12
 SSL_ALIAS=tomcat
 ```
 
-## 关键文件
+## 脚本清单
 
-| 文件 | 路径 |
-|---|---|
-| 生成 CA 脚本 | `spectra-admin/document/scripts/ssl/install-ca.ps1` |
-| 卸载 CA 脚本 | `spectra-admin/document/scripts/ssl/uninstall-ca.ps1` |
-| 生成 SSL 脚本 | `spectra-admin/document/scripts/ssl/generate-cert.ps1` |
+| 脚本 | 用途 | 权限 |
+|---|---|---|
+| `install-ca.ps1` | 安装 CA 到系统信任库 | 管理员 |
+| `uninstall-ca.ps1` | 从系统卸载 CA | 管理员 |
+| `generate-cert.ps1` | 生成 localhost SSL 证书 | 普通用户 |
 
-## 相关笔记
+## 相关
 
+- [[20-脚本工具]] — 脚本详细说明
 - [[80-基础设施]] — 全局基础设施配置
 - [[10-环境搭建]] — 开发环境初始化
-- [[82-数据库连接池]] — 数据库连接配置

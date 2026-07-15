@@ -20,34 +20,72 @@ tags:
 
 [[MOC-后端]]
 
-- [[10-架构分层]] — Maven 多模块架构设计
-- [[20-用户与权限]] — Account / User / Role / Authority / Permission
-- [[30-系统管理]] — Department / Region / Dict / Menu / Config / Log
-- [[85-接口加解密方案]] — RSA + AES-GCM 接口数据加密
-- [[90-API总览]] — 全部 REST API 端点速查表
+| 文档 | 说明 |
+|---|---|
+| [[10-架构分层]] | Maven 多模块架构设计 |
+| [[15-spectra-core模块]] | 核心模块详情（用户/权限/系统管理） |
+| [[20-用户与权限]] | Account / User / Role / Authority / Permission |
+| [[25-数据权限设计]] | @DataScope 二维数据权限过滤 |
+| [[30-系统管理]] | Department / Region / Dict / Menu / Config / Log |
+| [[35-OA模块]] | OA 办公模块（9 个子模块） |
+| [[40-文件上传]] | 分片上传 / 本地存储 / S3 |
+| [[45-工作流模块]] | Flowable 流程引擎 |
+| [[50-AI模块]] | LangChain4j + RAG |
+| [[55-接口加解密方案]] | RSA + AES-GCM 接口数据加密 |
+| [[60-基础设施]] | Redis / PostgreSQL / MyBatis-Plus / Cache / Security |
+| [[90-API总览]] | 全部 REST API 端点速查 |
 
 ## 前端开发
 
-[[20-前端/00-前端总览]]
-
-- [[10-spectra-ui]] — Web 管理后台（Vue 3 + Element Plus）
-- [[20-spectra-app]] — 移动端 / 小程序（Vue 3 + uni-app）
+| 文档 | 说明 |
+|---|---|
+| [[10-spectra-ui]] | Web 管理后台（Vue 3 + Element Plus） |
+| [[20-spectra-app]] | 移动端 / 小程序（Vue 3 + uni-app） |
+| [[30-流程建模插件]] | LogicFlow BPMN 2.0 插件 |
 
 ## 数据模型
 
-- [[10-ER图]] — 实体关系总览
-- [[20-实体清单]] — 25 个 Entity 完整字段字典
-- [[30-数据库随笔]] — PostgreSQL 实用备忘（UUID v7 / pg_dump）
+| 文档 | 说明 |
+|---|---|
+| [[10-ER图]] | 实体关系总览 |
+| [[20-实体清单]] | 25 个 Entity 完整字段字典 |
+| [[30-OA建表SQL]] | OA 模块建表语句 |
+| [[30-数据库随笔]] | PostgreSQL 实用备忘（UUID v7 / pg_dump） |
+
+## 开发指南
+
+| 文档 | 说明 |
+|---|---|
+| [[10-环境搭建]] | JDK / Node / pnpm / 数据库 |
+| [[15-常用命令]] | Maven / npm 常用命令速查 |
+| [[20-脚本工具]] | toml2env / SSL 脚本 |
 
 ## 规范与参考
 
 | 文档 | 说明 |
 |---|---|
 | [[10-Git提交规范]] | Conventional Commits 完整规范 |
+| [[15-后端开发规范]] | Controller / Service 分层、VO 响应、方法命名 |
 | [[20-前端命名规范]] | kebab-case / PascalCase 命名约定 |
 | [[30-MapStruct命名规范]] | Converter 命名与方法约定 |
 | [[40-数据库命名规范]] | 表 / 字段 / 索引命名规范 |
 | [[50-Redis使用规范]] | Key 设计 / TTL / 缓存策略 |
+| [[60-行政区域编码]] | 省级行政代码参考表 |
+
+## 部署运维
+
+| 文档 | 说明 |
+|---|---|
+| [[10-Docker部署]] | Docker 构建与部署 |
+| [[20-Nginx配置]] | Nginx 反向代理配置 |
+| [[30-DockerCompose]] | 容器编排配置 |
+| [[40-SSL证书配置]] | 本地开发 SSL 证书 |
+
+## 执行计划
+
+| 子项目 | 计划 | 状态 |
+|---|---|---|
+| logicflow-flowable | [[30-计划/logicflow-flowable/P-子流程标准化修复计划]] | ✅ 已完成 |
 
 ## 按任务查找
 
@@ -56,6 +94,25 @@ tags:
 | 新增后端接口 | [[90-API总览]] → [[10-架构分层]] |
 | 新增前端页面 | [[10-spectra-ui]] → [[20-前端命名规范]] |
 | 修改数据库 | [[10-ER图]] → [[20-实体清单]] → [[40-数据库命名规范]] |
-| 配置加解密 | [[85-接口加解密方案]] |
-| 部署上线 | [[12-Docker部署]] |
-| AI 集成 | [[70-AI模块]] |
+| 配置加解密 | [[55-接口加解密方案]] |
+| 部署上线 | [[10-Docker部署]] → [[20-Nginx配置]] → [[30-DockerCompose]] |
+| AI 集成 | [[50-AI模块]] |
+
+## 外部文档
+
+- [VitePress 文档站](https://www.devops00.com/spectra-admin/) — 项目官方文档
+
+---
+
+## AI Agent 参考
+
+> 以下为 AI Agent 专用的结构化速查数据，用于快速建立项目上下文。
+
+| 文档 | 用途 |
+|---|---|
+| [[10-知识图谱/01-架构概览]] | 系统架构、技术栈、端口 |
+| [[10-知识图谱/02-模块清单]] | 所有模块职责 |
+| [[10-知识图谱/03-实体字典]] | 25 个 Entity 字段速查 |
+| [[10-知识图谱/04-API端点]] | 30 个 Controller 端点 |
+| [[10-知识图谱/05-配置清单]] | 环境变量、配置项 |
+| [[10-知识图谱/06-依赖版本]] | 关键依赖版本号 |
