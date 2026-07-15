@@ -1,12 +1,11 @@
 {
-  "mcp": {
-    "servers": {
-      "postgres": {
-        "command": "npx",
-        "args": ["-y", "@yawlabs/postgres-mcp"],
-        "env": {
-          "POSTGRES_CONNECTION_STRING": "postgresql://ai:QuVsKppcWvwwX2Vv@127.0.0.1:5432/devops00_spectra_db"
-        }
+  "$schema": "https://opencode.ai/config.json",
+  "mcpServers": {
+    "postgres": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@yawlabs/postgres-mcp@latest"],
+      "env": {
+        "DATABASE_URL": "postgresql://ai:QuVsKppcWvwwX2Vv@127.0.0.1:5432/devops00_spectra_db"
       }
     }
   }
