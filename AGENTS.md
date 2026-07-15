@@ -176,6 +176,12 @@ DB_PASSWORD="QuVsKppcWvwwX2Vv"
 3. **禁止 `git add -A`**：必须使用 `git add <具体文件>`，逐一手动确认
 4. 使用 `git diff --cached --name-only` 确认暂存文件清单无误
 
+### GPG 签名
+
+- **绝对禁止**在 `git commit` 命令中使用 `--no-gpg-sign` 参数
+- 所有提交必须经过 GPG 签名，依赖全局配置 `commit.gpgsign=true` 自动生效
+- 如遇签名失败，排查 GPG 密钥配置，而非跳过签名
+
 ### 推送限制
 
 - **绝对禁止**在未经用户明确允许的情况下执行 `git push`
