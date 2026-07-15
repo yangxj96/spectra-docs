@@ -10,7 +10,7 @@
 	path = spectra-app
 	url = git@github.com:yangxj96/spectra-app.git
 	branch = master
-[submodule "logicflow-flowable"]
-	path = logicflow-flowable
-	url = git@github.com:yangxj96/logicflow-flowable.git
+[submodule "logicflow-plugin-flowable"]
+	path = logicflow-plugin-flowable
+	url = git@github.com:yangxj96/logicflow-plugin-flowable.git
 	branch = master

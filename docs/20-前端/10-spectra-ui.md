@@ -85,9 +85,9 @@ spectra-ui/
 
 ### 本地插件
 
-- **@yangxj96/logicflow-flowable** — BPMN 2.0 流程建模插件
-  - 引用方式：`file:../logicflow-flowable`（本地开发）
-  - 版本：0.0.4-dev
+- **@yangxj96/logicflow-plugin-flowable** — BPMN 2.0 流程建模插件
+  - 引用方式：`file:../logicflow-plugin-flowable`（本地开发）
+  - 版本：0.0.5
   - 用途：工作流流程设计、BPMN XML 导入/导出
   - 文档：[[30-流程建模插件]]
 
@@ -96,7 +96,7 @@ spectra-ui/
 ```vue
 <script setup>
 import LogicFlow from '@logicflow/core';
-import Flowable from '@yangxj96/logicflow-flowable';
+import Flowable from '@yangxj96/logicflow-plugin-flowable';
 
 const lf = new LogicFlow({ container: graphEl });
 lf.use(Flowable.Plugin, {

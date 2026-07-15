@@ -85,7 +85,7 @@ tags:
 
 | 子项目 | 计划 | 状态 |
 |---|---|---|
-| logicflow-flowable | [[98-计划/logicflow-flowable/P-子流程标准化修复计划]] | ✅ 已完成 |
+| logicflow-plugin-flowable | [[98-计划/logicflow-plugin-flowable/P-子流程标准化修复计划]] | ✅ 已完成 |
 
 ## 按任务查找
 
