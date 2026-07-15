@@ -81,6 +81,39 @@ spectra-ui/
 - `arrowParens: avoid`
 - `bracketSameLine: true`
 
+## 第三方依赖
+
+### 本地插件
+
+- **@yangxj96/logicflow-flowable** — BPMN 2.0 流程建模插件
+  - 引用方式：`file:../logicflow-flowable`（本地开发）
+  - 版本：0.0.4-dev
+  - 用途：工作流流程设计、BPMN XML 导入/导出
+  - 文档：[[30-流程建模插件]]
+
+### 使用方式
+
+```vue
+<script setup>
+import LogicFlow from '@logicflow/core';
+import Flowable from '@yangxj96/logicflow-flowable';
+
+const lf = new LogicFlow({ container: graphEl });
+lf.use(Flowable.Plugin, {
+    panel: {
+        dnd: dndPanelEl,
+        property: propertyPanelEl
+    }
+});
+
+// 导出 BPMN XML
+const xml = Flowable.toBpmnXml(lf);
+
+// 导入 BPMN XML
+const result = Flowable.fromBpmnXml(xmlString, lf);
+</script>
+```
+
 ## 与后端连接
 
 开发环境通过 `.env.development` 中的 `VITE_API_URL` 指向 `spectra-admin` 的 `https://127.0.0.1:4004/`。
@@ -111,6 +144,7 @@ spectra-ui/
 
 - [[00-项目总览]]
 - [[20-spectra-app]]
+- [[30-流程建模插件]]
 - [[10-环境搭建]]
 - [[20-常见命令]]
 - [[85-接口加解密方案]]
