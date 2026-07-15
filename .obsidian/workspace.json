@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "1907297945f38d52",
+        "id": "85392546604ba7d0",
         "type": "tabs",
         "children": [
           {
-            "id": "home-leaf",
+            "id": "a16a5a29c871ffe3",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/10-后端/90-API总览.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "90-API总览"
+              "title": "新标签页"
             }
           }
         ]
@@ -88,12 +84,12 @@
               "title": "文件列表"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
-    "width": 482.5,
-    "collapsed": true
+    "width": 414.5
   },
   "right": {
     "id": "60bfdc7268de73d7",
@@ -199,8 +195,15 @@
       "bases:新建数据库": false
     }
   },
-  "active": "home-leaf",
+  "active": "a16a5a29c871ffe3",
   "lastOpenFiles": [
+    "docs/20-知识库/50-规范与参考/40-数据库命名规范.md",
+    "docs/30-数据模型/30-数据库随笔.md",
+    "docs/20-知识库/30-数据模型/34-行政区划数据.dump",
+    "docs/20-知识库/30-数据模型/31-OA建表SQL.md",
+    "docs/20-知识库/30-数据模型/32-RAG建表SQL.md",
+    "docs/20-知识库/30-数据模型/30-核心建表SQL.md",
+    "docs/10-后端/90-API总览.md",
     "docs/MOC-后端.md",
     "docs/HOME.md",
     "docs/40-开发指南/10-环境搭建.md",
@@ -208,7 +211,6 @@
     "docs/00-项目总览.md",
     "docs/10-后端/70-AI模块.md",
     "docs/20-前端/00-前端总览.md",
-    "docs/10-后端/90-API总览.md",
     "docs/10-后端/85-接口加解密方案.md",
     "docs/10-后端/10-架构分层.md",
     "docs/30-数据模型/10-ER图.md",
