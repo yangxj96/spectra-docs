@@ -23,17 +23,17 @@ tags:
 | 认证安全 | [[20-用户与权限]] | Account / User / Role / Authority / Permission |
 | 数据权限 | [[25-数据权限设计]] | @DataScope 二维数据过滤 |
 | 系统管理 | [[30-系统管理]] | Department / Region / Dict / Menu / Config / Log |
-| OA 办公 | [[35-OA模块]] | 资产 / 考勤 / 日历 / 通讯录 / 合同 / 文档 / 会议 / 公告 / 报表 |
+| OA 办公 | [[40-OA模块]] | 资产 / 考勤 / 日历 / 通讯录 / 合同 / 文档 / 会议 / 公告 / 报表 |
 | 文件上传 | [[40-文件上传]] | 分片上传、本地存储、S3 |
-| 工作流 | [[45-工作流模块]] | Flowable 流程引擎集成 |
-| AI | [[50-AI模块]] | LangChain4j + RAG 检索增强生成 |
+| 工作流 | [[60-工作流]] | Flowable 流程引擎集成 |
+| AI | [[70-AI模块]] | LangChain4j + RAG 检索增强生成 |
 
 ## 基础设施
 
 | 文档 | 说明 |
 |---|---|
-| [[60-基础设施]] | Redis / Jackson / MyBatis-Plus / Cache / Security |
-| [[55-接口加解密方案]] | RSA + AES-GCM 接口数据加密（含密钥管理） |
+| [[80-基础设施]] | Redis / Jackson / MyBatis-Plus / Cache / Security |
+| [[85-接口加解密方案]] | RSA + AES-GCM 接口数据加密（含密钥管理） |
 | [[40-SSL证书配置]] | 本地开发 SSL 证书生成 |
 
 ## API
@@ -62,4 +62,4 @@ tags:
 ## 相关
 
 - [[HOME]] — 知识库首页
-- [[10-知识图谱/00-MOC-知识图谱]] — AI 速查知识图谱
+- [[50-知识图谱/00-MOC-知识图谱]] — AI 速查知识图谱
