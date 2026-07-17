@@ -131,6 +131,14 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 | 加解密 store | `spectra-ui/src/plugin/store/modules/use-crypto-store.ts` |
 | 加解密 API | `spectra-ui/src/api/system/crypto.ts` |
 | HTTP 加密拦截 | `spectra-ui/src/plugin/request/http.ts` |
+| 工作流 API | `spectra-ui/src/api/workflow/workflow-api.ts` |
+| 表单 API | `spectra-ui/src/api/workflow/form-api.ts` |
+| 工作流页面 | `spectra-ui/src/views/System/Workflow/index.vue` |
+| 表单列表 | `spectra-ui/src/views/System/Workflow/components/FormList/index.vue` |
+| 表单设计器 | `spectra-ui/src/views/System/Workflow/components/FormDesigner/index.vue` |
+| 表单预览 | `spectra-ui/src/views/System/Workflow/components/FormPreview/index.vue` |
+| 流程列表 | `spectra-ui/src/views/System/Workflow/components/WorkflowList/index.vue` |
+| 流程设计器 | `spectra-ui/src/views/System/Workflow/components/WorkflowDesigner/index.vue` |
 
 ## 加解密说明
 
