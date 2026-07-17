@@ -66,9 +66,10 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
+| `FormDefinitionController` | spectra-workflow | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
 | `ModelController` | spectra-workflow | `/workflow/model/**` | 流程模型 CRUD + 部署 |
-| `ProcessDefinitionController` | spectra-workflow | `/workflow/definition/**` | 流程定义查询/挂起/激活 |
-| `ProcessInstanceController` | spectra-workflow | `/workflow/instance/**` | 流程实例启动/查询/终止 |
+| `ProcessDefinitionController` | spectra-workflow | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
+| `ProcessInstanceController` | spectra-workflow | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
 | `TaskController` | spectra-workflow | `/workflow/task/**` | 待办/已办/签收/完成/转办 |
 | `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时状态查询 |
 | `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史记录查询 |
