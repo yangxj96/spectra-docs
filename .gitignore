@@ -106,3 +106,4 @@ docker-volumes/
 .opencode/logs/
 .opencode/cache/
 .codegraph/
+graphify-out/
