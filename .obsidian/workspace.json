@@ -11,10 +11,14 @@
             "id": "a16a5a29c871ffe3",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "docs/30-数据模型/10-ER图.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "10-ER图"
             }
           }
         ]
@@ -195,10 +199,16 @@
       "bases:新建数据库": false
     }
   },
-  "active": "a16a5a29c871ffe3",
+  "active": "7948c0cac8597504",
   "lastOpenFiles": [
-    "docs/20-知识库/50-规范与参考/40-数据库命名规范.md",
+    "docs/30-数据模型/20-实体清单.md",
     "docs/30-数据模型/30-数据库随笔.md",
+    "docs/98-计划/spectra-admin/P-工作流模块完整实现计划.md",
+    "docs/98-计划/logicflow-plugin-flowable/P-LogicFlow插件完善计划.md",
+    "docs/98-计划/logicflow-plugin-flowable/P-子流程标准化修复计划.md",
+    "docs/98-计划/spectra-admin/P-Workflow审批流完善计划.md",
+    "docs/98-计划/spectra-admin/P-OA模块对标分析与开发计划.md",
+    "docs/20-知识库/50-规范与参考/40-数据库命名规范.md",
     "docs/20-知识库/30-数据模型/34-行政区划数据.dump",
     "docs/20-知识库/30-数据模型/31-OA建表SQL.md",
     "docs/20-知识库/30-数据模型/32-RAG建表SQL.md",
