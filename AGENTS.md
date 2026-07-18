@@ -162,40 +162,7 @@ DB_PASSWORD="QuVsKppcWvwwX2Vv"
 
 ## Git 约定
 
-所有项目使用 Conventional Commits：`type(scope): 中文描述`
-- 后端 scope：`ai`、`security`、`core`、`framework`、`log`、`project`
-
-## Git 提交安全规则（每次提交必须执行）
-
-### 提交前强制检查清单
-
-1. 执行 `git diff --stat` 和 `git diff --cached`，逐文件审查所有变更
-2. 确认暂存区**不包含**以下敏感内容：
-   - `.env`、`.mise.local.toml` 等含真实凭据的配置文件
-   - 包含 `$env:... = "真实值"` 或 `export ...="真实值"` 的脚本（`.ps1`、`.sh`）
-   - 证书私钥文件（`*.p12`、`*.jks`、`*.pem`、`*.key`）
-   - 任何包含密码/Token/API Key 的文件
-3. **禁止 `git add -A`**：必须使用 `git add <具体文件>`，逐一手动确认
-4. 使用 `git diff --cached --name-only` 确认暂存文件清单无误
-
-### GPG 签名
-
-- **绝对禁止**在 `git commit` 命令中使用 `--no-gpg-sign` 参数
-- 所有提交必须经过 GPG 签名，依赖全局配置 `commit.gpgsign=true` 自动生效
-- 如遇签名失败，排查 GPG 密钥配置，而非跳过签名
-
-### 推送限制
-
-- **绝对禁止**在未经用户明确允许的情况下执行 `git push`
-- 即使用户说了"提交"，也只执行 `git commit`，不执行 `git push`
-- 推送需要用户明确说出"推送"或"push"指令后才可执行
-
-### 泄露后应急流程
-
-如已误提交推送：
-1. 立即轮换所有暴露的密钥/密码/Token
-2. `git rebase` 清理历史
-3. `git push --force`（需用户确认）
+Git 提交规范详见：`spectra/git-execution-spec` Skill（执行 git 命令时自动加载）。
 
 ## CodeGraph
 
