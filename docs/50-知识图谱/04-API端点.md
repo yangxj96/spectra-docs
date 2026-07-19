@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 30 个 Controller 端点速查表。
+> 32 个 Controller 端点速查表。
 
 ## 认证与安全
 
@@ -41,6 +41,12 @@ tags:
 | ServiceMonitorController | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
 | CryptoController | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 
+## 消息中心
+
+| Controller | 路径 | 说明 |
+|---|---|---|
+| NotificationController | `/notification/**` | 消息列表/未读数/已读/删除/发送 |
+
 ## OA 模块
 
 | Controller | 路径 | 说明 |
@@ -67,12 +73,11 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | FormDefinitionController | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
-| ModelController | `/workflow/model/**` | 流程模型 CRUD + 部署 |
 | ProcessDefinitionController | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | ProcessInstanceController | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
-| TaskController | `/workflow/task/**` | 待办/已办/签收/完成/转办 |
-| RuntimeController | `/workflow/runtime/**` | 运行时状态查询 |
-| HistoryController | `/workflow/history/**` | 历史记录查询 |
+| TaskController | `/workflow/tasks/**` | 待办/已办/签收/完成/转办/委派 |
+| RuntimeController | `/workflow/runtime/**` | 运行时状态查询（待实现） |
+| HistoryController | `/workflow/history/**` | 历史记录查询（待实现） |
 
 ## AI
 

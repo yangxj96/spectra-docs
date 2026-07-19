@@ -21,6 +21,7 @@ spectra-admin/spectra-modules/spectra-core/
     ├── auth/           ← 认证（Account）
     ├── user/           ← 用户/角色/权限
     ├── system/         ← 部门/菜单/字典/区域/配置/日志
+    ├── notification/   ← 消息中心（通知/设置）
     ├── controller/     ← REST 端点
     ├── service/        ← 业务逻辑
     │   └── impl/
@@ -63,6 +64,16 @@ spectra-admin/spectra-modules/spectra-core/
 - 系统任务调度
 - 审批任务
 
+### 消息中心
+
+- 消息列表查询（分页、按类型/已读状态/关键词筛选）
+- 未读消息数统计
+- 消息已读/全部已读标记
+- 消息删除/批量删除
+- 消息发送（内部调用，支持单条和批量）
+- 用户通知设置管理（系统/工作流/OA/站内信/审批通知开关）
+- 免打扰模式（时间段控制）
+
 ### 通知消息
 
 - 系统通知
@@ -101,6 +112,8 @@ spectra-core ← 被以下模块依赖
 | Configured | sys_configured | 系统配置 |
 | SysConfig | sys_config | 系统参数 |
 | OperationLog | sys_operation_log | 操作日志 |
+| Notification | sys_notification | 系统通知消息 |
+| NotificationSetting | sys_notification_setting | 用户通知设置 |
 
 ## API 端点
 
@@ -117,6 +130,7 @@ spectra-core ← 被以下模块依赖
 | ServiceMonitorController | `/monitor/**` | 服务器监控 |
 | CryptoController | `/system/crypto/**` | 加解密配置 |
 | CommonController | `/common/**` | 公共接口 |
+| NotificationController | `/notification/**` | 消息列表/未读数/已读/删除/发送 |
 
 ## 相关
 
