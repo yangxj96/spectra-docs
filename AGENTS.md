@@ -165,19 +165,19 @@ DB_PASSWORD="QuVsKppcWvwwX2Vv"
 
 Git 提交规范详见：`spectra/git-execution-spec` Skill（执行 git 命令时自动加载）。
 
-## CodeGraph
+## CodeGraph（源码级查询——日常开发首选）
 
-根目录有 `.codegraph/` 索引，覆盖全部三个子项目。系统提示已包含 CodeGraph 使用说明，此处不再重复。
+根目录有 `.codegraph/` 索引，覆盖全部三个子项目。
 
-## graphify
+- 查函数定义、调用链、blast radius 等源码级问题，使用 `codegraph_explore`
+- 数据实时同步（文件保存后 ~1s），零维护成本
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+## graphify（架构级查询——补充工具）
 
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+`graphify-out/` 是基于知识图谱的架构全景视图，含 god nodes、社区检测、跨模块关联。**仅用于架构全景类问题**（模块间关系、社区结构、高层依赖），日常源码级问题请走 CodeGraph。
 
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+用法：
+- `/graphify` 触发完整构建管线，使用内置 graphify skill
+- `graphify query "<问题>"` / `graphify path "<A>" "<B>"` / `graphify explain "<概念>"` 对已有图谱进行查询
+- `graphify-out/GRAPH_REPORT.md` 仅用于宏观架构审查
+- 修改代码后执行 `graphify update .` 保持图谱更新（仅 AST，无 API 费用）

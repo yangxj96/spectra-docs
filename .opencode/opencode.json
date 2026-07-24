@@ -1,6 +1,32 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    ".opencode/plugins/graphify.js"
-  ]
+  "plugin": [],
+  "mcp": {
+    "postgres": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://ai:QuVsKppcWvwwX2Vv@127.0.0.1:5432/devops00_spectra_db"
+      ]
+    },
+    "redis": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-redis",
+        "redis://:123456@127.0.0.1:6379/4"
+      ]
+    },
+    "context7": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    }
+  }
 }
