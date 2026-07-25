@@ -993,6 +993,8 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 
 开发环境通过 `.env.development` 中的 `VITE_API_URL` 指向 `spectra-admin` 的 `https://127.0.0.1:4004/`。
 
+> **环境变量命名约定**：spectra-ui 使用 `VITE_API_URL`（带尾部 `/`），spectra-app 使用 `VITE_API_BASE_URL`（无尾部 `/`）。这是两个项目的既定约定，不强制统一（Vite SPA 和 uni-app 的 base URL 处理逻辑不同）。
+
 ## 关键文件路径
 
 | 文件 | 路径 |
@@ -1025,6 +1027,8 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 - 应用启动：`initCrypto()` → `GET /api/system/crypto/config` → 获取 `enabled` + `serverPublicKey`
 - 登录成功：`fetchClientPrivateKey()` → `GET /api/system/keypair/client-private` → 获取 `clientPrivateKey`
 - 状态存储在 `use-crypto-store`，`enabled` + `serverPublicKey` 持久化，`clientPrivateKey` 仅内存
+
+> ⚠️ **技术债务**：`utils/crypto/` 下的 `aes-utils.ts`、`rsa-utils.ts`、`crypto-utils.ts` 与 spectra-app 中完全重复。未来应抽取为共享包 `@spectra/crypto`。
 
 ## 相关笔记
 
