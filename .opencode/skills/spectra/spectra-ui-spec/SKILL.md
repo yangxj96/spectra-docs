@@ -175,3 +175,8 @@ src/components/DictSelect/index.vue
 - 测试规范：`docs/20-前端/10-spectra-ui.md` 第 9 节
 - 路由规范：`docs/20-前端/10-spectra-ui.md` 第 10 节
 - Commit 规范：`docs/20-前端/10-spectra-ui.md` 第 11 节
+
+## 收尾：文档同步（必做）
+
+编码完成后，按 AGENTS.md「文档同步规则」检查是否需要更新文档。
+如有更新，与代码变更一起提交（同一 commit 或紧跟的 docs commit）。
