@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。共 30 个 Controller。
+> spectra-admin 全部 REST API 控制器速查表。共 35 个 Controller。
 
 ## 认证与安全
 

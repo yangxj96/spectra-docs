@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 32 个 Controller 端点速查表。
+> 35 个 Controller 端点速查表。
 
 ## 认证与安全
 
