@@ -897,6 +897,7 @@ src/views/
 │           ├── FormDesigner/
 │           ├── FormList/
 │           ├── FormPreview/
+│           ├── pickers/          # 流程设计器选择弹框（Form/User/Group/JavaClass/Process）
 │           ├── WorkflowDesigner/
 │           └── WorkflowList/
 └── Example/                # 示例页
@@ -961,8 +962,8 @@ refactor(ui): 重构 HTTP 客户端
 ### 本地插件
 
 - **@yangxj96/logicflow-plugin-flowable** — BPMN 2.0 流程建模插件
-  - 引用方式：`file:../logicflow-plugin-flowable`（本地开发）
-  - 版本：0.0.5
+  - 引用方式：`file:../logicflow-plugin-flowable`（本地开发），`vite.config.mts` 中配置 alias 指向插件 `src/` 源码（HMR 直连）
+  - 版本：0.1.0
   - 用途：工作流流程设计、BPMN XML 导入/导出
   - 文档：[[30-流程建模插件]]
 
@@ -973,12 +974,24 @@ refactor(ui): 重构 HTTP 客户端
 import LogicFlow from '@logicflow/core';
 import Flowable from '@yangxj96/logicflow-plugin-flowable';
 
-const lf = new LogicFlow({ container: graphEl });
-lf.use(Flowable.Plugin, {
-    panel: {
-        dnd: dndPanelEl,
-        property: propertyPanelEl
+const lf = new LogicFlow({
+    container: graphEl,
+    plugins: [Flowable.Plugin],
+    pluginsOptions: {
+        flowable: {
+            panel: {
+                dnd: dndPanelEl,
+                property: propertyPanelEl
+            },
+            // 声明已实现的选择器，未列出的字段降级为手动输入
+            pickers: ['form', 'user', 'group', 'javaClass', 'process']
+        }
     }
+});
+
+// 监听选择器事件，按类型弹出对应弹框，选择后 resolve 回填
+lf.on('property:picker', payload => {
+    // payload.pickerType / payload.multiple / payload.resolve(value, label)
 });
 
 // 导出 BPMN XML
@@ -1019,6 +1032,7 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 | 表单预览 | `spectra-ui/src/views/System/Workflow/components/FormPreview/index.vue` |
 | 流程列表 | `spectra-ui/src/views/System/Workflow/components/WorkflowList/index.vue` |
 | 流程设计器 | `spectra-ui/src/views/System/Workflow/components/WorkflowDesigner/index.vue` |
+| 选择弹框目录 | `spectra-ui/src/views/System/Workflow/components/pickers/` |
 
 ## 加解密说明
 
