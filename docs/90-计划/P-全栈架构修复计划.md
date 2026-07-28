@@ -639,4 +639,4 @@ cd spectra-app && pnpm run type-check && pnpm run lint
 - [[10-spectra-ui]] — Web 前端详情
 - [[20-spectra-app]] — 移动端详情
 - [[15-后端开发规范]] — 后端编码规范
-- [[98-计划/spectra-ui/P-前端规范性修复计划]] — 前端规范修复（Props/Emits/目录命名）
+- [[90-计划/spectra-ui/P-前端规范性修复计划]] — 前端规范修复（Props/Emits/目录命名）

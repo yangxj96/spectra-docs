@@ -281,5 +281,5 @@ const rules = [
 
 - [[30-流程建模插件]] — LogicFlow插件文档
 - [[60-工作流]] — Flowable工作流模块文档
-- [[98-计划/spectra-admin/P-Workflow审批流完善计划]] — Workflow审批流完善计划
-- [[98-计划/spectra-admin/P-工作流模块完整实现计划]] — 工作流模块完整实现计划（总控计划，本计划阶段一将被整合）
+- [[90-计划/spectra-admin/P-Workflow审批流完善计划]] — Workflow审批流完善计划
+- [[90-计划/spectra-admin/P-工作流模块完整实现计划]] — 工作流模块完整实现计划（总控计划，本计划阶段一将被整合）
