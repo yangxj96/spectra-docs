@@ -854,17 +854,23 @@ export default [
 ] as Array<RouteRecordRaw>;
 ```
 
-### 动态菜单路由
+### 静态路由与授权菜单
 
-业务菜单由后端接口动态加载（`@/utils/route-utils.ts`），不手动配置在 `routes.ts` 中。
+- 页面路由在 `src/plugin/router/modules/` 中按 `common/system/monitor/oa/example` 静态定义，由 `routes.ts` 聚合。
+- 登录后调用 `GET /menu/current` 获取当前用户授权导航树，不再根据数据库组件路径动态注册路由。
+- `MenuApi` 在 API 边界将后端 `menu_type/route_name` 递归归一化为前端 `menuType/routeName`，内部菜单工具统一使用 camelCase。
+- 可见页面通过 `meta.requiredMenu` 绑定数据库 `routeName`；详情和编辑页用 `activeMenu` 继承所属菜单权限和高亮。
+- 一级授权节点显示在顶部导航，后代由递归 `MenuItem` 显示在侧栏，支持任意层级。
+- 未授权的已定义路由进入 `/401`，未定义地址由 catch-all 路由进入 `/404`。
 
 ### 路由守卫逻辑
 
 1. **白名单**（如 `/login`）直接放行
 2. **无 token** 跳转登录页
 3. **有 token 但访问登录页** 重定向到主页
-4. **菜单未加载** 验证 token 并加载菜单
-5. **路由未匹配** 跳转 404
+4. **菜单未加载** 验证 token 并加载当前用户授权树
+5. **菜单权限不足** 以 replace 方式跳转 401
+6. **路由未匹配** 由 catch-all 路由跳转 404
 
 ### 页面组件组织
 
@@ -1025,6 +1031,9 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 | 全局类型 | `spectra-ui/types/http.d.ts` |
 | 分页类型 | `spectra-ui/types/paging.d.ts` |
 | 工作流 API | `spectra-ui/src/api/workflow/workflow-api.ts` |
+| 静态路由模块 | `spectra-ui/src/plugin/router/modules/` |
+| 菜单树工具 | `spectra-ui/src/utils/menu-utils.ts` |
+| 递归侧栏菜单 | `spectra-ui/src/layouts/Default/components/Sidebar/MenuItem/index.vue` |
 | 表单 API | `spectra-ui/src/api/workflow/form-api.ts` |
 | 工作流页面 | `spectra-ui/src/views/System/Workflow/index.vue` |
 | 表单列表 | `spectra-ui/src/views/System/Workflow/components/FormList/index.vue` |

@@ -33,7 +33,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| MenuController | `/menu/**` | 菜单 CRUD / 树形查询 / 角色菜单 |
+| MenuController | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树（`GET /menu/current`） |
 | DepartmentController | `/department/**` | 部门 CRUD / 树形查询 |
 | RegionController | `/region/**` | 区域查询（省/市/区县） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |

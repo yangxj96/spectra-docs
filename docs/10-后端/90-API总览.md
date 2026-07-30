@@ -33,13 +33,15 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `MenuController` | spectra-core | `/menu/**` | 菜单 CRUD / 树形查询 / 角色菜单 |
+| `MenuController` | spectra-core | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树 |
 | `DepartmentController` | spectra-core | `/department/**` | 部门 CRUD / 树形查询 |
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
+
+菜单查询：`GET /menu/tree` 需要 `MENU:*` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。
 
 ## OA 模块
 

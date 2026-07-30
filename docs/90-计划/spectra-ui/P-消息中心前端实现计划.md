@@ -23,7 +23,7 @@ tags:
 2. 点击铃铛弹出右侧抽屉，显示最新消息列表
 3. 提供完整的消息中心页面，支持搜索、筛选、批量操作
 4. 消息类型可扩展，支持系统通知、工作流、OA、站内信、待我审批等
-5. 消息中心页面通过数据库菜单动态加载
+5. 消息中心页面通过前端静态认证路由加载，不写入数据库菜单
 
 ## 详细实现步骤
 
@@ -245,33 +245,18 @@ export const NotificationApi = {
 - 显示发送者、时间、类型
 - 提供跳转链接按钮
 
-### 阶段五：数据库菜单配置
+### 阶段五：静态路由配置
 
-#### 5.1 插入菜单数据
+#### 5.1 注册消息中心路由
 
-**操作**：在数据库menu表中插入消息中心菜单项
+**操作**：在前端认证路由中注册消息中心页面
 
-**SQL**：
-```sql
-INSERT INTO sys_menu (id, parent_id, path, name, component, icon, sort, visible, status, metadata)
-VALUES (
-  'notification-menu-id',
-  '0',  -- 顶级菜单
-  '/notification',
-  '消息中心',
-  'Notification/index',
-  'icon-notification',
-  10,
-  '0',  -- 显示
-  '0',  -- 启用
-  '{"title": "消息中心", "icon": "icon-notification"}'
-);
-```
+**文件**：
+- `src/plugin/router/modules/common.ts` — 在公共模块的认证路由中注册消息中心页面
 
 **注意**：
-- 需要根据实际表结构调整字段名
-- 需要确认icon是否存在，如不存在需要先添加图标
-- 菜单位置需要与产品确认
+- 消息中心由导航栏入口访问，不进入角色菜单权限树
+- 路由仍受登录认证守卫保护
 
 ## 验证方案
 
@@ -287,7 +272,7 @@ VALUES (
 
 ### 2. 消息中心页面验证
 
-- [ ] 页面正确加载（通过数据库菜单配置）
+- [ ] 页面通过前端静态认证路由正确加载
 - [ ] 搜索筛选功能正常
 - [ ] 批量选择和操作正常
 - [ ] 分页功能正常
@@ -324,17 +309,12 @@ pnpm run type-check  # 类型检查
 | `src/views/Notification/components/NotificationList/index.vue` | 消息列表组件 |
 | `src/views/Notification/components/NotificationDetail/index.vue` | 消息详情弹窗 |
 
-### 修改文件（1个）
+### 修改文件（2个）
 
 | 文件路径 | 修改内容 |
 |---|---|
 | `src/layouts/components/Navbar/index.vue` | 集成NotificationBell组件，调整布局 |
-
-### 数据库变更
-
-| 表 | 操作 |
-|---|---|
-| `sys_menu` | 插入消息中心菜单项 |
+| `src/plugin/router/modules/common.ts` | 注册消息中心静态认证路由 |
 
 ## 相关
 

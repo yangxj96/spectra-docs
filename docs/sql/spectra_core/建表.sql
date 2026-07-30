@@ -225,6 +225,9 @@ COMMENT ON COLUMN spectra_core.sys_rel_role_menu.updated_by IS '最后更新人'
 COMMENT ON COLUMN spectra_core.sys_rel_role_menu.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_core.sys_rel_role_menu.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.sys_rel_role_menu.version IS '乐观锁';
+CREATE UNIQUE INDEX uk_sys_rel_role_menu_active
+    ON spectra_core.sys_rel_role_menu (role_id, menu_id)
+    WHERE deleted IS NULL;
 
 -- 角色数据权限范围
 CREATE TABLE spectra_core.sys_role_data_scope (
@@ -359,40 +362,43 @@ COMMENT ON COLUMN spectra_core.sys_department.sort IS '排序,默认0';
 
 -- 菜单表
 CREATE TABLE spectra_core.sys_menu (
-    id         UUID PRIMARY KEY,
-    name       VARCHAR(100) NOT NULL,
-    pid        UUID,
-    icon       VARCHAR(100),
-    path       VARCHAR(255) NOT NULL,
-    component  VARCHAR(100) NOT NULL,
-    layout     VARCHAR(100),
-    sort       INTEGER DEFAULT 0,
-    hide       BOOLEAN DEFAULT FALSE,
-    metadata   JSONB DEFAULT '{}'::jsonb,
-    created_by UUID,
-    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by UUID,
-    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0
+    id          UUID PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    pid         UUID,
+    icon        VARCHAR(100),
+    menu_type   VARCHAR(16) NOT NULL,
+    route_name  VARCHAR(100),
+    sort        INTEGER NOT NULL DEFAULT 0,
+    created_by  UUID,
+    created_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by  UUID,
+    updated_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted     TIMESTAMP(6) WITH TIME ZONE,
+    version     BIGINT DEFAULT 0,
+    CONSTRAINT ck_sys_menu_type
+        CHECK (menu_type IN ('DIRECTORY', 'MENU')),
+    CONSTRAINT ck_sys_menu_route_binding
+        CHECK (deleted IS NOT NULL
+            OR (menu_type = 'DIRECTORY' AND route_name IS NULL)
+            OR (menu_type = 'MENU' AND route_name IS NOT NULL))
 );
 COMMENT ON TABLE spectra_core.sys_menu IS '菜单表';
 COMMENT ON COLUMN spectra_core.sys_menu.id IS '主键ID';
 COMMENT ON COLUMN spectra_core.sys_menu.name IS '名称';
 COMMENT ON COLUMN spectra_core.sys_menu.pid IS '父级ID';
 COMMENT ON COLUMN spectra_core.sys_menu.icon IS '图标';
-COMMENT ON COLUMN spectra_core.sys_menu.path IS '请求路径';
-COMMENT ON COLUMN spectra_core.sys_menu.component IS '组件路径,为空则使用布局组件';
-COMMENT ON COLUMN spectra_core.sys_menu.layout IS '布局';
+COMMENT ON COLUMN spectra_core.sys_menu.menu_type IS '菜单类型：DIRECTORY-目录，MENU-可点击菜单';
+COMMENT ON COLUMN spectra_core.sys_menu.route_name IS '对应 Vue Router 的唯一命名路由';
 COMMENT ON COLUMN spectra_core.sys_menu.sort IS '排序';
-COMMENT ON COLUMN spectra_core.sys_menu.hide IS '是否显示再菜单(默认不显示)';
-COMMENT ON COLUMN spectra_core.sys_menu.metadata IS '元数据';
 COMMENT ON COLUMN spectra_core.sys_menu.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_menu.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_menu.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_core.sys_menu.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_core.sys_menu.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.sys_menu.version IS '乐观锁';
+CREATE UNIQUE INDEX uk_sys_menu_route_name_active
+    ON spectra_core.sys_menu (route_name)
+    WHERE deleted IS NULL AND route_name IS NOT NULL;
 
 -- 区域表
 CREATE TABLE spectra_core.sys_region (
