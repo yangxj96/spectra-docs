@@ -233,7 +233,7 @@ CREATE UNIQUE INDEX uk_sys_rel_role_menu_active
 CREATE TABLE spectra_core.sys_role_data_scope (
     id         UUID PRIMARY KEY,
     role_id    UUID NOT NULL,
-    scope      INTEGER,
+    scope_type INTEGER,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by UUID,
@@ -244,7 +244,7 @@ CREATE TABLE spectra_core.sys_role_data_scope (
 COMMENT ON TABLE spectra_core.sys_role_data_scope IS '角色数据权限范围';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope.id IS '主键ID';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope.role_id IS '角色ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.scope IS '数据权限范围';
+COMMENT ON COLUMN spectra_core.sys_role_data_scope.scope_type IS '数据权限范围';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope.updated_by IS '最后更新人';
@@ -255,8 +255,9 @@ COMMENT ON COLUMN spectra_core.sys_role_data_scope.version IS '乐观锁';
 -- 角色数据权限目标
 CREATE TABLE spectra_core.sys_role_data_scope_target (
     id         UUID PRIMARY KEY,
-    scope_id   UUID NOT NULL,
+    role_id     UUID NOT NULL,
     target_id  UUID NOT NULL,
+    target_type INTEGER,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by UUID,
@@ -266,8 +267,9 @@ CREATE TABLE spectra_core.sys_role_data_scope_target (
 );
 COMMENT ON TABLE spectra_core.sys_role_data_scope_target IS '角色数据权限目标';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.scope_id IS '权限范围ID';
+COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.role_id IS '角色ID';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.target_id IS '目标ID';
+COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.target_type IS '目标类型';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.updated_by IS '最后更新人';
@@ -279,7 +281,7 @@ COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.version IS '乐观锁'
 CREATE TABLE spectra_core.sys_user_data_scope (
     id         UUID PRIMARY KEY,
     user_id    UUID NOT NULL,
-    scope      INTEGER,
+    scope_type INTEGER,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by UUID,
@@ -290,7 +292,7 @@ CREATE TABLE spectra_core.sys_user_data_scope (
 COMMENT ON TABLE spectra_core.sys_user_data_scope IS '用户数据权限范围';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope.id IS '主键ID';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope.user_id IS '用户ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.scope IS '数据权限范围';
+COMMENT ON COLUMN spectra_core.sys_user_data_scope.scope_type IS '数据权限范围';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope.updated_by IS '最后更新人';
@@ -301,8 +303,9 @@ COMMENT ON COLUMN spectra_core.sys_user_data_scope.version IS '乐观锁';
 -- 用户数据权限目标
 CREATE TABLE spectra_core.sys_user_data_scope_target (
     id         UUID PRIMARY KEY,
-    scope_id   UUID NOT NULL,
+    user_id     UUID NOT NULL,
     target_id  UUID NOT NULL,
+    target_type INTEGER,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by UUID,
@@ -312,8 +315,9 @@ CREATE TABLE spectra_core.sys_user_data_scope_target (
 );
 COMMENT ON TABLE spectra_core.sys_user_data_scope_target IS '用户数据权限目标';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.scope_id IS '权限范围ID';
+COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.user_id IS '用户ID';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.target_id IS '目标ID';
+COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.target_type IS '目标类型';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.updated_by IS '最后更新人';
