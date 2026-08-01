@@ -25,7 +25,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `UserController` | spectra-core | `/user/**` | 用户 CRUD / 分页查询 / 状态管理 |
+| `UserController` | spectra-core | `/user/**` | 用户 CRUD / 分页查询 / 角色覆盖 / 状态管理 |
 | `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 分配权限 / 分配菜单 |
 | `AuthorityController` | spectra-core | `/authority/**` | 权限 CRUD / 树形查询 |
 
@@ -41,7 +41,9 @@ tags:
 | `ServiceMonitorController` | spectra-core | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 
-菜单查询：`GET /menu/tree` 需要 `MENU:*` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。
+菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。权限树 `GET /authority/tree` 需要 `AUTHORITY:QUERY`，权限树写操作仅限 `ROLE_DEV_OPS`。
+
+用户角色覆盖：`PUT /user/{uid}/roles`，请求体需包含 `user_id` 与 `role_ids`，使用 `USER:UPDATE` 权限，并在服务层校验目标角色均为有效角色后执行全量替换。
 
 ## OA 模块
 

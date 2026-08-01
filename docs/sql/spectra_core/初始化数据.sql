@@ -72,17 +72,7 @@ INSERT INTO spectra_core.sys_authority (id, pid, name, code, created_at, updated
 INSERT INTO spectra_core.sys_rel_role_authority (id, role_id, authority_id, created_at, updated_at) VALUES
 ('019bdfb6-fd8e-7823-ba61-5727e999b7ca', '019bdfad-ded6-731e-b27f-c4e7ca7b0d9d', '019bdf8f-6542-7b9b-8fc7-2eae5b1a4c94', NOW(), NOW());
 
--- 系统管理员：拥有所有权限
-INSERT INTO spectra_core.sys_rel_role_authority (id, role_id, authority_id, created_at, updated_at) VALUES
-('019bdfef-b0fb-7e21-a7c6-d218c51fa808', '019bdfad-df4b-7c16-9f95-a68f9a38a51b', '019bdf8f-6542-7b9b-8fc7-2eae5b1a4c94', NOW(), NOW());
-
--- 审计员：拥有所有权限
-INSERT INTO spectra_core.sys_rel_role_authority (id, role_id, authority_id, created_at, updated_at) VALUES
-('019bdff0-134d-7ace-b8db-e5ce5f306084', '019bdfad-df4f-7110-b2ce-9eecc82bf46b', '019bdf8f-6542-7b9b-8fc7-2eae5b1a4c94', NOW(), NOW());
-
--- 用户角色：拥有用户管理权限
-INSERT INTO spectra_core.sys_rel_role_authority (id, role_id, authority_id, created_at, updated_at) VALUES
-('019da4a2-9f47-75ec-aa7a-356c47e9a978', '019bdfad-df4d-7133-b6db-199c0e86b72b', '019bdf8f-6566-7223-87cd-87dbcc2326cb', NOW(), NOW());
+-- 其余角色的叶子权限和角色菜单由 `权限树与角色基线.sql` 幂等初始化，禁止使用顶级 * 或 MODULE:* 代替动作权限。
 
 -- ============================================
 -- 用户

@@ -25,7 +25,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| UserController | `/user/**` | 用户 CRUD / 分页查询 / 状态管理 |
+| UserController | `/user/**` | 用户 CRUD / 分页查询 / 角色覆盖 / 状态管理 |
 | RoleController | `/role/**` | 角色 CRUD / 分配权限 / 分配菜单 |
 | AuthorityController | `/authority/**` | 权限 CRUD / 树形查询 |
 
