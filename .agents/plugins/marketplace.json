@@ -1,0 +1,20 @@
+{
+  "name": "spectra-project",
+  "interface": {
+    "displayName": "Spectra Project"
+  },
+  "plugins": [
+    {
+      "name": "spectra",
+      "source": {
+        "source": "local",
+        "path": "./plugins/spectra"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -31,7 +31,7 @@
 1. 读取 `docs/00-项目总览.md` ← 全局概览
 2. 读取 `docs/40-规范/15-后端开发规范.md` ← 后端编码规范（后端任务必读）
 3. 读取任务相关的模块笔记 ← 领域知识
-4. 使用 `codegraph_explore` 查询具体代码 ← 实现细节
+4. 使用 CodeGraph MCP（或 `codegraph` CLI）查询具体代码 ← 实现细节
 5. 三者结合形成完整上下文后再开始编码
 
 ## 知识图谱维护
@@ -161,31 +161,33 @@ pnpm run dev                              # 开发监听模式（自动重新构
 | 数据库类型 | PostgreSQL 18 |
 | 地址 | `127.0.0.1` |
 | 用户名 | `ai` |
-| 密码 | `QuVsKppcWvwwX2Vv` |
+| 密码 | 使用本机 `.mise.local.toml` 中的本地值 |
 
 对应 `.mise.local.toml` 配置：
 ```toml
 DB_URL="jdbc:postgresql://127.0.0.1:5432/devops00_spectra_db"
 DB_USERNAME="ai"
-DB_PASSWORD="QuVsKppcWvwwX2Vv"
+DB_PASSWORD="<填写本机 .mise.local.toml 中的值>"
 ```
 
 ## 代码规范
 
-编码规范由 skills 控制，不再在 AGENTS.md 中内联：
+编码规范由 Codex 插件 `spectra` 内的 skills 控制，不再在 AGENTS.md 中内联。插件安装后在 Codex Skills 列表中显示为 `spectra:<skill-name>`，显式触发时可使用 `$<skill-name>`。
 
-- **后端**：`spectra/spectra-admin-spec` — 修改 spectra-admin 代码时自动加载
-- **前端**：`spectra/spectra-ui-spec` — 修改 spectra-ui/spectra-app 代码时自动加载
+- **后端**：`spectra:spectra-admin-spec`（显式 `$spectra-admin-spec`）— 修改 spectra-admin 代码时自动加载
+- **Web 前端**：`spectra:spectra-ui-spec`（显式 `$spectra-ui-spec`）— 修改 spectra-ui 代码时自动加载
+- **移动端**：`spectra:spectra-app-spec`（显式 `$spectra-app-spec`）— 修改 spectra-app 代码时自动加载
 
 ## Git 约定
 
-Git 提交规范详见：`spectra/git-execution-spec` Skill（执行 git 命令时自动加载）。
+Git 提交规范详见 Codex skill：`spectra:git-execution-spec`（显式 `$git-execution-spec`，执行 git 命令时自动加载）。
 
 ## CodeGraph（源码级查询——日常开发首选）
 
 根目录有 `.codegraph/` 索引，覆盖全部三个子项目。
 
-- 查函数定义、调用链、blast radius 等源码级问题，使用 `codegraph_explore`
+- Codex 插件 `spectra` 已配置 CodeGraph MCP：`codegraph serve --mcp`
+- 查函数定义、调用链、blast radius 等源码级问题，优先使用 CodeGraph MCP 暴露的查询工具；若当前任务尚未加载该插件/MCP，可退回 `codegraph` CLI
 - 数据实时同步（文件保存后 ~1s），零维护成本
 
 ## graphify（架构级查询——补充工具）
@@ -193,7 +195,7 @@ Git 提交规范详见：`spectra/git-execution-spec` Skill（执行 git 命令�
 `graphify-out/` 是基于知识图谱的架构全景视图，含 god nodes、社区检测、跨模块关联。**仅用于架构全景类问题**（模块间关系、社区结构、高层依赖），日常源码级问题请走 CodeGraph。
 
 用法：
-- `/graphify` 触发完整构建管线，使用内置 graphify skill
+- 显式触发 Codex 插件 skill `$graphify`，再执行完整构建管线
 - `graphify query "<问题>"` / `graphify path "<A>" "<B>"` / `graphify explain "<概念>"` 对已有图谱进行查询
 - `graphify-out/GRAPH_REPORT.md` 仅用于宏观架构审查
 - 修改代码后执行 `graphify update .` 保持图谱更新（仅 AST，无 API 费用）

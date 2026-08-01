@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spectra Git 执行规范"
+  short_description: "安全执行 Spectra 仓库的 Git 操作与规范化提交"
+  default_prompt: "使用 $git-execution-spec 检查并安全执行本次 Git 操作。"

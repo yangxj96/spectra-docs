@@ -15,8 +15,9 @@ spectra-docs/
 │   ├── 30-数据模型/   ← ER 图 / 25个实体清单
 │   ├── 40-开发指南/   ← 环境搭建 / 常用命令
 │   └── 99-模板/
-├── .opencode/        ← opencode AI Agent 技能定义
-│   └── skills/       ← 22 个专业技能（详见下方）
+├── plugins/spectra/  ← Codex 项目插件（规范、graphify 与 CodeGraph MCP）
+│   └── skills/       ← Spectra 专用 Codex skills
+├── .codex/config.toml ← 项目级 Codex MCP 配置
 ├── AGENTS.md         ← 根级 Agent 指令
 ├── spectra-admin/    → git submodule → spectra-admin (Spring Boot 4 + Java 25)
 ├── spectra-ui/       → git submodule → spectra-ui (Vue 3 + Element Plus + Vite 8)
@@ -39,7 +40,7 @@ git submodule update --remote
 
 ## CodeGraph 代码索引
 
-本项目使用 [CodeGraph](https://opencode.ai) 为代码库建立结构索引，通过 MCP 协议提供代码智能查询，AI Agent 可通过索引快速理解代码架构。
+本项目使用 CodeGraph 为代码库建立结构索引，通过 MCP 协议提供代码智能查询，Codex 可通过索引快速理解代码架构。
 
 ### 初始化索引
 
@@ -69,7 +70,7 @@ codegraph init
 
 ## MCP 服务器
 
-本项目通过 opencode 的 MCP（Model Context Protocol）协议集成以下工具：
+本项目通过 Codex 的 MCP（Model Context Protocol）协议集成以下工具：
 
 | MCP Server | 工具 | 用途 |
 |---|---|---|
@@ -77,57 +78,15 @@ codegraph init
 
 ## 项目技能（Skills）
 
-`.opencode/skills/` 目录定义了 22 个专业技能，指导 AI Agent 在不同场景下的行为：
+`plugins/spectra/skills/` 目录定义了项目专用 Codex skills：
 
-### 开发流程
-
-| 技能 | 场景 |
+| Skill | 用途 |
 |---|---|
-| `brainstorming` | 创建功能/组件前，先探索需求和设计 |
-| `writing-plans` | 多步骤任务，在写代码前制定计划 |
-| `executing-plans` | 按书面计划逐步执行，含审查检查点 |
-| `subagent-driven-development` | 分解独立任务到并行子 Agent |
-| `dispatching-parallel-agents` | 2 个以上独立任务并行执行 |
-| `finishing-a-development-branch` | 开发完成后，提供合并/PR/清理选项 |
-
-### 质量保证
-
-| 技能 | 场景 |
-|---|---|
-| `test-driven-development` | 红-绿-重构，先写测试再写实现 |
-| `verification-before-completion` | 宣称完成前必须运行验证命令 |
-| `systematic-debugging` | 遇到 bug 或异常，先诊断再修复 |
-| `requesting-code-review` | 任务完成后验证工作成果 |
-| `receiving-code-review` | 收到审查反馈后，技术验证再实施 |
-
-### 中文本地化
-
-| 技能 | 场景 |
-|---|---|
-| `chinese-code-review` | 中文 review 话术模板和分级标注 |
-| `chinese-commit-conventions` | Conventional Commits 中文适配 |
-| `chinese-documentation` | 中文排版参考（中英文空格/全半角标点） |
-| `chinese-git-workflow` | 国内 Git 平台（Gitee/Coding/GitLab）配置 |
-
-### Obsidian 集成
-
-| 技能 | 用途 |
-|---|---|
-| `obsidian-markdown` | 创建和编辑 Obsidian 风味 Markdown（wikilink/callout/属性） |
-| `obsidian-cli` | 通过命令行操作 Obsidian vault（搜索/笔记/插件开发） |
-| `json-canvas` | 创建和编辑 Canvas 可视化画布 |
-| `obsidian-bases` | 创建和编辑 Obsidian Bases（数据库视图/筛选/公式） |
-| `defuddle` | 从网页提取纯净 Markdown 内容 |
-
-### 工具与扩展
-
-| 技能 | 场景 |
-|---|---|
-| `using-superpowers` | 确立技能查找和使用方式 |
-| `using-git-worktrees` | 创建隔离工作区进行功能开发 |
-| `mcp-builder` | 系统化构建 MCP 工具 |
-| `workflow-runner` | 运行 agency-orchestrator YAML 工作流 |
-| `writing-skills` | 创建/编辑/验证技能定义 |
+| `spectra-admin-spec` | 后端 Java 分层、命名、事务、权限和数据规范 |
+| `spectra-ui-spec` | Web Vue/TypeScript 架构、类型、组件和测试规范 |
+| `spectra-app-spec` | 移动端 uni-app 跨平台、接口和类型规范 |
+| `git-execution-spec` | Git 安全检查、提交规范和推送规则 |
+| `graphify` | 架构级图谱构建、查询、路径和社区分析 |
 
 ## 用途
 
@@ -135,7 +94,7 @@ codegraph init
 - **CodeGraph 索引** — AI Agent 查询代码结构，比 grep 更快更准
 - **跨会话记忆** — AI Agent 开发时读取笔记 + CodeGraph 索引建立上下文，修改代码后更新笔记
 - **团队共享** — Markdown 文件可直接在 GitHub 上浏览，也可用 Obsidian 离线查看
-- **技能驱动开发** — 22 个专业 AI 技能覆盖从头脑风暴到代码审查的完整流程
+- **技能驱动开发** — Codex 插件提供项目规范、Git 安全和架构图谱能力
 
 ## 维护方式
 
@@ -155,4 +114,4 @@ codegraph init
 | 工作流 | Flowable |
 | 代码索引 | CodeGraph (MCP) |
 | 知识管理 | Obsidian |
-| AI Agent | opencode + 22 skills |
+| AI Agent | Codex + Spectra plugin skills |

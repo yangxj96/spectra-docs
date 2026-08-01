@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "D:\\Develop\\Platform\\mise\\data\\installs\\node\\24.14.0\\codegraph.ps1",
+        "serve",
+        "--mcp"
+      ],
+      "cwd": "D:\\Develop\\Projects\\spectra"
+    }
+  }
+}

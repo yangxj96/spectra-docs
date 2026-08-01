@@ -100,10 +100,7 @@ docker-volumes/
 *.7z
 
 # =================================================
-# opencode / CodeGraph
+# CodeGraph
 # =================================================
-.opencode/node_modules/
-.opencode/logs/
-.opencode/cache/
 .codegraph/
 graphify-out/

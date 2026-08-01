@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spectra 移动端规范"
+  short_description: "遵循 Spectra 移动端跨平台、类型与接口规范"
+  default_prompt: "使用 $spectra-app-spec 按项目规范实现或审查移动端代码。"

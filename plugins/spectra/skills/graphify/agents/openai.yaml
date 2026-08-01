@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spectra 架构图谱"
+  short_description: "使用 graphify 构建和查询 Spectra 架构知识图谱"
+  default_prompt: "使用 $graphify 分析 Spectra 的模块关系、社区结构和高层依赖。"

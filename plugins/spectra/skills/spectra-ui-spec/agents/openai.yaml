@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spectra Web 规范"
+  short_description: "遵循 Spectra Web 前端架构、类型与测试规范"
+  default_prompt: "使用 $spectra-ui-spec 按项目规范实现或审查 Web 前端代码。"
