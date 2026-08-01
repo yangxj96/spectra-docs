@@ -1,3 +1,4 @@
+model_verbosity = "medium"
 [mcp_servers.codegraph]
 enabled = true
 command = 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
