@@ -10,7 +10,11 @@ tags:
 
 ## OA P0 页面
 
-现有 `src/views/Dashboard/index.vue` 继续作为统一 OA 工作台，不新增 `/oa/workbench` 页面；通过 `GET /api/oa/workbench/summary` 替换首页待办/未读消息的静态数据。请假页面位于 `/oa/leave`，支持草稿创建、分页、提交和审批中撤回，对应 `src/api/oa/leave-api.ts`。
+现有 `src/views/Dashboard/index.vue` 继续作为统一 OA 工作台，不新增 `/oa/workbench` 页面；通过 `GET /api/oa/workbench/summary` 接入待办、申请、公告、今日日程和会议摘要。`/oa/notice` 支持发布/撤回/已读，`/oa/calendar` 支持日程创建和删除，`/oa/meeting` 支持会议创建、邀请响应和签到。
+
+## OA P1 页面
+
+费用报销页面为 `src/views/OA/Reimbursement/index.vue`，路由为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销草稿、明细、附件、审批和付款接口。凭证上传复用 `FileUpload`，上传响应中的 `file_id` 写入申请附件关联。
 
 ## 技术栈
 

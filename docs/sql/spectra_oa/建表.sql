@@ -454,6 +454,113 @@ VALUES
      '通用 OA 请假审批', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
 ON CONFLICT (code) DO NOTHING;
 
+-- P0-P1 协同办公 MVP：公告、日程、会议的增量结构。
+ALTER TABLE spectra_oa.oa_notice
+    ADD COLUMN IF NOT EXISTS title VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS summary VARCHAR(1000),
+    ADD COLUMN IF NOT EXISTS content TEXT,
+    ADD COLUMN IF NOT EXISTS status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    ADD COLUMN IF NOT EXISTS target_type VARCHAR(32) NOT NULL DEFAULT 'ALL',
+    ADD COLUMN IF NOT EXISTS target_department_id UUID,
+    ADD COLUMN IF NOT EXISTS publisher_id UUID,
+    ADD COLUMN IF NOT EXISTS publish_at TIMESTAMP(6) WITH TIME ZONE,
+    ADD COLUMN IF NOT EXISTS required_read BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_notice_reader (
+    id         UUID PRIMARY KEY,
+    notice_id  UUID NOT NULL,
+    user_id    UUID NOT NULL,
+    read_at    TIMESTAMP(6) WITH TIME ZONE,
+    created_by UUID,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by UUID,
+    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted    TIMESTAMP(6) WITH TIME ZONE,
+    version    BIGINT DEFAULT 0,
+    CONSTRAINT uk_oa_notice_reader UNIQUE (notice_id, user_id)
+);
+
+ALTER TABLE spectra_oa.oa_calendar
+    ADD COLUMN IF NOT EXISTS owner_id UUID,
+    ADD COLUMN IF NOT EXISTS title VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS content TEXT,
+    ADD COLUMN IF NOT EXISTS start_time TIMESTAMP(6) WITH TIME ZONE,
+    ADD COLUMN IF NOT EXISTS end_time TIMESTAMP(6) WITH TIME ZONE,
+    ADD COLUMN IF NOT EXISTS all_day BOOLEAN NOT NULL DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS event_type VARCHAR(32) NOT NULL DEFAULT 'PERSONAL',
+    ADD COLUMN IF NOT EXISTS visibility VARCHAR(32) NOT NULL DEFAULT 'PRIVATE',
+    ADD COLUMN IF NOT EXISTS location VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS participant_ids TEXT,
+    ADD COLUMN IF NOT EXISTS source_type VARCHAR(32),
+    ADD COLUMN IF NOT EXISTS source_id UUID;
+
+CREATE INDEX IF NOT EXISTS idx_oa_calendar_owner_time
+    ON spectra_oa.oa_calendar (owner_id, start_time, end_time);
+
+CREATE INDEX IF NOT EXISTS idx_oa_notice_publish_scope
+    ON spectra_oa.oa_notice (status, target_type, target_department_id, publish_at);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_oa_meeting_participant_user
+    ON spectra_oa.oa_meeting_participant (meeting_id, user_id)
+    WHERE deleted IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_oa_meeting_location_time
+    ON spectra_oa.oa_meeting (location, start_time, end_time);
+
+-- P1 阶段 3：费用报销 MVP，审批状态复用 oa_application，付款状态独立维护。
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_reimbursement (
+    id              UUID PRIMARY KEY,
+    application_id  UUID NOT NULL UNIQUE,
+    department_id   UUID,
+    purpose         VARCHAR(2000) NOT NULL,
+    expense_start   DATE NOT NULL,
+    expense_end     DATE NOT NULL,
+    total_amount    NUMERIC(14, 2) NOT NULL,
+    currency        VARCHAR(3) NOT NULL DEFAULT 'CNY',
+    payee_name      VARCHAR(128) NOT NULL,
+    payee_account   VARCHAR(256),
+    payment_status  VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    payment_at      TIMESTAMP(6) WITH TIME ZONE,
+    payment_remark  VARCHAR(1000),
+    created_by      UUID,
+    created_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by      UUID,
+    updated_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted         TIMESTAMP(6) WITH TIME ZONE,
+    version         BIGINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_reimbursement_item (
+    id              UUID PRIMARY KEY,
+    reimbursement_id UUID NOT NULL,
+    department_id   UUID,
+    expense_date    DATE NOT NULL,
+    category        VARCHAR(64) NOT NULL,
+    description     VARCHAR(500) NOT NULL,
+    amount          NUMERIC(14, 2) NOT NULL,
+    tax_amount      NUMERIC(14, 2) NOT NULL DEFAULT 0,
+    invoice_no      VARCHAR(128),
+    created_by      UUID,
+    created_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by      UUID,
+    updated_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted         TIMESTAMP(6) WITH TIME ZONE,
+    version         BIGINT DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_oa_reimbursement_department_status
+    ON spectra_oa.oa_reimbursement (department_id, payment_status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_oa_reimbursement_item_reimbursement
+    ON spectra_oa.oa_reimbursement_item (reimbursement_id, expense_date);
+
+INSERT INTO spectra_oa.oa_application_type
+    (id, code, name, process_definition_key, enabled, sort_order, description,
+     created_at, updated_at, version)
+VALUES
+    ('00000000-0000-0000-0000-000000000002', 'reimbursement', '费用报销', 'oa_reimbursement_approval', TRUE, 20,
+     'P1 费用报销审批', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+ON CONFLICT (code) DO NOTHING;
+
 INSERT INTO spectra_oa.oa_leave_type
     (id, code, name, unit, default_hours, enabled, created_at, updated_at, version)
 VALUES

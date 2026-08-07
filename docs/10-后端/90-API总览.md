@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。共 38 个 Controller。
+> spectra-admin 全部 REST API 控制器速查表。共 39 个 Controller。
 
 ## 认证与安全
 
@@ -51,15 +51,16 @@ tags:
 |---|---|---|---|
 | `AssetController` | spectra-oa | `/asset/**` | 资产管理 |
 | `AttendanceController` | spectra-oa | `/attendance/**` | 考勤管理 |
-| `CalendarController` | spectra-oa | `/calendar/**` | 日历事件 |
+| `CalendarController` | spectra-oa | `/calendar/**` | 日程查询、创建、更新、删除 |
 | `ContactController` | spectra-oa | `/contact/**` | 通讯录 |
 | `ContractController` | spectra-oa | `/contract/**` | 合同管理 |
 | `DocumentController` | spectra-oa | `/document/**` | 文档管理 |
-| `MeetingController` | spectra-oa | `/meeting/**` | 会议管理（含参会人、纪要） |
-| `NoticeController` | spectra-oa | `/notice/**` | 公告通知 |
+| `MeetingController` | spectra-oa | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
+| `NoticeController` | spectra-oa | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
 | `ReportController` | spectra-oa | `/report/**` | 报表管理 |
 | `ApplicationController` | spectra-oa | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
 | `LeaveController` | spectra-oa | `/oa/leave/**` | 请假草稿、提交、查询、撤回、取消 |
+| `ReimbursementController` | spectra-oa | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
 | `WorkbenchController` | spectra-oa | `/oa/workbench/summary` | OA 工作台摘要，复用 Dashboard |
 
 ## 文件上传

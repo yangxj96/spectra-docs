@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 38 个 Controller 端点速查表。
+> 39 个 Controller 端点速查表。
 
 ## 认证与安全
 
@@ -53,15 +53,16 @@ tags:
 |---|---|---|
 | AssetController | `/asset/**` | 资产管理 |
 | AttendanceController | `/attendance/**` | 考勤管理 |
-| CalendarController | `/calendar/**` | 日历事件 |
+| CalendarController | `/calendar/**` | 日程查询、创建、更新、删除 |
 | ContactController | `/contact/**` | 通讯录 |
 | ContractController | `/contract/**` | 合同管理 |
 | DocumentController | `/document/**` | 文档管理 |
-| MeetingController | `/meeting/**` | 会议管理（含参会人、纪要） |
-| NoticeController | `/notice/**` | 公告通知 |
+| MeetingController | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
+| NoticeController | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
 | ReportController | `/report/**` | 报表管理 |
 | ApplicationController | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
 | LeaveController | `/oa/leave/**` | 请假草稿、提交、审批状态查询、撤回、取消 |
+| ReimbursementController | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
 | WorkbenchController | `/oa/workbench/summary` | 复用 Dashboard 的 OA 工作台摘要 |
 
 ## 文件上传
