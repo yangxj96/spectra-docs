@@ -10,7 +10,7 @@ tags:
 
 ## OA P0 页面
 
-移动端复用既有 `pages/workbench/index.vue` 工作台，通过 `services/api/oa.ts` 加载待办、公告、日程和会议摘要；请假、报销、公告、日程、会议页面分别为 `pages/leave/index.vue`、`pages/reimbursement/index.vue`、`pages/notice/index.vue`、`pages/calendar/index.vue`、`pages/meeting/index.vue`，从工作台高频入口进入。报销页面支持草稿创建、费用明细、提交和撤回。
+移动端复用既有 `pages/workbench/index.vue` 工作台，通过 `services/api/oa.ts` 加载待办、公告、日程和会议摘要；请假、报销、采购、公告、日程、会议页面分别为 `pages/leave/index.vue`、`pages/reimbursement/index.vue`、`pages/purchase/index.vue`、`pages/notice/index.vue`、`pages/calendar/index.vue`、`pages/meeting/index.vue`，从工作台高频入口进入。报销页面支持草稿创建、费用明细、提交和撤回；采购页面支持草稿创建、明细、提交、撤回、执行登记和首项收货。
 
 ## 技术栈
 

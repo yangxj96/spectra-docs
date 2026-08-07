@@ -16,6 +16,8 @@ tags:
 
 费用报销页面为 `src/views/OA/Reimbursement/index.vue`，路由为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销草稿、明细、附件、审批和付款接口。凭证上传复用 `FileUpload`，上传响应中的 `file_id` 写入申请附件关联。
 
+采购申请页面为 `src/views/OA/Purchase/index.vue`，路由为 `/oa/purchase`，通过 `src/api/oa/purchase-api.ts` 对接采购草稿、明细、审批、执行登记和分批收货接口。
+
 ## 技术栈
 
 | 技术 | 版本 |

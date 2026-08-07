@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 39 个 Controller 端点速查表。
+> 40 个 Controller 端点速查表。
 
 ## 认证与安全
 
@@ -63,6 +63,7 @@ tags:
 | ApplicationController | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
 | LeaveController | `/oa/leave/**` | 请假草稿、提交、审批状态查询、撤回、取消 |
 | ReimbursementController | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
+| PurchaseController | `/oa/purchases/**` | 采购草稿、明细、提交、撤回、取消、执行登记和分批收货 |
 | WorkbenchController | `/oa/workbench/summary` | 复用 Dashboard 的 OA 工作台摘要 |
 
 ## 文件上传
