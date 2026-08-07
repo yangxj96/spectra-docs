@@ -60,7 +60,7 @@ tags:
 | DocumentController | `/document/**` | 文档管理 |
 | MeetingController | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | NoticeController | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
-| ReportController | `/report/**` | 报表管理 |
+| ReportController | `/oa/report/**` | 部门维度统计与 Excel 导出（`/department`、`/department/export`） |
 | ApplicationController | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
 | LeaveController | `/oa/leave/**` | 请假草稿、提交、审批状态查询、撤回、取消 |
 | ReimbursementController | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
