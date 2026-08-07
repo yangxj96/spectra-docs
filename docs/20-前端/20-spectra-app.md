@@ -8,6 +8,10 @@ tags:
 
 > 基于 Vue 3 + uni-app + Vite 5 的移动端和微信小程序应用。路径：`spectra-app/`。
 
+## OA P0 页面
+
+移动端复用既有 `pages/workbench/index.vue` 工作台，通过 `services/api/oa.ts` 加载待办数；请假申请查询页为 `pages/leave/index.vue`，从工作台的审批/请假入口进入。
+
 ## 技术栈
 
 | 技术 | 版本 |

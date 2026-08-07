@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。共 35 个 Controller。
+> spectra-admin 全部 REST API 控制器速查表。共 38 个 Controller。
 
 ## 认证与安全
 
@@ -58,6 +58,9 @@ tags:
 | `MeetingController` | spectra-oa | `/meeting/**` | 会议管理（含参会人、纪要） |
 | `NoticeController` | spectra-oa | `/notice/**` | 公告通知 |
 | `ReportController` | spectra-oa | `/report/**` | 报表管理 |
+| `ApplicationController` | spectra-oa | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
+| `LeaveController` | spectra-oa | `/oa/leave/**` | 请假草稿、提交、查询、撤回、取消 |
+| `WorkbenchController` | spectra-oa | `/oa/workbench/summary` | OA 工作台摘要，复用 Dashboard |
 
 ## 文件上传
 

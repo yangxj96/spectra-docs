@@ -8,6 +8,10 @@ tags:
 
 > 基于 Vue 3 + Element Plus + Vite 8 的 Web 管理后台。路径：`spectra-ui/`。
 
+## OA P0 页面
+
+现有 `src/views/Dashboard/index.vue` 继续作为统一 OA 工作台，不新增 `/oa/workbench` 页面；通过 `GET /api/oa/workbench/summary` 替换首页待办/未读消息的静态数据。请假页面位于 `/oa/leave`，支持草稿创建、分页、提交和审批中撤回，对应 `src/api/oa/leave-api.ts`。
+
 ## 技术栈
 
 | 技术 | 版本 |

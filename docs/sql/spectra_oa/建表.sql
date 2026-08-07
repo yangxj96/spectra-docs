@@ -1,6 +1,6 @@
 -- ============================================
 -- spectra_oa schema 建表语句
--- 共 11 张表
+-- 既有 OA 基础表 11 张 + 通用 OA P0 表 10 张
 -- ============================================
 
 CREATE SCHEMA IF NOT EXISTS spectra_oa;
@@ -259,3 +259,205 @@ COMMENT ON COLUMN spectra_oa.oa_report.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_oa.oa_report.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_oa.oa_report.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_oa.oa_report.version IS '乐观锁';
+
+-- ============================================================
+-- 通用 OA P0：统一申请内核
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_application_type (
+    id                     UUID PRIMARY KEY,
+    code                   VARCHAR(64) NOT NULL UNIQUE,
+    name                   VARCHAR(128) NOT NULL,
+    form_definition_id     UUID,
+    process_definition_key VARCHAR(128),
+    enabled                BOOLEAN NOT NULL DEFAULT TRUE,
+    sort_order             INTEGER NOT NULL DEFAULT 0,
+    description            VARCHAR(500),
+    created_by             UUID,
+    created_at             TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by             UUID,
+    updated_at             TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted                TIMESTAMP(6) WITH TIME ZONE,
+    version                BIGINT DEFAULT 0
+);
+COMMENT ON TABLE spectra_oa.oa_application_type IS 'OA 通用申请类型';
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_application (
+    id                   UUID PRIMARY KEY,
+    application_no       VARCHAR(64) NOT NULL UNIQUE,
+    type_code            VARCHAR(64) NOT NULL,
+    biz_id               UUID,
+    applicant_id         UUID NOT NULL,
+    department_id        UUID,
+    title                VARCHAR(255) NOT NULL,
+    status               VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    process_instance_id  VARCHAR(64),
+    submitted_at         TIMESTAMP(6) WITH TIME ZONE,
+    completed_at         TIMESTAMP(6) WITH TIME ZONE,
+    reject_reason        VARCHAR(1000),
+    created_by            UUID,
+    created_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by            UUID,
+    updated_at            TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted              TIMESTAMP(6) WITH TIME ZONE,
+    version              BIGINT DEFAULT 0
+);
+COMMENT ON TABLE spectra_oa.oa_application IS 'OA 通用申请主表';
+COMMENT ON COLUMN spectra_oa.oa_application.status IS 'DRAFT/IN_REVIEW/APPROVED/REJECTED/WITHDRAWN/CANCELLED';
+COMMENT ON COLUMN spectra_oa.oa_application.biz_id IS '类型业务明细ID';
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_application_attachment (
+    id             UUID PRIMARY KEY,
+    application_id UUID NOT NULL,
+    file_id        UUID NOT NULL,
+    file_name      VARCHAR(255),
+    created_by     UUID,
+    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by     UUID,
+    updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted        TIMESTAMP(6) WITH TIME ZONE,
+    version        BIGINT DEFAULT 0,
+    CONSTRAINT uk_oa_application_attachment UNIQUE (application_id, file_id)
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_application_cc (
+    id             UUID PRIMARY KEY,
+    application_id UUID NOT NULL,
+    user_id        UUID NOT NULL,
+    created_by     UUID,
+    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by     UUID,
+    updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted        TIMESTAMP(6) WITH TIME ZONE,
+    version        BIGINT DEFAULT 0,
+    CONSTRAINT uk_oa_application_cc UNIQUE (application_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_oa_application_applicant_status
+    ON spectra_oa.oa_application (applicant_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_oa_application_process_instance
+    ON spectra_oa.oa_application (process_instance_id);
+
+-- ============================================================
+-- 通用 OA P0：请假、固定班次与考勤回写
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_leave_type (
+    id            UUID PRIMARY KEY,
+    code          VARCHAR(64) NOT NULL UNIQUE,
+    name          VARCHAR(128) NOT NULL,
+    unit          VARCHAR(16) NOT NULL DEFAULT 'HOUR',
+    default_hours NUMERIC(12, 2),
+    enabled       BOOLEAN NOT NULL DEFAULT TRUE,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_leave_application (
+    id             UUID PRIMARY KEY,
+    application_id UUID NOT NULL UNIQUE,
+    department_id  UUID,
+    leave_type_code VARCHAR(64) NOT NULL,
+    start_time     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    end_time       TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    duration_hours NUMERIC(12, 2) NOT NULL,
+    reason         VARCHAR(2000) NOT NULL,
+    contact_address VARCHAR(500),
+    created_by     UUID,
+    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by     UUID,
+    updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted        TIMESTAMP(6) WITH TIME ZONE,
+    version        BIGINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_leave_balance (
+    id             UUID PRIMARY KEY,
+    user_id        UUID NOT NULL,
+    department_id  UUID,
+    leave_type_code VARCHAR(64) NOT NULL,
+    year           INTEGER NOT NULL,
+    total_hours    NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    used_hours     NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    reserved_hours NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    created_by     UUID,
+    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by     UUID,
+    updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted        TIMESTAMP(6) WITH TIME ZONE,
+    version        BIGINT DEFAULT 0,
+    CONSTRAINT uk_oa_leave_balance UNIQUE (user_id, leave_type_code, year)
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_work_shift (
+    id            UUID PRIMARY KEY,
+    name          VARCHAR(128) NOT NULL,
+    work_start    TIME NOT NULL DEFAULT '09:00',
+    lunch_start   TIME NOT NULL DEFAULT '12:00',
+    lunch_end     TIME NOT NULL DEFAULT '13:00',
+    work_end      TIME NOT NULL DEFAULT '18:00',
+    enabled       BOOLEAN NOT NULL DEFAULT TRUE,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_work_calendar (
+    id            UUID PRIMARY KEY,
+    calendar_date DATE NOT NULL UNIQUE,
+    is_workday    BOOLEAN NOT NULL DEFAULT TRUE,
+    shift_id      UUID,
+    remark        VARCHAR(255),
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS spectra_oa.oa_attendance_record (
+    id              UUID PRIMARY KEY,
+    application_id  UUID NOT NULL,
+    user_id         UUID NOT NULL,
+    attendance_date DATE NOT NULL,
+    status          VARCHAR(32) NOT NULL,
+    source          VARCHAR(32) NOT NULL,
+    department_id   UUID,
+    created_by      UUID,
+    created_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by      UUID,
+    updated_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted         TIMESTAMP(6) WITH TIME ZONE,
+    version         BIGINT DEFAULT 0,
+    CONSTRAINT uk_oa_attendance_record UNIQUE (application_id, attendance_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_oa_leave_application_time
+    ON spectra_oa.oa_leave_application (start_time, end_time);
+CREATE INDEX IF NOT EXISTS idx_oa_attendance_record_user_date
+    ON spectra_oa.oa_attendance_record (user_id, attendance_date);
+
+-- P0 最小内置配置：请假类型与流程定义 KEY 对齐，流程图由 Workflow 模块部署。
+INSERT INTO spectra_oa.oa_application_type
+    (id, code, name, process_definition_key, enabled, sort_order, description,
+     created_at, updated_at, version)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 'leave', '请假申请', 'oa_leave_approval', TRUE, 10,
+     '通用 OA 请假审批', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO spectra_oa.oa_leave_type
+    (id, code, name, unit, default_hours, enabled, created_at, updated_at, version)
+VALUES
+    ('00000000-0000-0000-0000-000000000011', 'annual', '年假', 'HOUR', 80, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
+    ('00000000-0000-0000-0000-000000000012', 'sick', '病假', 'HOUR', NULL, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
+    ('00000000-0000-0000-0000-000000000013', 'personal', '事假', 'HOUR', NULL, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+ON CONFLICT (code) DO NOTHING;
