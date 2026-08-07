@@ -113,6 +113,13 @@ COMMENT ON COLUMN spectra_oa.oa_contract.version IS '乐观锁';
 -- OA 文档
 CREATE TABLE spectra_oa.oa_document (
     id            UUID PRIMARY KEY,
+    folder_id     UUID,
+    title         VARCHAR(255) NOT NULL DEFAULT '',
+    summary       TEXT,
+    status        VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    visibility    VARCHAR(32) NOT NULL DEFAULT 'DEPARTMENT',
+    owner_id      UUID,
+    published_at  TIMESTAMP(6) WITH TIME ZONE,
     department_id UUID,
     created_by    UUID,
     created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
@@ -123,6 +130,13 @@ CREATE TABLE spectra_oa.oa_document (
 );
 COMMENT ON TABLE spectra_oa.oa_document IS '文档表';
 COMMENT ON COLUMN spectra_oa.oa_document.id IS '主键ID';
+COMMENT ON COLUMN spectra_oa.oa_document.folder_id IS '所属目录ID';
+COMMENT ON COLUMN spectra_oa.oa_document.title IS '文档标题';
+COMMENT ON COLUMN spectra_oa.oa_document.summary IS '文档摘要';
+COMMENT ON COLUMN spectra_oa.oa_document.status IS '文档状态（DRAFT/PUBLISHED）';
+COMMENT ON COLUMN spectra_oa.oa_document.visibility IS '可见范围（PUBLIC/DEPARTMENT/PRIVATE）';
+COMMENT ON COLUMN spectra_oa.oa_document.owner_id IS '文档所有者';
+COMMENT ON COLUMN spectra_oa.oa_document.published_at IS '发布时间';
 COMMENT ON COLUMN spectra_oa.oa_document.department_id IS '所属部门ID';
 COMMENT ON COLUMN spectra_oa.oa_document.created_by IS '创建人';
 COMMENT ON COLUMN spectra_oa.oa_document.created_at IS '创建时间';

@@ -47,6 +47,8 @@ tags:
 
 ## OA 模块
 
+`DocumentController` 已扩展为 `/oa/document/**`：文档分页/详情、目录、版本、发布以及受文档可见范围保护的预览/下载。
+
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `AssetController` | spectra-oa | `/oa/assets/**` | 资产台账、分类与生命周期 |

@@ -49,6 +49,8 @@ tags:
 
 ## OA 模块
 
+`DocumentController`：`/oa/document/**`，包含分页/详情、目录、版本、发布、预览和下载。
+
 | Controller | 路径 | 说明 |
 |---|---|---|
 | AssetController | `/oa/assets/**` | 资产台账、分类、生命周期和采购收货转草稿 |
