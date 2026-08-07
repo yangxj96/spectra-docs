@@ -51,6 +51,8 @@ tags:
 
 `DocumentController`：`/oa/document/**`，包含分页/详情、目录、版本、发布、预览和下载。
 
+`ContractController`：`/oa/contract/**`，包含台账、签署/生效/终止、文件版本、履约节点和受鉴权保护的文件访问。
+
 | Controller | 路径 | 说明 |
 |---|---|---|
 | AssetController | `/oa/assets/**` | 资产台账、分类、生命周期和采购收货转草稿 |
@@ -58,7 +60,7 @@ tags:
 | AttendanceController | `/attendance/**` | 考勤管理 |
 | CalendarController | `/calendar/**` | 日程查询、创建、更新、删除 |
 | ContactController | `/contact/**` | 通讯录 |
-| ContractController | `/contract/**` | 合同管理 |
+| ContractController | `/oa/contract/**` | 合同管理 |
 | DocumentController | `/document/**` | 文档管理 |
 | MeetingController | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | NoticeController | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |

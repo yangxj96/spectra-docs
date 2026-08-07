@@ -91,17 +91,47 @@ COMMENT ON COLUMN spectra_oa.oa_contact.version IS '乐观锁';
 
 -- OA 合同
 CREATE TABLE spectra_oa.oa_contract (
-    id            UUID PRIMARY KEY,
-    department_id UUID,
-    created_by    UUID,
-    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by    UUID,
-    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted       TIMESTAMP(6) WITH TIME ZONE,
-    version       BIGINT DEFAULT 0
+    id                   UUID PRIMARY KEY,
+    contract_no          VARCHAR(64) NOT NULL DEFAULT '',
+    title                VARCHAR(255) NOT NULL DEFAULT '',
+    contract_type        VARCHAR(64) NOT NULL DEFAULT 'OTHER',
+    counterparty_name    VARCHAR(255) NOT NULL DEFAULT '',
+    counterparty_contact VARCHAR(128),
+    owner_id             UUID,
+    amount               NUMERIC(18, 2) NOT NULL DEFAULT 0,
+    currency             VARCHAR(16) NOT NULL DEFAULT 'CNY',
+    start_date           DATE,
+    end_date             DATE,
+    status               VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    signing_status       VARCHAR(32) NOT NULL DEFAULT 'UNSIGNED',
+    signed_at            TIMESTAMP(6) WITH TIME ZONE,
+    visibility           VARCHAR(32) NOT NULL DEFAULT 'DEPARTMENT',
+    summary              TEXT,
+    department_id        UUID,
+    created_by           UUID,
+    created_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by           UUID,
+    updated_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted              TIMESTAMP(6) WITH TIME ZONE,
+    version              BIGINT DEFAULT 0
 );
 COMMENT ON TABLE spectra_oa.oa_contract IS '合同表';
 COMMENT ON COLUMN spectra_oa.oa_contract.id IS '主键ID';
+COMMENT ON COLUMN spectra_oa.oa_contract.contract_no IS '合同编号';
+COMMENT ON COLUMN spectra_oa.oa_contract.title IS '合同标题';
+COMMENT ON COLUMN spectra_oa.oa_contract.contract_type IS '合同类型';
+COMMENT ON COLUMN spectra_oa.oa_contract.counterparty_name IS '相对方名称';
+COMMENT ON COLUMN spectra_oa.oa_contract.counterparty_contact IS '相对方联系人';
+COMMENT ON COLUMN spectra_oa.oa_contract.owner_id IS '合同负责人';
+COMMENT ON COLUMN spectra_oa.oa_contract.amount IS '合同金额';
+COMMENT ON COLUMN spectra_oa.oa_contract.currency IS '币种';
+COMMENT ON COLUMN spectra_oa.oa_contract.start_date IS '生效日期';
+COMMENT ON COLUMN spectra_oa.oa_contract.end_date IS '到期日期';
+COMMENT ON COLUMN spectra_oa.oa_contract.status IS '合同状态（DRAFT/ACTIVE/EXPIRED/TERMINATED）';
+COMMENT ON COLUMN spectra_oa.oa_contract.signing_status IS '签署状态（UNSIGNED/SIGNED）';
+COMMENT ON COLUMN spectra_oa.oa_contract.signed_at IS '签署时间';
+COMMENT ON COLUMN spectra_oa.oa_contract.visibility IS '可见范围（PUBLIC/DEPARTMENT/PRIVATE）';
+COMMENT ON COLUMN spectra_oa.oa_contract.summary IS '合同摘要';
 COMMENT ON COLUMN spectra_oa.oa_contract.department_id IS '所属部门ID';
 COMMENT ON COLUMN spectra_oa.oa_contract.created_by IS '创建人';
 COMMENT ON COLUMN spectra_oa.oa_contract.created_at IS '创建时间';
@@ -109,6 +139,56 @@ COMMENT ON COLUMN spectra_oa.oa_contract.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_oa.oa_contract.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_oa.oa_contract.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_oa.oa_contract.version IS '乐观锁';
+
+CREATE TABLE spectra_oa.oa_contract_version (
+    id            UUID PRIMARY KEY,
+    contract_id   UUID NOT NULL,
+    version_no    INTEGER NOT NULL,
+    file_id       UUID NOT NULL,
+    file_name     VARCHAR(255),
+    file_size     BIGINT,
+    content_type  VARCHAR(128),
+    version_note  VARCHAR(500),
+    is_current    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT DEFAULT 0
+);
+COMMENT ON TABLE spectra_oa.oa_contract_version IS '合同文件版本表';
+
+CREATE TABLE spectra_oa.oa_contract_milestone (
+    id                UUID PRIMARY KEY,
+    contract_id       UUID NOT NULL,
+    name              VARCHAR(255) NOT NULL,
+    milestone_type    VARCHAR(64) NOT NULL DEFAULT 'OTHER',
+    due_date          DATE NOT NULL,
+    status            VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    assignee_id       UUID,
+    completed_at      TIMESTAMP(6) WITH TIME ZONE,
+    reminder_sent_at  TIMESTAMP(6) WITH TIME ZONE,
+    remark            VARCHAR(1000),
+    created_by        UUID,
+    created_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by        UUID,
+    updated_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted           TIMESTAMP(6) WITH TIME ZONE,
+    version           BIGINT DEFAULT 0
+);
+COMMENT ON TABLE spectra_oa.oa_contract_milestone IS '合同履约节点表';
+
+CREATE UNIQUE INDEX uk_oa_contract_no ON spectra_oa.oa_contract (NULLIF(contract_no, ''))
+    WHERE deleted IS NULL;
+CREATE UNIQUE INDEX uk_oa_contract_version_no ON spectra_oa.oa_contract_version (contract_id, version_no)
+    WHERE deleted IS NULL;
+CREATE UNIQUE INDEX uk_oa_contract_current_version ON spectra_oa.oa_contract_version (contract_id)
+    WHERE is_current = TRUE AND deleted IS NULL;
+CREATE INDEX idx_oa_contract_status ON spectra_oa.oa_contract (status, end_date);
+CREATE INDEX idx_oa_contract_counterparty ON spectra_oa.oa_contract (counterparty_name);
+CREATE INDEX idx_oa_contract_version_contract ON spectra_oa.oa_contract_version (contract_id, version_no DESC);
+CREATE INDEX idx_oa_contract_milestone_due ON spectra_oa.oa_contract_milestone (due_date, status);
 
 -- OA 文档
 CREATE TABLE spectra_oa.oa_document (

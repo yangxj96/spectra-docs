@@ -49,6 +49,8 @@ tags:
 
 `DocumentController` 已扩展为 `/oa/document/**`：文档分页/详情、目录、版本、发布以及受文档可见范围保护的预览/下载。
 
+`ContractController` 已扩展为 `/oa/contract/**`：合同台账分页/详情、草稿维护、签署/生效/终止、文件版本和履约节点；版本预览/下载继续经过合同可见范围校验。
+
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `AssetController` | spectra-oa | `/oa/assets/**` | 资产台账、分类与生命周期 |
@@ -56,7 +58,7 @@ tags:
 | `AttendanceController` | spectra-oa | `/attendance/**` | 考勤管理 |
 | `CalendarController` | spectra-oa | `/calendar/**` | 日程查询、创建、更新、删除 |
 | `ContactController` | spectra-oa | `/contact/**` | 通讯录 |
-| `ContractController` | spectra-oa | `/contract/**` | 合同管理 |
+| `ContractController` | spectra-oa | `/oa/contract/**` | 合同管理 |
 | `DocumentController` | spectra-oa | `/document/**` | 文档管理 |
 | `MeetingController` | spectra-oa | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | `NoticeController` | spectra-oa | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
