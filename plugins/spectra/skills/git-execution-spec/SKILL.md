@@ -1,6 +1,6 @@
 ---
 name: git-execution-spec
-description: 在 Spectra 根仓库或其子模块中执行 Git 状态检查、差异审查、暂存、提交、分支、标签、恢复、推送或冲突处理时使用。强制执行敏感信息检查、具体文件暂存、GPG 签名、Conventional Commits 中文提交信息以及推送确认规则。
+description: 在 Spectra 根仓库或其子模块中执行 Git 状态检查、差异审查、暂存、提交、分支、标签、恢复、推送或冲突处理时使用。强制执行敏感信息检查、具体文件暂存、Conventional Commits 中文提交信息以及推送确认规则。
 ---
 
 # Git 执行规范
@@ -9,7 +9,7 @@ description: 在 Spectra 根仓库或其子模块中执行 Git 状态检查、�
 
 本规范定义了在 Spectra 项目中执行 git 操作时必须遵循的安全规则和提交规范。
 
-**核心原则：** 安全第一、确认机制、GPG 签名、禁止自动推送。
+**核心原则：** 安全第一、确认机制、禁止自动推送。
 
 ## 何时使用
 
@@ -62,7 +62,7 @@ git add <具体文件1> <具体文件2>
 git add src/          # 添加整个目录
 git add -p            # 交互式暂存
 
-# 提交（必须 GPG 签名）
+# 提交
 git commit -m "type(scope): 描述"
 git commit --amend    # 修改最近一次提交
 ```
@@ -204,21 +204,6 @@ git add src/api/user-api.ts src/types/user.d.ts
 git diff --cached --name-only
 ```
 
-### GPG 签名规则
-
-- **绝对禁止**使用 `--no-gpg-sign` 参数
-- 所有提交必须经过 GPG 签名
-- 依赖全局配置 `commit.gpgsign=true` 自动生效
-- 如遇签名失败，排查 GPG 密钥配置，**不得跳过签名**
-
-```bash
-# ❌ 错误：跳过 GPG 签名
-git commit --no-gpg-sign -m "..."
-
-# ✅ 正确：依赖自动签名
-git commit -m "..."
-```
-
 ### 推送限制
 
 - **绝对禁止**在未经用户明确允许的情况下执行 `git push`
@@ -279,7 +264,7 @@ git add src/api/user-api.ts
 # 3. 确认暂存内容
 git diff --cached --name-only
 
-# 4. 提交（自动 GPG 签名）
+# 4. 提交
 git commit -m "feat(ui): 新增用户管理组件"
 
 # 5. 等待用户确认后推送
