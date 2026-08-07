@@ -12,6 +12,8 @@ tags:
 
 移动端复用既有 `pages/workbench/index.vue` 工作台，通过 `services/api/oa.ts` 加载待办、公告、日程和会议摘要；请假、报销、采购、公告、日程、会议页面分别为 `pages/leave/index.vue`、`pages/reimbursement/index.vue`、`pages/purchase/index.vue`、`pages/notice/index.vue`、`pages/calendar/index.vue`、`pages/meeting/index.vue`，从工作台高频入口进入。报销页面支持草稿创建、费用明细、提交和撤回；采购页面支持草稿创建、明细、提交、撤回、执行登记和首项收货。
 
+办公用品页面为 `pages/supplies/index.vue`，从工作台“办公用品”入口进入，通过 `services/api/oa.ts` 对接库存查询、入库、领用、退库和库存调整，并支持最低库存筛选。
+
 资产管理页面为 `pages/assets/index.vue`，从工作台行政管理分类进入；通过 `services/api/oa.ts` 对接资产台账、分类、手工建账以及领用、归还、维修、报废操作。
 
 ## 技术栈

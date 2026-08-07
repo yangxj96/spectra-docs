@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 40 个 Controller 端点速查表。
+> 41 个 Controller 端点速查表。
 
 ## 认证与安全
 
@@ -52,6 +52,7 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | AssetController | `/oa/assets/**` | 资产台账、分类、生命周期和采购收货转草稿 |
+| SupplyController | `/oa/supplies/**` | 办公用品台账、入库、领用、退库、调整和最低库存 |
 | AttendanceController | `/attendance/**` | 考勤管理 |
 | CalendarController | `/calendar/**` | 日程查询、创建、更新、删除 |
 | ContactController | `/contact/**` | 通讯录 |

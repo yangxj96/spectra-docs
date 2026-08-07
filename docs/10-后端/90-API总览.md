@@ -50,6 +50,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `AssetController` | spectra-oa | `/oa/assets/**` | 资产台账、分类与生命周期 |
+| `SupplyController` | spectra-oa | `/oa/supplies/**` | 办公用品 SKU、库存变动与最低库存 |
 | `AttendanceController` | spectra-oa | `/attendance/**` | 考勤管理 |
 | `CalendarController` | spectra-oa | `/calendar/**` | 日程查询、创建、更新、删除 |
 | `ContactController` | spectra-oa | `/contact/**` | 通讯录 |

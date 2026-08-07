@@ -20,6 +20,8 @@ tags:
 
 资产管理页面为 `src/views/OA/Asset/index.vue`，路由为 `/oa/asset`，通过 `src/api/oa/asset-api.ts` 对接资产台账、分类、采购收货转草稿及领用/归还/调拨/维修/报废操作。
 
+办公用品库存页面为 `src/views/OA/Supply/index.vue`，路由为 `/oa/supply`，通过 `src/api/oa/supply-api.ts` 对接 SKU 台账、库存入库/领用/退库/调整和最低库存筛选。
+
 ## 技术栈
 
 | 技术 | 版本 |
