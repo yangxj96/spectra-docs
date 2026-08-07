@@ -18,6 +18,8 @@ tags:
 
 采购申请页面为 `src/views/OA/Purchase/index.vue`，路由为 `/oa/purchase`，通过 `src/api/oa/purchase-api.ts` 对接采购草稿、明细、审批、执行登记和分批收货接口。
 
+资产管理页面为 `src/views/OA/Asset/index.vue`，路由为 `/oa/asset`，通过 `src/api/oa/asset-api.ts` 对接资产台账、分类、采购收货转草稿及领用/归还/调拨/维修/报废操作。
+
 ## 技术栈
 
 | 技术 | 版本 |

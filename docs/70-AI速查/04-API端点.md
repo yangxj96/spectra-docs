@@ -51,7 +51,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AssetController | `/asset/**` | 资产管理 |
+| AssetController | `/oa/assets/**` | 资产台账、分类、生命周期和采购收货转草稿 |
 | AttendanceController | `/attendance/**` | 考勤管理 |
 | CalendarController | `/calendar/**` | 日程查询、创建、更新、删除 |
 | ContactController | `/contact/**` | 通讯录 |
