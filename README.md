@@ -15,7 +15,7 @@ spectra-docs/
 │   ├── 30-数据模型/   ← ER 图 / 25个实体清单
 │   ├── 40-开发指南/   ← 环境搭建 / 常用命令
 │   └── 99-模板/
-├── plugins/spectra/  ← Codex 项目插件（规范、graphify 与 CodeGraph MCP）
+├── .codex/plugins/spectra/  ← Codex 项目插件（规范、graphify 与 CodeGraph MCP）
 │   └── skills/       ← Spectra 专用 Codex skills
 ├── .codex/config.toml ← 项目级 Codex MCP 配置
 ├── AGENTS.md         ← 根级 Agent 指令
@@ -78,7 +78,7 @@ codegraph init
 
 ## 项目技能（Skills）
 
-`plugins/spectra/skills/` 目录定义了项目专用 Codex skills：
+`.codex/plugins/spectra/skills/` 目录定义了项目专用 Codex skills：
 
 | Skill | 用途 |
 |---|---|

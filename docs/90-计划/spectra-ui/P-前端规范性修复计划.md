@@ -131,4 +131,4 @@ tags:
 ## 相关
 
 - [[20-前端/10-spectra-ui]] — 前端开发规范
-- `plugins/spectra/skills/spectra-ui-spec/SKILL.md` — 前端规范 Skill
+- `.codex/plugins/spectra/skills/spectra-ui-spec/SKILL.md` — 前端规范 Skill
