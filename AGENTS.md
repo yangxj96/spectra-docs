@@ -102,6 +102,76 @@ spectra-ui
 
 **每个子项目有自己的 `AGENTS.md`——进入该目录工作时先读取。** 本文件只覆盖跨项目的事实信息。
 
+## mise 与本地启动约定
+
+本仓库根目录（包含 `docs/`）以及各可运行子项目都使用 mise 管理本地开发环境。当前 PowerShell 配置通过以下内容激活 mise：
+
+```powershell
+(&mise activate pwsh) | Out-String | Invoke-Expression
+```
+
+正常打开的开发终端已经加载上述配置时，不需要每次手动重复执行；进入对应目录后直接使用该项目的命令即可。若新开的终端没有加载 PowerShell profile，先执行上面的激活命令。
+
+如果 mise 提示 `.mise.local.toml` 未被信任，在对应项目目录执行一次 `mise trust`；仅信任本机配置，不要把其中的密钥复制到代码或文档中。
+
+| 目录 | mise 配置 | 管理内容 |
+|---|---|---|
+| 根目录（含 `docs/`） | `.mise.local.toml` | 本地开发环境变量；不在文档中展开敏感值 |
+| `spectra-admin/` | `mise.toml` | Temurin JDK 25.0.2；Maven 使用项目自带 wrapper |
+| `spectra-ui/` | `mise.toml` | Node 24.14.0、pnpm 11.0.9 |
+| `spectra-app/` | `mise.toml` | Node 24.14.0、pnpm 11.0.9 |
+| `logicflow-plugin-flowable/` | `mise.toml` | Node 24.14.0、pnpm 11.0.9 |
+
+### 后端启动顺序
+
+默认不因为代码检查或普通开发任务自动启动服务；只有用户明确要求启动，或任务确实需要运行时验证时才执行下面流程。
+
+后端必须先编译打包，再运行 `spectra-launch` 生成的 Spring Boot 可执行 JAR：
+
+```powershell
+Set-Location D:\Develop\Projects\spectra\spectra-admin
+
+# 完整构建后端（跳过测试执行）
+.\mvnw.cmd clean package -DskipTests
+
+# 运行当前构建产物；不要选择 *.jar.original
+$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File | Select-Object -First 1
+java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
+    -Dspring.profiles.active=dev `
+    -jar $jar.FullName
+```
+
+项目 wrapper 已修复 PowerShell 在普通 `.m2` 目录上访问空 `Target[0]` 导致的 `Cannot index into a null array` 问题。正常用户终端不需要额外参数；如果 Codex/CI 沙箱把 Java 的 `user.home` 指向不可写目录，则将 Maven 本地仓库显式指向可写的临时目录：
+
+```powershell
+$mavenRepo = Join-Path $env:TEMP 'spectra-maven-repository'
+.\mvnw.cmd "-Dmaven.repo.local=$mavenRepo" clean package -DskipTests
+```
+
+`spectra-launch/pom.xml` 配置了 Spring Boot `repackage`，因此上述 `package` 会生成可直接运行的 fat JAR。当前版本产物名为 `spectra-launch-0.0.18.jar`，版本变更后以 `target/` 中实际的 `.jar` 为准。构建和运行依赖本地 PostgreSQL、Redis 以及 `spectra-admin/.mise.local.toml` 中的环境变量。
+
+IDEA 中看到的 `java ... @C:\Users\yangx\AppData\Local\Temp\idea_arg_file... com.devops00.spectra.launch.LaunchApplication` 是 IDEA 已编译 classpath 后的类启动命令；`idea_arg_file` 是 IDEA 临时生成的参数文件，不是项目编译命令，也不应复制到终端中使用。终端中的等价流程就是上面的 Maven `package` + JAR 启动。
+
+当前 `LaunchApplication` 不需要额外的 `@Import`。`spectra-security-spring-boot-starter` 的 `SecurityAutoConfiguration` 会扫描 `com.devops00.spectra.security.starter.web`，因此 `UserOnlineConverter` 放在该 starter 的扫描范围内即可。
+
+IDEA 命令中的 `-Dhttp.proxyHost/-Dhttp.proxyPort/-Dhttps.proxyHost/-Dhttps.proxyPort` 是本机代理参数；只有需要通过该代理访问外部服务时才补充，不作为本地 API 启动的固定前提。
+
+### 前端与移动端启动顺序
+
+后端启动并监听 4004 后，分别在各目录中执行 pnpm 脚本：
+
+```powershell
+# Web 管理后台，端口 5173
+Set-Location D:\Develop\Projects\spectra\spectra-ui
+pnpm start
+
+# 移动端 H5
+Set-Location D:\Develop\Projects\spectra\spectra-app
+pnpm start
+```
+
+`pnpm start` 已由各项目的 `prestart` 钩子负责格式化、代码检查和类型检查，不要在启动命令中再次手动串联这些检查。微信小程序开发使用 `pnpm dev:mp-weixin`，详见对应子项目的 `AGENTS.md`。
+
 ## 项目连接方式
 
 两个前端在开发环境指向同一个后端：
@@ -113,9 +183,9 @@ spectra-ui
 
 `spectra-ui` 通过 `file:` 引用本地 `logicflow-plugin-flowable`（`file:../logicflow-plugin-flowable`），修改插件代码后需在 `logicflow-plugin-flowable/` 执行 `pnpm run build` 或 `pnpm run dev`（监听模式）。
 
-跨前后端功能开发时：
-1. 先启动 `spectra-admin`（`./mvnw spring-boot:run -pl spectra-launch`）
-2. 再启动对应的前端（在 `spectra-ui` 或 `spectra-app` 中执行 `pnpm start`）
+跨前后端功能开发且用户明确要求启动时：
+1. 在已激活 mise 的终端中进入 `spectra-admin/`，执行 Maven `package` 并运行 `spectra-launch` JAR。
+2. 再进入 `spectra-ui/` 或 `spectra-app/` 执行 `pnpm start`。
 
 ## 通用工具链
 
@@ -125,10 +195,10 @@ spectra-ui
 
 ## 常用命令速查
 
-```bash
+```powershell
 # spectra-admin（在 spectra-admin/ 下执行）
-./mvnw clean package -DskipTests          # 构建
-./mvnw spring-boot:run -pl spectra-launch # 启动 API 服务
+.\mvnw.cmd clean package -DskipTests      # 编译并打包
+# 然后按上面的 JAR 启动命令运行 API 服务
 
 # spectra-ui（在 spectra-ui/ 下执行）
 pnpm install && pnpm start                # 开发服务器（自动 format+lint+typecheck）
