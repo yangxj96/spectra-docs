@@ -47,9 +47,9 @@ tags:
 
 ## OA 模块
 
-`DocumentController` 已扩展为 `/oa/document/**`：文档分页/详情、目录、版本、发布以及受文档可见范围保护的预览/下载。
+`DocumentController` 已扩展为 `/oa/document/**`：文档分页/详情、目录、版本、发布/归档、版本恢复以及受文档可见范围保护的预览/下载。
 
-`ContractController` 已扩展为 `/oa/contract/**`：合同台账分页/详情、草稿维护、签署/生效/终止、文件版本和履约节点；版本预览/下载继续经过合同可见范围校验。
+`ContractController` 已扩展为 `/oa/contract/**`：合同台账分页/详情、草稿维护、签署/生效/终止/归档、文件版本和履约节点；`POST /reminders/run` 与每日调度使用条件更新保证节点提醒只发送一次，版本预览/下载继续经过合同可见范围校验。
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
@@ -63,7 +63,7 @@ tags:
 | `MeetingController` | spectra-oa | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | `NoticeController` | spectra-oa | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
 | `ReportController` | spectra-oa | `/oa/report/**` | 部门维度统计与 Excel 导出 |
-| `ApplicationController` | spectra-oa | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
+| `ApplicationController` | spectra-oa | `/oa/applications/**` | 通用申请分页、详情、申请类型配置、撤回、取消 |
 | `LeaveController` | spectra-oa | `/oa/leave/**` | 请假草稿、提交、查询、撤回、取消 |
 | `ReimbursementController` | spectra-oa | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
 | `PurchaseController` | spectra-oa | `/oa/purchases/**` | 采购草稿、明细、提交、撤回、取消、执行登记和分批收货 |

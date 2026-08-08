@@ -46,6 +46,8 @@ node_modules/
 !.env.example
 !.env.template
 *.local
+.mise.local.toml
+.mise-data/
 
 # =================================================
 # Logs

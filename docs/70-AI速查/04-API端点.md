@@ -49,9 +49,9 @@ tags:
 
 ## OA 模块
 
-`DocumentController`：`/oa/document/**`，包含分页/详情、目录、版本、发布、预览和下载。
+`DocumentController`：`/oa/document/**`，包含分页/详情、目录、版本、发布/归档、版本恢复、预览和下载。
 
-`ContractController`：`/oa/contract/**`，包含台账、签署/生效/终止、文件版本、履约节点和受鉴权保护的文件访问。
+`ContractController`：`/oa/contract/**`，包含台账、签署/生效/终止/归档、文件版本、履约节点、一次性临期提醒和受鉴权保护的文件访问。
 
 | Controller | 路径 | 说明 |
 |---|---|---|
@@ -65,7 +65,7 @@ tags:
 | MeetingController | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | NoticeController | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
 | ReportController | `/oa/report/**` | 部门维度统计与 Excel 导出（`/department`、`/department/export`） |
-| ApplicationController | `/oa/applications/**` | 通用申请分页、详情、类型、撤回、取消 |
+| ApplicationController | `/oa/applications/**` | 通用申请分页、详情、申请类型配置、撤回、取消 |
 | LeaveController | `/oa/leave/**` | 请假草稿、提交、审批状态查询、撤回、取消 |
 | ReimbursementController | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
 | PurchaseController | `/oa/purchases/**` | 采购草稿、明细、提交、撤回、取消、执行登记和分批收货 |
