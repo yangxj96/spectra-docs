@@ -90,8 +90,8 @@ BEGIN
          'ExampleForm','ExampleTable','ExampleEcharts','ExampleMarkdown',
          'SystemUser','SystemRBAC','SystemDept','SystemConfigured','SystemDict','SystemMenu',
          'SystemStorage','SystemWorkflow','SystemRegion',
-         'OAAsset','OAAttendance','OACalendar','OAContact','OAContract','OADocument',
-         'OAMeeting','OANotice','OAReport'
+         'OAAsset','OASupply','OALeave','OAApplicationTypes','OAApproval','OAReimbursement','OAPurchase',
+         'OACalendar','OAContact','OAContract','OADocument','OAMeeting','OANotice','OAReport'
      ]::TEXT[])
        AND menu.menu_type = 'MENU'
        AND menu.deleted IS NULL;
@@ -104,8 +104,8 @@ BEGIN
      WHERE menu.route_name = ANY (ARRAY[
          'Dashboard','ExampleForm','ExampleTable','ExampleEcharts','ExampleMarkdown',
          'SystemUser','SystemRBAC','SystemDept','SystemDict','SystemMenu','SystemWorkflow','SystemRegion',
-         'OAAsset','OAAttendance','OACalendar','OAContact','OAContract','OADocument',
-         'OAMeeting','OANotice','OAReport'
+         'OAAsset','OASupply','OALeave','OAApplicationTypes','OAApproval','OAReimbursement','OAPurchase',
+         'OACalendar','OAContact','OAContract','OADocument','OAMeeting','OANotice','OAReport'
      ]::TEXT[])
        AND menu.menu_type = 'MENU'
        AND menu.deleted IS NULL;
@@ -117,8 +117,8 @@ BEGIN
       FROM spectra_core.sys_menu menu
      WHERE menu.route_name = ANY (ARRAY[
          'Dashboard','ExampleForm','ExampleTable','ExampleEcharts','ExampleMarkdown',
-         'OAAsset','OAAttendance','OACalendar','OAContact','OAContract','OADocument',
-         'OAMeeting','OANotice','OAReport'
+         'OAAsset','OASupply','OALeave','OAApproval','OAReimbursement','OAPurchase',
+         'OACalendar','OAContact','OAContract','OADocument','OAMeeting','OANotice','OAReport'
      ]::TEXT[])
        AND menu.menu_type = 'MENU'
        AND menu.deleted IS NULL;
@@ -130,8 +130,8 @@ BEGIN
       FROM spectra_core.sys_menu menu
      WHERE menu.route_name = ANY (ARRAY[
          'Dashboard','SystemUser','SystemRBAC','SystemDept','SystemDict','SystemMenu','SystemWorkflow','SystemRegion',
-         'OAAsset','OAAttendance','OACalendar','OAContact','OAContract','OADocument',
-         'OAMeeting','OANotice','OAReport'
+         'OAAsset','OASupply','OALeave','OAReimbursement','OAPurchase',
+         'OACalendar','OAContact','OAContract','OADocument','OAMeeting','OANotice','OAReport'
      ]::TEXT[])
        AND menu.menu_type = 'MENU'
        AND menu.deleted IS NULL;

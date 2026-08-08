@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。共 41 个 Controller。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 40 个 `*Controller.java`。
 
 ## 认证与安全
 
@@ -55,14 +55,13 @@ tags:
 |---|---|---|---|
 | `AssetController` | spectra-oa | `/oa/assets/**` | 资产台账、分类与生命周期 |
 | `SupplyController` | spectra-oa | `/oa/supplies/**` | 办公用品 SKU、库存变动与最低库存 |
-| `AttendanceController` | spectra-oa | `/attendance/**` | 考勤管理 |
 | `CalendarController` | spectra-oa | `/calendar/**` | 日程查询、创建、更新、删除 |
-| `ContactController` | spectra-oa | `/contact/**` | 通讯录 |
+| `ContactController` | spectra-oa | `/oa/contact/page` | 基于 Core 用户/部门的只读组织通讯录，不维护 OA 联系人表 |
 | `ContractController` | spectra-oa | `/oa/contract/**` | 合同管理 |
 | `DocumentController` | spectra-oa | `/document/**` | 文档管理 |
 | `MeetingController` | spectra-oa | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | `NoticeController` | spectra-oa | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
-| `ReportController` | spectra-oa | `/oa/report/**` | 部门维度统计与 Excel 导出 |
+| `ReportController` | spectra-oa | `/oa/report/**` | 基于业务表的部门维度统计与 Excel 导出，不维护通用报表实体 |
 | `ApplicationController` | spectra-oa | `/oa/applications/**` | 通用申请分页、详情、申请类型配置、撤回、取消 |
 | `LeaveController` | spectra-oa | `/oa/leave/**` | 请假草稿、提交、查询、撤回、取消 |
 | `ReimbursementController` | spectra-oa | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
@@ -84,7 +83,7 @@ tags:
 | `ModelController` | spectra-workflow | `/workflow/model/**` | 流程模型 CRUD + 部署 |
 | `ProcessDefinitionController` | spectra-workflow | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | `ProcessInstanceController` | spectra-workflow | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
-| `TaskController` | spectra-workflow | `/workflow/task/**` | 待办/已办/签收/完成/转办 |
+| `TaskController` | spectra-workflow | `/workflow/tasks/**` | 待办/已办/审批/驳回/签收/转办/委派；写操作校验当前办理人 |
 | `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时状态查询 |
 | `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史记录查询 |
 

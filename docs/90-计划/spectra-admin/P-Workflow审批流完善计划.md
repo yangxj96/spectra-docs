@@ -191,8 +191,7 @@ void terminate(String processInstanceId, String reason);
 - 编写BPMN XML文件
 
 **文件**：
-- `spectra-modules/spectra-workflow/src/main/resources/processes/oa-single-approval.bpmn20.xml` — 单级审批流程
-- `spectra-modules/spectra-workflow/src/main/resources/processes/oa-multi-approval.bpmn20.xml` — 多级审批流程
+- 单级/多级通用示例 BPMN 已在 2026-08-08 OA 完整度审计中移除；当前按业务保留请假、报销、采购三个审批流程。
 
 **流程设计**：
 ```

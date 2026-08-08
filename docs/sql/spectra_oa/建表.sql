@@ -26,27 +26,6 @@ COMMENT ON COLUMN spectra_oa.oa_asset.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_oa.oa_asset.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_oa.oa_asset.version IS '乐观锁';
 
--- OA 考勤
-CREATE TABLE spectra_oa.oa_attendance (
-    id            UUID PRIMARY KEY,
-    department_id UUID,
-    created_by    UUID,
-    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by    UUID,
-    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted       TIMESTAMP(6) WITH TIME ZONE,
-    version       BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_oa.oa_attendance IS '考勤表';
-COMMENT ON COLUMN spectra_oa.oa_attendance.id IS '主键ID';
-COMMENT ON COLUMN spectra_oa.oa_attendance.department_id IS '所属部门ID';
-COMMENT ON COLUMN spectra_oa.oa_attendance.created_by IS '创建人';
-COMMENT ON COLUMN spectra_oa.oa_attendance.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_oa.oa_attendance.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_oa.oa_attendance.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_oa.oa_attendance.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_oa.oa_attendance.version IS '乐观锁';
-
 -- OA 日历
 CREATE TABLE spectra_oa.oa_calendar (
     id            UUID PRIMARY KEY,
@@ -67,27 +46,6 @@ COMMENT ON COLUMN spectra_oa.oa_calendar.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_oa.oa_calendar.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_oa.oa_calendar.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_oa.oa_calendar.version IS '乐观锁';
-
--- OA 通讯录
-CREATE TABLE spectra_oa.oa_contact (
-    id            UUID PRIMARY KEY,
-    department_id UUID,
-    created_by    UUID,
-    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by    UUID,
-    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted       TIMESTAMP(6) WITH TIME ZONE,
-    version       BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_oa.oa_contact IS '通讯录表';
-COMMENT ON COLUMN spectra_oa.oa_contact.id IS '主键ID';
-COMMENT ON COLUMN spectra_oa.oa_contact.department_id IS '所属部门ID';
-COMMENT ON COLUMN spectra_oa.oa_contact.created_by IS '创建人';
-COMMENT ON COLUMN spectra_oa.oa_contact.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_oa.oa_contact.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_oa.oa_contact.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_oa.oa_contact.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_oa.oa_contact.version IS '乐观锁';
 
 -- OA 合同
 CREATE TABLE spectra_oa.oa_contract (
@@ -332,27 +290,6 @@ COMMENT ON COLUMN spectra_oa.oa_notice.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_oa.oa_notice.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_oa.oa_notice.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_oa.oa_notice.version IS '乐观锁';
-
--- OA 报表
-CREATE TABLE spectra_oa.oa_report (
-    id            UUID PRIMARY KEY,
-    department_id UUID,
-    created_by    UUID,
-    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by    UUID,
-    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted       TIMESTAMP(6) WITH TIME ZONE,
-    version       BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_oa.oa_report IS '报表表';
-COMMENT ON COLUMN spectra_oa.oa_report.id IS '主键ID';
-COMMENT ON COLUMN spectra_oa.oa_report.department_id IS '所属部门ID';
-COMMENT ON COLUMN spectra_oa.oa_report.created_by IS '创建人';
-COMMENT ON COLUMN spectra_oa.oa_report.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_oa.oa_report.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_oa.oa_report.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_oa.oa_report.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_oa.oa_report.version IS '乐观锁';
 
 -- ============================================================
 -- 通用 OA P0：统一申请内核

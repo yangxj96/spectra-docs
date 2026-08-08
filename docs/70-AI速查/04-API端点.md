@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 41 个 Controller 端点速查表。
+> 源码当前 40 个 `*Controller.java` 端点速查表。
 
 ## 认证与安全
 
@@ -57,14 +57,13 @@ tags:
 |---|---|---|
 | AssetController | `/oa/assets/**` | 资产台账、分类、生命周期和采购收货转草稿 |
 | SupplyController | `/oa/supplies/**` | 办公用品台账、入库、领用、退库、调整和最低库存 |
-| AttendanceController | `/attendance/**` | 考勤管理 |
 | CalendarController | `/calendar/**` | 日程查询、创建、更新、删除 |
-| ContactController | `/contact/**` | 通讯录 |
+| ContactController | `/oa/contact/page` | 基于 Core 用户/部门的只读组织通讯录 |
 | ContractController | `/oa/contract/**` | 合同管理 |
 | DocumentController | `/document/**` | 文档管理 |
 | MeetingController | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
 | NoticeController | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
-| ReportController | `/oa/report/**` | 部门维度统计与 Excel 导出（`/department`、`/department/export`） |
+| ReportController | `/oa/report/**` | 基于业务表的部门维度统计与 Excel 导出（`/department`、`/department/export`） |
 | ApplicationController | `/oa/applications/**` | 通用申请分页、详情、申请类型配置、撤回、取消 |
 | LeaveController | `/oa/leave/**` | 请假草稿、提交、审批状态查询、撤回、取消 |
 | ReimbursementController | `/oa/reimbursements/**` | 报销草稿、明细、附件、提交、撤回、取消、付款登记 |
@@ -85,7 +84,7 @@ tags:
 | FormDefinitionController | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
 | ProcessDefinitionController | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | ProcessInstanceController | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
-| TaskController | `/workflow/tasks/**` | 待办/已办/签收/完成/转办/委派 |
+| TaskController | `/workflow/tasks/**` | 待办/已办/审批/驳回/签收/转办/委派；任务动作校验当前办理人 |
 | RuntimeController | `/workflow/runtime/**` | 运行时状态查询（待实现） |
 | HistoryController | `/workflow/history/**` | 历史记录查询（待实现） |
 

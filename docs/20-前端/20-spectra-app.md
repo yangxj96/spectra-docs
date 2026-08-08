@@ -8,9 +8,11 @@ tags:
 
 > 基于 Vue 3 + uni-app + Vite 5 的移动端和微信小程序应用。路径：`spectra-app/`。
 
-## OA P0 页面
+## OA 页面
 
-移动端复用既有 `pages/workbench/index.vue` 工作台，通过 `services/api/oa.ts` 加载待办、公告、日程和会议摘要；请假、报销、采购、公告、日程、会议页面分别为 `pages/leave/index.vue`、`pages/reimbursement/index.vue`、`pages/purchase/index.vue`、`pages/notice/index.vue`、`pages/calendar/index.vue`、`pages/meeting/index.vue`，从工作台高频入口进入。报销页面支持草稿创建、费用明细、提交和撤回；采购页面支持草稿创建、明细、提交、撤回、执行登记和首项收货。
+移动端复用既有 `pages/workbench/index.vue` 工作台，通过 `services/api/oa.ts` 加载真实待办、公告、日程和会议摘要；已经移除无页面路径的模拟模块和硬编码待办数量。请假、报销、采购、公告、日程、会议页面分别为 `pages/leave/index.vue`、`pages/reimbursement/index.vue`、`pages/purchase/index.vue`、`pages/notice/index.vue`、`pages/calendar/index.vue`、`pages/meeting/index.vue`。
+
+`pages/approval/index.vue` 提供待办/已办、申请详情、同意和驳回；`pages/contacts/index.vue` 使用后端真实组织通讯录。请假、报销、采购均支持审批人选择、草稿编辑、提交、撤回和取消；报销覆盖驳回后的取消和审批后的付款状态，采购覆盖审批后的执行登记与分批收货，不再停留在“只能提交”的页面壳。
 
 办公用品页面为 `pages/supplies/index.vue`，从工作台“办公用品”入口进入，通过 `services/api/oa.ts` 对接库存查询、入库、领用、退库和库存调整，并支持最低库存筛选。
 

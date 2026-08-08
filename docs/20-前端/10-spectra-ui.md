@@ -10,13 +10,15 @@ tags:
 
 ## OA P0 页面
 
-现有 `src/views/Dashboard/index.vue` 继续作为统一 OA 工作台，不新增 `/oa/workbench` 页面；通过 `GET /api/oa/workbench/summary` 接入待办、申请、公告、今日日程和会议摘要。`/oa/notice` 支持发布/撤回/已读，`/oa/calendar` 支持日程创建和删除，`/oa/meeting` 支持会议创建、邀请响应和签到。
+现有 `src/views/Dashboard/index.vue` 继续作为统一 OA 工作台，不新增 `/oa/workbench` 页面；通过 `GET /api/oa/workbench/summary` 接入待办、申请、公告、今日日程和会议摘要，快捷入口只保留真实存在的 OA 页面，不再展示模拟待办或无效路由。
+
+`src/views/oa/Approval/index.vue`（`/oa/approval`）提供待办/已办、业务详情、同意和驳回；`src/views/oa/Contact/index.vue` 提供基于 Core 用户/部门的真实组织通讯录。旧 `Attendance` 占位页面及路由已删除，请假产生的考勤影响通过请假详情和后端 `oa_attendance_record` 管理。`/oa/notice` 支持发布/撤回/已读，`/oa/calendar` 支持日程创建和删除，`/oa/meeting` 支持会议创建、邀请响应和签到。
 
 ## OA P1 页面
 
-费用报销页面为 `src/views/OA/Reimbursement/index.vue`，路由为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销草稿、明细、附件、审批和付款接口。凭证上传复用 `FileUpload`，上传响应中的 `file_id` 写入申请附件关联。
+请假、费用报销和采购申请页统一使用 `OAApproverSelect` 选择审批人，支持草稿/驳回态编辑、提交、撤回和取消。费用报销页面为 `src/views/oa/Reimbursement/index.vue`，路由为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销明细、附件、审批和付款接口；凭证上传复用 `FileUpload`，上传响应中的 `file_id` 写入申请附件关联，收款账号回显使用脱敏值。
 
-采购申请页面为 `src/views/OA/Purchase/index.vue`，路由为 `/oa/purchase`，通过 `src/api/oa/purchase-api.ts` 对接采购草稿、明细、审批、执行登记和分批收货接口。
+采购申请页面为 `src/views/oa/Purchase/index.vue`，路由为 `/oa/purchase`，通过 `src/api/oa/purchase-api.ts` 对接采购草稿、明细、审批、执行登记和分批收货接口，审批完成后可继续执行至 `RECEIVED`。
 
 资产管理页面为 `src/views/OA/Asset/index.vue`，路由为 `/oa/asset`，通过 `src/api/oa/asset-api.ts` 对接资产台账、分类、采购收货转草稿及领用/归还/调拨/维修/报废操作。
 
