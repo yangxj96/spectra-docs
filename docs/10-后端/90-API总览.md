@@ -83,7 +83,7 @@ tags:
 | `ModelController` | spectra-workflow | `/workflow/model/**` | 流程模型 CRUD + 部署 |
 | `ProcessDefinitionController` | spectra-workflow | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | `ProcessInstanceController` | spectra-workflow | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
-| `TaskController` | spectra-workflow | `/workflow/tasks/**` | 待办/已办/审批/驳回/签收/转办/委派；写操作校验当前办理人 |
+| `TaskController` | spectra-workflow | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；写操作校验当前办理人 |
 | `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时状态查询 |
 | `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史记录查询 |
 

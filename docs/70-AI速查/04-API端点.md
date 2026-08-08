@@ -84,7 +84,7 @@ tags:
 | FormDefinitionController | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
 | ProcessDefinitionController | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | ProcessInstanceController | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
-| TaskController | `/workflow/tasks/**` | 待办/已办/审批/驳回/签收/转办/委派；任务动作校验当前办理人 |
+| TaskController | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；任务动作校验当前办理人 |
 | RuntimeController | `/workflow/runtime/**` | 运行时状态查询（待实现） |
 | HistoryController | `/workflow/history/**` | 历史记录查询（待实现） |
 
