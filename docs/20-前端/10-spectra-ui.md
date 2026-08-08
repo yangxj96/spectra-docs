@@ -12,7 +12,7 @@ tags:
 
 现有 `src/views/Dashboard/index.vue` 继续作为统一 OA 工作台，不新增 `/oa/workbench` 页面；通过 `GET /api/oa/workbench/summary` 接入待办、申请、公告、今日日程和会议摘要，快捷入口只保留真实存在的 OA 页面，不再展示模拟待办或无效路由。
 
-`src/views/oa/Approval/index.vue`（`/oa/approval`）提供待办/已办、业务详情、同意和驳回；`src/views/oa/Contact/index.vue` 提供基于 Core 用户/部门的真实组织通讯录。旧 `Attendance` 占位页面及路由已删除，请假产生的考勤影响通过请假详情和后端 `oa_attendance_record` 管理。`/oa/notice` 支持发布/撤回/已读，`/oa/calendar` 支持日程创建和删除，`/oa/meeting` 支持会议创建、邀请响应和签到。
+`src/views/oa/Approval/index.vue`（`/oa/approval`）提供待办/已办、业务详情、同意和驳回；审批中心新增 `/oa/approval/finance/reimbursement`、`/oa/approval/asset/purchase` 和 `/oa/approval/hr/leave` 三个流程类型页面，统一通过 `process_definition_key` 过滤 Workflow 任务。`src/views/oa/Contact/index.vue` 提供基于 Core 用户/部门的真实组织通讯录。旧 `Attendance` 占位页面及路由已删除，请假产生的考勤影响通过请假详情和后端 `oa_attendance_record` 管理。`/oa/notice` 支持发布/撤回/已读，`/oa/calendar` 支持日程创建和删除，`/oa/meeting` 支持会议创建、邀请响应和签到。
 
 ## OA P1 页面
 
