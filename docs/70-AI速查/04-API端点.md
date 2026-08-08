@@ -47,6 +47,8 @@ tags:
 |---|---|---|
 | NotificationController | `/notification/**` | 消息列表/未读数/已读/删除/发送 |
 
+`POST /notification/batch-delete` 使用 `NotificationBatchDeleteFrom` 请求体：`{"ids":["消息ID"]}`。
+
 ## OA 模块
 
 `DocumentController`：`/oa/document/**`，包含分页/详情、目录、版本、发布/归档、版本恢复、预览和下载。
