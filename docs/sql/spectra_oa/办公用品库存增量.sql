@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS spectra_oa.oa_supply_operation (
     department_id          UUID,
     user_id                UUID,
     location               VARCHAR(256),
-    operation_date         DATE NOT NULL,
+    operation_date         TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     reason                 VARCHAR(1000),
     source_purchase_id     UUID,
     source_receipt_id      UUID,
