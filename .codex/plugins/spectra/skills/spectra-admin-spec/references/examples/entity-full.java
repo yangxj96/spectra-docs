@@ -25,18 +25,22 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/// 实体完整示例
-///
-/// 注意：
-/// 1. 继承 BaseEntity（包含 id、createdBy、createdAt、updatedBy、updatedAt、deleted、version）
-/// 2. UUID 主键：@TableId(type = IdType.INPUT)
-/// 3. 表名注解：@TableName("xxx")
-/// 4. 字段注解：@TableField("xxx")
-/// 5. 使用 @Getter、@Setter、@ToString 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 实体完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>继承 BaseEntity（包含 id、createdBy、createdAt、updatedBy、updatedAt、deleted、version）</li>
+ * <li>UUID 主键：@TableId(type = IdType.INPUT)</li>
+ * <li>表名注解：@TableName("xxx")</li>
+ * <li>字段注解：@TableField("xxx")</li>
+ * <li>使用 @Getter、@Setter、@ToString 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Getter
 @Setter
 @ToString

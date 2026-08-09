@@ -21,39 +21,57 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// VO对象完整示例
-///
-/// 注意：
-/// 1. 统一后缀 VO
-/// 2. 包路径：javabean/vo/
-/// 3. 使用 @Data 注解
-/// 4. 分页查询返回 IPage<XxxVO>
-/// 5. 与 Entity 分开定义，职责单一
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * VO对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>统一后缀 VO</li>
+ * <li>包路径：javabean/vo/</li>
+ * <li>使用 @Data 注解</li>
+ * <li>分页查询返回 IPage<XxxVO></li>
+ * <li>与 Entity 分开定义，职责单一</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullVO {
 
-    /// 示例ID
+    /**
+     * 示例ID
+     */
     private UUID id;
 
-    /// 示例名称
+    /**
+     * 示例名称
+     */
     private String name;
 
-    /// 示例编码
+    /**
+     * 示例编码
+     */
     private String code;
 
-    /// 描述
+    /**
+     * 描述
+     */
     private String description;
 
-    /// 是否激活
+    /**
+     * 是否激活
+     */
     private Boolean active;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 
-    /// 更新时间
+    /**
+     * 更新时间
+     */
     private LocalDateTime updatedAt;
 }

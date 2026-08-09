@@ -22,41 +22,57 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/// 校验注解完整示例
-///
-/// 注意：
-/// 1. 必填字段必须加 @NotBlank/@NotNull 等校验注解
-/// 2. 提供清晰的中文 message 参数
-/// 3. 可选字段不加校验注解
-/// 4. 使用 @Data 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 校验注解完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>必填字段必须加 @NotBlank/@NotNull 等校验注解</li>
+ * <li>提供清晰的中文 message 参数</li>
+ * <li>可选字段不加校验注解</li>
+ * <li>使用 @Data 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ValidatorFullExample {
 
-    /// 必填字段 - 使用 @NotBlank
+    /**
+     * 必填字段 - 使用 @NotBlank
+     */
     @NotBlank(message = "用户名不能为空")
     private String username;
 
-    /// 必填字段 - 使用 @NotNull
+    /**
+     * 必填字段 - 使用 @NotNull
+     */
     @NotNull(message = "年龄不能为空")
     private Integer age;
 
-    /// 必填字段 - 带长度限制
+    /**
+     * 必填字段 - 带长度限制
+     */
     @NotBlank(message = "密码不能为空")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20之间")
     private String password;
 
-    /// 必填字段 - 邮箱格式
+    /**
+     * 必填字段 - 邮箱格式
+     */
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    /// 可选字段 - 不加校验注解
+    /**
+     * 可选字段 - 不加校验注解
+     */
     private String description;
 
-    /// 可选字段 - 不加校验注解
+    /**
+     * 可选字段 - 不加校验注解
+     */
     private Boolean active;
 }

@@ -18,24 +18,32 @@ package com.devops00.spectra.example.javabean.bo;
 
 import lombok.Data;
 
-/// 业务对象完整示例
-///
-/// 注意：
-/// 1. BO 用于业务逻辑处理
-/// 2. 统一后缀 BO
-/// 3. 使用 @Data 注解
-/// 4. 包路径：javabean/bo/
-/// 5. 使用 @Data 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 业务对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>BO 用于业务逻辑处理</li>
+ * <li>统一后缀 BO</li>
+ * <li>使用 @Data 注解</li>
+ * <li>包路径：javabean/bo/</li>
+ * <li>使用 @Data 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullBO {
 
-    /// 示例ID
+    /**
+     * 示例ID
+     */
     private String id;
 
-    /// 示例名称
+    /**
+     * 示例名称
+     */
     private String name;
 }

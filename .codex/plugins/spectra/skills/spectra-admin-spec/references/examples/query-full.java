@@ -18,30 +18,42 @@ package com.devops00.spectra.example.javabean.query;
 
 import lombok.Data;
 
-/// 查询参数对象完整示例
-///
-/// 注意：
-/// 1. Query 用于复杂查询参数
-/// 2. 统一后缀 Query
-/// 3. 使用 @Data 注解
-/// 4. 包路径：javabean/query/
-/// 5. 使用 @Data 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 查询参数对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>Query 用于复杂查询参数</li>
+ * <li>统一后缀 Query</li>
+ * <li>使用 @Data 注解</li>
+ * <li>包路径：javabean/query/</li>
+ * <li>使用 @Data 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullQuery {
 
-    /// 示例名称（模糊查询）
+    /**
+     * 示例名称（模糊查询）
+     */
     private String name;
 
-    /// 是否激活
+    /**
+     * 是否激活
+     */
     private Boolean active;
 
-    /// 开始时间
+    /**
+     * 开始时间
+     */
     private String startTime;
 
-    /// 结束时间
+    /**
+     * 结束时间
+     */
     private String endTime;
 }

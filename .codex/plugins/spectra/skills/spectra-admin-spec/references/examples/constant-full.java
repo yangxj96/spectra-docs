@@ -16,27 +16,35 @@
 
 package com.devops00.spectra.example.constant;
 
-/// 常量类完整示例
-///
-/// 注意：
-/// 1. 常量类使用 final 修饰
-/// 2. 私有构造函数
-/// 3. 常量使用 static final 修饰
-/// 4. 命名：XxxConstants
-/// 5. 使用 final 修饰类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 常量类完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>常量类使用 final 修饰</li>
+ * <li>私有构造函数</li>
+ * <li>常量使用 static final 修饰</li>
+ * <li>命名：XxxConstants</li>
+ * <li>使用 final 修饰类</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 public final class ExampleFullConstants {
 
     private ExampleFullConstants() {
         // 私有构造函数
     }
 
-    /// 默认最大连接数
+    /**
+     * 默认最大连接数
+     */
     public static final int DEFAULT_MAX_CONNECTIONS = 100;
 
-    /// 默认超时时间（秒）
+    /**
+     * 默认超时时间（秒）
+     */
     public static final int DEFAULT_TIMEOUT = 30;
 }

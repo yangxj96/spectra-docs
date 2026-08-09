@@ -16,24 +16,30 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 自定义异常完整示例
-///
-/// 注意：
-/// 1. 统一使用项目自定义异常，禁止裸 RuntimeException
-/// 2. 异常消息统一中文（用户友好）
-/// 3. 继承 DataException
-/// 4. 提供无参和有参构造函数
-///
-/// 可用异常类型：
-/// - DataNotExistException：数据不存在
-/// - DataSaveException：数据保存失败
-/// - EntityUpdateException：实体更新失败
-/// - BuiltinDataException：内置数据不可操作
-/// - DefaultDataException：默认数据不可操作
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 自定义异常完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>统一使用项目自定义异常，禁止裸 RuntimeException</li>
+ * <li>异常消息统一中文（用户友好）</li>
+ * <li>继承 DataException</li>
+ * <li>提供无参和有参构造函数</li>
+ * </ol>
+ *
+ * 可用异常类型：
+ * <ul>
+ * <li>DataNotExistException：数据不存在</li>
+ * <li>DataSaveException：数据保存失败</li>
+ * <li>EntityUpdateException：实体更新失败</li>
+ * <li>BuiltinDataException：内置数据不可操作</li>
+ * <li>DefaultDataException：默认数据不可操作</li>
+ * </ul>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 public class ExampleFullException extends DataException {
 
     public ExampleFullException() {

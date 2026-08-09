@@ -20,30 +20,42 @@ import lombok.Data;
 
 import java.util.List;
 
-/// 树形视图对象完整示例
-///
-/// 注意：
-/// 1. VO 用于响应数据封装
-/// 2. 统一后缀 VO
-/// 3. 使用 @Data 注解
-/// 4. 包路径：javabean/vo/
-/// 5. 支持树形结构
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 树形视图对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>VO 用于响应数据封装</li>
+ * <li>统一后缀 VO</li>
+ * <li>使用 @Data 注解</li>
+ * <li>包路径：javabean/vo/</li>
+ * <li>支持树形结构</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullTreeVO {
 
-    /// 示例ID
+    /**
+     * 示例ID
+     */
     private String id;
 
-    /// 父ID
+    /**
+     * 父ID
+     */
     private String parentId;
 
-    /// 示例名称
+    /**
+     * 示例名称
+     */
     private String name;
 
-    /// 子节点
+    /**
+     * 子节点
+     */
     private List<ExampleFullTreeVO> children;
 }

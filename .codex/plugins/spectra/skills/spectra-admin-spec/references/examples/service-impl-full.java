@@ -38,19 +38,23 @@ import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
-/// Service实现完整示例
-///
-/// 注意：
-/// 1. 继承 BaseServiceImpl<Mapper, Entity>，实现对应接口
-/// 2. 必须加 @Slf4j、@Service
-/// 3. 写操作必须加 @Transactional
-/// 4. 异常消息统一中文
-/// 5. 使用 Converter 进行对象转换
-/// 6. 关键业务节点用 log.info()，异常用 log.error()
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * Service实现完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>继承 BaseServiceImpl<Mapper, Entity>，实现对应接口</li>
+ * <li>必须加 @Slf4j、@Service</li>
+ * <li>写操作必须加 @Transactional</li>
+ * <li>异常消息统一中文</li>
+ * <li>使用 Converter 进行对象转换</li>
+ * <li>关键业务节点用 log.info()，异常用 log.error()</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

@@ -19,17 +19,21 @@ package com.devops00.spectra.example;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 
-/// 模块入口类完整示例
-///
-/// 注意：
-/// 1. 每个业务模块必须有一个 Module 入口类
-/// 2. @ComponentScan 扫描当前模块包路径
-/// 3. @MapperScan 扫描当前模块 Mapper 包路径
-/// 4. 使用 @ComponentScan 和 @MapperScan 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 模块入口类完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>每个业务模块必须有一个 Module 入口类</li>
+ * <li>@ComponentScan 扫描当前模块包路径</li>
+ * <li>@MapperScan 扫描当前模块 Mapper 包路径</li>
+ * <li>使用 @ComponentScan 和 @MapperScan 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @ComponentScan("com.devops00.spectra.example")
 @MapperScan("com.devops00.spectra.example.**.mapper")
 public class ExampleFullModule {

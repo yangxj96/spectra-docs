@@ -19,18 +19,22 @@ package com.devops00.spectra.example.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/// 枚举完整示例
-///
-/// 注意：
-/// 1. 枚举使用 @Getter 注解
-/// 2. 使用 @AllArgsConstructor 注解
-/// 3. 常量使用大写下划线命名
-/// 4. 命名：XxxEnum
-/// 5. 使用 @Getter 和 @AllArgsConstructor 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 枚举完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>枚举使用 @Getter 注解</li>
+ * <li>使用 @AllArgsConstructor 注解</li>
+ * <li>常量使用大写下划线命名</li>
+ * <li>命名：XxxEnum</li>
+ * <li>使用 @Getter 和 @AllArgsConstructor 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Getter
 @AllArgsConstructor
 public enum ExampleFullEnum {

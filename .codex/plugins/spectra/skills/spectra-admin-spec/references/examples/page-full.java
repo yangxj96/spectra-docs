@@ -20,27 +20,37 @@ import lombok.Data;
 
 import java.util.List;
 
-/// 分页请求参数完整示例
-///
-/// 注意：
-/// 1. 分页参数使用 PageFrom
-/// 2. 包路径：common.base.javabean.from
-/// 3. 使用 @Data 注解
-/// 4. 统一分页参数
-/// 5. 使用 @Data 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 分页请求参数完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>分页参数使用 PageFrom</li>
+ * <li>包路径：common.base.javabean.from</li>
+ * <li>使用 @Data 注解</li>
+ * <li>统一分页参数</li>
+ * <li>使用 @Data 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class PageFromFullExample {
 
-    /// 页码
+    /**
+     * 页码
+     */
     private Integer pageNum = 1;
 
-    /// 每页大小
+    /**
+     * 每页大小
+     */
     private Integer pageSize = 10;
 
-    /// 排序字段
+    /**
+     * 排序字段
+     */
     private List<String> orders;
 }

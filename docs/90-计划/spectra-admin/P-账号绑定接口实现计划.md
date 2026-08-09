@@ -51,22 +51,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 绑定手机入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 绑定手机入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BindPhoneFrom {
 
-    /// 手机号
+    /**
+     * 手机号
+     */
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
 
-    /// 验证码
+    /**
+     * 验证码
+     */
     @NotBlank(message = "验证码不能为空")
     private String code;
 }
@@ -89,22 +95,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 绑定邮箱入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 绑定邮箱入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BindEmailFrom {
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    /// 验证码
+    /**
+     * 验证码
+     */
     @NotBlank(message = "验证码不能为空")
     private String code;
 }
@@ -132,11 +144,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
-/// 账号绑定响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 账号绑定响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -145,22 +159,34 @@ public class AccountVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 账号ID
+    /**
+     * 账号ID
+     */
     private UUID id;
 
-    /// 登录类型
+    /**
+     * 登录类型
+     */
     private LoginType type;
 
-    /// 登录名称（用户名/手机号/邮箱）
+    /**
+     * 登录名称（用户名/手机号/邮箱）
+     */
     private String loginName;
 
-    /// 状态（1:正常 2:禁用 3:未验证）
+    /**
+     * 状态（1:正常 2:禁用 3:未验证）
+     */
     private Short status;
 
-    /// 是否已验证（0:未验证 1:已验证）
+    /**
+     * 是否已验证（0:未验证 1:已验证）
+     */
     private Short verified;
 
-    /// 是否为当前登录方式
+    /**
+     * 是否为当前登录方式
+     */
     private Boolean current;
 }
 ```
@@ -176,30 +202,38 @@ public class AccountVO implements Serializable {
 
 **添加内容**：
 ```java
-/// 获取用户的所有绑定账号
-///
-/// @param userId 用户ID
-/// @return 账号列表
+/**
+ * 获取用户的所有绑定账号
+ *
+ * @param userId 用户ID
+ * @return 账号列表
+ */
 List<Account> listByUserId(UUID userId);
 
-/// 绑定手机号
-///
-/// @param userId 用户ID
-/// @param phone 手机号
-/// @param code 验证码
+/**
+ * 绑定手机号
+ *
+ * @param userId 用户ID
+ * @param phone 手机号
+ * @param code 验证码
+ */
 void bindPhone(UUID userId, String phone, String code);
 
-/// 绑定邮箱
-///
-/// @param userId 用户ID
-/// @param email 邮箱
-/// @param code 验证码
+/**
+ * 绑定邮箱
+ *
+ * @param userId 用户ID
+ * @param email 邮箱
+ * @param code 验证码
+ */
 void bindEmail(UUID userId, String email, String code);
 
-/// 解绑账号
-///
-/// @param userId 用户ID
-/// @param accountId 账号ID
+/**
+ * 解绑账号
+ *
+ * @param userId 用户ID
+ * @param accountId 账号ID
+ */
 void unbind(UUID userId, UUID accountId);
 ```
 
@@ -352,11 +386,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/// 账号绑定控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 账号绑定控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Slf4j
 @RestController
 @RequestMapping("/account")
@@ -365,7 +401,9 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    /// 获取当前用户绑定的账号列表
+    /**
+     * 获取当前用户绑定的账号列表
+     */
     @ULog("'获取账号绑定列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -386,7 +424,9 @@ public class AccountController {
         }).toList();
     }
 
-    /// 绑定手机号
+    /**
+     * 绑定手机号
+     */
     @ULog("'绑定手机号'")
     @PostMapping(value = "/bindPhone", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -395,7 +435,9 @@ public class AccountController {
         accountService.bindPhone(userId, params.getPhone(), params.getCode());
     }
 
-    /// 绑定邮箱
+    /**
+     * 绑定邮箱
+     */
     @ULog("'绑定邮箱'")
     @PostMapping(value = "/bindEmail", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -404,7 +446,9 @@ public class AccountController {
         accountService.bindEmail(userId, params.getEmail(), params.getCode());
     }
 
-    /// 解绑账号
+    /**
+     * 解绑账号
+     */
     @ULog("'解绑账号'")
     @DeleteMapping(value = "/unbind/{accountId}", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -413,7 +457,9 @@ public class AccountController {
         accountService.unbind(userId, accountId);
     }
 
-    /// 根据账号类型获取显示名称
+    /**
+     * 根据账号类型获取显示名称
+     */
     private String getLoginName(com.devops00.spectra.core.auth.javabean.entity.Account account) {
         return switch (account.getType()) {
             case PASSWORD -> account.getLoginName();

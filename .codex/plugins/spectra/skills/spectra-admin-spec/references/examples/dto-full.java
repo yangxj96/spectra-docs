@@ -18,24 +18,32 @@ package com.devops00.spectra.example.javabean.dto;
 
 import lombok.Data;
 
-/// 数据传输对象完整示例
-///
-/// 注意：
-/// 1. DTO 用于跨层数据传输
-/// 2. 统一后缀 DTO
-/// 3. 使用 @Data 注解
-/// 4. 包路径：javabean/dto/
-/// 5. 使用 @Data 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 数据传输对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>DTO 用于跨层数据传输</li>
+ * <li>统一后缀 DTO</li>
+ * <li>使用 @Data 注解</li>
+ * <li>包路径：javabean/dto/</li>
+ * <li>使用 @Data 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullDTO {
 
-    /// 示例ID
+    /**
+     * 示例ID
+     */
     private String id;
 
-    /// 示例名称
+    /**
+     * 示例名称
+     */
     private String name;
 }

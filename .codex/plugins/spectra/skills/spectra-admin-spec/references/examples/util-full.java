@@ -16,25 +16,31 @@
 
 package com.devops00.spectra.example.utils;
 
-/// 工具类完整示例
-///
-/// 注意：
-/// 1. 工具类使用 final 修饰
-/// 2. 私有构造函数
-/// 3. 方法使用 static 修饰
-/// 4. 命名：XxxUtils
-/// 5. 使用 final 修饰类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 工具类完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>工具类使用 final 修饰</li>
+ * <li>私有构造函数</li>
+ * <li>方法使用 static 修饰</li>
+ * <li>命名：XxxUtils</li>
+ * <li>使用 final 修饰类</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 public final class ExampleFullUtils {
 
     private ExampleFullUtils() {
         // 私有构造函数
     }
 
-    /// 示例方法
+    /**
+     * 示例方法
+     */
     public static String formatName(String name) {
         if (name == null || name.isBlank()) {
             return "未命名";

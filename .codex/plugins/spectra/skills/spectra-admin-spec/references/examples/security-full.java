@@ -23,24 +23,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 权限控制完整示例
-///
-/// 注意：
-/// 1. 所有接口必须加 @PreAuthorize
-/// 2. 公开接口用 @PreAuthorize("permitAll()") 显式标注
-/// 3. 权限控制用 @PreAuthorize("hasPermission(null, 'MODULE:ACTION')")
-/// 4. 角色控制用 @PreAuthorize("hasRole('ROLE_xxx')")
-/// 5. 使用 @Slf4j 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 权限控制完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>所有接口必须加 @PreAuthorize</li>
+ * <li>公开接口用 @PreAuthorize("permitAll()") 显式标注</li>
+ * <li>权限控制用 @PreAuthorize("hasPermission(null, 'MODULE:ACTION')")</li>
+ * <li>角色控制用 @PreAuthorize("hasRole('ROLE_xxx')")</li>
+ * <li>使用 @Slf4j 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @RestController
 @RequestMapping("/security-full-example")
 public class SecurityFullExampleController {
 
-    /// 公开接口示例
+    /**
+     * 公开接口示例
+     */
     @ULog("'获取公开数据'")
     @GetMapping(value = "/public", version = "1.0.0+")
     @PreAuthorize("permitAll()")
@@ -48,7 +54,9 @@ public class SecurityFullExampleController {
         return "公开数据";
     }
 
-    /// 已认证用户接口示例
+    /**
+     * 已认证用户接口示例
+     */
     @ULog("'获取用户数据'")
     @GetMapping(value = "/authenticated", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -56,7 +64,9 @@ public class SecurityFullExampleController {
         return "用户数据";
     }
 
-    /// 权限控制接口示例
+    /**
+     * 权限控制接口示例
+     */
     @ULog("'获取管理数据'")
     @GetMapping(value = "/admin", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'SYSTEM:ADMIN')")
@@ -64,7 +74,9 @@ public class SecurityFullExampleController {
         return "管理数据";
     }
 
-    /// 角色控制接口示例
+    /**
+     * 角色控制接口示例
+     */
     @ULog("'获取开发数据'")
     @GetMapping(value = "/dev", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

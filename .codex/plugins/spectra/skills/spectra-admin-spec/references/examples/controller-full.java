@@ -31,20 +31,24 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-/// Controller完整示例
-///
-/// 注意：
-/// 1. 瘦 Controller：只做请求转发，不包含任何业务逻辑
-/// 2. 统一 @RequiredArgsConstructor + private final 构造器注入
-/// 3. 禁止返回 Object，必须返回具体类型
-/// 4. 统一方法命名：created/modify/deleteById/page
-/// 5. 所有接口必须加 @ULog、@PreAuthorize
-/// 6. 写操作必须加 @Validated
-/// 7. Mapping 注解中统一 version = "1.0.0+"
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * Controller完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>瘦 Controller：只做请求转发，不包含任何业务逻辑</li>
+ * <li>统一 @RequiredArgsConstructor + private final 构造器注入</li>
+ * <li>禁止返回 Object，必须返回具体类型</li>
+ * <li>统一方法命名：created/modify/deleteById/page</li>
+ * <li>所有接口必须加 @ULog、@PreAuthorize</li>
+ * <li>写操作必须加 @Validated</li>
+ * <li>Mapping 注解中统一 version = "1.0.0+"</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @RestController
 @RequestMapping("/example")
@@ -53,7 +57,9 @@ public class ExampleFullController {
 
     private final ExampleServiceInterface exampleService;
 
-    /// 分页查询示例列表
+    /**
+     * 分页查询示例列表
+     */
     @ULog("'查询示例列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -61,7 +67,9 @@ public class ExampleFullController {
         return exampleService.page(page, params);
     }
 
-    /// 查询示例详情
+    /**
+     * 查询示例详情
+     */
     @ULog("'查询示例详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -69,7 +77,9 @@ public class ExampleFullController {
         return exampleService.getDetail(id);
     }
 
-    /// 创建示例
+    /**
+     * 创建示例
+     */
     @ULog("'创建示例'")
     @PostMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:INSERT')")
@@ -77,7 +87,9 @@ public class ExampleFullController {
         exampleService.created(from);
     }
 
-    /// 更新示例
+    /**
+     * 更新示例
+     */
     @ULog("'更新示例'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:UPDATE')")
@@ -85,7 +97,9 @@ public class ExampleFullController {
         exampleService.modify(id, from);
     }
 
-    /// 删除示例
+    /**
+     * 删除示例
+     */
     @ULog("'删除示例'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:DELETE')")

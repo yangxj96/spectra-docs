@@ -155,19 +155,29 @@ CREATE TABLE spectra_core.wf_form_version (
 @Getter @Setter @ToString
 @TableName("wf_form_definition")
 public class FormDefinition extends BaseEntity {
-    /// 表单名称
+    /**
+     * 表单名称
+     */
     @TableField("name")
     private String name;
-    /// 表单编码（唯一）
+    /**
+     * 表单编码（唯一）
+     */
     @TableField("code")
     private String code;
-    /// 当前版本号
+    /**
+     * 当前版本号
+     */
     @TableField("current_version")
     private Integer currentVersion;
-    /// 是否启用
+    /**
+     * 是否启用
+     */
     @TableField("active")
     private Boolean active;
-    /// 描述
+    /**
+     * 描述
+     */
     @TableField("description")
     private String description;
 }
@@ -178,19 +188,29 @@ public class FormDefinition extends BaseEntity {
 @Getter @Setter @ToString
 @TableName("wf_form_version")
 public class FormVersion extends BaseEntity {
-    /// 关联表单定义ID
+    /**
+     * 关联表单定义ID
+     */
     @TableField("form_definition_id")
     private UUID formDefinitionId;
-    /// 版本号
+    /**
+     * 版本号
+     */
     @TableField("version")
     private Integer version;
-    /// form-create规则JSON
+    /**
+     * form-create规则JSON
+     */
     @TableField("rule_json")
     private String ruleJson;
-    /// form-create配置JSON
+    /**
+     * form-create配置JSON
+     */
     @TableField("options_json")
     private String optionsJson;
-    /// form-create完整输出
+    /**
+     * form-create完整输出
+     */
     @TableField("form_json")
     private String formJson;
 }
@@ -299,20 +319,34 @@ export const FormApi = {
 @Entity
 @Table(name = "wf_model")
 public class ProcessModel extends BaseEntity {
-    /// 模型名称
+    /**
+     * 模型名称
+     */
     private String name;
-    /// 流程Key
+    /**
+     * 流程Key
+     */
     private String key;
-    /// 描述
+    /**
+     * 描述
+     */
     private String description;
-    /// BPMN XML内容
+    /**
+     * BPMN XML内容
+     */
     @Column(columnDefinition = "TEXT")
     private String bpmnXml;
-    /// 关联的表单定义ID
+    /**
+     * 关联的表单定义ID
+     */
     private String formDefinitionId;
-    /// 版本号
+    /**
+     * 版本号
+     */
     private Integer version;
-    /// 是否已部署
+    /**
+     * 是否已部署
+     */
     private Boolean deployed;
 }
 ```
@@ -369,19 +403,29 @@ public class ProcessModel extends BaseEntity {
 **TaskService接口**：
 ```java
 public interface TaskService {
-    /// 查询待办任务
+    /**
+     * 查询待办任务
+     */
     IPage<TaskVO> todo(PageFrom page, String assignee);
     
-    /// 查询已办任务
+    /**
+     * 查询已办任务
+     */
     IPage<TaskVO> done(PageFrom page, String assignee);
     
-    /// 完成任务（审批通过）
+    /**
+     * 完成任务（审批通过）
+     */
     void complete(String taskId, boolean approved, String comment);
     
-    /// 驳回任务
+    /**
+     * 驳回任务
+     */
     void reject(String taskId, String comment);
     
-    /// 转办任务
+    /**
+     * 转办任务
+     */
     void transfer(String taskId, String targetUserId);
 }
 ```

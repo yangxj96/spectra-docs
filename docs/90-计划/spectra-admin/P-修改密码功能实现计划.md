@@ -45,21 +45,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 修改密码入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 修改密码入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangePasswordFrom {
 
-    /// 旧密码
+    /**
+     * 旧密码
+     */
     @NotBlank(message = "旧密码不能为空")
     private String old_password;
 
-    /// 新密码
+    /**
+     * 新密码
+     */
     @NotBlank(message = "新密码不能为空")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20位之间")
     @Pattern(
@@ -68,7 +74,9 @@ public class ChangePasswordFrom {
     )
     private String new_password;
 
-    /// 确认密码
+    /**
+     * 确认密码
+     */
     @NotBlank(message = "确认密码不能为空")
     private String verify_password;
 }
@@ -83,10 +91,12 @@ public class ChangePasswordFrom {
 
 **添加内容**：
 ```java
-/// 修改当前用户密码
-///
-/// @param userId 用户ID
-/// @param params 修改密码参数
+/**
+ * 修改当前用户密码
+ *
+ * @param userId 用户ID
+ * @param params 修改密码参数
+ */
 void changePassword(UUID userId, ChangePasswordFrom params);
 ```
 

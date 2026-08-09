@@ -28,23 +28,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-/// 事务处理完整示例
-///
-/// 注意：
-/// 1. 写操作必须加 @Transactional
-/// 2. 异常消息统一中文
-/// 3. 使用自定义异常，禁止裸 RuntimeException
-/// 4. 使用 @Slf4j 注解
-/// 5. 使用 @Service 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 事务处理完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>写操作必须加 @Transactional</li>
+ * <li>异常消息统一中文</li>
+ * <li>使用自定义异常，禁止裸 RuntimeException</li>
+ * <li>使用 @Slf4j 注解</li>
+ * <li>使用 @Service 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @Service
 public class TransactionFullExample extends BaseServiceImpl<ExampleFullMapper, ExampleFullEntity> {
 
-    /// 事务处理示例
+    /**
+     * 事务处理示例
+     */
     @Transactional
     public void transactionExample(UUID id, ExampleFullFrom from) {
         // 1. 查询实体
@@ -63,7 +69,9 @@ public class TransactionFullExample extends BaseServiceImpl<ExampleFullMapper, E
         log.info("更新示例成功: id={}", id);
     }
 
-    /// 事务传播示例
+    /**
+     * 事务传播示例
+     */
     @Transactional
     public void propagationExample() {
         // 事务传播：内部方法会加入外部事务

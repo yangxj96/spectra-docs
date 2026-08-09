@@ -20,30 +20,42 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/// 列表视图对象完整示例
-///
-/// 注意：
-/// 1. VO 用于响应数据封装
-/// 2. 统一后缀 VO
-/// 3. 使用 @Data 注解
-/// 4. 包路径：javabean/vo/
-/// 5. 与 DetailVO 分开定义，职责单一
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 列表视图对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>VO 用于响应数据封装</li>
+ * <li>统一后缀 VO</li>
+ * <li>使用 @Data 注解</li>
+ * <li>包路径：javabean/vo/</li>
+ * <li>与 DetailVO 分开定义，职责单一</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullListVO {
 
-    /// 示例ID
+    /**
+     * 示例ID
+     */
     private String id;
 
-    /// 示例名称
+    /**
+     * 示例名称
+     */
     private String name;
 
-    /// 是否激活
+    /**
+     * 是否激活
+     */
     private Boolean active;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 }

@@ -22,41 +22,57 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/// From对象完整示例
-///
-/// 注意：
-/// 1. 统一后缀 From（非 Form）
-/// 2. 包路径：javabean/from/
-/// 3. 必填字段必须加 @NotBlank/@NotNull 等校验注解
-/// 4. 使用 @Data 注解
-/// 5. 提供清晰的中文 message 参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * From对象完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>统一后缀 From（非 Form）</li>
+ * <li>包路径：javabean/from/</li>
+ * <li>必填字段必须加 @NotBlank/@NotNull 等校验注解</li>
+ * <li>使用 @Data 注解</li>
+ * <li>提供清晰的中文 message 参数</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Data
 public class ExampleFullFrom {
 
-    /// 示例名称
+    /**
+     * 示例名称
+     */
     @NotBlank(message = "示例名称不能为空")
     private String name;
 
-    /// 示例编码（可选，后端自动生成）
+    /**
+     * 示例编码（可选，后端自动生成）
+     */
     private String code;
 
-    /// 描述
+    /**
+     * 描述
+     */
     private String description;
 
-    /// 是否激活
+    /**
+     * 是否激活
+     */
     @NotNull(message = "激活状态不能为空")
     private Boolean active;
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    /// 密码
+    /**
+     * 密码
+     */
     @NotBlank(message = "密码不能为空")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20之间")
     private String password;

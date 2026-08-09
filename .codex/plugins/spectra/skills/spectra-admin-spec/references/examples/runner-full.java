@@ -21,17 +21,21 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-/// 模块启动执行器完整示例
-///
-/// 注意：
-/// 1. 使用 @Component 注解
-/// 2. 实现 ApplicationRunner 接口
-/// 3. 在应用启动后执行
-/// 4. 使用 @Slf4j 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 模块启动执行器完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>使用 @Component 注解</li>
+ * <li>实现 ApplicationRunner 接口</li>
+ * <li>在应用启动后执行</li>
+ * <li>使用 @Slf4j 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @Component
 public class ExampleFullRunner implements ApplicationRunner {

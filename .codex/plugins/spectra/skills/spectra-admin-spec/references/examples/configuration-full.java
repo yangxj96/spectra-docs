@@ -18,17 +18,21 @@ package com.devops00.spectra.example.configuration;
 
 import org.springframework.context.annotation.Configuration;
 
-/// 模块配置类完整示例
-///
-/// 注意：
-/// 1. 配置类放在 configuration/ 包下
-/// 2. 使用 @Configuration 注解
-/// 3. 模块级配置，非全局配置
-/// 4. 使用 @Configuration 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 模块配置类完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>配置类放在 configuration/ 包下</li>
+ * <li>使用 @Configuration 注解</li>
+ * <li>模块级配置，非全局配置</li>
+ * <li>使用 @Configuration 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Configuration
 public class ExampleFullConfiguration {
 

@@ -19,16 +19,20 @@ package com.devops00.spectra.example.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
 
-/// Mapper接口完整示例
-///
-/// 注意：
-/// 1. 继承 BaseMapper<Entity>
-/// 2. 包路径：mapper/
-/// 3. 使用 @Mapper 注解（可选）
-/// 4. 提供基础 CRUD 操作
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * Mapper接口完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>继承 BaseMapper<Entity></li>
+ * <li>包路径：mapper/</li>
+ * <li>使用 @Mapper 注解（可选）</li>
+ * <li>提供基础 CRUD 操作</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 public interface ExampleFullMapper extends BaseMapper<ExampleFullEntity> {
 }

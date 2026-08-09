@@ -69,11 +69,13 @@ spectra-admin 采用标准 Spring Boot 分层架构，所有后端代码必须�
 - 类注释必须包含 `@author`、`@version`、`@since`
 
 ```java
-/// 表单定义Service实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 表单定义Service实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 ```
 
 ### 2. 包结构

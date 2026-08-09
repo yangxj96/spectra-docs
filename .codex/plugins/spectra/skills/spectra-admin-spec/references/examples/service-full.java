@@ -26,32 +26,46 @@ import com.devops00.spectra.example.javabean.vo.ExampleFullVO;
 
 import java.util.UUID;
 
-/// Service接口完整示例
-///
-/// 注意：
-/// 1. 继承 BaseService<Entity>
-/// 2. 禁止直接继承 MyBatis-Plus 的 IService
-/// 3. 方法命名规范：created/modify/deleteById/page
-/// 4. 返回类型使用具体 VO 类型
-/// 5. 使用 @Service 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * Service接口完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>继承 BaseService<Entity></li>
+ * <li>禁止直接继承 MyBatis-Plus 的 IService</li>
+ * <li>方法命名规范：created/modify/deleteById/page</li>
+ * <li>返回类型使用具体 VO 类型</li>
+ * <li>使用 @Service 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 public interface ExampleFullServiceInterface extends BaseService<ExampleFullEntity> {
 
-    /// 分页查询示例列表
+    /**
+     * 分页查询示例列表
+     */
     IPage<ExampleFullVO> page(PageFrom page, ExamplePageFrom params);
 
-    /// 查询示例详情
+    /**
+     * 查询示例详情
+     */
     ExampleFullVO getDetail(UUID id);
 
-    /// 创建示例
+    /**
+     * 创建示例
+     */
     void created(ExampleFullFrom from);
 
-    /// 更新示例
+    /**
+     * 更新示例
+     */
     void modify(UUID id, ExampleFullFrom from);
 
-    /// 删除示例
+    /**
+     * 删除示例
+     */
     void deleteById(UUID id);
 }

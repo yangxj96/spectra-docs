@@ -104,15 +104,17 @@ DROP TABLE IF EXISTS spectra_ai.ai_session;
 ```java
 package com.devops00.spectra.ai.javabean;
 
-/// AI 对话复合记忆标识
-///
-/// conversationId 用于 ChatMemory 缓存 key 和数据库存储 key；
-/// token 用于工具执行时设置 SecurityContext。
-/// equals/hashCode 仅比较 conversationId，确保同一会话在 token 变化后仍复用同一 Memory 实例。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 对话复合记忆标识
+ *
+ * conversationId 用于 ChatMemory 缓存 key 和数据库存储 key；
+ * token 用于工具执行时设置 SecurityContext。
+ * equals/hashCode 仅比较 conversationId，确保同一会话在 token 变化后仍复用同一 Memory 实例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public record AiMemoryId(String conversationId, String token) {
 
     @Override
@@ -156,26 +158,34 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-/// AI 会话元数据
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话元数据
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "ai_conversation", schema = "spectra_ai")
 public class AiConversation extends BaseEntity {
 
-    /// 所属用户 ID
+    /**
+     * 所属用户 ID
+     */
     @TableField("user_id")
     private UUID userId;
 
-    /// 会话标题
+    /**
+     * 会话标题
+     */
     @TableField("title")
     private String title;
 
-    /// 状态：active / archived
+    /**
+     * 状态：active / archived
+     */
     @TableField("status")
     private String status;
 }
@@ -200,30 +210,40 @@ import lombok.ToString;
 
 import java.time.Instant;
 
-/// AI 对话消息持久化记录
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 对话消息持久化记录
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "ai_chat_memory", schema = "spectra_ai")
 public class AiChatMemory {
 
-    /// 会话 ID（= ai_conversation.id::text）
+    /**
+     * 会话 ID（= ai_conversation.id::text）
+     */
     @TableId(value = "memory_id", type = IdType.INPUT)
     private String memoryId;
 
-    /// 序列化的消息 JSON
+    /**
+     * 序列化的消息 JSON
+     */
     @TableField("messages")
     private String messages;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     @TableField("created_at")
     private Instant createdAt;
 
-    /// 更新时间
+    /**
+     * 更新时间
+     */
     @TableField("updated_at")
     private Instant updatedAt;
 }
@@ -241,11 +261,13 @@ package com.devops00.spectra.ai.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.ai.javabean.entity.AiConversation;
 
-/// AI 会话 Mapper
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话 Mapper
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public interface AiConversationMapper extends BaseMapper<AiConversation> {
 }
 ```
@@ -263,14 +285,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.ai.javabean.entity.AiChatMemory;
 import org.apache.ibatis.annotations.Param;
 
-/// AI 对话消息存储 Mapper
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 对话消息存储 Mapper
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public interface AiChatMemoryMapper extends BaseMapper<AiChatMemory> {
 
-    /// 插入或更新消息（PostgreSQL ON CONFLICT）
+    /**
+     * 插入或更新消息（PostgreSQL ON CONFLICT）
+     */
     void upsert(@Param("memoryId") String memoryId, @Param("messages") String messages);
 }
 ```
@@ -350,11 +376,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/// 基于 PostgreSQL 的 ChatMemoryStore 实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * 基于 PostgreSQL 的 ChatMemoryStore 实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Component
 @RequiredArgsConstructor
 public class PostgresChatMemoryStore implements ChatMemoryStore {
@@ -412,23 +440,33 @@ import com.devops00.spectra.common.base.BaseService;
 import java.util.List;
 import java.util.UUID;
 
-/// AI 会话管理 Service
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话管理 Service
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public interface AiConversationService extends BaseService<AiConversation> {
 
-    /// 创建新会话
+    /**
+     * 创建新会话
+     */
     UUID create(UUID userId, String firstMessage);
 
-    /// 获取当前用户的会话列表
+    /**
+     * 获取当前用户的会话列表
+     */
     List<AiConversation> listByUser(UUID userId);
 
-    /// 重命名会话
+    /**
+     * 重命名会话
+     */
     void rename(UUID conversationId, UUID userId, String title);
 
-    /// 删除会话（同时清理消息存储）
+    /**
+     * 删除会话（同时清理消息存储）
+     */
     void delete(UUID conversationId, UUID userId);
 }
 ```
@@ -457,11 +495,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-/// AI 会话管理 Service 实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话管理 Service 实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -585,10 +625,14 @@ import java.util.UUID;
 @Data
 public class AiAskFrom {
 
-    /// 会话 ID（为空时自动创建新会话）
+    /**
+     * 会话 ID（为空时自动创建新会话）
+     */
     private UUID conversationId;
 
-    /// 问题消息
+    /**
+     * 问题消息
+     */
     @NotBlank(message = "消息内容不能为空")
     private String message;
 }
@@ -765,18 +809,24 @@ package com.devops00.spectra.ai.javabean.vo;
 
 import lombok.Data;
 
-/// 对话消息 VO（前端展示用）
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * 对话消息 VO（前端展示用）
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Data
 public class ChatMessageVO {
 
-    /// 角色：user / assistant / system
+    /**
+     * 角色：user / assistant / system
+     */
     private String role;
 
-    /// 消息内容
+    /**
+     * 消息内容
+     */
     private String content;
 }
 ```

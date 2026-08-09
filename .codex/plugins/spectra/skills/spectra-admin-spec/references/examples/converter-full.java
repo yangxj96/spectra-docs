@@ -25,27 +25,37 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-/// MapStruct转换器完整示例
-///
-/// 注意：
-/// 1. 所有模块必须使用 MapStruct Converter 进行对象转换，禁止手动 setter
-/// 2. 统一放在 javabean/converter/
-/// 3. 引用 GlobalMapperConfig.class 和 TimeMapper.class
-/// 4. 使用 @Mapper 注解
-/// 5. 提供 toVO、toEntity、updateEntity 方法
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * MapStruct转换器完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>所有模块必须使用 MapStruct Converter 进行对象转换，禁止手动 setter</li>
+ * <li>统一放在 javabean/converter/</li>
+ * <li>引用 GlobalMapperConfig.class 和 TimeMapper.class</li>
+ * <li>使用 @Mapper 注解</li>
+ * <li>提供 toVO、toEntity、updateEntity 方法</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ExampleFullConverter {
 
-    /// 实体转 VO
+    /**
+     * 实体转 VO
+     */
     ExampleFullVO toVO(ExampleFullEntity source);
 
-    /// From 转实体
+    /**
+     * From 转实体
+     */
     ExampleFullEntity toEntity(ExampleFullFrom source);
 
-    /// 更新已有实体
+    /**
+     * 更新已有实体
+     */
     void updateEntity(ExampleFullFrom source, @MappingTarget ExampleFullEntity target);
 }

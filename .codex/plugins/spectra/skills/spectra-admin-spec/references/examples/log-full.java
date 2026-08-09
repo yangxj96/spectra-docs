@@ -18,28 +18,36 @@ package com.devops00.spectra.example.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 
-/// 日志使用完整示例
-///
-/// 注意：
-/// 1. Controller 层：使用 log.debug() 记录请求入参
-/// 2. Service 层：关键业务节点用 log.info()，异常用 log.error()
-/// 3. 日志消息使用中文
-/// 4. 关键节点必须记录实体 ID
-/// 5. 使用 @Slf4j 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 日志使用完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>Controller 层：使用 log.debug() 记录请求入参</li>
+ * <li>Service 层：关键业务节点用 log.info()，异常用 log.error()</li>
+ * <li>日志消息使用中文</li>
+ * <li>关键节点必须记录实体 ID</li>
+ * <li>使用 @Slf4j 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 public class LogFullExample {
 
-    /// Controller 层日志示例
+    /**
+     * Controller 层日志示例
+     */
     public void controllerLogExample() {
         // 使用较低级别 log.debug() 记录请求入参
         log.debug("查询示例列表: name={}, page={}", "test", 1);
     }
 
-    /// Service 层日志示例
+    /**
+     * Service 层日志示例
+     */
     public void serviceLogExample() {
         // 关键业务节点用 log.info()
         log.info("创建示例成功: id={}, name={}", "123", "test");

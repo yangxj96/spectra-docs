@@ -23,23 +23,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 版本控制完整示例
-///
-/// 注意：
-/// 1. Mapping 注解中统一 version = "1.0.0+"
-/// 2. 版本号格式：主版本.次版本.修订号
-/// 3. "+" 表示兼容该版本及更高版本
-/// 4. 使用 @Slf4j 注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 版本控制完整示例
+ *
+ * 注意：
+ * <ol>
+ * <li>Mapping 注解中统一 version = "1.0.0+"</li>
+ * <li>版本号格式：主版本.次版本.修订号</li>
+ * <li>"+" 表示兼容该版本及更高版本</li>
+ * <li>使用 @Slf4j 注解</li>
+ * </ol>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @RestController
 @RequestMapping("/version-full-example")
 public class VersionFullExampleController {
 
-    /// 版本控制接口示例
+    /**
+     * 版本控制接口示例
+     */
     @ULog("'获取版本数据'")
     @GetMapping(value = "/data", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
@@ -47,7 +53,9 @@ public class VersionFullExampleController {
         return "版本数据";
     }
 
-    /// 不同版本的接口示例
+    /**
+     * 不同版本的接口示例
+     */
     @ULog("'获取V1版本数据'")
     @GetMapping(value = "/data", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
