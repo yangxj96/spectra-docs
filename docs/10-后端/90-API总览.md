@@ -14,6 +14,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取 |
+| `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑 |
 
 ## 核心 — 公共服务
 
@@ -38,8 +39,15 @@ tags:
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
-| `ServiceMonitorController` | spectra-core | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
+| `ServiceMonitorController` | spectra-core | `/service/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
+
+## 消息中心
+
+| Controller | 模块 | 基础路径 | 说明 |
+|---|---|---|---|
+| `NotificationController` | spectra-core | `/notification/**` | 消息分页、未读数、标记已读、删除与发送 |
+| `NotificationSettingController` | spectra-core | `/notification/setting/**` | 当前用户消息接收偏好查询与保存 |
 
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。权限树 `GET /authority/tree` 需要 `AUTHORITY:QUERY`，权限树写操作仅限 `ROLE_DEV_OPS`。
 
@@ -55,12 +63,12 @@ tags:
 |---|---|---|---|
 | `AssetController` | spectra-oa | `/oa/assets/**` | 资产台账、分类与生命周期 |
 | `SupplyController` | spectra-oa | `/oa/supplies/**` | 办公用品 SKU、库存变动与最低库存 |
-| `CalendarController` | spectra-oa | `/calendar/**` | 日程查询、创建、更新、删除 |
-| `ContactController` | spectra-oa | `/oa/contact/page` | 基于 Core 用户/部门的只读组织通讯录，不维护 OA 联系人表 |
+| `CalendarController` | spectra-oa | `/oa/calendar/**` | 日程查询、创建、更新、删除 |
+| `ContactController` | spectra-oa | `/oa/contact/**` | 基于 Core 用户/部门的只读组织通讯录，不维护 OA 联系人表 |
 | `ContractController` | spectra-oa | `/oa/contract/**` | 合同管理 |
-| `DocumentController` | spectra-oa | `/document/**` | 文档管理 |
-| `MeetingController` | spectra-oa | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
-| `NoticeController` | spectra-oa | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
+| `DocumentController` | spectra-oa | `/oa/document/**` | 文档管理 |
+| `MeetingController` | spectra-oa | `/oa/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
+| `NoticeController` | spectra-oa | `/oa/notice/**` | 公告发布范围、发布/撤回、已读回执 |
 | `ReportController` | spectra-oa | `/oa/report/**` | 基于业务表的部门维度统计与 Excel 导出，不维护通用报表实体 |
 | `ApplicationController` | spectra-oa | `/oa/applications/**` | 通用申请分页、详情、申请类型配置、撤回、取消 |
 | `LeaveController` | spectra-oa | `/oa/leave/**` | 请假草稿、提交、查询、撤回、取消 |
@@ -72,7 +80,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `FileController` | spectra-upload | `/file/**` | 文件上传/下载/分片上传 |
+| `FileController` | spectra-upload | `/file/upload/**` | 文件上传/下载/分片上传 |
 | `FileInfoController` | spectra-upload | `/file/info/**` | 文件信息/类型管理 |
 
 ## 工作流
@@ -80,18 +88,19 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `FormDefinitionController` | spectra-workflow | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
-| `ModelController` | spectra-workflow | `/workflow/model/**` | 流程模型 CRUD + 部署 |
+| `ModelController` | spectra-workflow | `/workflow/model/**` | 流程模型草稿入口（当前为空壳） |
 | `ProcessDefinitionController` | spectra-workflow | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | `ProcessInstanceController` | spectra-workflow | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
 | `TaskController` | spectra-workflow | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；写操作校验当前办理人 |
-| `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时状态查询 |
-| `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史记录查询 |
+| `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时控制入口（当前为空壳） |
+| `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史查询入口（当前为空壳） |
 
 ## AI
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `AiAskController` | spectra-ai | `/ai/**` | AI 问答接口 |
+| `AiAskController` | spectra-ai | `/ai/ask/**` | AI 问答接口 |
+| `AiConversationController` | spectra-ai | `/ai/conversation/**` | 当前用户 AI 会话列表、消息历史与删除 |
 
 ## 全局异常处理
 

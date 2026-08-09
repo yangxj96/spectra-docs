@@ -14,6 +14,7 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | AuthController | `/auth/**` | 登录/登出/刷新 Token/验证码获取 |
+| AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑 |
 
 ## 核心 — 公共
 
@@ -38,7 +39,7 @@ tags:
 | RegionController | `/region/**` | 区域查询（省/市/区县） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |
 | ConfiguredController | `/configured/**` | 配置表管理 |
-| ServiceMonitorController | `/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
+| ServiceMonitorController | `/service/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
 | CryptoController | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 
 ## 消息中心
@@ -46,6 +47,7 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | NotificationController | `/notification/**` | 消息列表/未读数/已读/删除/发送 |
+| NotificationSettingController | `/notification/setting/**` | 当前用户消息接收偏好查询与保存 |
 
 `POST /notification/batch-delete` 使用 `NotificationBatchDeleteFrom` 请求体：`{"ids":["消息ID"]}`。
 
@@ -59,12 +61,12 @@ tags:
 |---|---|---|
 | AssetController | `/oa/assets/**` | 资产台账、分类、生命周期和采购收货转草稿 |
 | SupplyController | `/oa/supplies/**` | 办公用品台账、入库、领用、退库、调整和最低库存 |
-| CalendarController | `/calendar/**` | 日程查询、创建、更新、删除 |
-| ContactController | `/oa/contact/page` | 基于 Core 用户/部门的只读组织通讯录 |
+| CalendarController | `/oa/calendar/**` | 日程查询、创建、更新、删除 |
+| ContactController | `/oa/contact/**` | 基于 Core 用户/部门的只读组织通讯录 |
 | ContractController | `/oa/contract/**` | 合同管理 |
-| DocumentController | `/document/**` | 文档管理 |
-| MeetingController | `/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
-| NoticeController | `/notice/**` | 公告发布范围、发布/撤回、已读回执 |
+| DocumentController | `/oa/document/**` | 文档管理 |
+| MeetingController | `/oa/meeting/**` | 会议创建、冲突检测、参会响应、签到、纪要 |
+| NoticeController | `/oa/notice/**` | 公告发布范围、发布/撤回、已读回执 |
 | ReportController | `/oa/report/**` | 基于业务表的部门维度统计与 Excel 导出（`/department`、`/department/export`） |
 | ApplicationController | `/oa/applications/**` | 通用申请分页、详情、申请类型配置、撤回、取消 |
 | LeaveController | `/oa/leave/**` | 请假草稿、提交、审批状态查询、撤回、取消 |
@@ -76,7 +78,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| FileController | `/file/**` | 文件上传/下载/分片上传 |
+| FileController | `/file/upload/**` | 文件上传/下载/分片上传 |
 | FileInfoController | `/file/info/**` | 文件信息/类型管理 |
 
 ## 工作流
@@ -84,6 +86,7 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | FormDefinitionController | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
+| ModelController | `/workflow/model/**` | 流程模型草稿入口（当前为空壳） |
 | ProcessDefinitionController | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | ProcessInstanceController | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
 | TaskController | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；任务动作校验当前办理人 |
@@ -94,7 +97,8 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AiAskController | `/ai/**` | AI 问答接口 |
+| AiAskController | `/ai/ask/**` | AI 问答接口 |
+| AiConversationController | `/ai/conversation/**` | 当前用户 AI 会话列表、消息历史与删除 |
 
 ## 全局异常处理
 

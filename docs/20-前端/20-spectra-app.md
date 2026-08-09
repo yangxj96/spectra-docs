@@ -22,18 +22,19 @@ tags:
 
 | 技术 | 版本 |
 |---|---|
-| Vue | 3.x |
-| 框架 | uni-app (跨端) |
-| 构建工具 | Vite 5 |
-| 语言 | TypeScript |
-| 包管理 | pnpm 11 |
+| Vue | 3.4.21 |
+| 框架 | uni-app 3.0.0-5010420260703001 |
+| 构建工具 | Vite 5.2.8 |
+| 语言 | TypeScript 5.4.5 |
+| 包管理 | pnpm 11.0.9 |
 | Node | 24.14.0 |
+| H5 端口 | 5174 |
 
 ## 运行模式
 
 ```bash
 pnpm install         # 安装依赖
-pnpm start           # H5 开发（浏览器），自动 typecheck+lint+format
+pnpm start           # H5 开发（http://localhost:5174），自动 type-check+lint+format
 pnpm dev:mp-weixin   # 微信小程序开发
 ```
 
@@ -54,16 +55,22 @@ pnpm dev:mp-weixin   # 微信小程序开发
 ```
 spectra-app/
 ├── src/
-│   ├── api/          # API 请求封装
 │   ├── components/   # 公共组件
-│   ├── composables/  # 组合式函数
 │   ├── config/
 │   │   └── env.ts          # 环境变量统一导出（含 CRYPTO_ENABLED）
+│   ├── helper/       # 通用辅助函数
+│   ├── hooks/        # uni-app 组合式逻辑
+│   ├── interceptor/  # 请求/路由拦截器
+│   ├── locales/      # i18n 语言包
 │   ├── pages/        # 页面（uni-app 页面路由）
+│   ├── platform/     # H5/小程序/App 平台能力抽象
 │   ├── services/
 │   │   └── http.ts         # HTTP 客户端（H5 平台集成加密/解密）
 │   ├── static/       # 静态资源
 │   ├── stores/       # Pinia 状态管理
+│   ├── styles/       # 全局样式
+│   ├── subpackages/  # 小程序分包页面
+│   ├── types/        # 全局与业务类型
 │   ├── utils/        # 工具函数
 │   │   └── crypto/    # 加解密工具（H5 平台可用，#ifdef 条件编译）
 │   ├── App.vue       # 根组件

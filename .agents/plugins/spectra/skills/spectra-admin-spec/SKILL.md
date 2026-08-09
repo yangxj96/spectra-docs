@@ -64,7 +64,8 @@ spectra-admin 采用标准 Spring Boot 分层架构，所有后端代码必须�
 
 ### 1. 注释规范
 
-- 使用三斜杠（`///`）注释，而非 Javadoc 块注释
+- 使用传统 Javadoc 块注释（`/** ... */`），不使用 Java 23+ 的三斜杠 Markdown 文档注释
+- 文档内容使用传统 Javadoc/HTML 语法：标题使用 `<h3>`，列表使用 `<ul>/<li>`，代码和类型使用 `{@code ...}` 或 `<code>...</code>`
 - 每个 Java 文件必须包含 Apache License 2.0 头部
 - 类注释必须包含 `@author`、`@version`、`@since`
 

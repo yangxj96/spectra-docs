@@ -1,6 +1,10 @@
 # 工作流 Picker 选择弹框 实现计划
 
-> **面向 AI 代理的工作者：** 必需子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 逐任务实现此计划。步骤使用复选框（`- [ ]`）语法来跟踪进度。
+## 状态
+
+**待启动**
+
+> 执行时按 `spectra-ui/AGENTS.md` 和 Spectra Web skill 实施，并使用复选框跟踪进度；不依赖仓库未提供的外部 Agent 技能。
 
 **目标：** 为流程设计器的 5 种 picker 类型（form/user/group/javaClass/process）实现对应的选择弹框，点击属性面板「选择」按钮后弹出对应弹框，选中后回填到 BPMN 属性。
 

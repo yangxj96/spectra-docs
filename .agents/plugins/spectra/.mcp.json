@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "D:\\Develop\\Platform\\codegraph\\bin\\codegraph.cmd",
+      "args": [
+        "serve",
+        "--mcp"
+      ],
+      "cwd": "D:\\Develop\\Projects\\spectra"
+    }
+  }
+}

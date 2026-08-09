@@ -40,10 +40,10 @@ tags:
 
 1. 完成工作流模块的完整实现（后端API + 前端页面）
 2. 实现自定义表单、流程编辑、流程管理三大功能
-3. 完成后，以下计划可自动关闭：
-   - P-Workflow审批流完善计划
-   - P-LogicFlow插件完善计划（阶段一）
-   - P-OA模块对标分析与开发计划（阶段一）
+3. 复用已经完成的审批流前置能力，并在本计划中继续收口：
+   - 任务审批、流程实例查询、业务回调和流程状态查询已完成
+   - P-LogicFlow插件完善计划（阶段一）仍由本计划阶段二衔接
+   - OA 模块建设路线统一由通用 OA 总计划维护
 
 ---
 
@@ -59,9 +59,9 @@ graph TB
     end
 
     subgraph "关联计划"
-        E[P-Workflow审批流完善计划]
+        E[已完成的审批流前置能力]
         F[P-LogicFlow插件完善计划]
-        G[P-OA模块对标分析与开发计划]
+        G[通用 OA 业务建设总计划]
     end
 
     A -->|"完成后"| F
@@ -80,9 +80,9 @@ graph TB
 | 关联计划 | 关闭条件 | 对应本计划阶段 |
 |---|---|---|
 | P-LogicFlow插件完善计划（阶段一） | 流程验证 + 部署API对接完成 | 阶段二 |
-| P-Workflow审批流完善计划（阶段一-三） | TaskController + ProcessInstanceController完成 | 阶段三 |
-| P-Workflow审批流完善计划（阶段四-五） | 审批回调 + 流程图完成 | 阶段三-四 |
-| P-OA模块对标分析与开发计划（阶段一） | Meeting接入审批流完成 | 阶段四 |
+| 审批流前置能力（任务与实例） | TaskController + ProcessInstanceController 已完成 | 已落地 |
+| 审批流前置能力（回调与流程图） | 审批回调 + 流程状态查询已完成 | 已落地 |
+| 通用 OA 业务建设总计划 | OA 业务逐步接入统一审批能力 | 阶段四 |
 
 ---
 
@@ -549,15 +549,12 @@ public interface TaskService {
 
 ## 五、计划关闭条件
 
-### P-Workflow审批流完善计划
+### 已完成的审批流前置能力
 
-当以下条件全部满足时，该计划可关闭：
-
-- [ ] TaskController实现完成（待办/已办/完成/驳回/转办）
-- [ ] ProcessInstanceController实现完成（查询/终止/流程图）
-- [ ] 流程变量传递功能完成
-- [ ] OA审批流程定义部署完成
-- [ ] 审批回调机制实现完成
+- [x] TaskController 已实现待办、已办、完成、驳回、转办和委派
+- [x] ProcessInstanceController 已实现查询、终止和流程图状态查询
+- [x] 流程变量传递与 OA 审批流程定义部署完成
+- [x] 审批回调机制已接入请假、报销和采购流程
 
 ### P-LogicFlow插件完善计划（阶段一）
 
@@ -566,7 +563,7 @@ public interface TaskService {
 - [ ] 流程验证功能完成（保存前验证）
 - [ ] 部署API对接完成（与后端ModelController集成）
 
-### P-OA模块对标分析与开发计划（阶段一）
+### OA 集成收口条件
 
 当以下条件全部满足时，该计划阶段一可关闭：
 
@@ -578,8 +575,7 @@ public interface TaskService {
 
 ## 相关
 
-- [[90-计划/spectra-admin/P-Workflow审批流完善计划]] — Workflow审批流完善计划（将被本计划整合）
 - [[90-计划/logicflow-plugin-flowable/P-LogicFlow插件完善计划]] — LogicFlow插件完善计划（将被本计划整合）
-- [[90-计划/spectra-admin/P-OA模块对标分析与开发计划]] — OA模块对标分析与开发计划（阶段一将被本计划完成）
+- [[90-计划/spectra-admin/P-通用OA业务建设总计划]] — OA 业务建设的唯一总控计划
 - [[60-工作流]] — 工作流模块文档
 - [[40-OA模块]] — OA模块文档

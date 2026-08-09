@@ -52,7 +52,7 @@ tags:
 
 ```bash
 pnpm install    # 安装依赖
-pnpm start      # 启动开发服务器（:5173），自动执行 format+lint+typecheck
+pnpm start      # 启动开发服务器（:5173），自动执行 format+lint+type-check
 ```
 
 ## 目录结构
