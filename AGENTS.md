@@ -5,7 +5,7 @@
 
 - MCP 可用时优先调用 `codegraph_explore`。
 - MCP 不可用时执行：`& 'D:\Develop\Platform\codegraph\bin\codegraph.cmd' explore "符号或问题"`。
-- 架构全景、社区结构和 god nodes 才使用 graphify；日常源码查询使用 CodeGraph。
+- 源码定义、调用链、影响范围和高层依赖分析统一使用 CodeGraph。
 <!-- CODEGRAPH_END -->
 
 # AGENTS.md
@@ -63,6 +63,7 @@ Spectra 是一个后端服务、两个前端客户端和一个流程建模插件
 - 根目录 `.mise.local.toml` 只保存本机环境变量；不要读取后输出、复制或提交其中的密钥。
 - 子项目 `mise.toml` 分别固定 JDK 25.0.2 或 Node 24.14.0 + pnpm 11.0.9。
 - Maven 3.9.12 使用 `spectra-admin/mvnw.cmd`，不要依赖全局 Maven。
+- Windows 命令统一使用 `C:\Program Files\PowerShell\7\pwsh.exe` 7.6 或更高版本；不要使用 Windows PowerShell 5.1 的 `powershell.exe`。根目录脚本通过 `#requires -Version 7.6` 强制执行此约束。
 - mise 信任是人工安全决策；若提示未信任，只提醒用户在对应目录执行一次 `mise trust`，Agent 不自动修改信任状态。只读检查和验证可点源 `scripts/agent-runtime.ps1`，直接使用项目固定运行时。
 
 ```powershell
@@ -116,7 +117,6 @@ PowerShell 中 `-Dspotless.ratchetFrom=NONE` 必须作为带引号的单个参�
 - Web：`spectra:spectra-ui-spec`
 - 移动端：`spectra:spectra-app-spec`
 - Git：`spectra:git-execution-spec`
-- 架构级 graphify：`spectra:graphify`
 
 Skill 是工作流和规范的唯一来源；不要在多个 `AGENTS.md` 中复制整份 skill 内容。若 skill 与 `docs/40-规范/` 冲突，以当前项目文档和用户最新明确决定为准，并同步修正 skill 源文件。
 

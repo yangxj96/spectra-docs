@@ -12,10 +12,10 @@ spectra-docs/
 │   ├── 00-项目总览.md
 │   ├── 10-后端/      ← 架构分层/用户权限/系统管理/OA/文件/工作流/AI/API
 │   ├── 20-前端/      ← spectra-ui / spectra-app
-│   ├── 30-数据模型/   ← ER 图 / 25个实体清单
+│   ├── 30-数据模型/   ← ER 图 / 实体清单
 │   ├── 40-开发指南/   ← 环境搭建 / 常用命令
 │   └── 99-模板/
-├── .codex/plugins/spectra/  ← Codex 项目插件（规范、graphify 与 CodeGraph MCP）
+├── .agents/plugins/spectra/ ← Codex 项目插件（规范与 CodeGraph MCP）
 │   └── skills/       ← Spectra 专用 Codex skills
 ├── .codex/config.toml ← 项目级 Codex MCP 配置
 ├── AGENTS.md         ← 根级 Agent 指令
@@ -86,7 +86,6 @@ codegraph init
 | `spectra-ui-spec` | Web Vue/TypeScript 架构、类型、组件和测试规范 |
 | `spectra-app-spec` | 移动端 uni-app 跨平台、接口和类型规范 |
 | `git-execution-spec` | Git 安全检查、提交规范和推送规则 |
-| `graphify` | 架构级图谱构建、查询、路径和社区分析 |
 
 ## 用途
 
@@ -94,7 +93,7 @@ codegraph init
 - **CodeGraph 索引** — AI Agent 查询代码结构，比 grep 更快更准
 - **跨会话记忆** — AI Agent 开发时读取笔记 + CodeGraph 索引建立上下文，修改代码后更新笔记
 - **团队共享** — Markdown 文件可直接在 GitHub 上浏览，也可用 Obsidian 离线查看
-- **技能驱动开发** — Codex 插件提供项目规范、Git 安全和架构图谱能力
+- **技能驱动开发** — Codex 插件提供项目规范、Git 安全和 CodeGraph 源码智能能力
 
 ## 维护方式
 

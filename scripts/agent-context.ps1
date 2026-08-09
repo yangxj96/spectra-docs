@@ -1,3 +1,5 @@
+#requires -Version 7.6
+
 [CmdletBinding()]
 param()
 
@@ -49,7 +51,7 @@ Write-Output '=== Spectra 快速上下文 ==='
     Entities = $entityCount
     Controllers = $controllerCount
     CodeGraph = 'D:\Develop\Platform\codegraph\bin\codegraph.cmd'
-    GraphifyHook = 'C:\Users\yangx\.local\bin\graphify.exe'
+    PowerShell = $PSVersionTable.PSVersion.ToString()
 } | Format-List
 
 Write-Output '=== 子项目与验证命令 ==='

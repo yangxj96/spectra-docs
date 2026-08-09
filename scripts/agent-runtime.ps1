@@ -1,3 +1,5 @@
+#requires -Version 7.6
+
 [CmdletBinding()]
 param()
 
@@ -39,7 +41,31 @@ $agentPathPrefixes = @((Split-Path $agentPnpm -Parent), $agentNodeBin, (Join-Pat
 $existingPathParts = $env:Path -split ';' | Where-Object { $_ }
 $env:Path = (($agentPathPrefixes + $existingPathParts) | Select-Object -Unique) -join ';'
 $env:CI = 'true'
-$env:SPECTRA_MAVEN_REPO = Join-Path $env:USERPROFILE '.m2\repository'
+
+$agentMavenRepoCandidates = @(
+    $env:SPECTRA_AGENT_MAVEN_REPO
+    (Join-Path $env:USERPROFILE '.m2\repository')
+    (Join-Path $env:TEMP 'spectra-maven-repository')
+) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) }
+
+$agentMavenRepo = $null
+foreach ($candidate in $agentMavenRepoCandidates) {
+    try {
+        $probePath = Join-Path $candidate ('.codex-write-test-' + $PID)
+        Set-Content -LiteralPath $probePath -Value 'ok' -NoNewline
+        Remove-Item -LiteralPath $probePath -Force
+        $agentMavenRepo = $candidate
+        break
+    } catch {
+        continue
+    }
+}
+
+if (-not $agentMavenRepo) {
+    throw '未找到可写的 Maven 本地仓库。可通过 SPECTRA_AGENT_MAVEN_REPO 指定目录。'
+}
+
+$env:SPECTRA_MAVEN_REPO = $agentMavenRepo
 
 [pscustomobject]@{
     JavaHome = $env:JAVA_HOME
