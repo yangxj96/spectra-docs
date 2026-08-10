@@ -60,7 +60,7 @@ $projects | Format-Table -AutoSize -Wrap
 Write-Output '=== Agent 环境回退 ==='
 Write-Output 'mise 未信任或沙箱运行时不可写时：. .\scripts\agent-runtime.ps1'
 Write-Output 'Node 项目会直接使用项目固定的 Node 24.14.0 与 pnpm 11.0.9。'
-Write-Output '后端命令追加："-Dmaven.repo.local=$env:SPECTRA_MAVEN_REPO"'
+Write-Output '后端 Maven 仓库由 agent-runtime.ps1 自动注入 MAVEN_OPTS，无需逐条追加参数。'
 
 Write-Output '=== 保留的执行计划 ==='
 $planRows | Sort-Object Area, Plan | Format-Table -AutoSize -Wrap

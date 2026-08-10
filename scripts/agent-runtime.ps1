@@ -44,6 +44,7 @@ $env:CI = 'true'
 
 $agentMavenRepoCandidates = @(
     $env:SPECTRA_AGENT_MAVEN_REPO
+    'D:\Develop\Platform\mavenrepo'
     (Join-Path $env:USERPROFILE '.m2\repository')
     (Join-Path $env:TEMP 'spectra-maven-repository')
 ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) }
@@ -66,11 +67,17 @@ if (-not $agentMavenRepo) {
 }
 
 $env:SPECTRA_MAVEN_REPO = $agentMavenRepo
+$mavenRepoOption = "-Dmaven.repo.local=$agentMavenRepo"
+$existingMavenOpts = @($env:MAVEN_OPTS -split '\s+' | Where-Object {
+    $_ -and $_ -notlike '-Dmaven.repo.local=*'
+})
+$env:MAVEN_OPTS = (($existingMavenOpts + $mavenRepoOption) -join ' ').Trim()
 
 [pscustomobject]@{
     JavaHome = $env:JAVA_HOME
     Node = (Get-Command node).Source
     Pnpm = $env:SPECTRA_PNPM
     MavenRepository = $env:SPECTRA_MAVEN_REPO
+    MavenOpts = $env:MAVEN_OPTS
     CI = $env:CI
 } | Format-List
