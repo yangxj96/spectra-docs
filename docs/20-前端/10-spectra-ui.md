@@ -927,7 +927,7 @@ src/views/
 
 ## Commit 规范
 
-项目使用 Conventional Commits + commitlint 进行提交信息规范。
+项目提交信息遵循 Conventional Commits 约定。为兼容 Windows 开发环境，`spectra-ui` 和 `spectra-app` 不再配置 Husky、lint-staged 或 commitlint 提交钩子，提交时按以下格式人工遵循。
 
 ### 提交格式
 
@@ -961,9 +961,9 @@ src/views/
 | `app` | spectra-app 项目 |
 | `admin` | spectra-admin 后端 |
 
-### commitlint 规则
+### 提交信息建议
 
-| 规则 | 配置 |
+| 约束项 | 建议 |
 |---|---|
 | `header-max-length` | 120 字符 |
 | `body-max-line-length` | 200 字符 |
