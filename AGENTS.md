@@ -4,7 +4,7 @@
 根目录存在 `.codegraph/`，需要定位源码、定义、调用链或影响范围时，先使用 CodeGraph，再使用 `rg` 补充文本检索：
 
 - MCP 可用时优先调用 `codegraph_explore`。
-- MCP 不可用时执行：`& 'D:\Develop\Platform\codegraph\bin\codegraph.cmd' explore "符号或问题"`。
+- MCP 不可用且本机已把 CodeGraph 加入 PATH 时执行：`codegraph explore "符号或问题"`；CodeGraph 是可选工具，不得假设固定安装路径。
 - 源码定义、调用链、影响范围和高层依赖分析统一使用 CodeGraph。
 <!-- CODEGRAPH_END -->
 
@@ -60,10 +60,10 @@ Spectra 是一个后端服务、两个前端客户端和一个流程建模插件
 
 ## 工具链与高频命令
 
-- 根目录 `.mise.local.toml` 只保存本机环境变量；不要读取后输出、复制或提交其中的密钥。
+- 后端团队模板位于 `spectra-admin/.mise.local.toml.example`，实际值写入被忽略的 `spectra-admin/.mise.local.toml`。根目录 `.mise.local.toml` 仅是维护者可选的本机上层覆盖，不是新克隆前置条件；不要读取后输出、复制或提交其中的密钥。
 - 子项目 `mise.toml` 分别固定 JDK 25.0.2 或 Node 24.14.0 + pnpm 11.0.9。
 - Maven 3.9.12 使用 `spectra-admin/mvnw.cmd`，不要依赖全局 Maven。
-- Windows 命令统一使用 `C:\Program Files\PowerShell\7\pwsh.exe` 7.6 或更高版本；不要使用 Windows PowerShell 5.1 的 `powershell.exe`。根目录脚本通过 `#requires -Version 7.6` 强制执行此约束。
+- Windows 命令统一使用 PowerShell 7.6 或更高版本的 `pwsh`；实际安装路径由 `Get-Command pwsh` 确认，不假设固定磁盘位置。不要使用 Windows PowerShell 5.1 的 `powershell.exe`。根目录脚本通过 `#requires -Version 7.6` 强制执行此约束。
 - mise 信任是人工安全决策；若提示未信任，只提醒用户在对应目录执行一次 `mise trust`，Agent 不自动修改信任状态。只读检查和验证可点源 `scripts/agent-runtime.ps1`，直接使用项目固定运行时。
 
 ```powershell
@@ -124,5 +124,5 @@ Skill 是工作流和规范的唯一来源；不要在多个 `AGENTS.md` 中复�
 
 - Git 操作必须遵循 `spectra:git-execution-spec`：检查敏感信息、具体文件暂存、Conventional Commits 中文消息，提交和推送按 skill 要求确认。
 - `.mise.local.toml`、数据库密码、Token、私钥和本机凭据不得写入文档、日志或提交。
-- 本地数据库账号 `ai` 仅用于只读查询；密码只从本机 `.mise.local.toml` 获取。
+- 当前维护者机器若配置了只读数据库账号 `ai`，只能用于只读查询，密码只从本机配置获取；新克隆环境不得假设该账号存在，应使用自己的最小权限账号。
 - 不改写用户已有的无关变更，不使用破坏性 Git 命令。

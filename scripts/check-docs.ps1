@@ -61,6 +61,39 @@ if ($overview -notmatch [regex]::Escape("$($controllerNames.Count) 个 Controlle
     $errors.Add("项目总览中的 Controller 数量不是源码实际值 $($controllerNames.Count)。")
 }
 
+$configExpectations = @(
+    [pscustomobject]@{ Path = 'spectra-admin/.mise.local.toml.example'; Pattern = 'SERVER_PORT\s*=\s*"4004"'; Description = '后端模板端口 4004' }
+    [pscustomobject]@{ Path = 'spectra-admin/.mise.local.toml.example'; Pattern = 'SERVER_SSL_ENABLED\s*=\s*"false"'; Description = '后端模板首次启动关闭 HTTPS' }
+    [pscustomobject]@{ Path = 'spectra-ui/.env.example'; Pattern = 'VITE_API_URL=http://127\.0\.0\.1:4004/'; Description = 'Web 模板 HTTP 4004' }
+    [pscustomobject]@{ Path = 'spectra-app/.env.example'; Pattern = 'VITE_API_BASE_URL\s*=\s*"http://127\.0\.0\.1:4004"'; Description = 'App 模板 HTTP 4004' }
+)
+foreach ($expectation in $configExpectations) {
+    $configPath = Join-Path $projectRoot $expectation.Path
+    $configContent = Get-Content -Raw -LiteralPath $configPath
+    if ($configContent -notmatch $expectation.Pattern) {
+        $errors.Add("配置模板与首次启动文档不一致：$($expectation.Description)（$($expectation.Path)）。")
+    }
+}
+
+$devConfig = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'spectra-admin/spectra-config/src/main/resources/application-dev.yml')
+$requiredBackendVariables = [regex]::Matches($devConfig, '\$\{([A-Z][A-Z0-9_]*)(?::[^}]*)?\}') |
+    ForEach-Object { $_.Groups[1].Value } |
+    Sort-Object -Unique
+$backendTemplate = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'spectra-admin/.mise.local.toml.example')
+$providedBackendVariables = [regex]::Matches($backendTemplate, '(?m)^([A-Z][A-Z0-9_]*)\s*=') |
+    ForEach-Object { $_.Groups[1].Value } |
+    Sort-Object -Unique
+$missingBackendVariables = $requiredBackendVariables | Where-Object { $_ -notin $providedBackendVariables }
+$allowedBackendOverrides = @('SERVER_SSL_ENABLED')
+$unexpectedBackendVariables = $providedBackendVariables |
+    Where-Object { $_ -notin $requiredBackendVariables -and $_ -notin $allowedBackendOverrides }
+if ($missingBackendVariables) {
+    $errors.Add("后端本机模板缺少 application-dev.yml 变量：$($missingBackendVariables -join ', ')。")
+}
+if ($unexpectedBackendVariables) {
+    $errors.Add("后端本机模板包含源码未使用的旧变量：$($unexpectedBackendVariables -join ', ')。")
+}
+
 foreach ($relativeDoc in @('10-后端/90-API总览.md', '70-AI速查/04-API端点.md')) {
     $path = Join-Path $docsRoot $relativeDoc
     $content = Get-Content -Raw -LiteralPath $path
@@ -75,9 +108,40 @@ foreach ($relativeDoc in @('10-后端/90-API总览.md', '70-AI速查/04-API端�
     }
 }
 
-$stalePatterns = @('logicflow-flowable/', 'document/Plans/', '31-OA建表SQL.sql', '使用三斜杠（`///`）注释')
+$stalePatterns = @(
+    'logicflow-flowable/'
+    'document/Plans/'
+    '31-OA建表SQL.sql'
+    '20-知识库/'
+    'D:\Develop\'
+    'C:\Users\'
+)
+$staleTargets = @(
+    $docsRoot
+    (Join-Path $projectRoot 'README.md')
+    (Join-Path $projectRoot 'AGENTS.md')
+    (Join-Path $projectRoot 'spectra-admin/README.md')
+    (Join-Path $projectRoot 'spectra-admin/AGENTS.md')
+    (Join-Path $projectRoot 'spectra-ui/README.md')
+    (Join-Path $projectRoot 'spectra-ui/AGENTS.md')
+    (Join-Path $projectRoot 'spectra-app/README.md')
+    (Join-Path $projectRoot 'spectra-app/AGENTS.md')
+    (Join-Path $projectRoot 'logicflow-plugin-flowable/README.md')
+    (Join-Path $projectRoot 'logicflow-plugin-flowable/AGENTS.md')
+    (Join-Path $projectRoot '.agents/plugins/spectra')
+)
 foreach ($pattern in $stalePatterns) {
-    $matches = & rg -n -F $pattern $docsRoot (Join-Path $projectRoot 'AGENTS.md') (Join-Path $projectRoot 'spectra-admin/AGENTS.md') (Join-Path $projectRoot '.agents/plugins/spectra') 2>$null
+    $previousNativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+    $PSNativeCommandUseErrorActionPreference = $false
+    try {
+        $matches = & rg -n -F $pattern $staleTargets 2>$null
+        $rgExitCode = $LASTEXITCODE
+    } finally {
+        $PSNativeCommandUseErrorActionPreference = $previousNativeErrorPreference
+    }
+    if ($rgExitCode -gt 1) {
+        throw "扫描过期内容失败：rg 退出码 $rgExitCode，模式 $pattern"
+    }
     foreach ($result in $matches) {
         $errors.Add("过期内容: $result")
     }

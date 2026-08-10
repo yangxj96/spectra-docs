@@ -3,63 +3,57 @@ tags:
   - devops
   - docker
   - deployment
-source: https://www.devops00.com/spectra-admin/ (Docker 部分)
 ---
 
 # Docker 部署
 
-> Docker 构建与部署配置。
+> Docker 构建命令可以复用；镜像仓库、Tag、端口、Secret、数据卷和证书属于部署环境配置。
 
-## 验证码与字体
+## 构建前提
 
-本项目的验证码功能依赖 Java AWT（`java.desktop` 模块）进行字体注册与图像绘制。
+- 使用 `spectra-admin/mvnw.cmd` 生成 Spring Boot 可执行 JAR。
+- Dockerfile 位于 `spectra-admin/spectra-launch/Dockerfile`。
+- Dockerfile 的构建上下文必须是 `spectra-launch/`，`JAR_FILE` 只传 JAR 文件名。
+- 运行镜像时显式配置 `SERVER_PORT`；[[30-DockerCompose]] 使用容器内 HTTP 8888，由 Nginx 终止 TLS。
 
-### 问题
+## 构建
 
-Spring Boot `build-image` 默认使用精简（headless）JRE，不包含 `java.desktop` 模块，导致：
+从仓库根目录执行：
 
-```
-java.io.IOException: Problem reading font data
-```
+```powershell
+Push-Location .\spectra-admin
+.\mvnw.cmd clean package -DskipTests
+$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File |
+    Where-Object { $_.Name -notlike '*.jar.original' } |
+    Select-Object -First 1
 
-### 解决方案
-
-使用完整 JDK 的 buildpack 构建镜像：
-
-```xml
-<plugin>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-maven-plugin</artifactId>
-  <configuration>
-    <image>
-      <builder>paketobuildpacks/builder-jammy-full</builder>
-    </image>
-  </configuration>
-</plugin>
+Push-Location .\spectra-launch
+docker build --build-arg "JAR_FILE=$($jar.Name)" -t spectra-admin:local .
+Pop-Location
+Pop-Location
 ```
 
-该 builder 提供：
-- 完整的 `java.desktop` 模块
-- 字体渲染依赖（fontconfig / freetype）
-- AWT 字体注册与验证码正常生成
+`spectra-admin:local` 是本机标签，可直接用于本机验证。推送到镜像仓库时，仓库地址和版本 Tag 必须按发布流程确定；生产部署不要长期跟随 `latest`。
 
-> 本地开发环境（完整 JDK）通常不会出现该问题。
+## 本机容器验证
 
-## 手动 Docker 构建
+后端仍需要完整的数据库、Redis、S3、AI 和 RAG 环境变量。推荐使用 [[30-DockerCompose]] 集中配置，不要把真实值写进 Dockerfile 或 `docker run` 命令历史。
 
-```bash
-# 在 spectra-launch 目录下执行
-docker build --build-arg JAR_FILE=spectra-launch-*.jar -t spectra-admin .
+```powershell
+docker image inspect spectra-admin:local
 ```
+
+## AWT 与字体
+
+验证码依赖 Java AWT 字体渲染。修改运行时基础镜像或改用 Spring Boot buildpack 后，必须验证镜像包含 `java.desktop`、fontconfig/freetype 和可用字体。精简 JRE/buildpack 可能出现 `Problem reading font data`；这不是本地完整 JDK 构建失败。
 
 ## CI/CD
 
-GitHub Actions 工作流：`.github/workflows/spectra-minimal-image.yml`
-- 手动触发（`workflow_dispatch`）
-- 构建 Maven 项目 → 创建 Docker 镜像 → 推送到 GHCR
+后端子项目的 `.github/workflows/spectra-minimal-image.yml` 是当前 CI 入口。工作流、镜像仓库权限和发布 Tag 会随部署策略变化，实际发布前以工作流文件和目标环境为准。
 
 ## 相关
 
-- [[20-Nginx配置]] — Nginx 反向代理
-- [[30-DockerCompose]] — 容器编排
-- [[40-SSL证书配置]] — SSL 证书
+- [[20-Nginx配置]]
+- [[30-DockerCompose]]
+- [[40-SSL证书配置]]
+- [[05-配置清单]]

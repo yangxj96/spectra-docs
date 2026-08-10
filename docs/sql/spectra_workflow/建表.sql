@@ -3,6 +3,8 @@
 -- 共 2 张表（自定义表单）
 -- ============================================
 
+CREATE SCHEMA IF NOT EXISTS spectra_workflow;
+
 -- 工作流-表单定义主表
 -- 存储表单的元数据信息，每个表单一条记录
 CREATE TABLE spectra_workflow.wf_form_definition (

@@ -18,6 +18,8 @@ $springBootVersion = [regex]::Match($pom, '<artifactId>spring-boot-starter-paren
 
 $controllerCount = (& rg -l '^\s*@RestController\s*$' (Join-Path $projectRoot 'spectra-admin') -g '*.java' | Measure-Object).Count
 $entityCount = (& rg -l '@TableName' (Join-Path $projectRoot 'spectra-admin') -g '*.java' | Measure-Object).Count
+$codeGraphCommand = Get-Command codegraph -ErrorAction SilentlyContinue
+$codeGraphLocation = if ($codeGraphCommand) { $codeGraphCommand.Source } else { '未在 PATH 中（可选工具）' }
 
 $projects = @(
     [pscustomobject]@{ Project = 'spectra-admin'; Runtime = 'Java 25.0.2'; PackageManager = "Maven $mavenVersion (wrapper)"; Check = '.\mvnw.cmd spotless:check'; Build = '.\mvnw.cmd clean package -DskipTests' }
@@ -50,7 +52,7 @@ Write-Output '=== Spectra 快速上下文 ==='
     SpringBoot = $springBootVersion
     Entities = $entityCount
     Controllers = $controllerCount
-    CodeGraph = 'D:\Develop\Platform\codegraph\bin\codegraph.cmd'
+    CodeGraph = $codeGraphLocation
     PowerShell = $PSVersionTable.PSVersion.ToString()
 } | Format-List
 

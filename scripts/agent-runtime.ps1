@@ -4,35 +4,60 @@
 param()
 
 $ErrorActionPreference = 'Stop'
+$projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+
+$javaCommand = Get-Command java -ErrorAction SilentlyContinue
+$javaHomeFromPath = if ($javaCommand) {
+    Split-Path (Split-Path $javaCommand.Source -Parent) -Parent
+}
+$nodeCommand = Get-Command node -ErrorAction SilentlyContinue
+$nodeBinFromPath = if ($nodeCommand) { Split-Path $nodeCommand.Source -Parent }
+$pnpmCommand = Get-Command pnpm -ErrorAction SilentlyContinue
+$pnpmFromPath = if ($pnpmCommand) { $pnpmCommand.Source }
 
 $agentJavaCandidates = @(
     $env:SPECTRA_AGENT_JAVA_HOME
-    'D:\Develop\Platform\mise\data\installs\java\temurin-25.0.2+10.0.LTS'
+    $env:JAVA_HOME
+    $javaHomeFromPath
 ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) }
 
 $agentNodeCandidates = @(
     $env:SPECTRA_AGENT_NODE_BIN
-    'D:\Develop\Platform\mise\data\installs\node\24.14.0'
+    $nodeBinFromPath
     (Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin')
 ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) }
 
 $agentPnpmCandidates = @(
     $env:SPECTRA_AGENT_PNPM
-    'D:\Develop\Platform\mise\data\installs\pnpm\11.0.9\pnpm.exe'
+    $pnpmFromPath
 ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Leaf) }
 
-$agentJavaHome = $agentJavaCandidates | Select-Object -First 1
-$agentNodeBin = $agentNodeCandidates | Select-Object -First 1
-$agentPnpm = $agentPnpmCandidates | Select-Object -First 1
+$agentJavaHome = $agentJavaCandidates | Where-Object {
+    $javaExecutable = Join-Path $_ 'bin\java.exe'
+    if (-not (Test-Path -LiteralPath $javaExecutable -PathType Leaf)) {
+        return $false
+    }
+    $versionOutput = (& $javaExecutable -version 2>&1 | Select-Object -First 1) -join ''
+    $versionOutput -match 'version "25(?:\.|\")'
+} | Select-Object -First 1
+
+$agentNodeBin = $agentNodeCandidates | Where-Object {
+    $nodeExecutable = Join-Path $_ 'node.exe'
+    (Test-Path -LiteralPath $nodeExecutable -PathType Leaf) -and ((& $nodeExecutable --version) -eq 'v24.14.0')
+} | Select-Object -First 1
+
+$agentPnpm = $agentPnpmCandidates | Where-Object {
+    ((& $_ --version) -join '').Trim() -eq '11.0.9'
+} | Select-Object -First 1
 
 if (-not $agentJavaHome) {
-    throw '未找到项目要求的 Java 25。可通过 SPECTRA_AGENT_JAVA_HOME 指定 JDK 目录。'
+    throw '未找到项目要求的 Java 25。请先激活 mise，或通过 SPECTRA_AGENT_JAVA_HOME 指定 JDK 目录。'
 }
 if (-not $agentNodeBin) {
-    throw '未找到 Codex bundled Node。可通过 SPECTRA_AGENT_NODE_BIN 指定 Node bin 目录。'
+    throw '未找到项目要求的 Node 24.14.0。请先激活 mise，或通过 SPECTRA_AGENT_NODE_BIN 指定 Node bin 目录。'
 }
 if (-not $agentPnpm) {
-    throw '未找到项目要求的 pnpm 11.0.9。可通过 SPECTRA_AGENT_PNPM 指定 pnpm.exe。'
+    throw '未找到项目要求的 pnpm 11.0.9。请先激活 mise，或通过 SPECTRA_AGENT_PNPM 指定 pnpm 可执行文件。'
 }
 
 $env:JAVA_HOME = $agentJavaHome
@@ -42,10 +67,15 @@ $existingPathParts = $env:Path -split ';' | Where-Object { $_ }
 $env:Path = (($agentPathPrefixes + $existingPathParts) | Select-Object -Unique) -join ';'
 $env:CI = 'true'
 
+$workspaceMavenRepo = Join-Path $projectRoot '.maven-repository'
+if (-not (Test-Path -LiteralPath $workspaceMavenRepo -PathType Container)) {
+    New-Item -ItemType Directory -Path $workspaceMavenRepo -Force | Out-Null
+}
+
 $agentMavenRepoCandidates = @(
     $env:SPECTRA_AGENT_MAVEN_REPO
-    'D:\Develop\Platform\mavenrepo'
     (Join-Path $env:USERPROFILE '.m2\repository')
+    $workspaceMavenRepo
     (Join-Path $env:TEMP 'spectra-maven-repository')
 ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) }
 

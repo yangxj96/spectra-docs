@@ -32,7 +32,8 @@ tags:
 
 ## 运行模式
 
-```bash
+```powershell
+Copy-Item .env.example .env.development
 pnpm install         # 安装依赖
 pnpm start           # H5 开发（http://localhost:5174），自动 type-check+lint+format
 pnpm dev:mp-weixin   # 微信小程序开发
@@ -47,7 +48,8 @@ pnpm dev:mp-weixin   # 微信小程序开发
 | `tsconfig.json` | TypeScript 配置 |
 | `eslint.config.mjs` | ESLint 扁平配置 |
 | `.prettierrc` | Prettier 格式化配置（与 spectra-ui 一致） |
-| `.env.development` | 开发环境变量（`VITE_API_BASE_URL=https://127.0.0.1:4004`） |
+| `.env.example` | 已提交的环境变量模板（默认 HTTP 4004） |
+| `.env.development` | 从模板复制的本机开发配置，不提交 |
 | `package.json` | 依赖与脚本 |
 
 ## 目录结构
@@ -89,7 +91,7 @@ spectra-app/
 
 ## 与后端连接
 
-开发环境通过 `.env.development` 中的 `VITE_API_BASE_URL` 指向 `spectra-admin` 的 `https://127.0.0.1:4004`。
+仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；模板中的 `VITE_API_BASE_URL=http://127.0.0.1:4004` 可直接配合后端首次 HTTP 启动。启用本地 HTTPS、修改端口或连接远程后端时，只修改本机文件。
 
 > **环境变量命名约定**：spectra-app 使用 `VITE_API_BASE_URL`（无尾部 `/`），spectra-ui 使用 `VITE_API_URL`（带尾部 `/`）。这是两个项目的既定约定，不强制统一。
 
@@ -105,6 +107,7 @@ spectra-app/
 | ESLint 配置 | `spectra-app/eslint.config.mjs` |
 | Prettier 配置 | `spectra-app/.prettierrc` |
 | 环境变量 | `spectra-app/.env.development` |
+| 环境变量模板 | `spectra-app/.env.example` |
 | uni-app manifest | `spectra-app/src/manifest.json` |
 | 页面路由 | `spectra-app/src/pages.json` |
 | AGENTS.md | `spectra-app/AGENTS.md` |

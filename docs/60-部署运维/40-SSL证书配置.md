@@ -3,96 +3,91 @@ tags:
   - backend
   - infrastructure
   - security
-source: https://www.devops00.com/spectra-admin/be-ssl-scripts
 ---
 
 # SSL 证书配置
 
-> 本地开发 HTTPS 证书生成与管理。
+> 本地首次启动默认使用 HTTP，不需要证书。本页只用于确实需要 HTTPS、Secure Cookie 或证书链验证的本机环境。
 
-## 步骤概述
+## 哪些内容可复用
 
-1. 生成 CA 根证书并加载到 Windows「受信任的根证书颁发机构」
-2. 用 CA 根证书签发 SSL 证书
-3. CA 证书可团队复用
+| 内容 | 分类 |
+|---|---|
+| 后端证书相对路径 `spectra-admin/files/ssl/keystore.p12` | 可复用约定 |
+| `SSL_TYPE=PKCS12`、`SSL_ALIAS=tomcat` | 可复用默认值 |
+| P12 密码、CA、私钥、证书有效期 | 每台机器/每套环境自行生成 |
+| 系统证书库位置和企业 CA 流程 | 取决于操作系统和组织策略 |
 
-## 一、生成 CA 根证书（需管理员权限）
+仓库当前没有提交 `install-ca.ps1`、`generate-cert.ps1` 或 `uninstall-ca.ps1`。不要按旧文档尝试运行不存在的脚本。
 
-```powershell
-$WorkDir = Join-Path $env:USERPROFILE "dev-https"
-$CA_Name = "Spectra CA"
-$Org = "Spectra"
-$Country = "CN"
-$State = "Kunming"
-$City = "Kunming"
-$ValidDays = 3650  # 10年
+## 本机自签名证书示例
 
-New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
-Set-Location $WorkDir
-
-# 生成 CA 私钥和证书
-openssl genrsa -out SpectraRootCA.key 2048
-openssl req -x509 -new -nodes -key SpectraRootCA.key \
-  -sha256 -days $ValidDays \
-  -subj "/C=$Country/ST=$State/L=$City/O=$Org/CN=$CA_Name" \
-  -out SpectraRootCA.crt
-
-# 安装到信任库
-Import-Certificate -FilePath "$WorkDir\SpectraRootCA.crt" -CertStoreLocation Cert:\CurrentUser\Root
-```
-
-## 二、卸载 CA 根证书
+要求 OpenSSL 已加入 PATH。以下命令从仓库根目录执行，生成仅用于本机开发的证书：
 
 ```powershell
-$CA_Name = "Spectra CA"
-$Cert = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object {
-    $_.Subject -like "*CN=$CA_Name*"
-}
-if ($Cert) {
-    Remove-Item -Path "Cert:\CurrentUser\Root\$($Cert.Thumbprint)" -Force
+$certDir = Join-Path (Resolve-Path .\spectra-admin) 'files\ssl'
+New-Item -ItemType Directory -Path $certDir -Force | Out-Null
+Push-Location $certDir
+
+$securePassword = Read-Host '输入本机 P12 密码' -AsSecureString
+$passwordPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
+try {
+    $env:SPECTRA_SSL_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($passwordPtr)
+
+    openssl req -x509 -newkey rsa:2048 -sha256 -days 825 -nodes `
+        -keyout localhost.key -out localhost.crt `
+        -subj '/CN=localhost' `
+        -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'
+
+    openssl pkcs12 -export -in localhost.crt -inkey localhost.key `
+        -out keystore.p12 -name tomcat -passout env:SPECTRA_SSL_PASSWORD
+} finally {
+    $env:SPECTRA_SSL_PASSWORD = $null
+    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($passwordPtr)
+    Pop-Location
 }
 ```
 
-## 三、生成 SSL 证书
+生成的 `localhost.key`、`localhost.crt` 和 `keystore.p12` 都是本机材料，不得提交。确认 P12 可用后，可按本机安全策略处理不再需要的明文私钥文件。
 
-```powershell
-# 生成私钥
-openssl genrsa -out localhost.key 2048
+## 后端本机配置
 
-# SAN 配置（支持 localhost + 127.0.0.1）
-# 见 20-知识库/40-开发指南/20-脚本工具.md
-
-# 签发证书
-openssl x509 -req -in localhost.csr \
-  -CA SpectraRootCA.crt -CAkey SpectraRootCA.key -CAcreateserial \
-  -out localhost.crt -days 365 -sha256 \
-  -extfile san.cnf -extensions v3_req
-
-# 生成 .p12（Spring Boot 使用）
-openssl pkcs12 -export -in localhost.crt -inkey localhost.key \
-  -out keystore.p12 -name tomcat -password pass:QuVsKppcWvwwX2Vv
-```
-
-## Spring Boot 配置
-
-将 `keystore.p12` 放入 `src/main/resources/`，在 `.mise.local.toml` 中配置：
+在 `spectra-admin/.mise.local.toml` 中设置：
 
 ```toml
-SSL_PASSWORD=QuVsKppcWvwwX2Vv
-SSL_TYPE=PKCS12
-SSL_ALIAS=tomcat
+SERVER_SSL_ENABLED = "true"
+SSL_PASSWORD = "<与生成 P12 时一致的本机密码>"
+SSL_TYPE = "PKCS12"
+SSL_ALIAS = "tomcat"
 ```
 
-## 脚本清单
+尖括号内容必须替换，不能直接复制。不要把真实密码写回 `.mise.local.toml.example`。
 
-| 脚本 | 用途 | 权限 |
-|---|---|---|
-| `install-ca.ps1` | 安装 CA 到系统信任库 | 管理员 |
-| `uninstall-ca.ps1` | 从系统卸载 CA | 管理员 |
-| `generate-cert.ps1` | 生成 localhost SSL 证书 | 普通用户 |
+## 前端同步
+
+把本机前端配置改成 HTTPS：
+
+```dotenv
+# spectra-ui/.env.development
+VITE_API_URL=https://127.0.0.1:4004/
+
+# spectra-app/.env.development
+VITE_API_BASE_URL=https://127.0.0.1:4004
+```
+
+浏览器默认不信任自签名证书。个人机器可以按操作系统策略信任 `localhost.crt`，团队或企业环境应使用组织 CA；不要共享或提交开发 CA 私钥。未建立信任时，健康检查和前端请求可能因证书校验失败。
+
+## 恢复 HTTP
+
+```toml
+SERVER_SSL_ENABLED = "false"
+```
+
+同时把两个前端 API URL 改回 `http://`。协议不一致是新环境最常见的“页面能打开但接口全部失败”原因之一。
 
 ## 相关
 
-- [[20-脚本工具]] — 脚本详细说明
-- [[80-基础设施]] — 全局基础设施配置
-- [[10-环境搭建]] — 开发环境初始化
+- [[10-环境搭建]]
+- [[20-脚本工具]]
+- [[80-基础设施]]
+- [[05-配置清单]]

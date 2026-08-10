@@ -48,6 +48,7 @@ node_modules/
 *.local
 .mise.local.toml
 .mise-data/
+.maven-repository/
 
 # =================================================
 # Logs

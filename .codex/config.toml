@@ -1,4 +1,1 @@
 model_verbosity = "medium"
-
-[sandbox_workspace_write]
-writable_roots = ["D:\\Develop\\Platform\\mavenrepo"]
