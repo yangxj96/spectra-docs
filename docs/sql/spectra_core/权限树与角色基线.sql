@@ -68,6 +68,333 @@ BEGIN
     END LOOP;
 END $$;
 
+-- ============================================================
+-- OA 费用报销与采购权限（原增量脚本已并入权限基线）
+-- ============================================================
+
+DO $$
+DECLARE
+    root_id UUID;
+    module_id UUID;
+    role_row RECORD;
+    permission_code TEXT;
+BEGIN
+    SELECT id INTO root_id
+      FROM spectra_core.sys_authority
+     WHERE code = '*' AND deleted IS NULL
+     LIMIT 1;
+
+    IF root_id IS NULL THEN
+        RAISE EXCEPTION '缺少顶级权限 *';
+    END IF;
+
+    SELECT id INTO module_id
+      FROM spectra_core.sys_authority
+     WHERE code = 'OA_REIMBURSEMENT:*' AND deleted IS NULL
+     LIMIT 1;
+
+    IF module_id IS NULL THEN
+        INSERT INTO spectra_core.sys_authority
+            (id, pid, name, code, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), root_id, 'OA费用报销', 'OA_REIMBURSEMENT:*', NOW(), NOW())
+        RETURNING id INTO module_id;
+    END IF;
+
+    FOREACH permission_code IN ARRAY ARRAY[
+        'OA_REIMBURSEMENT:QUERY', 'OA_REIMBURSEMENT:INSERT',
+        'OA_REIMBURSEMENT:UPDATE', 'OA_REIMBURSEMENT:PAYMENT'
+    ]
+    LOOP
+        INSERT INTO spectra_core.sys_authority
+            (id, pid, name, code, created_at, updated_at)
+        SELECT gen_random_uuid(), module_id,
+               CASE permission_code
+                   WHEN 'OA_REIMBURSEMENT:QUERY' THEN '报销查询'
+                   WHEN 'OA_REIMBURSEMENT:INSERT' THEN '报销新增'
+                   WHEN 'OA_REIMBURSEMENT:UPDATE' THEN '报销修改'
+                   ELSE '报销付款'
+               END,
+               permission_code, NOW(), NOW()
+         WHERE NOT EXISTS (
+             SELECT 1 FROM spectra_core.sys_authority
+              WHERE code = permission_code AND deleted IS NULL
+         );
+    END LOOP;
+
+    FOR role_row IN
+        SELECT id, code FROM spectra_core.sys_role
+         WHERE code IN ('ROLE_ADMIN_SYSTEM', 'ROLE_USER', 'ROLE_AUDIT')
+           AND deleted IS NULL
+    LOOP
+        FOR permission_code IN SELECT unnest(
+            CASE role_row.code
+                WHEN 'ROLE_ADMIN_SYSTEM' THEN ARRAY[
+                    'OA_REIMBURSEMENT:QUERY', 'OA_REIMBURSEMENT:INSERT',
+                    'OA_REIMBURSEMENT:UPDATE', 'OA_REIMBURSEMENT:PAYMENT'
+                ]
+                WHEN 'ROLE_USER' THEN ARRAY[
+                    'OA_REIMBURSEMENT:QUERY', 'OA_REIMBURSEMENT:INSERT', 'OA_REIMBURSEMENT:UPDATE'
+                ]
+                ELSE ARRAY['OA_REIMBURSEMENT:QUERY']
+            END
+        ) LOOP
+            INSERT INTO spectra_core.sys_rel_role_authority
+                (id, role_id, authority_id, created_at, updated_at)
+            SELECT gen_random_uuid(), role_row.id, authority.id, NOW(), NOW()
+              FROM spectra_core.sys_authority authority
+             WHERE authority.code = permission_code
+               AND authority.deleted IS NULL
+               AND NOT EXISTS (
+                   SELECT 1 FROM spectra_core.sys_rel_role_authority rel
+                    WHERE rel.role_id = role_row.id
+                      AND rel.authority_id = authority.id
+                      AND rel.deleted IS NULL
+               );
+        END LOOP;
+    END LOOP;
+END $$;
+
+DO $$
+DECLARE
+    root_id UUID;
+    module_id UUID;
+    role_row RECORD;
+    permission_code TEXT;
+BEGIN
+    SELECT id INTO root_id
+      FROM spectra_core.sys_authority
+     WHERE code = '*' AND deleted IS NULL
+     LIMIT 1;
+
+    IF root_id IS NULL THEN
+        RAISE EXCEPTION '缺少顶级权限 *';
+    END IF;
+
+    SELECT id INTO module_id
+      FROM spectra_core.sys_authority
+     WHERE code = 'OA_PURCHASE:*' AND deleted IS NULL
+     LIMIT 1;
+
+    IF module_id IS NULL THEN
+        INSERT INTO spectra_core.sys_authority
+            (id, pid, name, code, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), root_id, 'OA采购申请', 'OA_PURCHASE:*', NOW(), NOW())
+        RETURNING id INTO module_id;
+    END IF;
+
+    FOREACH permission_code IN ARRAY ARRAY[
+        'OA_PURCHASE:QUERY', 'OA_PURCHASE:INSERT', 'OA_PURCHASE:UPDATE',
+        'OA_PURCHASE:EXECUTE', 'OA_PURCHASE:RECEIVE'
+    ]
+    LOOP
+        INSERT INTO spectra_core.sys_authority
+            (id, pid, name, code, created_at, updated_at)
+        SELECT gen_random_uuid(), module_id,
+               CASE permission_code
+                   WHEN 'OA_PURCHASE:QUERY' THEN '采购查询'
+                   WHEN 'OA_PURCHASE:INSERT' THEN '采购新增'
+                   WHEN 'OA_PURCHASE:UPDATE' THEN '采购修改'
+                   WHEN 'OA_PURCHASE:EXECUTE' THEN '采购执行'
+                   ELSE '采购收货'
+               END,
+               permission_code, NOW(), NOW()
+         WHERE NOT EXISTS (
+             SELECT 1 FROM spectra_core.sys_authority
+              WHERE code = permission_code AND deleted IS NULL
+         );
+    END LOOP;
+
+    FOR role_row IN
+        SELECT id, code FROM spectra_core.sys_role
+         WHERE code IN ('ROLE_ADMIN_SYSTEM', 'ROLE_USER', 'ROLE_AUDIT')
+           AND deleted IS NULL
+    LOOP
+        FOR permission_code IN SELECT unnest(
+            CASE role_row.code
+                WHEN 'ROLE_ADMIN_SYSTEM' THEN ARRAY[
+                    'OA_PURCHASE:QUERY', 'OA_PURCHASE:INSERT', 'OA_PURCHASE:UPDATE',
+                    'OA_PURCHASE:EXECUTE', 'OA_PURCHASE:RECEIVE'
+                ]
+                WHEN 'ROLE_USER' THEN ARRAY[
+                    'OA_PURCHASE:QUERY', 'OA_PURCHASE:INSERT', 'OA_PURCHASE:UPDATE'
+                ]
+                ELSE ARRAY['OA_PURCHASE:QUERY']
+            END
+        ) LOOP
+            INSERT INTO spectra_core.sys_rel_role_authority
+                (id, role_id, authority_id, created_at, updated_at)
+            SELECT gen_random_uuid(), role_row.id, authority.id, NOW(), NOW()
+              FROM spectra_core.sys_authority authority
+             WHERE authority.code = permission_code
+               AND authority.deleted IS NULL
+               AND NOT EXISTS (
+                   SELECT 1 FROM spectra_core.sys_rel_role_authority rel
+                    WHERE rel.role_id = role_row.id
+                      AND rel.authority_id = authority.id
+                      AND rel.deleted IS NULL
+               );
+        END LOOP;
+    END LOOP;
+END $$;
+
+-- ============================================================
+-- 审批中心三级菜单（原增量脚本已并入权限基线）
+-- ============================================================
+
+DO $$
+DECLARE
+    approval_root_id UUID;
+    all_id UUID;
+    finance_id UUID;
+    asset_id UUID;
+    hr_id UUID;
+BEGIN
+    SELECT id INTO approval_root_id
+      FROM spectra_core.sys_menu
+     WHERE pid IS NULL
+       AND name = '审批中心'
+       AND deleted IS NULL
+     LIMIT 1;
+
+    IF approval_root_id IS NULL THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), NULL, 'icon-module', 'DIRECTORY', NULL, '审批中心', 5, NOW(), NOW())
+        RETURNING id INTO approval_root_id;
+    ELSE
+        UPDATE spectra_core.sys_menu
+           SET icon = 'icon-module', menu_type = 'DIRECTORY', route_name = NULL, sort = 5, updated_at = NOW()
+         WHERE id = approval_root_id;
+    END IF;
+
+    SELECT id INTO all_id
+      FROM spectra_core.sys_menu
+     WHERE pid = approval_root_id AND name = '综合审批' AND deleted IS NULL
+     LIMIT 1;
+    IF all_id IS NULL THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), approval_root_id, 'icon-folder', 'DIRECTORY', NULL, '综合审批', 0, NOW(), NOW())
+        RETURNING id INTO all_id;
+    END IF;
+
+    SELECT id INTO finance_id
+      FROM spectra_core.sys_menu
+     WHERE pid = approval_root_id AND name = '财务相关' AND deleted IS NULL
+     LIMIT 1;
+    IF finance_id IS NULL THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), approval_root_id, 'icon-folder', 'DIRECTORY', NULL, '财务相关', 10, NOW(), NOW())
+        RETURNING id INTO finance_id;
+    END IF;
+
+    SELECT id INTO asset_id
+      FROM spectra_core.sys_menu
+     WHERE pid = approval_root_id AND name = '资产相关' AND deleted IS NULL
+     LIMIT 1;
+    IF asset_id IS NULL THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), approval_root_id, 'icon-folder', 'DIRECTORY', NULL, '资产相关', 20, NOW(), NOW())
+        RETURNING id INTO asset_id;
+    END IF;
+
+    SELECT id INTO hr_id
+      FROM spectra_core.sys_menu
+     WHERE pid = approval_root_id AND name = '行政人事' AND deleted IS NULL
+     LIMIT 1;
+    IF hr_id IS NULL THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), approval_root_id, 'icon-folder', 'DIRECTORY', NULL, '行政人事', 30, NOW(), NOW())
+        RETURNING id INTO hr_id;
+    END IF;
+
+    UPDATE spectra_core.sys_menu
+       SET pid = all_id, icon = 'icon-list', menu_type = 'MENU', name = '全部审批', sort = 0, updated_at = NOW()
+     WHERE route_name = 'OAApproval' AND deleted IS NULL;
+    IF NOT FOUND THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), all_id, 'icon-list', 'MENU', 'OAApproval', '全部审批', 0, NOW(), NOW());
+    END IF;
+
+    UPDATE spectra_core.sys_menu
+       SET pid = finance_id, icon = 'icon-list', menu_type = 'MENU', name = '费用报销审批', sort = 0, updated_at = NOW()
+     WHERE route_name = 'OAApprovalReimbursement' AND deleted IS NULL;
+    IF NOT FOUND THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), finance_id, 'icon-list', 'MENU', 'OAApprovalReimbursement', '费用报销审批', 0, NOW(), NOW());
+    END IF;
+
+    UPDATE spectra_core.sys_menu
+       SET pid = asset_id, icon = 'icon-list', menu_type = 'MENU', name = '采购申请审批', sort = 0, updated_at = NOW()
+     WHERE route_name = 'OAApprovalPurchase' AND deleted IS NULL;
+    IF NOT FOUND THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), asset_id, 'icon-list', 'MENU', 'OAApprovalPurchase', '采购申请审批', 0, NOW(), NOW());
+    END IF;
+
+    UPDATE spectra_core.sys_menu
+       SET pid = hr_id, icon = 'icon-list', menu_type = 'MENU', name = '请假审批', sort = 0, updated_at = NOW()
+     WHERE route_name = 'OAApprovalLeave' AND deleted IS NULL;
+    IF NOT FOUND THEN
+        INSERT INTO spectra_core.sys_menu
+            (id, pid, icon, menu_type, route_name, name, sort, created_at, updated_at)
+        VALUES
+            (gen_random_uuid(), hr_id, 'icon-list', 'MENU', 'OAApprovalLeave', '请假审批', 0, NOW(), NOW());
+    END IF;
+END $$;
+
+DO $$
+DECLARE
+    role_row RECORD;
+    route_name_value TEXT;
+BEGIN
+    FOR role_row IN
+        SELECT id
+          FROM spectra_core.sys_role
+         WHERE code IN ('ROLE_DEV_OPS', 'ROLE_ADMIN_SYSTEM', 'ROLE_USER', 'ROLE_AUDIT')
+    LOOP
+        FOR route_name_value IN
+            SELECT unnest(ARRAY[
+                'OAApproval',
+                'OAApprovalReimbursement',
+                'OAApprovalPurchase',
+                'OAApprovalLeave'
+            ]::TEXT[])
+        LOOP
+            INSERT INTO spectra_core.sys_rel_role_menu
+                (id, role_id, menu_id, created_at, updated_at)
+            SELECT gen_random_uuid(), role_row.id, menu.id, NOW(), NOW()
+              FROM spectra_core.sys_menu menu
+             WHERE menu.route_name = route_name_value
+               AND menu.menu_type = 'MENU'
+               AND menu.deleted IS NULL
+               AND NOT EXISTS (
+                   SELECT 1
+                     FROM spectra_core.sys_rel_role_menu rel
+                    WHERE rel.role_id = role_row.id
+                      AND rel.menu_id = menu.id
+                      AND rel.deleted IS NULL
+               );
+        END LOOP;
+    END LOOP;
+END $$;
+
 -- 角色-菜单基线：关联表只保存可点击的 MENU 叶子节点，当前用户菜单接口会自动补齐目录。
 -- 运维管理员可见完整导航；其他角色只展示与其业务权限边界对应的菜单。
 DELETE FROM spectra_core.sys_rel_role_menu rel
@@ -239,5 +566,138 @@ BEGIN
                   AND rel.authority_id = authority.id
                   AND rel.deleted IS NULL
            );
+    END LOOP;
+END $$;
+
+-- ============================================================
+-- 存量数据权限兼容回填（原迁移脚本已并入权限基线）
+-- ============================================================
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM spectra_core.sys_user_data_scope
+        WHERE deleted IS NULL
+        GROUP BY user_id
+        HAVING COUNT(*) > 1
+    ) THEN
+        RAISE EXCEPTION 'sys_user_data_scope 存在同一用户多条活动记录，请先人工合并';
+    END IF;
+    IF EXISTS (
+        SELECT 1
+        FROM spectra_core.sys_role_data_scope
+        WHERE deleted IS NULL
+        GROUP BY role_id
+        HAVING COUNT(*) > 1
+    ) THEN
+        RAISE EXCEPTION 'sys_role_data_scope 存在同一角色多条活动记录，请先人工合并';
+    END IF;
+END
+$$;
+
+INSERT INTO spectra_core.sys_role_data_scope
+    (id, role_id, scope_type, created_at, updated_at, version)
+SELECT gen_random_uuid(), r.id, r.scope, NOW(), NOW(), 0
+FROM spectra_core.sys_role r
+WHERE r.scope IS NOT NULL
+  AND r.deleted IS NULL
+  AND NOT EXISTS (
+      SELECT 1
+      FROM spectra_core.sys_role_data_scope s
+      WHERE s.role_id = r.id
+        AND s.deleted IS NULL
+  );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_sys_user_data_scope_active
+    ON spectra_core.sys_user_data_scope (user_id)
+    WHERE deleted IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_sys_role_data_scope_active
+    ON spectra_core.sys_role_data_scope (role_id)
+    WHERE deleted IS NULL;
+CREATE INDEX IF NOT EXISTS idx_sys_user_data_scope_target_active
+    ON spectra_core.sys_user_data_scope_target (user_id, target_id)
+    WHERE deleted IS NULL;
+CREATE INDEX IF NOT EXISTS idx_sys_role_data_scope_target_active
+    ON spectra_core.sys_role_data_scope_target (role_id, target_id)
+    WHERE deleted IS NULL;
+
+-- 后置补齐：通用角色基线会先清理业务角色关系，这里在其后恢复报销、采购和审批中心授权。
+DO $$
+DECLARE
+    role_row RECORD;
+    permission_code TEXT;
+BEGIN
+    FOR role_row IN
+        SELECT id, code
+          FROM spectra_core.sys_role
+         WHERE code IN ('ROLE_ADMIN_SYSTEM', 'ROLE_USER', 'ROLE_AUDIT')
+           AND deleted IS NULL
+    LOOP
+        FOR permission_code IN SELECT unnest(
+            CASE role_row.code
+                WHEN 'ROLE_ADMIN_SYSTEM' THEN ARRAY[
+                    'OA_REIMBURSEMENT:QUERY', 'OA_REIMBURSEMENT:INSERT',
+                    'OA_REIMBURSEMENT:UPDATE', 'OA_REIMBURSEMENT:PAYMENT',
+                    'OA_PURCHASE:QUERY', 'OA_PURCHASE:INSERT', 'OA_PURCHASE:UPDATE',
+                    'OA_PURCHASE:EXECUTE', 'OA_PURCHASE:RECEIVE'
+                ]
+                WHEN 'ROLE_USER' THEN ARRAY[
+                    'OA_REIMBURSEMENT:QUERY', 'OA_REIMBURSEMENT:INSERT', 'OA_REIMBURSEMENT:UPDATE',
+                    'OA_PURCHASE:QUERY', 'OA_PURCHASE:INSERT', 'OA_PURCHASE:UPDATE'
+                ]
+                ELSE ARRAY['OA_REIMBURSEMENT:QUERY', 'OA_PURCHASE:QUERY']
+            END
+        ) LOOP
+            INSERT INTO spectra_core.sys_rel_role_authority
+                (id, role_id, authority_id, created_at, updated_at)
+            SELECT gen_random_uuid(), role_row.id, authority.id, NOW(), NOW()
+              FROM spectra_core.sys_authority authority
+             WHERE authority.code = permission_code
+               AND authority.deleted IS NULL
+               AND NOT EXISTS (
+                   SELECT 1
+                     FROM spectra_core.sys_rel_role_authority rel
+                    WHERE rel.role_id = role_row.id
+                      AND rel.authority_id = authority.id
+                      AND rel.deleted IS NULL
+               );
+        END LOOP;
+    END LOOP;
+END $$;
+
+DO $$
+DECLARE
+    role_row RECORD;
+    route_name_value TEXT;
+BEGIN
+    FOR role_row IN
+        SELECT id
+          FROM spectra_core.sys_role
+         WHERE code IN ('ROLE_DEV_OPS', 'ROLE_ADMIN_SYSTEM', 'ROLE_USER', 'ROLE_AUDIT')
+    LOOP
+        FOR route_name_value IN
+            SELECT unnest(ARRAY[
+                'OAApproval',
+                'OAApprovalReimbursement',
+                'OAApprovalPurchase',
+                'OAApprovalLeave'
+            ]::TEXT[])
+        LOOP
+            INSERT INTO spectra_core.sys_rel_role_menu
+                (id, role_id, menu_id, created_at, updated_at)
+            SELECT gen_random_uuid(), role_row.id, menu.id, NOW(), NOW()
+              FROM spectra_core.sys_menu menu
+             WHERE menu.route_name = route_name_value
+               AND menu.menu_type = 'MENU'
+               AND menu.deleted IS NULL
+               AND NOT EXISTS (
+                   SELECT 1
+                     FROM spectra_core.sys_rel_role_menu rel
+                    WHERE rel.role_id = role_row.id
+                      AND rel.menu_id = menu.id
+                      AND rel.deleted IS NULL
+               );
+        END LOOP;
     END LOOP;
 END $$;

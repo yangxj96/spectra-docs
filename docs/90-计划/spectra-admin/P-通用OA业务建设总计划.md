@@ -603,7 +603,7 @@ graph LR
 | 报销提交 → 同意 → 登记付款 | `APPROVED / PAID` |
 | 采购提交 → 同意 → 执行 → 收货 | `APPROVED / RECEIVED` |
 
-上述 5 个申请均对应 1 条已结束历史流程、0 条运行中流程，验收账号剩余待办为 0。数据库已确认 `oa_attendance`、`oa_contact`、`oa_report` 不存在，`oa_attendance_record` 正常保留。清理脚本为 `docs/sql/spectra_oa/OA模块清理增量.sql`。
+上述 5 个申请均对应 1 条已结束历史流程、0 条运行中流程，验收账号剩余待办为 0。数据库已确认 `oa_attendance`、`oa_contact`、`oa_report` 不存在，`oa_attendance_record` 正常保留；最终结构已直接体现在 `docs/sql/spectra_oa/建表.sql` 中。
 
 质量验证：spectra-admin 生产包构建成功；spectra-ui 的 format/type-check/lint/build 全部通过；spectra-app 的 format/type-check/H5 build 通过，lint 为 0 error（17 条既有 warning）。仓库全量 Maven test 在 `spectra-framework` 的既有 `GuoMiUtilTest` 处因测试类路径缺少 `org.postgresql.Driver` 中止，发生在 OA 模块之前；OA 真实接口/数据库闭环和生产构建不受该测试基础设施问题影响。
 

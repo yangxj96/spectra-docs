@@ -325,6 +325,20 @@ COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.updated_at IS '最后�
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.version IS '乐观锁';
 
+-- 数据权限活动记录及目标查询索引
+CREATE UNIQUE INDEX uk_sys_user_data_scope_active
+    ON spectra_core.sys_user_data_scope (user_id)
+    WHERE deleted IS NULL;
+CREATE UNIQUE INDEX uk_sys_role_data_scope_active
+    ON spectra_core.sys_role_data_scope (role_id)
+    WHERE deleted IS NULL;
+CREATE INDEX idx_sys_user_data_scope_target_active
+    ON spectra_core.sys_user_data_scope_target (user_id, target_id)
+    WHERE deleted IS NULL;
+CREATE INDEX idx_sys_role_data_scope_target_active
+    ON spectra_core.sys_role_data_scope_target (role_id, target_id)
+    WHERE deleted IS NULL;
+
 -- ============================================
 -- 系统管理
 -- ============================================
