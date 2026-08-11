@@ -1,4 +1,6 @@
+-- 将旧固定通知设置展开为用途×渠道偏好。脚本支持重复执行。
 BEGIN;
+
 INSERT INTO spectra_notification.ntf_user_preference
     (id, tenant_id, user_id, purpose, channel, enabled, do_not_disturb, created_at, updated_at)
 SELECT gen_random_uuid(), '00000000-0000-0000-0000-000000000000', s.user_id, v.purpose, 'IN_APP', v.enabled,
@@ -11,6 +13,9 @@ CROSS JOIN LATERAL (VALUES
     ('INNER_MESSAGE', COALESCE(s.inner_mail_enabled, TRUE)),
     ('WORKFLOW_RESULT', COALESCE(s.approval_enabled, TRUE))
 ) AS v(purpose, enabled)
-ON CONFLICT (tenant_id, user_id, purpose, channel) DO UPDATE
-SET enabled = EXCLUDED.enabled, do_not_disturb = EXCLUDED.do_not_disturb, updated_at = CURRENT_TIMESTAMP;
+ON CONFLICT (tenant_id, user_id, purpose, channel) WHERE deleted IS NULL DO UPDATE
+SET enabled = EXCLUDED.enabled,
+    do_not_disturb = EXCLUDED.do_not_disturb,
+    updated_at = CURRENT_TIMESTAMP;
+
 COMMIT;

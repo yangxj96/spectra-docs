@@ -209,27 +209,27 @@ spectra-ai ───────┘                                      ▼
 
 ### 3.2 包结构
 
-`spectra-notification` 按复杂模块拆分：
+`spectra-notification` 参考 `spectra-upload`，按简单模块扁平分层：
 
 ```text
 com.devops00.spectra.notification
 ├── NotificationModule.java
-├── inbox/                 # 消息中心、已读、删除、未读数
-├── preference/            # 用户用途×渠道偏好
-├── template/              # 模板、版本、参数校验和渲染
-├── request/               # 逻辑请求、受众展开、幂等
-├── dispatch/              # Task、Delivery、Worker、状态机
-├── channel/
-│   ├── inapp/
-│   ├── sms/
-│   └── email/
-├── controller/
-│   ├── self/              # 当前用户自服务 API
-│   └── admin/             # 模板、任务、发送、重试和取消
 ├── configuration/
+├── controller/
+├── javabean/
+│   ├── converter/
+│   ├── domain/
+│   ├── entity/
+│   ├── from/
+│   └── vo/
+├── mapper/
 ├── properties/
-└── common/                # 仅模块内部共享代码
+├── service/
+│   └── impl/
+└── strategy/
 ```
+
+Controller 统一放在 `controller`，Entity/From/VO/Converter 放在 `javabean` 对应子包，Mapper 放在 `mapper`，Service 接口与实现放在 `service`、`service/impl`，规则策略放在 `strategy`。Mapper XML 统一放在 `src/main/resources/mapper`，测试包镜像生产代码结构。
 
 所有 Java 代码遵循项目后端规范：传统 Javadoc、瘦 Controller、Service 事务、MapStruct、项目异常和 `PgJsonbTypeHandler`。
 
@@ -430,6 +430,7 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 主键 |
+| `tenant_id` | UUID | 租户边界 |
 | `template_group_code` | varchar(100) | 逻辑模板组 |
 | `channel` | varchar(16) | IN_APP/SMS/EMAIL |
 | `purpose` | varchar(50) | 通知用途 |
@@ -440,7 +441,7 @@ spectra_notification
 | `parameter_schema` | jsonb | 参数白名单、必填和敏感标记 |
 | `provider_template_code` | varchar(200) | 供应商模板编码，可空 |
 | `enabled` | boolean | 是否启用 |
-| 审计字段 | — | 继承 BaseEntity |
+| `created_by/created_at/updated_by/updated_at/deleted/version` | — | 继承 `BaseEntity` |
 
 约束：
 
@@ -456,6 +457,7 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 内部请求 ID |
+| `tenant_id` | UUID | 租户边界 |
 | `external_request_id` | varchar(100) | 调用方 `requestId` |
 | `idempotency_key` | varchar(200) | 业务幂等键 |
 | `purpose` | varchar(50) | 通知用途 |
@@ -474,8 +476,9 @@ spectra_notification
 | `task_count` | integer | 任务数 |
 | `scheduled_at` | timestamptz | 计划时间 |
 | `expires_at` | timestamptz | 过期时间 |
+| `priority` | smallint | 请求优先级 |
 | `trace_id` | varchar(100) | 追踪 ID |
-| 审计字段 | — | 继承 BaseEntity |
+| `created_by/created_at/updated_by/updated_at/deleted/version` | — | 继承 `BaseEntity` |
 
 约束：
 
@@ -490,6 +493,7 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 任务 ID，同时作为 Sender 幂等键 |
+| `tenant_id` | UUID | 租户边界 |
 | `notification_request_id` | UUID | 关联 `ntf_request.id` |
 | `channel` | varchar(16) | IN_APP/SMS/EMAIL |
 | `receiver_user_id` | UUID | 系统用户，可空 |
@@ -497,6 +501,8 @@ spectra_notification
 | `recipient_masked` | varchar(200) | 脱敏地址 |
 | `recipient_ciphertext` | text | 手机号或邮箱密文 |
 | `template_id` | UUID | 锁定模板版本 |
+| `purpose` | varchar(50) | 通知用途 |
+| `title/content/link/extra` | — | 渲染快照；`extra` 为 JSONB |
 | `status` | varchar(20) | Task 状态 |
 | `priority` | smallint | 优先级 |
 | `attempt_count` | integer | 已尝试次数 |
@@ -507,7 +513,7 @@ spectra_notification
 | `locked_by` | varchar(100) | Worker 标识 |
 | `locked_at` | timestamptz | 锁定时间 |
 | `last_error_code` | varchar(100) | 最后错误码 |
-| 审计字段 | — | 继承 BaseEntity |
+| `created_by/created_at/updated_by/updated_at/deleted/version` | — | 继承 `BaseEntity` |
 
 约束和索引：
 
@@ -524,6 +530,7 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 主键 |
+| `tenant_id` | UUID | 租户边界 |
 | `notification_task_id` | UUID | 关联 `ntf_task.id` |
 | `attempt_no` | integer | 尝试序号 |
 | `provider` | varchar(50) | 供应商标识 |
@@ -535,7 +542,7 @@ spectra_notification
 | `error_message_sanitized` | text | 脱敏错误 |
 | `duration_ms` | bigint | 耗时 |
 | `response_summary` | jsonb | 白名单响应摘要 |
-| 审计字段 | — | 继承 BaseEntity |
+| `created_by/created_at/updated_by/updated_at/deleted/version` | — | 继承 `BaseEntity` |
 
 约束：`(notification_task_id, attempt_no)` 有效记录唯一。禁止保存第三方完整请求、验证码、Token、密钥、完整手机号、完整邮箱和未过滤响应。
 
@@ -544,6 +551,7 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 消息 ID；迁移时保留旧 ID |
+| `tenant_id` | UUID | 租户边界 |
 | `notification_task_id` | UUID | IN_APP Task，迁移历史数据时可空 |
 | `notification_request_id` | UUID | 逻辑请求，迁移历史数据时可空 |
 | `receiver_user_id` | UUID | 消息所有者 |
@@ -556,7 +564,7 @@ spectra_notification
 | `is_read` | boolean | 是否已读 |
 | `read_at` | timestamptz | 阅读时间 |
 | `extra` | jsonb | 白名单扩展信息 |
-| 审计字段 | — | 继承 BaseEntity |
+| `created_by/created_at/updated_by/updated_at/deleted/version` | — | 继承 `BaseEntity` |
 
 约束和索引：
 
@@ -573,6 +581,7 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 主键 |
+| `tenant_id` | UUID | 租户边界 |
 | `user_id` | UUID | 当前用户 |
 | `purpose` | varchar(50) | 通知用途 |
 | `channel` | varchar(16) | 渠道 |
@@ -580,7 +589,7 @@ spectra_notification
 | `do_not_disturb` | boolean | 是否启用免打扰 |
 | `do_not_disturb_start` | timestamptz | 开始时间，按用户时区解释 |
 | `do_not_disturb_end` | timestamptz | 结束时间，按用户时区解释 |
-| 审计字段 | — | 继承 BaseEntity |
+| `created_by/created_at/updated_by/updated_at/deleted/version` | — | 继承 `BaseEntity` |
 
 约束：
 
@@ -1012,6 +1021,7 @@ INFO 只记录：
 - [x] 实现 Template、Request、Task、Delivery、InboxMessage、UserPreference Entity/Mapper/Service/Converter。
 - [x] 所有 JSONB 使用 `PgJsonbTypeHandler`。
 - [x] 实现请求和任务唯一约束、收件箱复合索引、Worker 索引和检查约束。
+- [x] 增加早期 `ntf_*` 表到标准字段模型的幂等规范化迁移脚本，保留旧列供发布窗口核对。
 
 ### 阶段 3：迁移消息中心
 
