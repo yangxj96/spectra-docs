@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     tenant_id UUID NOT NULL,
     template_code VARCHAR(100) NOT NULL,
     channel VARCHAR(20) NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    content TEXT NOT NULL,
     title_template VARCHAR(500) NOT NULL,
     content_template TEXT NOT NULL,
     enabled BOOLEAN NOT NULL DEFAULT TRUE,
@@ -79,6 +81,8 @@ COMMENT ON COLUMN spectra_notification.ntf_task.tenant_id IS '租户主键';
 COMMENT ON COLUMN spectra_notification.ntf_task.recipient_user_id IS '站内收件人用户主键，外部地址发送时可为空';
 COMMENT ON COLUMN spectra_notification.ntf_task.recipient_address IS '短信手机号或邮件地址，按最小必要原则保存';
 COMMENT ON COLUMN spectra_notification.ntf_task.channel IS '发送渠道：INBOX/SMS/EMAIL';
+COMMENT ON COLUMN spectra_notification.ntf_task.title IS '已渲染通知标题';
+COMMENT ON COLUMN spectra_notification.ntf_task.content IS '已渲染通知正文';
 COMMENT ON COLUMN spectra_notification.ntf_task.scheduled_at IS '计划发送时间';
 COMMENT ON COLUMN spectra_notification.ntf_task.status IS '任务状态：PENDING/PROCESSING/SENT/FAILED/CANCELLED';
 COMMENT ON COLUMN spectra_notification.ntf_task.retry_count IS '已重试次数';
