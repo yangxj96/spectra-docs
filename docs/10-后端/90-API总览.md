@@ -48,6 +48,7 @@ tags:
 |---|---|---|---|
 | `NotificationController` | spectra-core | `/notification/**` | 消息分页、未读数、标记已读、删除与发送 |
 | `NotificationSettingController` | spectra-core | `/notification/setting/**` | 当前用户消息接收偏好查询与保存 |
+| `NotificationInboxController` | spectra-core | `/notification-center/inbox/**` | 新通知中心站内信分页、未读数、已读与归档 |
 
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。权限树 `GET /authority/tree` 需要 `AUTHORITY:QUERY`，权限树写操作仅限 `ROLE_DEV_OPS`。
 

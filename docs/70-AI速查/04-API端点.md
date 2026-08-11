@@ -48,6 +48,7 @@ tags:
 |---|---|---|
 | NotificationController | `/notification/**` | 消息列表/未读数/已读/删除/发送 |
 | NotificationSettingController | `/notification/setting/**` | 当前用户消息接收偏好查询与保存 |
+| NotificationInboxController | `/notification-center/inbox/**` | 新通知中心站内信分页/未读数/已读/归档 |
 
 `POST /notification/batch-delete` 使用 `NotificationBatchDeleteFrom` 请求体：`{"ids":["消息ID"]}`。
 
