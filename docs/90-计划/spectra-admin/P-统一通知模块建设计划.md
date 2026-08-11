@@ -14,16 +14,16 @@ updated: 2026-08-11
 
 ## 状态
 
-**待执行（已完成独立模块、消息中心、多渠道投递和数据隔离目标设计；第三方渠道仅做占位）**
+**进行中（已完成独立模块、消息中心 Self API、基础多渠道任务和部分 OA 调用迁移；Security、管理端、完整 Worker 与真实收件人/敏感载荷能力未完成）**
 
 > 创建时间：2026-08-11
-> 最近调整：2026-08-11
+> 最近调整：2026-08-11（继续实现）
 > 适用范围：`spectra-admin`，由 Security、Core、OA、Workflow、AI 和后续业务模块共同使用。
 > 关联计划：[[P-Security安全修复计划]]、[[P-消息中心前端实现计划]]。Security 只负责验证码生命周期和认证语义，通知模块负责消息中心与可靠投递。
 
 ## 执行摘要
 
-当前项目已经在 `spectra-core.notification` 中实现基础站内消息和用户通知设置，OA 的会议、请假、采购、报销、合同、文档和公告等服务直接调用具体 `NotificationService`。该能力已经跨越 Core、Security、OA 和 Workflow，继续放在 `spectra-core` 会造成模块依赖扩散，也无法自然承载短信、邮件、模板、投递状态、重试和用户渠道偏好。
+原有通知能力曾位于 `spectra-core.notification`，并由 OA 业务直接调用具体 `NotificationService`。本轮已完成通知实现迁移到 `spectra-notification`，Core 旧通知 Java/XML 映射已移除，OA 已迁移的业务通过公共 `NotificationGateway` 入队；Security、Workflow、AI 和收件人目录尚未完成迁移。
 
 本计划新增独立 Maven 子模块 `spectra-notification`，统一负责：
 
@@ -1000,64 +1000,64 @@ INFO 只记录：
 ### 阶段 1：公共契约与独立模块
 
 - 在 `spectra-common.notification` 新增 Gateway、Request、Receipt、Audience、Channel、Purpose、Priority 和目录端口。
-- 新建 `spectra-modules/spectra-notification`。
-- 注册到 `spectra-modules/pom.xml` 和 `spectra-launch/pom.xml`。
-- 新增 `NotificationModule`、配置属性和模块级测试。
-- 验证不存在 notification → core/oa/workflow 的 Maven 反向依赖。
+- [x] 新建 `spectra-modules/spectra-notification`。
+- [x] 注册到 `spectra-modules/pom.xml` 和 `spectra-launch/pom.xml`。
+- [x] 新增 `NotificationModule`、配置属性和模块级测试。
+- [x] 验证不存在 notification → core/oa/workflow 的 Maven 反向依赖。
 
 ### 阶段 2：专属 schema 与领域模型
 
-- 新增 `docs/sql/spectra_notification/建表.sql`。
-- 创建 `spectra_notification` schema 和六张 `ntf_*` 表。
+- [x] 新增 `docs/sql/spectra_notification/建表.sql`。
+- [x] 创建 `spectra_notification` schema 和六张 `ntf_*` 表。
 - 实现 Template、Request、Task、Delivery、InboxMessage、UserPreference Entity/Mapper/Service/Converter。
-- 所有 JSONB 使用 `PgJsonbTypeHandler`。
-- 实现请求和任务唯一约束、收件箱复合索引、Worker 索引和检查约束。
+- [x] 所有 JSONB 使用 `PgJsonbTypeHandler`。
+- [x] 实现请求和任务唯一约束、收件箱复合索引、Worker 索引和检查约束。
 
 ### 阶段 3：迁移消息中心
 
-- 将旧 `sys_notification` 数据复制到 `ntf_inbox_message`，保留 ID、接收人、已读状态、创建时间和软删除状态。
-- 将旧 type 映射为新 purpose：
+- [x] 将旧 `sys_notification` 数据复制到 `ntf_inbox_message`，保留 ID、接收人、已读状态、创建时间和软删除状态。
+- [x] 将旧 type 映射为新 purpose：
   - system → SYSTEM_NOTICE
   - workflow → `extra` 可明确识别审批结果时映射 WORKFLOW_RESULT，否则映射 WORKFLOW_TODO
   - oa → OA_NOTICE
   - inner_mail → INNER_MESSAGE
   - approval → WORKFLOW_TODO
-- 将旧 `extra` 校验后迁移为 JSONB；非法历史值进入空对象并记录匿名计数。
-- 将旧固定设置展开为 `ntf_user_preference` 多行记录：system、workflow、oa、inner_mail、approval 分别映射到对应 IN_APP purpose；原免打扰复制到所有可选用途。
-- 旧系统没有 SMS/EMAIL 偏好，迁移时不自动生成“已启用”的外部渠道记录；非安全外部渠道继续继承默认关闭策略，避免供应商启用后突然发送历史用户未选择的邮件或短信。
-- 迁移脚本可重复执行且不会重复插入。
+- [x] 将旧 `extra` 校验后迁移为 JSONB；非法历史值进入空对象并记录匿名计数。
+- [x] 将旧固定设置展开为 `ntf_user_preference` 多行记录：system、workflow、oa、inner_mail、approval 分别映射到对应 IN_APP purpose；原免打扰复制到所有可选用途。
+- [x] 旧系统没有 SMS/EMAIL 偏好，迁移时不自动生成“已启用”的外部渠道记录；非安全外部渠道继续继承默认关闭策略，避免供应商启用后突然发送历史用户未选择的邮件或短信。
+- [x] 迁移脚本可重复执行且不会重复插入。
 - 对比迁移前后行数、用户未读数和抽样匿名校验。
-- 切换读写后保留旧表只读观察一个发布窗口，再由独立清理计划处理，不立即 DROP。
+- [x] 切换读写后保留旧表只读观察一个发布窗口，再由独立清理计划处理，不立即 DROP。
 
 ### 阶段 4：Self API 与数据隔离
 
-- 移动 NotificationController、SettingController 及相关 From/VO 到新模块。
-- 保持现有 API 路径和权限编码兼容。
-- 实现 `pageMine/detailMine/markMineAsRead/markAllMineAsRead/deleteMineById/deleteMineBatch`。
-- 所有更新和删除使用带 `receiver_user_id` 的单条条件 SQL。
-- Self API 不接受 userId。
+- [x] 移动 NotificationController、SettingController 及相关 From/VO 到新模块。
+- [x] 保持现有 API 路径和权限编码兼容。
+- [x] 实现 `pageMine/detailMine/markMineAsRead/markAllMineAsRead/deleteMineById/deleteMineBatch`。
+- [x] 所有更新和删除使用带 `receiver_user_id` 的单条条件 SQL。
+- [x] Self API 不接受 userId。
 - 增加跨用户、GLOBAL 角色和混合批量 ID 越权测试。
 
 ### 阶段 5：请求、模板与可靠 Worker
 
-- 实现 `NotificationGateway`。
-- 实现 purpose 策略、模板选择、参数校验、受众展开和渠道计算。
+- [x] 实现 `NotificationGateway`。
+- [x] 实现 purpose 策略、模板选择、参数校验和渠道计算；受众展开仍限于明确用户 ID。
 - 实现 Request/Task 状态机和汇总。
 - 实现 `FOR UPDATE SKIP LOCKED` 领取、锁超时恢复、CAS 更新和指数退避。
 - 实现管理端 Request/Task/Delivery 脱敏查询、重试和取消。
 
 ### 阶段 6：渠道实现
 
-- 完整实现 `InAppNotificationSender` 和 taskId 幂等。
+- [x] 完整实现 `InAppNotificationSender` 和 taskId 幂等。
 - 实现 SMS/EMAIL 标准模型、地址解析、脱敏和密文存储。
-- 实现 Placeholder Sender 和 test-scope Capturing Sender。
+- [x] 实现 Placeholder Sender；test-scope Capturing Sender 尚未加入。
 - 实现渠道可用性、启动校验和健康检查。
 
 ### 阶段 7：调用方迁移
 
 - Core、OA、Workflow、AI 改为依赖 `NotificationGateway`。
 - Security 验证码改为通过 Gateway 交付。
-- 禁止新增 `com.devops00.spectra.core.notification.*` import。
+- [x] 禁止新增 `com.devops00.spectra.core.notification.*` import。
 - 如需过渡，旧 facade 只委托新 Gateway，不复制业务逻辑。
 - 每迁移一个调用方都定义稳定的 idempotencyKey。
 
@@ -1076,8 +1076,9 @@ oa:contract-reminder:{milestoneId}:{userId}
 - 增加配置项、指标、健康检查、脱敏日志和清理任务。
 - 更新项目总览、架构、API、ER、实体清单和 AI 速查。
 - 新增 `docs/10-后端/75-统一通知模块.md`。
-- 更新前端消息中心计划中的 purpose、偏好和详情接口。
-- 运行 Maven 测试、Spotless 和 `scripts/check-docs.ps1`。
+- [x] 更新前端消息中心计划中的 purpose、偏好和详情接口。
+- [x] Maven 全量测试和 `scripts/check-docs.ps1` 已通过（64 个 Entity、41 个 Controller）。
+- [ ] Spotless 格式检查；当前 Maven 本地仓库缺少插件，网络下载在受控重试中超时。
 
 ---
 
@@ -1085,9 +1086,9 @@ oa:contract-reminder:{milestoneId}:{userId}
 
 ### 14.1 单元测试
 
-- [ ] purpose 与 channel 分离，非法组合拒绝。
-- [ ] 模板缺少参数、多余参数和非法占位符拒绝。
-- [ ] HTML 模板不允许脚本和非法协议。
+- [x] purpose 与 channel 分离，非法组合拒绝。
+- [x] 模板缺少参数和非法占位符拒绝；多余参数拒绝尚未实现。
+- [x] HTML 模板不允许脚本和非法协议。
 - [ ] 相同幂等键返回同一 Request。
 - [ ] 一次请求按“接收人 × 渠道”正确展开 Task。
 - [ ] 用户关闭可选渠道时跳过，不关闭强制安全用途。
@@ -1239,7 +1240,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [ ] GLOBAL/DEPT/CUSTOM 不扩大私人收件箱可见范围。
 - [ ] 业务受众展开遵守调用方权限和数据范围。
 - [ ] 管理端 Request/Task/Delivery 查询完整脱敏。
-- [ ] 强制安全通知不能被普通用户设置关闭。
+- [x] 强制安全通知不能被普通用户设置关闭。
 - [ ] 验证码不以明文写 Redis 普通值、数据库、日志、指标或 API。
 - [ ] 幂等、并发领取、失败重试、UNKNOWN、过期和迁移测试通过。
 - [ ] Maven 全量测试、Spotless 和文档检查通过。

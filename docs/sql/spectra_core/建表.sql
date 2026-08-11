@@ -736,6 +736,8 @@ COMMENT ON COLUMN spectra_core.ai_session.state_data IS 'state_data';
 -- -------------------------------------------
 -- 1. 系统通知消息表
 -- -------------------------------------------
+-- 统一通知模块启用后，本表仅作为历史数据迁移源保留，新的读写统一落到
+-- docs/sql/spectra_notification/建表.sql 中的 ntf_* 表，不再由 spectra-core 映射。
 DROP TABLE IF EXISTS "spectra_core"."sys_notification";
 CREATE TABLE "spectra_core"."sys_notification"
 (
@@ -805,6 +807,8 @@ COMMENT ON INDEX "spectra_core"."idx_notification_created_at" IS '创建时间�
 -- -------------------------------------------
 -- 2. 用户通知设置表
 -- -------------------------------------------
+-- 统一通知模块启用后，本表仅作为历史偏好迁移源保留，新的读写统一落到
+-- spectra_notification.ntf_user_preference，不再由 spectra-core 映射。
 DROP TABLE IF EXISTS "spectra_core"."sys_notification_setting";
 CREATE TABLE "spectra_core"."sys_notification_setting"
 (

@@ -1,7 +1,7 @@
 BEGIN;
 INSERT INTO spectra_notification.ntf_user_preference
     (id, tenant_id, user_id, purpose, channel, enabled, do_not_disturb, created_at, updated_at)
-SELECT gen_random_uuid(), '00000000-0000-0000-0000-000000000000', s.user_id, v.purpose, 'INBOX', v.enabled,
+SELECT gen_random_uuid(), '00000000-0000-0000-0000-000000000000', s.user_id, v.purpose, 'IN_APP', v.enabled,
        COALESCE(s.do_not_disturb, FALSE), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 FROM spectra_core.sys_notification_setting s
 CROSS JOIN LATERAL (VALUES

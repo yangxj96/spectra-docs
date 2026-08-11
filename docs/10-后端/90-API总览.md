@@ -46,9 +46,11 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `NotificationController` | spectra-core | `/notification/**` | 消息分页、未读数、标记已读、删除与发送 |
-| `NotificationSettingController` | spectra-core | `/notification/setting/**` | 当前用户消息接收偏好查询与保存 |
-| `NotificationInboxController` | spectra-core | `/notification-center/inbox/**` | 新通知中心站内信分页、未读数、已读与归档 |
+| `NotificationController` | spectra-notification | `/notification/**`、`/notification-center/inbox/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
+| `NotificationSettingController` | spectra-notification | `/notification/setting/**` | 兼容旧 API 的当前用户消息设置查询与保存 |
+| `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
+
+消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。`/notification-center/inbox/**` 是 `/notification/**` 的兼容路径别名。
 
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。权限树 `GET /authority/tree` 需要 `AUTHORITY:QUERY`，权限树写操作仅限 `ROLE_DEV_OPS`。
 

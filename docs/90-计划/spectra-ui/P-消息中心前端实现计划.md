@@ -15,7 +15,7 @@ tags:
 
 ## 问题背景
 
-系统当前缺少统一的消息通知入口，用户无法及时获取系统通知、工作流审批、OA公告等信息。需要在头部导航栏添加消息中心功能，提供快速查看和完整管理两种交互方式。
+后端统一通知模块已提供当前用户消息中心 Self API，前端需要在头部导航栏添加消息中心功能，提供快速查看和完整管理两种交互方式。Self API 不接受 `userId`，消息类型对应后端 `NotificationPurpose`，渠道和用户偏好由后端统一计算。
 
 ## 修复目标
 
@@ -44,7 +44,7 @@ type NotificationType =
   | 'workflow'      // 工作流通知
   | 'oa'           // OA通知（会议、公告等）
   | 'inner_mail'   // 站内信
-  | 'approval'     // 待我审批
+  | 'approval'     // 待我审批（兼容展示值，后端映射 WORKFLOW_TODO）
   | string;        // 支持自定义扩展类型
 
 /** 消息实体 */
@@ -99,7 +99,7 @@ interface NotificationTypeConfig {
 - `batchDelete(ids)`: 批量删除
 - `refreshUnreadCount()`: 刷新未读数
 
-#### 1.3 创建通知API模块（预留）
+#### 1.3 创建通知API模块
 
 **操作**：创建API模块，后续对接后端
 
@@ -123,6 +123,8 @@ export const NotificationApi = {
   batchDelete: (ids: string[]) => post("/api/notification/batch-delete", { body: { ids } })
 };
 ```
+
+后端同时兼容 `/notification-center/inbox/**` 路径；详情使用 `GET /api/notification/{id}`。偏好设置另用 `GET/PUT /api/notification-center/preferences`，提交 `purpose`、`channel`、`enabled` 和 `doNotDisturb`，不能关闭登录验证码、绑定、重置密码和安全告警等强制安全用途。
 
 ### 阶段二：头部组件（NotificationBell + Drawer）
 
