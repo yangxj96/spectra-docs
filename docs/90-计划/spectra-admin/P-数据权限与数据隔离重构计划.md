@@ -54,7 +54,7 @@ created: 2026-08-01
 - OA 会议：服务端强制写入当前用户的发起人和部门归属，并加入事务与更新结果校验；关系表声明 `spectra_oa` schema。
 - `MetaObjectHandlerImpl`：凡实体声明 `departmentId` 且未显式归属时，自动使用当前用户部门；数据范围异常统一映射为 HTTP 403。
 - 回归测试：新增 `DataScopeIsolationTest`，覆盖请求上下文、绕过作用域、SELF 字段/别名、空 CUSTOM、关系 schema。
-- 文档/SQL：同步 `docs/10-后端/25-数据权限设计.md`、`docs/sql/spectra_core/建表.sql`；活动范围唯一索引和目标查询索引已并入建表 SQL，历史库兼容回填已并入 `docs/sql/spectra_core/权限树与角色基线.sql`。
+- 文档/SQL：同步 `docs/10-后端/25-数据权限设计.md`、`docs/sql/spectra_core/建表.sql`；活动范围唯一索引和目标查询索引已并入建表 SQL，历史库兼容回填已经完成并纳入全库备份 `docs/sql/db.dump`，不再保留独立迁移脚本。
 
 仍需在独立数据库变更窗口完成：资源策略表（`sys_data_scope_policy`）及 INSERT 写入策略的完整迁移、READ/WRITE 分动作关系策略、PostgreSQL 集成测试和旧 `sys_role.scope` 字段下线。上述内容保留在本计划后续阶段，不能以本轮兼容修复替代。
 
