@@ -49,6 +49,7 @@ tags:
 | `NotificationController` | spectra-notification | `/notification/**`、`/notification-center/inbox/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
 | `NotificationSettingController` | spectra-notification | `/notification/setting/**` | 兼容旧 API 的当前用户消息设置查询与保存 |
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
+| `NotificationAdminController` | spectra-notification | `/notification/admin/**` | ROLE_AUDIT/ROLE_DEV_OPS 脱敏查询、渠道状态、重试和取消 |
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。`/notification-center/inbox/**` 是 `/notification/**` 的兼容路径别名。
 

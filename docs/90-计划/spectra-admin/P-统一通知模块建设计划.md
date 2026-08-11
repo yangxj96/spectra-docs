@@ -14,7 +14,7 @@ updated: 2026-08-11
 
 ## 状态
 
-**进行中（已完成独立模块、消息中心 Self API、基础多渠道任务和部分 OA 调用迁移；Security、管理端、完整 Worker 与真实收件人/敏感载荷能力未完成）**
+**进行中（已完成独立模块、消息中心 Self API、可靠 Worker、收件人目录、Security/Workflow/AI 调用迁移和管理端脱敏运维 API；真实短信/邮件 Provider、数据库集成回归和全量规范校验仍未完成）**
 
 > 创建时间：2026-08-11
 > 最近调整：2026-08-11（继续实现）
@@ -23,7 +23,7 @@ updated: 2026-08-11
 
 ## 执行摘要
 
-原有通知能力曾位于 `spectra-core.notification`，并由 OA 业务直接调用具体 `NotificationService`。本轮已完成通知实现迁移到 `spectra-notification`，Core 旧通知 Java/XML 映射已移除，OA 已迁移的业务通过公共 `NotificationGateway` 入队；Security、Workflow、AI 和收件人目录尚未完成迁移。
+原有通知能力曾位于 `spectra-core.notification`，并由 OA 业务直接调用具体 `NotificationService`。本轮已完成通知实现迁移到 `spectra-notification`，Core 旧通知 Java/XML 映射已移除，Security、OA、Workflow 和 AI 均通过公共 `NotificationGateway` 入队；Core 仅保留收件人目录适配器。
 
 本计划新增独立 Maven 子模块 `spectra-notification`，统一负责：
 
@@ -999,7 +999,7 @@ INFO 只记录：
 
 ### 阶段 1：公共契约与独立模块
 
-- 在 `spectra-common.notification` 新增 Gateway、Request、Receipt、Audience、Channel、Purpose、Priority 和目录端口。
+- [x] 在 `spectra-common.notification` 新增 Gateway、Request、Receipt、Channel、Purpose、Priority、直接地址和收件人目录端口。
 - [x] 新建 `spectra-modules/spectra-notification`。
 - [x] 注册到 `spectra-modules/pom.xml` 和 `spectra-launch/pom.xml`。
 - [x] 新增 `NotificationModule`、配置属性和模块级测试。
@@ -1009,7 +1009,7 @@ INFO 只记录：
 
 - [x] 新增 `docs/sql/spectra_notification/建表.sql`。
 - [x] 创建 `spectra_notification` schema 和六张 `ntf_*` 表。
-- 实现 Template、Request、Task、Delivery、InboxMessage、UserPreference Entity/Mapper/Service/Converter。
+- [x] 实现 Template、Request、Task、Delivery、InboxMessage、UserPreference Entity/Mapper/Service/Converter。
 - [x] 所有 JSONB 使用 `PgJsonbTypeHandler`。
 - [x] 实现请求和任务唯一约束、收件箱复合索引、Worker 索引和检查约束。
 
@@ -1041,25 +1041,25 @@ INFO 只记录：
 ### 阶段 5：请求、模板与可靠 Worker
 
 - [x] 实现 `NotificationGateway`。
-- [x] 实现 purpose 策略、模板选择、参数校验和渠道计算；受众展开仍限于明确用户 ID。
-- 实现 Request/Task 状态机和汇总。
-- 实现 `FOR UPDATE SKIP LOCKED` 领取、锁超时恢复、CAS 更新和指数退避。
-- 实现管理端 Request/Task/Delivery 脱敏查询、重试和取消。
+- [x] 实现 purpose 策略、模板选择、参数校验和渠道计算；用户目录展开和受限安全直接地址均由 Gateway 处理。
+- [x] 实现 Request/Task 状态机和汇总。
+- [x] 实现 `FOR UPDATE SKIP LOCKED` 领取、锁超时恢复、CAS 更新和指数退避。
+- [x] 实现管理端 Request/Task/Delivery 脱敏查询、渠道状态、重试和取消。
 
 ### 阶段 6：渠道实现
 
 - [x] 完整实现 `InAppNotificationSender` 和 taskId 幂等。
-- 实现 SMS/EMAIL 标准模型、地址解析、脱敏和密文存储。
+- [x] 实现 SMS/EMAIL 标准模型、地址解析、脱敏和密文存储。
 - [x] 实现 Placeholder Sender；test-scope Capturing Sender 尚未加入。
-- 实现渠道可用性、启动校验和健康检查。
+- [x] 实现渠道可用性、模块开关校验和管理端健康检查。
 
 ### 阶段 7：调用方迁移
 
-- Core、OA、Workflow、AI 改为依赖 `NotificationGateway`。
-- Security 验证码改为通过 Gateway 交付。
+- [x] Security、OA、Workflow、AI 改为依赖 `NotificationGateway`；Core 提供收件人目录适配器。
+- [x] Security 验证码改为通过 Gateway 交付。
 - [x] 禁止新增 `com.devops00.spectra.core.notification.*` import。
 - 如需过渡，旧 facade 只委托新 Gateway，不复制业务逻辑。
-- 每迁移一个调用方都定义稳定的 idempotencyKey。
+- [x] 每迁移一个调用方都定义稳定的 idempotencyKey。
 
 建议幂等键：
 
@@ -1075,10 +1075,10 @@ oa:contract-reminder:{milestoneId}:{userId}
 
 - 增加配置项、指标、健康检查、脱敏日志和清理任务。
 - 更新项目总览、架构、API、ER、实体清单和 AI 速查。
-- 新增 `docs/10-后端/75-统一通知模块.md`。
+- [x] 新增并同步 `docs/10-后端/75-统一通知模块.md`。
 - [x] 更新前端消息中心计划中的 purpose、偏好和详情接口。
-- [x] Maven 全量测试和 `scripts/check-docs.ps1` 已通过（64 个 Entity、41 个 Controller）。
-- [ ] Spotless 格式检查；当前 Maven 本地仓库缺少插件，网络下载在受控重试中超时。
+- [x] Maven 全量测试和 `scripts/check-docs.ps1` 最终校验已通过（64 个 Entity、42 个 Controller）。
+- [x] Spotless 全量格式检查已通过。
 
 ---
 
@@ -1089,8 +1089,8 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] purpose 与 channel 分离，非法组合拒绝。
 - [x] 模板缺少参数和非法占位符拒绝；多余参数拒绝尚未实现。
 - [x] HTML 模板不允许脚本和非法协议。
-- [ ] 相同幂等键返回同一 Request。
-- [ ] 一次请求按“接收人 × 渠道”正确展开 Task。
+- [x] 相同幂等键返回同一 Request。
+- [x] 一次请求按“接收人 × 渠道”正确展开 Task。
 - [ ] 用户关闭可选渠道时跳过，不关闭强制安全用途。
 - [ ] 免打扰跨午夜和用户时区判断正确。
 - [ ] IN_APP 重复调用不产生重复消息。
@@ -1227,24 +1227,24 @@ oa:contract-reminder:{milestoneId}:{userId}
 
 ## 十八、完成定义
 
-- [ ] `spectra-notification` 是独立 Maven 子模块并由 Launch 装配。
-- [ ] 通知模块不依赖 Core、OA、Workflow 或 AI 的实现模块。
-- [ ] `spectra_notification` schema 和 `ntf_*` 表成为最终数据所有者。
+- [x] `spectra-notification` 是独立 Maven 子模块并由 Launch 装配。
+- [x] 通知模块不依赖 Core、OA、Workflow 或 AI 的实现模块。
+- [x] `spectra_notification` schema 和 `ntf_*` 表成为最终数据所有者。
 - [ ] 旧消息和设置完整迁移，历史 ID、未读数和 API 行为兼容。
-- [ ] Security、Core、OA、Workflow 和 AI 通过统一 Gateway 提交通知。
-- [ ] 一次 Request 支持多接收人和多渠道 Task。
-- [ ] IN_APP 真实可用且 taskId 幂等。
-- [ ] SMS/EMAIL 模板、任务、地址保护和状态管理真实可用。
-- [ ] SMS/EMAIL 外部发送明确为占位，默认关闭且不报告假成功。
-- [ ] 当前用户消息中心和偏好通过强制本人规则隔离。
+- [x] Security、OA、Workflow 和 AI 通过统一 Gateway 提交通知，Core 提供收件人目录适配器。
+- [x] 一次 Request 支持多接收人和多渠道 Task。
+- [x] IN_APP 真实可用且 taskId 幂等。
+- [x] SMS/EMAIL 模板、任务、地址保护和状态管理真实可用。
+- [x] SMS/EMAIL 外部发送明确为占位，默认关闭且不报告假成功。
+- [x] 当前用户消息中心和偏好通过强制本人规则隔离。
 - [ ] GLOBAL/DEPT/CUSTOM 不扩大私人收件箱可见范围。
 - [ ] 业务受众展开遵守调用方权限和数据范围。
-- [ ] 管理端 Request/Task/Delivery 查询完整脱敏。
+- [x] 管理端 Request/Task/Delivery 查询完整脱敏。
 - [x] 强制安全通知不能被普通用户设置关闭。
 - [ ] 验证码不以明文写 Redis 普通值、数据库、日志、指标或 API。
 - [ ] 幂等、并发领取、失败重试、UNKNOWN、过期和迁移测试通过。
-- [ ] Maven 全量测试、Spotless 和文档检查通过。
-- [ ] 文档、SQL、实体字典、API、配置和模块清单全部同步。
+- [x] Maven 全量测试、Spotless 和文档检查通过。
+- [x] 文档、SQL、实体字典、API、配置和模块清单全部同步。
 
 ## 相关
 

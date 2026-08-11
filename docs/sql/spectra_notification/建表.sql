@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request (
     scheduled_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMPTZ NULL,
     priority INTEGER NOT NULL DEFAULT 0,
+    sensitive_payload TEXT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uk_ntf_request_idempotency UNIQUE (tenant_id, idempotency_key),
@@ -61,7 +62,9 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
     content TEXT NOT NULL,
     link VARCHAR(500) NULL,
     extra JSONB NOT NULL DEFAULT '{}'::jsonb,
+    sensitive_payload TEXT NULL,
     scheduled_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMPTZ NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     retry_count INTEGER NOT NULL DEFAULT 0,
     last_error VARCHAR(1000) NULL,
@@ -74,6 +77,7 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery (
     id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
     task_id UUID NOT NULL REFERENCES spectra_notification.ntf_task(id),
     provider_code VARCHAR(100) NOT NULL,
     provider_message_id VARCHAR(200) NULL,
@@ -118,7 +122,25 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_user_preference (
     CONSTRAINT ck_ntf_user_preference_channel CHECK (channel IN ('IN_APP', 'SMS', 'EMAIL'))
 );
 
+ALTER TABLE spectra_notification.ntf_request
+    ADD COLUMN IF NOT EXISTS sensitive_payload TEXT NULL;
+ALTER TABLE spectra_notification.ntf_task
+    ADD COLUMN IF NOT EXISTS sensitive_payload TEXT NULL;
+ALTER TABLE spectra_notification.ntf_task
+    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ NULL;
+
+ALTER TABLE spectra_notification.ntf_delivery
+    ADD COLUMN IF NOT EXISTS tenant_id UUID;
+UPDATE spectra_notification.ntf_delivery d
+SET tenant_id = t.tenant_id
+FROM spectra_notification.ntf_task t
+WHERE d.task_id = t.id AND d.tenant_id IS NULL;
+ALTER TABLE spectra_notification.ntf_delivery
+    ALTER COLUMN tenant_id SET NOT NULL;
+
 CREATE INDEX IF NOT EXISTS idx_ntf_task_pending ON spectra_notification.ntf_task (status, scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_ntf_task_processing_timeout ON spectra_notification.ntf_task (status, updated_at)
+    WHERE status = 'PROCESSING';
 CREATE INDEX IF NOT EXISTS idx_ntf_task_request ON spectra_notification.ntf_task (request_id, status);
 CREATE INDEX IF NOT EXISTS idx_ntf_delivery_task ON spectra_notification.ntf_delivery (task_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ntf_inbox_owner_created
