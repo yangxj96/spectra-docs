@@ -135,3 +135,28 @@ COMMENT ON COLUMN spectra_notification.ntf_inbox.created_at IS '入箱时间';
 
 CREATE INDEX IF NOT EXISTS idx_ntf_task_pending ON spectra_notification.ntf_task (status, scheduled_at);
 CREATE INDEX IF NOT EXISTS idx_ntf_inbox_recipient ON spectra_notification.ntf_inbox (tenant_id, recipient_user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS spectra_notification.ntf_user_preference (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    purpose VARCHAR(50) NOT NULL,
+    channel VARCHAR(20) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    do_not_disturb BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_ntf_user_preference UNIQUE (tenant_id, user_id, purpose, channel),
+    CONSTRAINT ck_ntf_user_preference_channel CHECK (channel IN ('INBOX', 'SMS', 'EMAIL'))
+);
+COMMENT ON TABLE spectra_notification.ntf_user_preference IS '用户通知偏好表：按用途和渠道保存可选通知设置，安全用途由策略强制覆盖';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.id IS '偏好记录主键';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.tenant_id IS '租户主键';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.user_id IS '用户主键';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.purpose IS '通知用途编码';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.channel IS '通知渠道：INBOX/SMS/EMAIL';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.enabled IS '是否启用该用途和渠道';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.do_not_disturb IS '是否在免打扰时段抑制可选通知';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.created_at IS '创建时间';
+COMMENT ON COLUMN spectra_notification.ntf_user_preference.updated_at IS '更新时间';
+CREATE INDEX IF NOT EXISTS idx_ntf_user_preference_user ON spectra_notification.ntf_user_preference (tenant_id, user_id);
