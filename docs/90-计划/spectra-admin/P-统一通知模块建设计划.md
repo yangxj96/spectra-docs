@@ -14,7 +14,7 @@ updated: 2026-08-11
 
 ## 状态
 
-**进行中（已完成独立模块、消息中心 Self API、可靠 Worker、收件人目录、Security/Workflow/AI 调用迁移和管理端脱敏运维 API；真实短信/邮件 Provider、数据库集成回归和全量规范校验仍未完成）**
+**进行中（已完成独立模块、消息中心 Self API、可靠 Worker、收件人目录、Security/Workflow/AI 调用迁移、Mock Provider 示例和管理端脱敏运维 API；真实短信/邮件 Provider、真实 PostgreSQL 并发回归、完整 Self API 权限回归及指标/清理任务仍未完成）**
 
 > 创建时间：2026-08-11
 > 最近调整：2026-08-11（继续实现）
@@ -1050,7 +1050,7 @@ INFO 只记录：
 
 - [x] 完整实现 `InAppNotificationSender` 和 taskId 幂等。
 - [x] 实现 SMS/EMAIL 标准模型、地址解析、脱敏和密文存储。
-- [x] 实现 Placeholder Sender；test-scope Capturing Sender 尚未加入。
+- [x] 实现 Placeholder Sender；新增 test-scope `MockSmsSender` 和 `MockEmailSender` 示例，不进入生产运行时。
 - [x] 实现渠道可用性、模块开关校验和管理端健康检查。
 
 ### 阶段 7：调用方迁移
@@ -1091,12 +1091,15 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] HTML 模板不允许脚本和非法协议。
 - [x] 相同幂等键返回同一 Request。
 - [x] 一次请求按“接收人 × 渠道”正确展开 Task。
+- [x] Worker 成功、过期、失败重试和 Delivery 租户隔离。
+- [x] 管理端地址、错误、投递摘要脱敏和 ROLE_DEV_OPS/ROLE_AUDIT 注解边界。
+- [x] SQL 建表/迁移结构契约检查；真实 PostgreSQL 事务和并发仍需环境测试。
 - [ ] 用户关闭可选渠道时跳过，不关闭强制安全用途。
 - [ ] 免打扰跨午夜和用户时区判断正确。
 - [ ] IN_APP 重复调用不产生重复消息。
 - [ ] Placeholder 返回 `CHANNEL_NOT_CONFIGURED`。
-- [ ] Capturing Sender 仅在测试类路径可用。
-- [ ] 日志和 VO 不包含原始地址、验证码和密文。
+- [x] Mock SMS/EMAIL Sender 仅在测试类路径可用。
+- [x] 管理端 VO 不包含原始地址、验证码和密文；完整日志捕获测试仍待补充。
 
 ### 14.2 数据隔离测试
 
@@ -1134,17 +1137,18 @@ oa:contract-reminder:{milestoneId}:{userId}
 
 ### 14.5 Security 联动
 
-- [ ] 渠道关闭时验证码接口不写 Redis。
-- [ ] Capturing Sender 收到随机验证码，Redis 只包含摘要。
+- [x] 渠道关闭时验证码接口不写 Redis。
+- [x] Gateway 收到随机六位验证码，Redis 只包含摘要。
 - [ ] Request、Task、Delivery、日志均无明文验证码。
-- [ ] 入队失败时 Redis 验证记录被补偿删除。
+- [x] 入队失败时 Redis 验证记录被补偿删除。
 - [ ] 到期验证码不发送。
 - [ ] 同一安全请求不生成重复 Task。
 
 ### 14.6 OA/Workflow/AI 回归
 
 - [ ] 请假、报销、采购、会议、合同和公告仍能生成消息中心记录。
-- [ ] Workflow 待办重复回调不重复通知。
+- [x] Workflow 审批完成生成 WORKFLOW_RESULT 通知并使用稳定幂等键。
+- [x] AI RAG 失败生成 SYSTEM_NOTICE 通知并使用稳定幂等键。
 - [ ] 业务数据范围校验发生在调用 Gateway 之前。
 - [ ] 用户偏好关闭可选渠道后行为正确。
 - [ ] 消息 link 只能跳转允许的前端内部路由。
