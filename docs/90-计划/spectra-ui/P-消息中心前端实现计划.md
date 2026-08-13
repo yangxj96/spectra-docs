@@ -9,13 +9,22 @@ tags:
 
 ## 状态
 
-**进行中**
+**代码实现已完成，真实 HTTP 登录联调通过，待浏览器交互验收**
 
 > 创建时间：2026-07-19
 
 ## 问题背景
 
 后端统一通知模块已提供当前用户消息中心 Self API，前端需要在头部导航栏添加消息中心功能，提供快速查看和完整管理两种交互方式。Self API 不接受 `userId`，消息类型对应后端 `NotificationPurpose`，渠道和用户偏好由后端统一计算。
+
+## 当前实现状态
+
+- [x] 已完成消息类型声明、通知 API、Pinia Store、铃铛/抽屉、消息中心页面、详情弹窗和静态认证路由。
+- [x] API 路径已按后端 `/api` context path 对齐，Self API 不携带 `userId`；查询和偏好仍由后端绑定当前用户。
+- [x] 已增加通知 API/Store Vitest 回归，覆盖路径参数、查询条件、已读和批量删除状态同步。
+- [x] 后端本地 HTTP 安全冒烟已确认未登录请求被拒绝（401），登录入口可达；前端构建与静态回归通过。
+- [x] 已在长期保留测试账号的真实登录会话下联调 Bearer Token、消息中心权限和偏好接口；刷新 Token、登出和用户隔离均通过。
+- [ ] 待在浏览器中完成消息铃铛、抽屉、详情、筛选、已读、删除和偏好交互验收。
 
 ## 修复目标
 
@@ -110,7 +119,9 @@ interface NotificationTypeConfig {
 ```typescript
 export const NotificationApi = {
   /** 获取消息列表 */
-  list: (params: NotificationQueryParams) => get("/api/notification/list", { params }),
+  list: (params: NotificationQueryParams) => get("/api/notification/list", params),
+  /** 获取消息详情 */
+  detail: (id: string) => get(`/api/notification/${id}`),
   /** 获取未读数量 */
   unreadCount: () => get("/api/notification/unread-count"),
   /** 标记已读 */
@@ -118,9 +129,13 @@ export const NotificationApi = {
   /** 全部标记已读 */
   markAllAsRead: () => put("/api/notification/read-all"),
   /** 删除消息 */
-  delete: (id: string) => del("/api/notification/{id}", { pathParams: { id } }),
-  /** 批量删除 */
-  batchDelete: (ids: string[]) => post("/api/notification/batch-delete", { body: { ids } })
+  delete: (id: string) => del(`/api/notification/${id}`),
+  /** 批量删除，post 的第二个参数就是 JSON 请求体 */
+  batchDelete: (ids: string[]) => post("/api/notification/batch-delete", { ids }),
+  /** 当前用户用途×渠道偏好 */
+  preferences: () => get("/api/notification-center/preferences"),
+  savePreference: (params: NotificationPreferenceUpdate) =>
+    put("/api/notification-center/preferences", undefined, { params })
 };
 ```
 
@@ -288,12 +303,15 @@ pnpm run lint:fix    # ESLint检查
 pnpm run type-check  # 类型检查
 ```
 
+当前自动化验证：`format:check`、`lint`、`type-check`、`test`（11 个文件、34 个测试）和 `build` 均已通过。
+
 ### 4. 集成测试
 
 - [ ] 启动开发服务器 `pnpm start`
-- [ ] 登录系统，检查头部铃铛显示
-- [ ] 点击铃铛，检查抽屉功能
-- [ ] 导航到消息中心页面，检查完整功能
+- [ ] 使用真实账号登录系统，检查头部铃铛显示和 Bearer Token 请求
+- [ ] 点击铃铛，检查抽屉、已读和跳转功能
+- [ ] 导航到消息中心页面，检查筛选、批量删除和详情功能
+- [ ] 查询和保存用途×渠道偏好，确认强制安全用途仍不可关闭
 
 ## 影响范围
 
