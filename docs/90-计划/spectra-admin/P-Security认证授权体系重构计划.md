@@ -1688,6 +1688,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 3 已提供目标 RoleAssignment/Boundary 只读 API；写入继续冻结到 Phase 4 GrantBoundary 流程。
 - [x] Phase 4 已交付 Assignment 与 Role 的 Grant Boundary/authorityLevel 校验、Impact Preview/Apply token、并发 version/securityVersion 门禁、统一 Audit/Session revoke；旧用户角色、旧角色权限和旧 DataScope 写入口已冻结。
 - [x] Phase 5 已交付 `sec:v2:*` Redis Session、Token Digest、Token Family Rotation/Replay 撤销、并发策略、Web HttpOnly Host-only Refresh Cookie + CSRF、App Token 存储/设备 ID 适配，以及 TOTP/AAL2/Recovery Code MFA 核心和 DEV_OPS 强制 MFA。
+- [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
 - [~] Phase 3 Permission Catalog 已固化为 `V3__security_permission_catalog_seed.sql`，并有 102 条完整性门禁；Controller/ResourceScopePolicy 覆盖报告和业务语义复核仍待完成。
 - [x] 已完成 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed；仍需业务语义复核及 Controller/ResourceScopePolicy 覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
