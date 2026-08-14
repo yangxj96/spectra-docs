@@ -1695,7 +1695,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引、全量业务表汇总和 V2 运行时权限边界的第一版文件级设计；真实部署账号授权核对仍待完成。
 - [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
 - [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试和默认禁用的真实 PostgreSQL/Flyway 集成测试；集成测试通过专用环境变量显式开启，不会默认触碰本机数据库。
-- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；新增的空库/非空库 Flyway 门禁尚未在 CI/部署隔离数据库实际执行，并发边界自动化仍待补齐。
+- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；已新增隔离 PostgreSQL service 的 CI Flyway workflow，仍待首次 CI 实际执行并补齐并发边界自动化。
 - [x] Phase 1 已交付 `V2__security_runtime_privileges.sql`，应用运行时角色不能更新/删除 Security Audit；实际部署登录角色的 membership 和 owner/runtime 分离仍需上线前核对。
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke。
@@ -1708,7 +1708,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
 - [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；策略变更生产者、真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
-- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider、身份绑定/解绑不再读取旧 Account 表，统一使用目标 `authentication_identity`；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的 SecUtil 业务/框架调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧 Role/Authority/RoleAssignment/Account 运行时迁移和 V11/V12 旧表清理已完成，Redis 旧键和最终端到端验收仍待完成。
+- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider、身份绑定/解绑不再读取旧 Account 表，统一使用目标 `authentication_identity`；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的旧静态安全调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧 Role/Authority/RoleAssignment/Account 运行时迁移和 V11/V12 旧表清理已完成，真实 Redis 旧键盘点和最终端到端验收仍待完成。
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
 - [x] Phase 9 已清理旧 DataScope 孤儿模型与数据库契约：删除旧实体、Mapper/XML、DTO/枚举，新增 V10 下线迁移并同步 `docs/sql`、实体清单、ER 图和 AI 实体字典；数据库安全契约测试已覆盖 V10 的幂等 DROP 与无自动迁移约束。
