@@ -435,14 +435,14 @@ Access Boundary 与 Grant Boundary 相互独立：操作者可以被明确授权
 
 引入 Flyway 作为唯一 schema 事实源。最终物理表、字段、约束和索引由 Codex 在实现 Phase 1 时依据当前 PostgreSQL 命名、审计字段和模块分层规范完成设计与契约评审，不以旧表结构限制目标模型：
 
-- 新环境从 `V1__init_target_schema.sql` 开始；V1 一次性创建完整目标 schema、约束、索引和基础 seed，不先复制旧 schema 作为 baseline。运行时/迁移角色隔离和最小数据库权限由紧随其后的不可变 V2 migration 建立。
+- 新环境从 `V1__init_target_schema.sql` 开始；V1 一次性创建完整目标 schema、约束和索引，不先复制旧 schema 作为 baseline。V2 建立运行时/迁移角色隔离和最小数据库权限，V3 将经审查的 Permission Catalog 固化为目标 `permission` seed。
 - 默认明确设置 `baselineOnMigrate=false`。非空旧 schema 不允许被 Flyway 自动打 baseline 后假装已经符合目标模型。
 - 旧环境使用独立、一次性的 export -> transform -> validate -> import/cutover 流程迁入由 V1 创建的干净目标 schema；旧表只作为受控迁移输入，不进入新运行时模型。
 - V1 发布后保持不可变，后续真实 schema 变化使用 V2、V3 等 versioned migration；禁止改写已发布 migration。
 - `docs/sql/db.dump` 降级为发布快照/测试夹具，不再手工维护为主迁移源。
 - `docs/sql/<schema>/建表.sql` 继续作为汇总文档，由 migration 结果同步生成或核对。
 - 不为旧认证、Permission、Scope 或 Session 模型长期维护兼容表、双写 Service 或 compatibility adapter。
-- 本轮不创建任何 migration。
+- 当前已创建 `V1__init_target_schema.sql`、`V2__security_runtime_privileges.sql` 和 `V3__security_permission_catalog_seed.sql`；后续 migration 仍须保持 versioned、不可改写，并通过真实 PostgreSQL 门禁。
 
 ## 6.2 Target Tables / Changes
 
@@ -1256,13 +1256,13 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 预计文件：根/模块 `pom.xml`、`spectra-config` migration 配置、Proposed `core/security/audit/*`、`core/security/change/*`、`RootAuthorizationPolicy.java`、`AuditLogSanitizer.java`、`docs/sql/*`。
 - 已实现骨架（2026-08-14）：security-base 已加入 `SecurityAuditEvent`/`SecurityAuditWriter`/`AuditVisibilityPolicy`、`SecurityAuditSnapshotSanitizer`、`RootPolicy`/`RootPolicyRepository`/`LastEffectiveDevOpsGuard`/`RootAuthorizationPolicy`、`SecurityChangeExecutor`；core 已加入 JDBC Audit append writer、Root policy repository、最后 Root guard 和同事务 STARTED/RESULT 审计执行器；starter 已注册统一 Root 判定 Bean；`docs/sql/spectra_security/建表.sql` 已形成 permission-specific boundary、Root singleton、append-only Audit、Outbox 的目标 DDL 契约。
 - 删除/废弃：新增代码不得使用散落 `hasRole('ROLE_DEV_OPS')`；旧点位记录迁移清单。
-- DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束、索引和基础 seed，`V2__security_runtime_privileges.sql` 建立运行时/迁移角色边界与 Audit 最小权限；`baselineOnMigrate=false`，不建立旧 schema baseline。
+- DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束和索引，`V2__security_runtime_privileges.sql` 建立运行时/迁移角色边界与 Audit 最小权限，`V3__security_permission_catalog_seed.sql` 写入 102 个目标 Permission；`baselineOnMigrate=false`，不建立旧 schema baseline。
 - Redis：仅定义 Port，尚不切 v2。
 - API/前端：可暂不开放 Audit UI；当前已提供审计写入与高风险事务端口，现有 Root/角色/账号写入口尚未全部接入，接入完成前不得宣称 Phase 1 完成。
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
 - 依赖：Phase 0。
-- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、V2 运行时权限边界、Flyway 配置、静态 schema 契约和 Break-glass Runbook 草案已交付；已加入默认禁用、需显式环境变量开启的真实 PostgreSQL/Flyway 集成测试（覆盖空库 V1/V2 和非空库拒绝自动 baseline），但尚未在 CI/部署环境实际执行。现有写入口接入、并发边界自动化测试，以及 Runbook 的运维评审/演练仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
+- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、V2 运行时权限边界、V3 Permission seed、Flyway 配置、静态 schema 契约和 Break-glass Runbook 草案已交付；已加入默认禁用、需显式环境变量开启的真实 PostgreSQL/Flyway 集成测试（覆盖空库 V1-V3、Permission 数量和非空库拒绝自动 baseline），但尚未在 CI/部署环境实际执行。现有写入口接入、并发边界自动化测试，以及 Runbook 的运维评审/演练仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
 - DoD：新环境只需从 V1 初始化完整目标 schema；任何新安全变更必须使用 Change skeleton；应用账号不能更新/删除 Audit；默认支持 2 normal + 1 break-glass 且任何管理变更不能移除最后一个 effective DEV_OPS；独立 break-glass Runbook 完成评审。
 
 ## Phase 2 — Identity Lifecycle and Organization Membership
@@ -1681,8 +1681,8 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke。
 - [x] Phase 2 已接入 `authentication_identity`、`password_credential` Entity/Mapper/Service；用户名密码登录、用户创建、密码修改/重置、通知地址解析切换到目标模型；旧 Account 仅保留为短信/邮箱等后续 Factor 的迁移输入。
 - [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约、目标 schema 数据库加载器和 cross-assignment/Grant Boundary 单元测试；RoleAssignment 写入、旧 Role/Authority 删除和正式授权上下文接入仍待完成。
-- [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
-- [x] 已完成 Permission Catalog 初稿和旧 code mapping 扫描；Phase 3 仍需复核、seed 化和覆盖率门禁。
+- [~] Phase 3 Permission Catalog 已固化为 `V3__security_permission_catalog_seed.sql`，并有 102 条完整性门禁；Controller/ResourceScopePolicy 覆盖报告和业务语义复核仍待完成。
+- [x] 已完成 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed；仍需业务语义复核及 Controller/ResourceScopePolicy 覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
