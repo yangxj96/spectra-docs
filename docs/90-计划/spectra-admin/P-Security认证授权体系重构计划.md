@@ -90,7 +90,7 @@
 - `auth:online`：在线用户 ID 集合。
 - `auth:rt:{accessToken}` 与 `auth:rt:{refreshToken}`：双向 Refresh 映射。
 
-现有 ClientType 只有 WEB、APP、MINI。创建 Token 时同端直接复用既有 Access/Refresh Token；请求经过 `TokenAuthenticationFilter` 时会续期 Access Session TTL。
+现有 ClientType 只有 WEB、APP、MINI。创建 Token 时同端直接复用既有 Access/Refresh Token；请求经过 `TokenAuthenticationFilter` 时已不再续期 Access Session TTL。Phase 0 的 Refresh Rotation 会先通过 `SecurityUserLoader` 从当前身份源重新加载主体，未配置加载器或主体已不可用时拒绝刷新；普通 Access Session 仍暂存 `SecurityUser` 快照，待 Phase 5 的 v2 Session 聚合移除。
 
 在线用户由 `/user/online` 查询，响应包含完整 Access Token；前端在线用户页面目前主要为 mock。
 
@@ -212,16 +212,16 @@ App/H5/小程序支持 PASSWORD、SMS、EMAIL 登录，Access/Refresh Token 使�
 |---|---|---|---|
 | Critical | Permission 与 Scope 分别全局 UNION | 跨 Assignment 数据越权 | `DataScopeResolver`、`SecurityUser` |
 | Critical | 用户/角色/范围/状态变化不统一 revoke | 旧 Session 长期保留旧权限；被禁用用户可继续请求或 refresh | `UserServiceImpl`、`RoleServiceImpl`、`RedisSecHolderStrategy` |
-| Critical | Refresh 不强制 Rotation、无 Replay 检测 | Refresh Token 被盗后可持续复用 | `refreshByRefreshToken` |
-| Critical | Refresh 使用 Redis 中旧 `SecurityUser` 重建 Session | 禁用、离职、角色撤销后仍可能恢复旧权限 | `refreshByRefreshToken` |
+| Critical（Phase 0 已封堵） | 旧实现不强制 Refresh Rotation、无 Replay 检测 | Refresh Token 被盗后可持续复用；当前已使用独立 claim key + 用户级 replay fence，完整 Token Family 仍待 Phase 5 | `RedisSecHolderStrategy`、`RefreshTokenRotationStore` |
+| Critical（Phase 0 已封堵） | 旧实现曾使用 Redis 中旧 `SecurityUser` 重建 Refresh Session | 禁用、离职、角色撤销后可能恢复旧权限；当前已要求 `SecurityUserLoader` 从身份源重载，未配置时 fail-closed | `RedisSecHolderStrategy`、`SecurityUserLoader` |
 | Critical | 手机/邮箱绑定入参 code 未校验 | 攻击者可直接绑定未证明所有权的标识 | `AccountServiceImpl.bindPhone/bindEmail` |
 | High | 用户角色和角色权限没有 Grant Boundary | 普通管理员可分配自己没有的角色/权限，或修改自己依赖的角色提权 | `RelUserRoleServiceImpl`、`RelRoleAuthorityServiceImpl` |
 | High | 无 authorityLevel 管理边界 | 可管理同级/上级管理员 | Role/User Service |
 | High | User Scope 直接覆盖 Role Scope | 用户直接权限模型与目标冲突，且扩大面难审计 | `sys_user_data_scope*` |
-| High | Refresh logout 不删除 Access Session 和 user-client key | 仅提交 Refresh Token 登出时 Access Token 仍可能有效 | `deleteByRefreshToken` |
-| High | CORS 默认 `originPatterns=*` 且 credentials=true | 任意站点可发起带凭证跨域请求；目标 Web cookie 后风险更高 | `SystemProperties.SpectraCors`、`MvcConfiguration` |
-| High | `/actuator/**`、`/file/preview/**` 默认白名单 | 运维信息或文件可能被匿名访问 | `SecurityProperties.whitelists` |
-| High | 在线用户响应返回完整 Access Token | 运维页面、日志或浏览器泄漏即可劫持会话 | `UserOnlineConverter` / `UserOnlineVO` |
+| High（Phase 0 已封堵） | 旧实现 Refresh logout 不删除 Access Session 和 user-client key | 仅提交 Refresh Token 登出时 Access Token 仍可能有效；当前 logout 会清理关联 Access Session 和索引 | `deleteByRefreshToken` |
+| High（Phase 0 已封堵） | 旧实现 CORS 默认 `originPatterns=*` 且 credentials=true | 任意站点可发起带凭证跨域请求；当前只允许精确部署 Origin | `SystemProperties.SpectraCors`、`MvcConfiguration` |
+| High（Phase 0 已封堵） | 旧实现 `/actuator/**`、`/file/preview/**` 默认白名单 | 运维信息或文件可能被匿名访问；当前仅保留 health/info 且文件预览需认证 | `SecurityProperties.whitelists` |
+| High（Phase 0 已封堵） | 旧实现在线用户响应返回完整 Access Token | 运维页面、日志或浏览器泄漏即可劫持会话；当前响应不再回显 Token | `UserOnlineConverter` / `UserOnlineVO` |
 
 ## 2.2 Medium / Structural Risk
 
@@ -245,12 +245,12 @@ App/H5/小程序支持 PASSWORD、SMS、EMAIL 登录，Access/Refresh Token 使�
 
 ## 2.3 Frontend-Specific Problems
 
-- Web 的 Refresh 请求复用同一拦截器；Refresh 本身返回 401 时可能等待自己的刷新队列，形成死锁。
-- Web Refresh 失败会清空等待队列但不完整 reject 所有调用路径，存在悬挂请求。
-- App 刷新成功后用 `skipAuth=true` 重试，实际不携带新的 Authorization Header。
+- Web 的 Refresh 请求复用同一拦截器；Refresh 本身返回 401 时可能等待自己的刷新队列，形成死锁（Phase 0 已通过独立 `skipAuth/_skipRefresh` 门禁隔离）。
+- Web Refresh 失败会清空等待队列但不完整 reject 所有调用路径，存在悬挂请求（Phase 0 已改为共享 Promise，失败统一返回 `null`）。
+- App 刷新成功后用 `skipAuth=true` 重试，实际不携带新的 Authorization Header（Phase 0 已改为携带新 Access Token 重试）。
 - Web `Token.roles` 类型声明为 `RolePageVO[]`，后端实际返回 `string[]`；角色指令可能失效。
 - 路由无菜单权限时跳转 `/401`，语义应为 403；401/403/Session Revoked 未形成统一 UX。
-- Web/App 开发模式源码中硬编码 DEV_OPS 示例账号、密码和验证码。
+- Web/App 开发模式源码中硬编码 DEV_OPS 示例账号、密码和验证码（Phase 0 已移除；仍需防止未来 fixture 回流）。
 - Web localStorage、App 普通 storage 保存 Refresh Token；XSS、调试备份或设备数据提取后风险较大。
 - 移动端路由守卫在 DEV_MODE 完全绕过，且只检查 Token 是否存在。
 - App 设备 ID adapter 是固定占位值，无法作为 Session 设备索引。
@@ -1239,14 +1239,14 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 目标：建立攻击回归基线，先封堵与目标架构无冲突的现有 Critical 风险。
 - 模块：security starter/base、core auth、framework CORS、Web/App 请求层、测试。
 - 预计文件：`AuthServiceImpl.java`、`AccountServiceImpl.java`、`SecurityProperties.java`、`MvcConfiguration.java`、`RedisSecHolderStrategy.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts` 及对应测试。
-- 修改：验证码绑定校验与原子消费、精确 CORS/白名单、文件预览授权、在线用户去 Token、固定 Access Token TTL（移除普通请求续期）。Refresh Rotation、logout 全量撤销和开发默认凭据清理仍待后续门禁。
+- 修改：验证码绑定校验与原子消费、精确 CORS/白名单、文件预览授权、在线用户去 Token、固定 Access Token TTL（移除普通请求续期）、Refresh Token 一次性 Rotation/Replay 撤销并重新加载当前身份源、logout 全量撤销和前后端开发默认凭据清理。
 - 新增：Token/Refresh/disable/password change/DataScope cross-assignment characterization tests；前端 refresh queue tests。
 - DB/Redis：不引入目标 schema；只允许兼容性最小 Redis 修复。
 - API/前端：错误码可补齐；不先重做全部页面。
 - 风险：修复现行 refresh 可能影响已登录用户；测试环境应先全量退出。
 - 依赖：无。
-- 当前进度（2026-08-14）：已完成登录/绑定验证码按用途隔离、绑定验证码发送入口与 Redis Lua 一次性原子消费、精确 Origin allowlist、Actuator/file preview 白名单收敛、在线用户和过期日志去 Token、普通请求不再滑动 Access TTL；后端验证码回归和 Web 格式/lint/type/test 已通过。
-- 未完成门禁：Refresh Rotation/Replay 与全量 Session revoke、账号/角色/范围变化的统一 revoke、前端 Refresh single-flight 回归、开发默认凭据清理、CORS/白名单自动化测试、Redis fail-closed 适配器及完整 Phase 0 安全矩阵。
+- 当前进度（2026-08-14）：已完成登录/绑定验证码按用途隔离、绑定验证码发送入口与 Redis Lua 一次性原子消费、精确 Origin allowlist、Actuator/file preview 白名单收敛、在线用户和过期日志去 Token、普通请求不再滑动 Access TTL、Refresh Token 一次性 Rotation/Replay 用户级撤销并从当前数据库身份源重建主体、logout 清理 Access Session、密码修改/管理员重置/用户角色替换后的 Session 撤销、Redis 会话异常 fail-closed（503）、Web Refresh 请求隔离和 App 刷新后携带新 Access Token；后端验证码/Rotation/CORS/白名单回归、Web Refresh single-flight 回归及 Web 格式/lint/type/test 已通过。
+- 未完成门禁：账号/角色/范围变化的统一 revoke、App Refresh single-flight 自动化回归、Redis 故障注入与完整 Phase 0 安全矩阵。当前 Rotation 仍基于旧 Redis Key 形态，Token Family、服务端 Session 聚合和 Cookie/CSRF 将在后续 Phase 5 重构。
 - DoD：Critical 漏洞有失败测试再修复；CORS/白名单审计通过；无 Token 回显；现行安全测试绿。只有上述未完成门禁全部通过后，Phase 0 才可标记完成。
 
 ## Phase 1 — Complete V1 Schema, Audit Spine, Root Governance
@@ -1503,6 +1503,12 @@ spectra-core/src/main/java/com/devops00/spectra/core/security/root/
   RootAuthorizationPolicy.java
   LastEffectiveDevOpsGuard.java
   BreakGlassAuditPolicy.java
+
+spectra-security-base/src/main/java/com/devops00/spectra/security/base/holder/
+  SecurityUserLoader.java                         # Phase 0 已实现
+
+spectra-core/src/main/java/com/devops00/spectra/core/auth/service/impl/
+  DatabaseSecurityUserLoader.java                 # Phase 0 已实现
 
 spectra-security-spring-boot-starter/src/main/java/.../session/redis/
   RedisSecuritySessionRepository.java
