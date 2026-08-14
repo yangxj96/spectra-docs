@@ -1254,14 +1254,15 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 目标：由 Codex 按现有规范锁定完整目标 schema，以 Flyway V1 建立新环境，并交付 append-only Security Audit、SecurityChangeOutbox 和统一 RootPolicy。
 - 模块：spectra-config/core/security、security starter、docs/sql。
 - 预计文件：根/模块 `pom.xml`、`spectra-config` migration 配置、Proposed `core/security/audit/*`、`core/security/change/*`、`RootAuthorizationPolicy.java`、`AuditLogSanitizer.java`、`docs/sql/*`。
-- 新增组件：SecurityAuditWriter、AuditVisibilityPolicy interface、RootAuthorizationPolicy、RootPolicy repository、LastEffectiveDevOpsGuard、SecurityChange transaction skeleton。
+- 已实现骨架（2026-08-14）：security-base 已加入 `SecurityAuditEvent`/`SecurityAuditWriter`/`AuditVisibilityPolicy`、`RootPolicy`/`RootPolicyRepository`/`LastEffectiveDevOpsGuard`/`RootAuthorizationPolicy`、`SecurityChangeExecutor`；core 已加入 JDBC Audit append writer、Root policy repository、最后 Root guard 和同事务 STARTED/RESULT 审计执行器；starter 已注册统一 Root 判定 Bean；`docs/sql/spectra_security/建表.sql` 已形成 permission-specific boundary、Root singleton、append-only Audit、Outbox 的目标 DDL 契约。
 - 删除/废弃：新增代码不得使用散落 `hasRole('ROLE_DEV_OPS')`；旧点位记录迁移清单。
 - DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束、索引、catalog seed 与最小数据库权限；`baselineOnMigrate=false`，不建立旧 schema baseline。
 - Redis：仅定义 Port，尚不切 v2。
-- API/前端：可暂不开放 Audit UI；Root 高风险操作已经写新审计。
+- API/前端：可暂不开放 Audit UI；当前已提供审计写入与高风险事务端口，现有 Root/角色/账号写入口尚未全部接入，接入完成前不得宣称 Phase 1 完成。
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
 - 依赖：Phase 0。
+- 当前状态：骨架与目标安全 DDL 契约已交付；Flyway 完整 V1、全量业务表汇总、数据库角色权限、现有写入口接入、并发 PostgreSQL 集成测试和 break-glass Runbook 仍未完成。
 - DoD：新环境只需从 V1 初始化完整目标 schema；任何新安全变更必须使用 Change skeleton；应用账号不能更新/删除 Audit；默认支持 2 normal + 1 break-glass 且任何管理变更不能移除最后一个 effective DEV_OPS；独立 break-glass Runbook 完成评审。
 
 ## Phase 2 — Identity Lifecycle and Organization Membership
@@ -1474,15 +1475,14 @@ spectra-core/src/main/java/com/devops00/spectra/core/authorization/
   application/AuthorizationSnapshotLoader.java
 
 spectra-core/src/main/java/com/devops00/spectra/core/security/change/
+  DefaultSecurityChangeExecutor.java                 # Phase 1 已实现
   SecurityChangeCoordinator.java
   AuthorizationEpochGuard.java
   HighRiskApprovalGate.java
   SecurityChangeOutboxProcessor.java
 
 spectra-core/src/main/java/com/devops00/spectra/core/security/audit/
-  SecurityAuditWriter.java
-  SecurityAuditEvent.java
-  AuditVisibilityPolicy.java
+  JdbcSecurityAuditWriter.java                       # Phase 1 已实现
   SecurityAuditQueryService.java
 
 spectra-core/src/main/java/com/devops00/spectra/core/security/session/
@@ -1500,9 +1500,19 @@ spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/
   RecoveryCodeService.java
 
 spectra-core/src/main/java/com/devops00/spectra/core/security/root/
-  RootAuthorizationPolicy.java
-  LastEffectiveDevOpsGuard.java
+  JdbcRootPolicyRepository.java                      # Phase 1 已实现
+  JdbcLastEffectiveDevOpsGuard.java                  # Phase 1 已实现
   BreakGlassAuditPolicy.java
+
+spectra-starter/spectra-security-base/src/main/java/com/devops00/spectra/security/base/
+  audit/SecurityAuditEvent.java                      # Phase 1 已实现
+  audit/SecurityAuditWriter.java                     # Phase 1 已实现
+  audit/AuditVisibilityPolicy.java                   # Phase 1 已实现
+  root/RootPolicy.java                               # Phase 1 已实现
+  root/RootPolicyRepository.java                     # Phase 1 已实现
+  root/LastEffectiveDevOpsGuard.java                 # Phase 1 已实现
+  root/RootAuthorizationPolicy.java                 # Phase 1 已实现
+  change/SecurityChangeExecutor.java                 # Phase 1 已实现
 
 spectra-security-base/src/main/java/com/devops00/spectra/security/base/holder/
   SecurityUserLoader.java                         # Phase 0 已实现
@@ -1651,7 +1661,9 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 
 ## 剩余 Phase-specific 实施项
 
-- [ ] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标表、字段、约束、索引、V1 和数据库权限的文件级设计审查。
+- [~] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引的第一版文件级设计；完整 V1、全量业务表汇总和数据库权限仍待完成。
+- [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
+- [ ] Phase 1 将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`，并以空库/非空库拒绝 baseline 的集成测试核对。
 - [ ] Phase 1 编写并演练 2 normal + 1 break-glass 的独立 Runbook、凭据分权保管、最高等级告警和轮换流程。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
@@ -1670,4 +1682,4 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [ ] 为 Phase 0/1 建立独立 PR 边界，不把架构迁移和漏洞修复混在一个提交。
 - [ ] 每个 Phase 评审 Definition of Done 后再进入下一阶段。
 
-核心安全决策已经确认，实施按 Phase 门禁推进。本轮已创建 Phase 0 的最小代码改动，但尚未创建目标数据库 migration、V2 Redis Session、MFA 或完整 Authorization Domain；后续实现必须继续遵守各 Phase 的 Definition of Done。
+核心安全决策已经确认，实施按 Phase 门禁推进。本轮已完成 Phase 0 提交后的 Phase 1 审计/Root 治理骨架和目标安全 DDL 契约，但尚未创建完整目标数据库 migration、V2 Redis Session、MFA 或完整 Authorization Domain；后续实现必须继续遵守各 Phase 的 Definition of Done。
