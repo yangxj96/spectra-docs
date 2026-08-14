@@ -1372,6 +1372,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 风险：JSONB before/after 可能泄密或体积膨胀。
 - 依赖：Phase 1 审计 spine、Phase 7 权限 catalog。
 - DoD：Prompt 事件清单均有生产者；Root 自身事件可查不可删；默认热存 12 个月、总保留至少 5 年，归档行为具有完整最高等级审计链。
+- 当前进度（2026-08-14）：已交付 `DefaultAuditVisibilityPolicy`，统一 Root/break-glass、SYSTEM_ADMIN 和普通主体的审计可见性矩阵；新增 `/security/audit/page`、详情、CSV 导出和保留策略只读 API，查询侧对 JSONB 快照执行二次脱敏并限制分页/导出上限。V9 已登记热存/总保留策略、归档 manifest、完整性摘要和 runtime 只读权限，Web 已接入安全审计列表、详情、筛选、导出与策略卡片；本轮补齐登录/登出/刷新、TOTP/Recovery Code、用户创建/生命周期/密码变更，以及归档 started/completed/failed/verified 的事件生产者和结果语义。Role/Assignment/组织/策略等剩余事件生产者、部署相关归档后端选择和真实 PostgreSQL 分区/恢复演练仍需 Phase 8 门禁继续完成。
 
 ## Phase 9 — Cutover, Legacy Removal and Hardening
 
@@ -1691,6 +1692,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
+- [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、归档状态事件生产者；Role/Assignment/组织/策略等剩余生产者、真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
