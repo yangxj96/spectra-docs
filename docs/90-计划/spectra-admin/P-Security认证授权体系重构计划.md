@@ -1388,7 +1388,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：Permission Catalog 叶子节点已返回 `allowed_scope_modes`；Web 用户编辑器已接入 RoleAssignment 新增/修改，明确编辑 Permission-specific Access/Grant Boundary，RULES 必须选择组织，保存前执行 Assignment Preview 并携带短时 token Apply。数据库安全契约、后端目录测试与 Web format/lint/type/test 均已通过。
 - 阶段补充（2026-08-15）：旧 `Authority`/`Role`/`RelUserRole`/`RelRoleAuthority` 运行时实体、Mapper、Service、监听器和旧 `RoleController` 权限路由已删除；User 生命周期回收改为将活动 RoleAssignment 标记为 `REVOKED` 并保留 version/validUntil。V11 以无 `CASCADE` 幂等 DDL 下线旧授权表。
 - 阶段补充（2026-08-15）：绑定/解绑已切换到 `authentication_identity` 目标表，新增 `AuthenticationIdentityController` 与 `/security/identities/**`；旧 Account 实体、Mapper、Service、Controller、XML 和 `sys_account` 已删除，V12 以无 `CASCADE` 幂等 DDL 下线旧表。目标身份只返回 method/provider/state/verifiedAt 元数据，不返回原始标识；Redis 旧键核对和真实数据库验收仍待后续。
-- 阶段补充（2026-08-15）：已删除旧 `auth:*` 过期监听器及其 Redis keyspace listener 配置，Rotation 测试样例统一使用 `sec:v2:*`；普通 `DELETE /user/{uid}` 后端路由、Service 方法、Web API 和用户列表删除操作已移除，用户仅通过 LOCKED/DISABLED/DEPARTED 生命周期状态回收并保留历史安全事实；同时删除无调用者的旧 `refreshToken()` 滑动续期接口与 TTL 刷新实现，Access TTL 只在显式会话签发时设定，续期仅允许 Refresh Token Rotation。
+- 阶段补充（2026-08-15）：已删除旧 `auth:*` 过期监听器及其 Redis keyspace listener 配置，Rotation 测试样例统一使用 `sec:v2:*`；普通 `DELETE /user/{uid}` 后端路由、Service 方法、Web API 和用户列表删除操作已移除，用户仅通过 LOCKED/DISABLED/DEPARTED 生命周期状态回收并保留历史安全事实；同时删除无调用者的旧 `refreshToken()` 滑动续期接口、TTL 刷新实现和 `tokenRefreshInterval` 配置，Access TTL 只在显式会话签发时设定，续期仅允许 Refresh Token Rotation。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
