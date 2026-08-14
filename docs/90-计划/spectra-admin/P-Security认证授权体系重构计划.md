@@ -1262,7 +1262,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
 - 依赖：Phase 0。
-- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、Flyway 配置和静态 schema 契约已交付；V1 已在临时 PostgreSQL 数据库执行通过。数据库角色权限、现有写入口接入、自动化并发 PostgreSQL 集成测试和 break-glass Runbook 仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
+- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、Flyway 配置、静态 schema 契约和 Break-glass Runbook 草案已交付；V1 已在临时 PostgreSQL 数据库执行通过。数据库角色权限、现有写入口接入、自动化并发 PostgreSQL 集成测试，以及 Runbook 的运维评审/演练仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
 - DoD：新环境只需从 V1 初始化完整目标 schema；任何新安全变更必须使用 Change skeleton；应用账号不能更新/删除 Audit；默认支持 2 normal + 1 break-glass 且任何管理变更不能移除最后一个 effective DEV_OPS；独立 break-glass Runbook 完成评审。
 
 ## Phase 2 — Identity Lifecycle and Organization Membership
@@ -1673,7 +1673,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
 - [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试；空库/非空库拒绝 baseline 的真实 PostgreSQL 集成测试仍待补齐。
 - [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；非空库拒绝 baseline 的 Flyway 启动测试及并发边界自动化仍待补齐。
-- [ ] Phase 1 编写并演练 2 normal + 1 break-glass 的独立 Runbook、凭据分权保管、最高等级告警和轮换流程。
+- [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
 - [x] 已完成 Permission Catalog 初稿和旧 code mapping 扫描；Phase 3 仍需复核、seed 化和覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
@@ -1688,8 +1688,8 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] 明确 Permission Catalog 由 Codex 扫描生成，scopeMode 为 NONE/ALL/SELF/RULES，旧 code 只做一次性 mapping。
 - [ ] 建立现有管理员、Root、角色、用户 Scope 数据盘点报告。
 - [ ] 建立当前数据库备份、恢复、全局 logout 和回滚演练方案。
-- [ ] 完成独立 break-glass Runbook 和首版 TOTP/Recovery Code 运维流程评审。
+- [~] 已提交独立 break-glass Runbook 草案；仍需完成首版 TOTP/Recovery Code 运维流程评审和隔离环境演练。
 - [ ] 为 Phase 0/1 建立独立 PR 边界，不把架构迁移和漏洞修复混在一个提交。
 - [ ] 每个 Phase 评审 Definition of Done 后再进入下一阶段。
 
-核心安全决策已经确认，实施按 Phase 门禁推进。本轮已完成 Phase 0 提交后的 Phase 1 审计/Root 治理骨架和目标安全 DDL 契约，但尚未创建完整目标数据库 migration、V2 Redis Session、MFA 或完整 Authorization Domain；后续实现必须继续遵守各 Phase 的 Definition of Done。
+核心安全决策已经确认，实施按 Phase 门禁推进。本轮已完成 Phase 0 提交后的 Phase 1 审计/Root 治理骨架、完整目标数据库 V1 migration 和目标安全 DDL 契约，但尚未完成数据库运行时角色权限、V2 Redis Session、MFA 或完整 Authorization Domain；后续实现必须继续遵守各 Phase 的 Definition of Done。
