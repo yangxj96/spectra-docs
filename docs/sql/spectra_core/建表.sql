@@ -1,6 +1,6 @@
 -- ============================================
 -- spectra_core schema 建表语句
--- 共 15 张表（不含 BaseEntity；旧授权运行时表由 V11 下线）
+-- 共 14 张表（不含 BaseEntity；旧认证/授权运行时表由 V11/V12 下线）
 -- ============================================
 
 CREATE SCHEMA IF NOT EXISTS spectra_core;
@@ -8,49 +8,6 @@ CREATE SCHEMA IF NOT EXISTS spectra_core;
 -- ============================================
 -- 认证
 -- ============================================
-
--- 账号表
-CREATE TABLE spectra_core.sys_account (
-    id           UUID PRIMARY KEY,
-    user_id      UUID NOT NULL,
-    type         INTEGER NOT NULL,
-    login_name   VARCHAR(100),
-    password     VARCHAR(255),
-    phone        VARCHAR(20),
-    email        VARCHAR(100),
-    openid       VARCHAR(100),
-    unionid      VARCHAR(100),
-    provider     VARCHAR(50),
-    status       SMALLINT NOT NULL DEFAULT 1,
-    verified     SMALLINT DEFAULT 0,
-    expires_at   TIMESTAMP(6) WITH TIME ZONE,
-    created_by   UUID,
-    created_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by   UUID,
-    updated_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted      TIMESTAMP(6) WITH TIME ZONE,
-    version      BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_core.sys_account IS '账号表';
-COMMENT ON COLUMN spectra_core.sys_account.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_account.user_id IS '用户ID';
-COMMENT ON COLUMN spectra_core.sys_account.type IS '账号类型';
-COMMENT ON COLUMN spectra_core.sys_account.login_name IS '用户名（用于账号密码登录）';
-COMMENT ON COLUMN spectra_core.sys_account.password IS '密码(仅用作账号密码登录)';
-COMMENT ON COLUMN spectra_core.sys_account.phone IS '手机号（用于短信登录）';
-COMMENT ON COLUMN spectra_core.sys_account.email IS '邮箱（用于邮箱验证码登录）';
-COMMENT ON COLUMN spectra_core.sys_account.openid IS '微信 openid';
-COMMENT ON COLUMN spectra_core.sys_account.unionid IS '微信 unionid（跨应用唯一）';
-COMMENT ON COLUMN spectra_core.sys_account.provider IS '第三方来源：WECHAT, ALIPAY, APPLE 等';
-COMMENT ON COLUMN spectra_core.sys_account.status IS '1:正常 2:禁用 3:未验证';
-COMMENT ON COLUMN spectra_core.sys_account.verified IS '0:未验证 1:已验证';
-COMMENT ON COLUMN spectra_core.sys_account.expires_at IS '用于临时账号（如扫码未确认）';
-COMMENT ON COLUMN spectra_core.sys_account.created_by IS '创建人';
-COMMENT ON COLUMN spectra_core.sys_account.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_core.sys_account.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_core.sys_account.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_core.sys_account.deleted IS '删除标识';
-COMMENT ON COLUMN spectra_core.sys_account.version IS '乐观锁';
 
 -- ============================================
 -- 用户权限
