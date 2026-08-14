@@ -1373,7 +1373,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 风险：JSONB before/after 可能泄密或体积膨胀。
 - 依赖：Phase 1 审计 spine、Phase 7 权限 catalog。
 - DoD：Prompt 事件清单均有生产者；Root 自身事件可查不可删；默认热存 12 个月、总保留至少 5 年，归档行为具有完整最高等级审计链。
-- 当前进度（2026-08-14）：已交付 `DefaultAuditVisibilityPolicy`，统一 Root/break-glass、SYSTEM_ADMIN 和普通主体的审计可见性矩阵；新增 `/security/audit/page`、详情、CSV 导出和保留策略只读 API，查询侧对 JSONB 快照执行二次脱敏并限制分页/导出上限。V9 已登记热存/总保留策略、归档 manifest、完整性摘要和 runtime 只读权限，Web 已接入安全审计列表、详情、筛选、导出与策略卡片；本轮补齐登录/登出/刷新、TOTP/Recovery Code、用户创建/生命周期/密码变更、Role/Assignment/组织 Preview/Apply，以及归档 started/completed/failed/verified 的事件生产者和结果语义。策略变更生产者、部署相关归档后端选择和真实 PostgreSQL 分区/恢复演练仍需 Phase 8 门禁继续完成。
+- 当前进度（2026-08-15）：已交付 `DefaultAuditVisibilityPolicy`，统一 Root/break-glass、SYSTEM_ADMIN 和普通主体的审计可见性矩阵；新增 `/security/audit/page`、详情、CSV 导出和保留策略只读 API，查询侧对 JSONB 快照执行二次脱敏并限制分页/导出上限。V9 已登记热存/总保留策略、归档 manifest、完整性摘要和 runtime 只读权限，Web 已接入安全审计列表、详情、筛选、导出与策略卡片；已补齐登录/登出/刷新、TOTP/Recovery Code、用户创建/生命周期/密码变更、Role/Assignment/组织 Preview/Apply，以及归档 started/completed/failed/verified 的事件生产者和结果语义。本阶段新增会话/密码策略查询与受审计乐观锁保护的修改 API、V13 默认策略种子，并让 Redis Session 与用户主动改密读取数据库策略；部署相关归档后端选择和真实 PostgreSQL 分区/恢复演练仍需 Phase 8 门禁继续完成。
 
 ## Phase 9 — Cutover, Legacy Removal and Hardening
 
@@ -1707,7 +1707,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
-- [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；策略变更生产者、真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
+- [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；本阶段已补齐会话/密码策略变更生产者、V13 默认策略种子和运行时数据库策略读取，并通过定向编译/策略单测/数据库契约门禁；真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
 - [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider、身份绑定/解绑不再读取旧 Account 表，统一使用目标 `authentication_identity`；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的旧静态安全调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧 Role/Authority/RoleAssignment/Account 运行时迁移和 V11/V12 旧表清理已完成，真实 Redis 旧键盘点和最终端到端验收仍待完成。
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。

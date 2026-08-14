@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 46 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 47 个 `*Controller.java`。
 
 ## 认证与安全
 
@@ -19,6 +19,7 @@ tags:
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
 | `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费；TOTP 密钥加密存储，Recovery Code 仅保存哈希 |
+| `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 
 ## 核心 — 公共服务
 

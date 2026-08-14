@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 46 个 `*Controller.java` 端点速查表。
+> 源码当前 47 个 `*Controller.java` 端点速查表。
 
 ## 认证与安全
 
@@ -19,6 +19,7 @@ tags:
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据 |
 | MfaController | `/security/mfa/**` | TOTP 登记/确认与 Recovery Code 单次消费；DEV_OPS 必须通过 MFA 才能创建 Root Session |
+| SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 
 ## 核心 — 公共
 
