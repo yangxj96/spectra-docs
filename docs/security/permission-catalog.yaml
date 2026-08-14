@@ -3,12 +3,12 @@
 # code 是目标稳定权限，不是 HTTP method、URL 或按钮 ID；旧大写 code 只用于一次性 mapping，
 # 不得作为 V1 seed 或运行时 authority。scopeMode 是 permission-specific boundary 的默认候选，
 # 最终仍由 RoleAssignment 的 Access/Grant Boundary 决定。
-version: 1
+version: 2
 generatedAt: 2026-08-14
 sourceScan:
   annotations: spectra-admin/spectra-*/**/src/{main,test}/java/**/*.java
   legacyPermissionCount: 89
-  targetPermissionCount: 102
+  targetPermissionCount: 115
   legacyRoleCodes:
     - ROLE_DEV_OPS
     - ROLE_AUDIT
@@ -172,6 +172,27 @@ permissions:
     name: 行政区划查看
     scopeMode: NONE
     legacy: [REGION:QUERY]
+  - code: region:create
+    name: 行政区划创建
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: region:update
+    name: 行政区划维护
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: region:disable
+    name: 行政区划停用
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
 
   # Session, audit and security governance
   - code: session:read
@@ -222,6 +243,39 @@ permissions:
     devOpsOnly: true
     delegatable: false
     source: target-model
+  - code: security:config:read
+    name: 系统配置查看
+    scopeMode: NONE
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: security:config:update
+    name: 系统配置维护
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: security:crypto:manage
+    name: 加解密密钥治理
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: permission:manage
+    name: 权限目录维护
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: system:monitor:read
+    name: 系统运行状态查看
+    scopeMode: NONE
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
 
   # File / notification
   - code: file:create
@@ -232,10 +286,43 @@ permissions:
     name: 文件查看
     scopeMode: RULES
     legacy: [FILE:QUERY]
+  - code: file:admin:read
+    name: 文件资产管理查看
+    scopeMode: NONE
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: file:admin:delete
+    name: 文件资产管理删除
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
   - code: notification:read
     name: 通知查看
     scopeMode: SELF
     legacy: [NOTIFICATION:QUERY]
+  - code: notification:admin:read
+    name: 通知运维记录查看
+    scopeMode: NONE
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: notification:admin:retry
+    name: 通知任务重试
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
+  - code: notification:admin:cancel
+    name: 通知任务取消
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-7-controller-migration
   - code: notification:update
     name: 通知标记已读
     scopeMode: SELF

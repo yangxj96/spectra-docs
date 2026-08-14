@@ -1295,7 +1295,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 风险：旧 Role Scope 迁移歧义。
 - 依赖：Phase 2 Membership/OrganizationVersion。
 - 当前进度（2026-08-14）：security-base 已建立 `ScopeMode`、`AuthorizationScope`、`PermissionBoundary`、`AuthorizationAssignment` 和 assignment-preserving `AuthorizationSnapshot`；core 已接入目标 security schema 的 `JdbcAuthorizationSnapshotLoader`，按 active RoleAssignment 加载 Role capability、GrantablePermission、permission-specific Access/Grant Boundary 和 ScopeRule，并对缺失/停用/不一致引用 fail-closed。已提供 `/security/authorization/users/{userId}/assignments` v2 只读查询，保留 Assignment 内 Access/Grant Boundary 绑定。单元测试覆盖同 Permission Scope union、跨 Permission Scope 隔离、Access/Grant Boundary 分离、组织子树规则、数据库加载器和只读查询映射。RoleAssignment 写入、正式授权上下文接入、旧 Role/Authority 运行时切换仍待完成。
-- 当前准备工作（2026-08-14）：已根据全仓 Controller `@PreAuthorize` 扫描生成 `docs/security/permission-catalog.yaml`，覆盖 89 个旧 Permission code 的一次性 mapping 和 102 个目标 code 候选；其中 `user:disable`、`user:reset-password`、`role:authority-level:update`、Session/Audit/Security Policy/Root 等高风险能力已与普通 CRUD 拆开，旧 `*` 明确拒绝迁移。该 catalog 仍需业务语义复核后才能作为 Flyway seed。
+- 当前准备工作（2026-08-14）：已根据全仓 Controller `@PreAuthorize` 扫描生成 `docs/security/permission-catalog.yaml`，覆盖 89 个旧 Permission code 的一次性 mapping 和 102 个目标 code 候选；其中 `user:disable`、`user:reset-password`、`role:authority-level:update`、Session/Audit/Security Policy/Root 等高风险能力已与普通 CRUD 拆开，旧 `*` 明确拒绝迁移。该初稿已在 Phase 7 完成业务动作复核，升级为 version 2 并扩展至 115 个目标 Permission，同时由 V8 migration 负责增量 seed。
 - DoD：目标模型可完整计算权限但尚可 shadow；任何 Snapshot 保留 Assignment 边界。
 
 ## Phase 4 — Delegation, Authority Level and Impact Analysis
@@ -1689,8 +1689,8 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 4 已交付 Assignment 与 Role 的 Grant Boundary/authorityLevel 校验、Impact Preview/Apply token、并发 version/securityVersion 门禁、统一 Audit/Session revoke；旧用户角色、旧角色权限和旧 DataScope 写入口已冻结。
 - [x] Phase 5 已交付 `sec:v2:*` Redis Session、Token Digest、Token Family Rotation/Replay 撤销、并发策略、Web HttpOnly Host-only Refresh Cookie + CSRF、App Token 存储/设备 ID 适配，以及 TOTP/AAL2/Recovery Code MFA 核心和 DEV_OPS 强制 MFA。
 - [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
-- [~] Phase 3 Permission Catalog 已固化为 `V3__security_permission_catalog_seed.sql`，并有 102 条完整性门禁；Controller/ResourceScopePolicy 覆盖报告和业务语义复核仍待完成。
-- [x] 已完成 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed；仍需业务语义复核及 Controller/ResourceScopePolicy 覆盖率门禁。
+- [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
+- [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。

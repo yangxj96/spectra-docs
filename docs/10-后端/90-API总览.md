@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 44 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 45 个 `*Controller.java`。
 
 ## 认证与安全
 
@@ -16,6 +16,7 @@ tags:
 | `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role/Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；所有高风险写入绑定短时 token |
+| `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费；TOTP 密钥加密存储，Recovery Code 仅保存哈希 |
 
 ## 核心 — 公共服务
@@ -51,7 +52,7 @@ tags:
 | `NotificationController` | spectra-notification | `/notification/**`、`/notification-center/inbox/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
 | `NotificationSettingController` | spectra-notification | `/notification/setting/**` | 兼容旧 API 的当前用户消息设置查询与保存 |
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
-| `NotificationAdminController` | spectra-notification | `/notification/admin/**` | ROLE_AUDIT/ROLE_DEV_OPS 脱敏查询、渠道状态、重试和取消 |
+| `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的脱敏查询、渠道状态、重试和取消 |
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。`/notification-center/inbox/**` 是 `/notification/**` 的兼容路径别名。
 
@@ -88,7 +89,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `FileController` | spectra-upload | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `FILE:QUERY`，不再匿名开放 |
+| `FileController` | spectra-upload | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `file:read`，不再匿名开放 |
 | `FileInfoController` | spectra-upload | `/file/info/**` | 文件信息/类型管理 |
 
 ## 工作流
