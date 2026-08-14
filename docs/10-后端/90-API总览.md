@@ -7,14 +7,15 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 40 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 43 个 `*Controller.java`。
 
 ## 认证与安全
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取 |
-| `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑 |
+| `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；认证后可申请绑定手机号/邮箱验证码 |
+| `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
+| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 RoleAssignment、Access Boundary、Grant Boundary 只读查询；Phase 4 前冻结写入口 |
 
 ## 核心 — 公共服务
 
@@ -57,6 +58,8 @@ tags:
 
 用户角色覆盖：`PUT /user/{uid}/roles`，请求体需包含 `user_id` 与 `role_ids`，使用 `USER:UPDATE` 权限，并在服务层校验目标角色均为有效角色后执行全量替换。
 
+用户生命周期已拆分为高风险写入口：`PUT /user/lock/{uid}`、`/user/unlock/{uid}`、`/user/disable/{uid}`、`/user/enable/{uid}`、`/user/depart/{uid}`、`/user/reinstate/{uid}`；操作原因通过可选 `reason` 查询参数传入，服务层统一执行状态机、Security Audit、securityVersion 递增和全部 Session 撤销。
+
 ## OA 模块
 
 `DocumentController` 已扩展为 `/oa/document/**`：文档分页/详情、目录、版本、发布/归档、版本恢复以及受文档可见范围保护的预览/下载。
@@ -84,7 +87,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `FileController` | spectra-upload | `/file/upload/**` | 文件上传/下载/分片上传 |
+| `FileController` | spectra-upload | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `FILE:QUERY`，不再匿名开放 |
 | `FileInfoController` | spectra-upload | `/file/info/**` | 文件信息/类型管理 |
 
 ## 工作流

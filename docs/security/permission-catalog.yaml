@@ -1,0 +1,521 @@
+# Phase 3 预生成 Permission Catalog（由全仓 @PreAuthorize / Service 高风险动作扫描产生）。
+#
+# code 是目标稳定权限，不是 HTTP method、URL 或按钮 ID；旧大写 code 只用于一次性 mapping，
+# 不得作为 V1 seed 或运行时 authority。scopeMode 是 permission-specific boundary 的默认候选，
+# 最终仍由 RoleAssignment 的 Access/Grant Boundary 决定。
+version: 1
+generatedAt: 2026-08-14
+sourceScan:
+  annotations: spectra-admin/spectra-*/**/src/{main,test}/java/**/*.java
+  legacyPermissionCount: 89
+  targetPermissionCount: 102
+  legacyRoleCodes:
+    - ROLE_DEV_OPS
+    - ROLE_AUDIT
+  reviewRequired: true
+
+permissions:
+  # Core identity and navigation
+  - code: account:read
+    name: 认证账号查看
+    scopeMode: RULES
+    legacy: [ACCOUNT:QUERY]
+  - code: account:update
+    name: 认证账号维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [ACCOUNT:UPDATE]
+  - code: user:create
+    name: 用户创建
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    legacy: [USER:INSERT]
+  - code: user:read
+    name: 用户查看
+    scopeMode: RULES
+    delegatable: true
+    legacy: [USER:QUERY]
+  - code: user:update
+    name: 用户资料维护
+    scopeMode: RULES
+    delegatable: true
+    legacy: [USER:UPDATE]
+  - code: user:disable
+    name: 用户锁定/禁用/离职
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    legacy: [USER:DELETE]
+  - code: user:reset-password
+    name: 管理员重置密码
+    scopeMode: RULES
+    highRisk: true
+    delegatable: false
+    source: target-model
+  - code: user:assign-role
+    name: 用户分配角色
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    source: target-model
+  - code: user:unlock
+    name: 用户解锁/启用/重新入职
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    source: target-model
+  - code: role:create
+    name: 角色创建
+    scopeMode: NONE
+    highRisk: true
+    delegatable: true
+    legacy: [ROLE:INSERT]
+  - code: role:read
+    name: 角色查看
+    scopeMode: NONE
+    legacy: [ROLE:QUERY]
+  - code: role:update
+    name: 角色资料维护
+    scopeMode: NONE
+    highRisk: true
+    delegatable: true
+    legacy: [ROLE:UPDATE]
+  - code: role:disable
+    name: 角色停用
+    scopeMode: NONE
+    highRisk: true
+    delegatable: true
+    legacy: [ROLE:DELETE]
+  - code: role:assign
+    name: 角色分配
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    source: target-model
+  - code: role:grant
+    name: 角色授予能力配置
+    scopeMode: NONE
+    highRisk: true
+    delegatable: false
+    source: target-model
+  - code: role:authority-level:update
+    name: 角色管理等级调整
+    scopeMode: NONE
+    highRisk: true
+    delegatable: false
+    source: target-model
+  - code: permission:read
+    name: 权限目录查看
+    scopeMode: NONE
+    legacy: [AUTHORITY:QUERY]
+  - code: menu:create
+    name: 菜单创建
+    scopeMode: NONE
+    highRisk: true
+    legacy: [MENU:INSERT]
+  - code: menu:read
+    name: 菜单查看
+    scopeMode: NONE
+    legacy: [MENU:QUERY]
+  - code: menu:update
+    name: 菜单维护
+    scopeMode: NONE
+    highRisk: true
+    legacy: [MENU:UPDATE]
+  - code: menu:disable
+    name: 菜单停用
+    scopeMode: NONE
+    highRisk: true
+    legacy: [MENU:DELETE]
+  - code: department:create
+    name: 部门创建
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    legacy: [DEPT:INSERT]
+  - code: department:read
+    name: 部门查看
+    scopeMode: RULES
+    delegatable: true
+    legacy: [DEPT:QUERY]
+  - code: department:update
+    name: 部门维护/移动
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    legacy: [DEPT:UPDATE]
+  - code: department:disable
+    name: 部门停用
+    scopeMode: RULES
+    highRisk: true
+    delegatable: true
+    legacy: [DEPT:DELETE]
+  - code: dictionary:create
+    name: 字典创建
+    scopeMode: NONE
+    legacy: [DICT:INSERT]
+  - code: dictionary:read
+    name: 字典查看
+    scopeMode: NONE
+    legacy: [DICT:QUERY]
+  - code: dictionary:update
+    name: 字典维护
+    scopeMode: NONE
+    legacy: [DICT:UPDATE]
+  - code: dictionary:disable
+    name: 字典停用
+    scopeMode: NONE
+    highRisk: true
+    legacy: [DICT:DELETE]
+  - code: region:read
+    name: 行政区划查看
+    scopeMode: NONE
+    legacy: [REGION:QUERY]
+
+  # Session, audit and security governance
+  - code: session:read
+    name: 在线会话查看
+    scopeMode: RULES
+    legacy: [MONITOR:QUERY]
+  - code: session:revoke
+    name: 会话强制下线
+    scopeMode: RULES
+    highRisk: true
+    delegatable: false
+    source: target-model
+  - code: audit:read
+    name: 安全审计查看
+    scopeMode: RULES
+    source: target-model
+  - code: audit:export
+    name: 安全审计导出
+    scopeMode: RULES
+    highRisk: true
+    delegatable: false
+    source: target-model
+  - code: security:auth-method:update
+    name: 认证方式配置
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: target-model
+  - code: security:session-policy:update
+    name: Session 策略配置
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: target-model
+  - code: security:password-policy:update
+    name: 密码策略配置
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: target-model
+  - code: security:root:manage
+    name: DEV_OPS Root 治理
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: target-model
+
+  # File / notification
+  - code: file:create
+    name: 文件上传
+    scopeMode: RULES
+    legacy: [FILE:INSERT]
+  - code: file:read
+    name: 文件查看
+    scopeMode: RULES
+    legacy: [FILE:QUERY]
+  - code: notification:read
+    name: 通知查看
+    scopeMode: SELF
+    legacy: [NOTIFICATION:QUERY]
+  - code: notification:update
+    name: 通知标记已读
+    scopeMode: SELF
+    legacy: [NOTIFICATION:UPDATE]
+  - code: notification:delete
+    name: 通知删除
+    scopeMode: SELF
+    highRisk: true
+    legacy: [NOTIFICATION:DELETE]
+  - code: notification-setting:read
+    name: 通知设置查看
+    scopeMode: SELF
+    legacy: [NOTIFICATION_SETTING:QUERY]
+  - code: notification-setting:update
+    name: 通知设置维护
+    scopeMode: SELF
+    legacy: [NOTIFICATION_SETTING:UPDATE]
+
+  # AI
+  - code: ai:create
+    name: AI 会话创建
+    scopeMode: SELF
+    legacy: [AI:INSERT]
+  - code: ai:read
+    name: AI 会话查看
+    scopeMode: SELF
+    legacy: [AI:QUERY]
+  - code: ai:update
+    name: AI 会话维护
+    scopeMode: SELF
+    legacy: [AI:UPDATE]
+  - code: ai:delete
+    name: AI 会话删除
+    scopeMode: SELF
+    highRisk: true
+    legacy: [AI:DELETE]
+
+  # OA resources: all RULES by default; payment/execute are high-risk and non-delegatable by default.
+  - code: oa:application-type:create
+    name: OA 申请类型创建
+    scopeMode: NONE
+    legacy: [OA_APPLICATION_TYPE:INSERT]
+  - code: oa:application-type:read
+    name: OA 申请类型查看
+    scopeMode: NONE
+    legacy: [OA_APPLICATION_TYPE:QUERY]
+  - code: oa:application-type:update
+    name: OA 申请类型维护
+    scopeMode: NONE
+    legacy: [OA_APPLICATION_TYPE:UPDATE]
+  - code: oa:application-type:disable
+    name: OA 申请类型停用
+    scopeMode: NONE
+    highRisk: true
+    legacy: [OA_APPLICATION_TYPE:DELETE]
+  - code: oa:application:read
+    name: OA 申请查看
+    scopeMode: RULES
+    legacy: [OA_APPLICATION:QUERY]
+  - code: oa:application:update
+    name: OA 申请处理
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_APPLICATION:UPDATE]
+  - code: oa:asset:create
+    name: OA 资产创建
+    scopeMode: RULES
+    legacy: [OA_ASSET:INSERT]
+  - code: oa:asset:read
+    name: OA 资产查看
+    scopeMode: RULES
+    legacy: [OA_ASSET:QUERY]
+  - code: oa:asset:update
+    name: OA 资产维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_ASSET:UPDATE]
+  - code: oa:calendar:create
+    name: OA 日历创建
+    scopeMode: SELF
+    legacy: [OA_CALENDAR:INSERT]
+  - code: oa:calendar:read
+    name: OA 日历查看
+    scopeMode: SELF
+    legacy: [OA_CALENDAR:QUERY]
+  - code: oa:calendar:update
+    name: OA 日历维护
+    scopeMode: SELF
+    legacy: [OA_CALENDAR:UPDATE]
+  - code: oa:calendar:delete
+    name: OA 日历删除
+    scopeMode: SELF
+    highRisk: true
+    legacy: [OA_CALENDAR:DELETE]
+  - code: oa:contract:create
+    name: OA 合同创建
+    scopeMode: RULES
+    legacy: [OA_CONTRACT:INSERT]
+  - code: oa:contract:read
+    name: OA 合同查看
+    scopeMode: RULES
+    legacy: [OA_CONTRACT:QUERY]
+  - code: oa:contract:update
+    name: OA 合同维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_CONTRACT:UPDATE]
+  - code: oa:contract:delete
+    name: OA 合同归档/删除
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_CONTRACT:DELETE]
+  - code: oa:contact:read
+    name: OA 联系人查看
+    scopeMode: RULES
+    legacy: [OA_CONTACT:QUERY]
+  - code: oa:document:create
+    name: OA 文档创建
+    scopeMode: RULES
+    legacy: [OA_DOCUMENT:INSERT]
+  - code: oa:document:read
+    name: OA 文档查看
+    scopeMode: RULES
+    legacy: [OA_DOCUMENT:QUERY]
+  - code: oa:document:update
+    name: OA 文档维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_DOCUMENT:UPDATE]
+  - code: oa:leave:create
+    name: OA 请假申请
+    scopeMode: SELF
+    legacy: [OA_LEAVE:INSERT]
+  - code: oa:leave:read
+    name: OA 请假查看
+    scopeMode: RULES
+    legacy: [OA_LEAVE:QUERY]
+  - code: oa:leave:update
+    name: OA 请假审批/处理
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_LEAVE:UPDATE]
+  - code: oa:meeting:create
+    name: OA 会议创建
+    scopeMode: RULES
+    legacy: [OA_MEETING:INSERT]
+  - code: oa:meeting:read
+    name: OA 会议查看
+    scopeMode: RULES
+    legacy: [OA_MEETING:QUERY]
+  - code: oa:meeting:update
+    name: OA 会议维护
+    scopeMode: RULES
+    legacy: [OA_MEETING:UPDATE]
+  - code: oa:notice:create
+    name: OA 公告创建
+    scopeMode: RULES
+    legacy: [OA_NOTICE:INSERT]
+  - code: oa:notice:read
+    name: OA 公告查看
+    scopeMode: RULES
+    legacy: [OA_NOTICE:QUERY]
+  - code: oa:notice:update
+    name: OA 公告维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_NOTICE:UPDATE]
+  - code: oa:purchase:create
+    name: OA 采购创建
+    scopeMode: RULES
+    legacy: [OA_PURCHASE:INSERT]
+  - code: oa:purchase:read
+    name: OA 采购查看
+    scopeMode: RULES
+    legacy: [OA_PURCHASE:QUERY]
+  - code: oa:purchase:update
+    name: OA 采购维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_PURCHASE:UPDATE]
+  - code: oa:purchase:execute
+    name: OA 采购执行
+    scopeMode: RULES
+    highRisk: true
+    delegatable: false
+    legacy: [OA_PURCHASE:EXECUTE]
+  - code: oa:purchase:receive
+    name: OA 采购收货
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_PURCHASE:RECEIVE]
+  - code: oa:reimbursement:create
+    name: OA 报销创建
+    scopeMode: SELF
+    legacy: [OA_REIMBURSEMENT:INSERT]
+  - code: oa:reimbursement:read
+    name: OA 报销查看
+    scopeMode: RULES
+    legacy: [OA_REIMBURSEMENT:QUERY]
+  - code: oa:reimbursement:update
+    name: OA 报销维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [OA_REIMBURSEMENT:UPDATE]
+  - code: oa:reimbursement:pay
+    name: OA 报销付款
+    scopeMode: RULES
+    highRisk: true
+    delegatable: false
+    legacy: [OA_REIMBURSEMENT:PAYMENT]
+  - code: oa:report:read
+    name: OA 报表查看
+    scopeMode: RULES
+    legacy: [OA_REPORT:QUERY]
+  - code: oa:workbench:read
+    name: OA 工作台查看
+    scopeMode: SELF
+    legacy: [OA_WORKBENCH:QUERY]
+
+  # Workflow
+  - code: workflow:form:create
+    name: 流程表单创建
+    scopeMode: RULES
+    legacy: [WF_FORM:INSERT]
+  - code: workflow:form:read
+    name: 流程表单查看
+    scopeMode: RULES
+    legacy: [WF_FORM:QUERY]
+  - code: workflow:form:update
+    name: 流程表单维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [WF_FORM:UPDATE]
+  - code: workflow:form:disable
+    name: 流程表单停用
+    scopeMode: RULES
+    highRisk: true
+    legacy: [WF_FORM:DELETE]
+  - code: workflow:process:create
+    name: 流程定义创建
+    scopeMode: RULES
+    legacy: [WF_PROCESS:INSERT]
+  - code: workflow:process:read
+    name: 流程定义查看
+    scopeMode: RULES
+    legacy: [WF_PROCESS:QUERY]
+  - code: workflow:process:update
+    name: 流程定义维护
+    scopeMode: RULES
+    highRisk: true
+    legacy: [WF_PROCESS:UPDATE]
+  - code: workflow:instance:create
+    name: 流程实例发起
+    scopeMode: SELF
+    legacy: [WF_INSTANCE:INSERT]
+  - code: workflow:instance:read
+    name: 流程实例查看
+    scopeMode: RULES
+    legacy: [WF_INSTANCE:QUERY]
+  - code: workflow:instance:update
+    name: 流程实例处理
+    scopeMode: RULES
+    highRisk: true
+    legacy: [WF_INSTANCE:UPDATE]
+  - code: workflow:task:read
+    name: 流程任务查看
+    scopeMode: RULES
+    legacy: [WF_TASK:QUERY]
+  - code: workflow:task:update
+    name: 流程任务处理
+    scopeMode: RULES
+    highRisk: true
+    legacy: [WF_TASK:UPDATE]
+
+# 旧 code 不得进入目标 permission 表；只允许在一次性 migration mapping 中消费。
+legacyMapping:
+  wildcard:
+    action: reject
+    reason: "* 不迁移为 Permission，也不能替代 ROLE_DEV_OPS RootPolicy"
+  unmappedAction: block-cutover
+  roleMapping:
+    ROLE_DEV_OPS: ROLE_DEV_OPS
+    ROLE_AUDIT: ROLE_AUDITOR

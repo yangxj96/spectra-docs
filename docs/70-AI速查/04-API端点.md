@@ -7,14 +7,15 @@ tags:
 
 # API 端点
 
-> 源码当前 40 个 `*Controller.java` 端点速查表。
+> 源码当前 43 个 `*Controller.java` 端点速查表。
 
 ## 认证与安全
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AuthController | `/auth/**` | 登录/登出/刷新 Token/验证码获取 |
-| AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑 |
+| AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；认证后可申请绑定手机号/邮箱验证码 |
+| AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
+| AuthorizationController | `/security/authorization/**` | 目标 RoleAssignment、Access Boundary、Grant Boundary 只读查询；Phase 4 前冻结写入口 |
 
 ## 核心 — 公共
 
@@ -29,6 +30,8 @@ tags:
 | UserController | `/user/**` | 用户 CRUD / 分页查询 / 角色覆盖 / 状态管理 |
 | RoleController | `/role/**` | 角色 CRUD / 分配权限 / 分配菜单 |
 | AuthorityController | `/authority/**` | 权限 CRUD / 树形查询 |
+
+`UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
 
 ## 核心 — 系统管理
 
@@ -80,7 +83,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| FileController | `/file/upload/**` | 文件上传/下载/分片上传 |
+| FileController | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `FILE:QUERY`，不再匿名开放 |
 | FileInfoController | `/file/info/**` | 文件信息/类型管理 |
 
 ## 工作流

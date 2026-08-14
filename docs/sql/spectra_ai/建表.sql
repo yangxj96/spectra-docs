@@ -6,7 +6,7 @@
 CREATE SCHEMA IF NOT EXISTS spectra_ai;
 
 -- 启用 pgvector 扩展
-CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA spectra_ai;
 
 -- RAG 知识分块表
 CREATE TABLE spectra_ai.ai_knowledge_chunks (
