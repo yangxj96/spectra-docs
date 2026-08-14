@@ -7,8 +7,7 @@
 --
 -- 迁移来源：spectra_core.sys_notification、spectra_core.sys_notification_setting。
 -- 迁移目标：spectra_notification.ntf_inbox_message、ntf_user_preference。
--- 约定：旧表没有租户字段，统一归入系统租户 00000000-0000-0000-0000-000000000000；
---       脚本可重复执行，不删除旧数据，偏好 ID 使用稳定哈希保证重复执行不产生新行。
+-- 约定：目标通知表不包含租户字段；脚本可重复执行，不删除旧数据，偏好 ID 使用稳定哈希保证重复执行不产生新行。
 
 BEGIN;
 
@@ -30,7 +29,6 @@ BEGIN
 
     INSERT INTO spectra_notification.ntf_inbox_message (
         id,
-        tenant_id,
         notification_task_id,
         notification_request_id,
         receiver_user_id,
@@ -52,7 +50,6 @@ BEGIN
     )
     SELECT
         source.id,
-        '00000000-0000-0000-0000-000000000000'::uuid,
         NULL,
         NULL,
         source.receiver_id,
@@ -105,7 +102,6 @@ BEGIN
 
     INSERT INTO spectra_notification.ntf_user_preference (
         id,
-        tenant_id,
         user_id,
         purpose,
         channel,
@@ -122,7 +118,6 @@ BEGIN
     )
     SELECT
         md5(source.id::text || ':' || purpose.purpose || ':IN_APP')::uuid,
-        '00000000-0000-0000-0000-000000000000'::uuid,
         source.user_id,
         purpose.purpose,
         'IN_APP',
@@ -148,8 +143,7 @@ BEGIN
     WHERE NOT EXISTS (
         SELECT 1
           FROM spectra_notification.ntf_user_preference target
-         WHERE target.tenant_id = '00000000-0000-0000-0000-000000000000'::uuid
-           AND target.user_id = source.user_id
+         WHERE target.user_id = source.user_id
            AND target.purpose = purpose.purpose
            AND target.channel = 'IN_APP'
            AND target.deleted IS NULL

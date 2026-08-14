@@ -430,7 +430,6 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 主键 |
-| `tenant_id` | UUID | 租户边界 |
 | `template_group_code` | varchar(100) | 逻辑模板组 |
 | `channel` | varchar(16) | IN_APP/SMS/EMAIL |
 | `purpose` | varchar(50) | 通知用途 |
@@ -457,7 +456,6 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 内部请求 ID |
-| `tenant_id` | UUID | 租户边界 |
 | `external_request_id` | varchar(100) | 调用方 `requestId` |
 | `idempotency_key` | varchar(200) | 业务幂等键 |
 | `purpose` | varchar(50) | 通知用途 |
@@ -493,7 +491,6 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 任务 ID，同时作为 Sender 幂等键 |
-| `tenant_id` | UUID | 租户边界 |
 | `notification_request_id` | UUID | 关联 `ntf_request.id` |
 | `channel` | varchar(16) | IN_APP/SMS/EMAIL |
 | `receiver_user_id` | UUID | 系统用户，可空 |
@@ -530,7 +527,6 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 主键 |
-| `tenant_id` | UUID | 租户边界 |
 | `notification_task_id` | UUID | 关联 `ntf_task.id` |
 | `attempt_no` | integer | 尝试序号 |
 | `provider` | varchar(50) | 供应商标识 |
@@ -551,7 +547,6 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 消息 ID；迁移时保留旧 ID |
-| `tenant_id` | UUID | 租户边界 |
 | `notification_task_id` | UUID | IN_APP Task，迁移历史数据时可空 |
 | `notification_request_id` | UUID | 逻辑请求，迁移历史数据时可空 |
 | `receiver_user_id` | UUID | 消息所有者 |
@@ -581,7 +576,6 @@ spectra_notification
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | UUID | 主键 |
-| `tenant_id` | UUID | 租户边界 |
 | `user_id` | UUID | 当前用户 |
 | `purpose` | varchar(50) | 通知用途 |
 | `channel` | varchar(16) | 渠道 |
@@ -1104,7 +1098,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] HTML 模板不允许脚本和非法协议。
 - [x] 相同幂等键返回同一 Request。
 - [x] 一次请求按“接收人 × 渠道”正确展开 Task。
-- [x] Worker 成功、过期、失败重试和 Delivery 租户隔离。
+- [x] Worker 成功、过期、失败重试和 Delivery 任务边界回归。
 - [x] 管理端地址、错误、投递摘要脱敏和 ROLE_DEV_OPS/ROLE_AUDIT 注解边界。
 - [x] SQL 建表/迁移结构契约检查；真实 PostgreSQL 事务和并发基线已在显式开启的集成测试中通过。
 - [x] 用户关闭可选渠道时跳过，不关闭强制安全用途。
@@ -1118,7 +1112,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 
 ### 14.2 数据隔离测试
 
-- [x] Self API/管理端权限注解覆盖、用户 A/B 认证上下文切换和消息中心 Service 租户、收件人条件契约回归。
+- [x] Self API/管理端权限注解覆盖、用户 A/B 认证上下文切换和消息中心 Service 收件人条件契约回归。
 - [x] 用户 A 不能分页、详情、已读或删除用户 B 的消息（认证上下文和 Service 条件回归）。
 - [x] 混合批量删除只影响当前用户记录（Controller 绑定和 Service 条件回归）。
 - [x] 不属于当前用户的 ID 统一表现为“消息不存在”。

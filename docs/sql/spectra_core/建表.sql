@@ -701,30 +701,7 @@ COMMENT ON COLUMN spectra_core.file_upload_chunk.updated_at IS '最后更新时�
 COMMENT ON COLUMN spectra_core.file_upload_chunk.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.file_upload_chunk.version IS '乐观锁';
 
--- ============================================
--- AI 模块
--- ============================================
-
--- AI 会话状态
-CREATE TABLE spectra_core.ai_session (
-    id          UUID PRIMARY KEY,
-    session_id  VARCHAR(255) NOT NULL,
-    state_key   VARCHAR(255) NOT NULL,
-    item_index  INTEGER DEFAULT 0 NOT NULL,
-    state_data  TEXT NOT NULL,
-    created_by  UUID,
-    created_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by  UUID,
-    updated_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted     TIMESTAMP(6) WITH TIME ZONE,
-    version     BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_core.ai_session IS 'AI-Agent会话状态存储表';
-COMMENT ON COLUMN spectra_core.ai_session.session_id IS 'session id';
-COMMENT ON COLUMN spectra_core.ai_session.state_key IS 'state key';
-COMMENT ON COLUMN spectra_core.ai_session.item_index IS 'item_index';
-COMMENT ON COLUMN spectra_core.ai_session.state_data IS 'state_data';
-
+-- AI 会话和消息记忆统一由 spectra_ai schema 管理，core 不再创建会话表。
 
 -- ============================================
 -- 消息中心
