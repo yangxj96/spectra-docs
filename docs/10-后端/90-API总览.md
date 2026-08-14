@@ -31,7 +31,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `UserController` | spectra-core | `/user/**` | 用户资料 CRUD / 分页查询 / 状态管理；RoleAssignment 使用 AuthorizationController 独立管理 |
-| `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联写入口已冻结 |
+| `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 ## 核心 — 系统管理
@@ -65,7 +65,7 @@ tags:
 
 Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取 Role/Permission Catalog/组织树，新增或修改 Permission-specific Access/Grant Boundary，先调用 Assignment Preview，再携带短时 token 调用 Apply；Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 
-Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 写入口保持 fail-closed，菜单 UX 配置仍由 RoleController 管理。
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
 
 用户生命周期已拆分为高风险写入口：`PUT /user/lock/{uid}`、`/user/unlock/{uid}`、`/user/disable/{uid}`、`/user/enable/{uid}`、`/user/depart/{uid}`、`/user/reinstate/{uid}`；操作原因通过可选 `reason` 查询参数传入，服务层统一执行状态机、Security Audit、securityVersion 递增和全部 Session 撤销。
 

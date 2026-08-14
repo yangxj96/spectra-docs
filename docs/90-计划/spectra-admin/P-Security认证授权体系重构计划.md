@@ -1380,12 +1380,13 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：`DataScopeInnerInterceptor` 已切换为只读取 Permission-specific `AuthorizationSnapshot`，旧 `DataScopeProvider`/`DataScopeResolver` 全局范围解析端口已删除，通知收件人目录已按 `user:read` Boundary 执行组织影响检查；本阶段框架/核心定向测试、后端全量回归与数据库安全契约核对均已通过。旧 Account/Role/Authority/DataScope 模型、Controller、Mapper 和其他模块旧调用，旧 Redis/表清理及最终端到端验收仍待完成。
 - 阶段补充（2026-08-15）：用户/角色创建和编辑接口已移除旧 DataScope 参数及旧 `sys_role.scope` 映射，User/Role service 不再读取或写入旧范围表，`SecurityUser` 不再携带全局 DataScope；Web 用户/角色表单、列表和转换器已同步删除旧范围字段。旧范围实体、Mapper、DTO、枚举及 DDL 尚待独立清理，历史 user-level Scope 不自动映射到新 Permission Boundary。
 - 阶段补充（2026-08-15）：旧 DataScope 实体、Mapper/XML、DTO 和枚举已删除；`V10__remove_legacy_data_scope.sql` 以不带 `CASCADE` 的幂等 DDL 下线四张旧 Scope 表并删除 `sys_role.scope`，schema 文档和实体字典已同步。迁移不自动转换历史 user/role Scope，需在显式 Assignment Boundary 变更中人工消歧。
-- 阶段补充（2026-08-15）：角色目录 CRUD 已切换到 `spectra_security.role`，补齐稳定 `ROLE_*` 编码、`authorityLevel`、`roleKind` 和 `systemManaged` 映射；角色菜单授权读写及当前菜单树已切换到 `spectra_security.role_menu` + `AuthorizationSnapshot`，不再从旧 `sys_rel_role_menu` 或 `sys_user_role` 回退读取。本批角色目录、菜单关系、菜单树和 V1–V10 数据库契约测试均已通过并独立提交；旧 Permission/Authority 目录、用户 RoleAssignment 写入口及旧角色模型清理仍待后续阶段。
-- 阶段补充（2026-08-15）：`/authority/tree` 已切换为只读 Permission Catalog 适配器，从 `spectra_security.permission` 按资源分组返回活动权限；旧 Authority CRUD 路由已移除。角色权限查询和撤销清理已切换到目标 `role_permission`/`role_grantable_permission`，旧角色权限写入口继续 fail-closed，Permission Preview/Apply 前端接入仍待下一阶段。
+- 阶段补充（2026-08-15）：角色目录 CRUD 已切换到 `spectra_security.role`，补齐稳定 `ROLE_*` 编码、`authorityLevel`、`roleKind` 和 `systemManaged` 映射；角色菜单授权读写及当前菜单树已切换到 `spectra_security.role_menu` + `AuthorizationSnapshot`，不再从旧 `sys_rel_role_menu` 或 `sys_user_role` 回退读取。本批角色目录、菜单关系、菜单树和 V1–V10 数据库契约测试均已通过并独立提交；旧 Permission/Authority 目录、用户 RoleAssignment 写入口及旧角色模型清理已在后续阶段完成。
+- 阶段补充（2026-08-15）：`/authority/tree` 已切换为只读 Permission Catalog 适配器，从 `spectra_security.permission` 按资源分组返回活动权限；旧 Authority CRUD 路由已移除。角色权限查询和撤销清理已切换到目标 `role_permission`/`role_grantable_permission`，旧角色权限写入口已删除，Permission Preview/Apply 前端已接入。
 - 阶段补充（2026-08-15）：AuthorizationController 新增目标 Role 当前授权状态查询，返回 role version、authorityLevel、Permission code 与 GrantablePermission code；spectra-ui RBAC 已移除旧角色权限覆盖写 API，改为分别编辑 Role capability 与 Grantable capability，提交前执行 Impact Preview，确认后携带短时 token Apply，菜单仍作为独立 UX 配置保存。
-- 阶段补充（2026-08-15）：用户资料保存已移除 `role_ids`，`UserController` 删除旧 `/user/{uid}/roles` 覆盖写路由；用户资料与 RoleAssignment 写入彻底解耦，Assignment 必须通过 AuthorizationController 的 Preview/Apply 逐条提交 Boundary。目标 RoleAssignment 编辑器仍需后续阶段接入。
-- 阶段补充（2026-08-15）：用户分页资料与当前用户资料的角色展示已切换到活动 `spectra_security.role_assignment`；只读 Assignment 查询补充 Role/Assignment version、Role 名称、系统托管标记及分离的 Access/Grant Boundary。旧 `sys_rel_user_role` 仅保留生命周期/删除兼容清理，后续继续下线。
+- 阶段补充（2026-08-15）：用户资料保存已移除 `role_ids`，`UserController` 删除旧 `/user/{uid}/roles` 覆盖写路由；用户资料与 RoleAssignment 写入彻底解耦，Assignment 必须通过 AuthorizationController 的 Preview/Apply 逐条提交 Boundary。Web RoleAssignment 编辑器已完成接入。
+- 阶段补充（2026-08-15）：用户分页资料与当前用户资料的角色展示已切换到活动 `spectra_security.role_assignment`；只读 Assignment 查询补充 Role/Assignment version、Role 名称、系统托管标记及分离的 Access/Grant Boundary。旧 `sys_rel_user_role` 已不再作为运行时来源，并由 V11 迁移下线。
 - 阶段补充（2026-08-15）：Permission Catalog 叶子节点已返回 `allowed_scope_modes`；Web 用户编辑器已接入 RoleAssignment 新增/修改，明确编辑 Permission-specific Access/Grant Boundary，RULES 必须选择组织，保存前执行 Assignment Preview 并携带短时 token Apply。数据库安全契约、后端目录测试与 Web format/lint/type/test 均已通过。
+- 阶段补充（2026-08-15）：旧 `Authority`/`Role`/`RelUserRole`/`RelRoleAuthority` 运行时实体、Mapper、Service、监听器和旧 `RoleController` 权限路由已删除；User 生命周期回收改为将活动 RoleAssignment 标记为 `REVOKED` 并保留 version/validUntil。V11 以无 `CASCADE` 幂等 DDL 下线对应旧表，旧 Account/认证因子、Redis 旧键和真实数据库验收仍待后续。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1425,19 +1426,19 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | `core/auth/service/impl/AccountServiceImpl.java` | 账号绑定 | REPLACE；验证码证明所有权后创建 AuthenticationIdentity |
 | `core/auth/javabean/entity/Account.java` | 多认证字段聚合 | MIGRATE/REMOVE |
 | `core/user/javabean/entity/User.java` | 用户与单部门/二状态 | MODIFY lifecycle/securityVersion；成员关系拆表 |
-| `core/user/javabean/entity/Role.java` | 角色和单 Scope | REPLACE/迁移 Role domain；增加 stable code/level，删除 scope |
-| `core/user/javabean/entity/Authority.java` | 权限树 | MIGRATE 到 Permission；不再用树压缩表达安全语义 |
-| `core/user/javabean/entity/RelUserRole.java` | 简单 M:N | REMOVE，RoleAssignment 替代 |
+| `core/user/javabean/entity/Role.java` | 旧角色模型 | [x] REMOVE（2026-08-15）；目标角色使用 `SecurityRole` |
+| `core/user/javabean/entity/Authority.java` | 旧权限树 | [x] REMOVE（2026-08-15）；目标权限使用 `Permission` Catalog |
+| `core/user/javabean/entity/RelUserRole.java` | 旧用户角色 M:N | [x] REMOVE（2026-08-15）；使用 `RoleAssignment` |
 | `core/user/javabean/entity/UserDataScope*.java` | 用户直接 Scope | REMOVE |
 | `core/user/javabean/entity/RoleDataScope*.java` | 角色 Scope | REMOVE after Assignment migration |
 | `core/user/service/impl/DataScopeResolver.java` | 全局 Scope 合并 | [x] REMOVE（2026-08-15）；Permission-specific AuthorizationSnapshot 替代 |
 | `core/user/service/impl/UserServiceImpl.java` | 资料/状态/角色/范围/密码混合 | SPLIT 到 Profile、Lifecycle、Credential、Assignment Application Services |
 | `core/user/service/impl/RoleServiceImpl.java` | Role CRUD | REPLACE 为 RoleCommandService + Impact/Boundary orchestration |
-| `RelUserRoleServiceImpl.java` | 直接 grant | REMOVE |
-| `RelRoleAuthorityServiceImpl.java` | 权限树关系更新 | REMOVE；RolePermissionCommandService 替代 |
+| `RelUserRoleServiceImpl.java` | 旧直接 grant | [x] REMOVE（2026-08-15）；RoleAssignment Application Service 替代 |
+| `RelRoleAuthorityServiceImpl.java` | 旧权限树关系更新 | [x] REMOVE（2026-08-15）；RolePermissionCommandService 替代 |
 | `RelRoleMenuServiceImpl.java` | 菜单关系 | KEEP/MODIFY，明确只负责 UX |
 | `core/user/controller/UserController.java` | 宽泛用户 API/online | SPLIT，删除普通 delete 和 mock-like online contract |
-| `core/user/controller/RoleController.java` | Role/权限/菜单混合 | SPLIT Role、Assignment、Menu assignment API |
+| `core/user/controller/RoleController.java` | Role/权限/菜单混合 | [x] 已移除旧权限路由；保留 Role CRUD 与菜单 UX 配置 |
 | `core/user/controller/AuthorityController.java` | Permission CRUD/tree | REPLACE 为只读 PermissionCatalogController；Root catalog 治理另设 |
 | `core/system/service/impl/DepartmentServiceImpl.java` | 邻接树 CRUD | REPLACE move/closure/impact transactional service |
 | `core/system/service/impl/MenuServiceImpl.java` | 当前角色菜单 | MODIFY：Root 全菜单、其他 Role menu union |
@@ -1697,7 +1698,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke。
 - [x] Phase 2 已接入 `authentication_identity`、`password_credential` Entity/Mapper/Service；用户名密码登录、用户创建、密码修改/重置、通知地址解析切换到目标模型；旧 Account 仅保留为短信/邮箱等后续 Factor 的迁移输入。
-- [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约、目标 schema 数据库加载器和 cross-assignment/Grant Boundary 单元测试；RoleAssignment 写入、旧 Role/Authority 删除和正式授权上下文接入仍待完成。
+- [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约、目标 schema 数据库加载器和 cross-assignment/Grant Boundary 单元测试；RoleAssignment 写入、旧 Role/Authority 删除和正式授权上下文接入已在后续 Phase 完成。
 - [x] Phase 3 已提供目标 RoleAssignment/Boundary 只读 API；写入继续冻结到 Phase 4 GrantBoundary 流程。
 - [x] Phase 4 已交付 Assignment 与 Role 的 Grant Boundary/authorityLevel 校验、Impact Preview/Apply token、并发 version/securityVersion 门禁、统一 Audit/Session revoke；旧用户角色、旧角色权限和旧 DataScope 写入口已冻结。
 - [x] Phase 5 已交付 `sec:v2:*` Redis Session、Token Digest、Token Family Rotation/Replay 撤销、并发策略、Web HttpOnly Host-only Refresh Cookie + CSRF、App Token 存储/设备 ID 适配，以及 TOTP/AAL2/Recovery Code MFA 核心和 DEV_OPS 强制 MFA。
@@ -1705,7 +1706,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
 - [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；策略变更生产者、真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
-- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider 不再读取旧 Account 表，绑定/解绑写入目标 authentication_identity，SecurityUserHelper 删除旧 Account/DataScope 构造路径；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的 SecUtil 业务/框架调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧模型删除、其他模块旧调用迁移、旧 Redis/表清理和最终端到端验收仍待完成。
+- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider 不再读取旧 Account 表，绑定/解绑写入目标 authentication_identity，SecurityUserHelper 删除旧 Account/DataScope 构造路径；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的 SecUtil 业务/框架调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧 Role/Authority/RoleAssignment 运行时迁移和 V11 旧授权表清理已完成，旧 Account/认证因子、Redis 旧键和最终端到端验收仍待完成。
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
 - [x] Phase 9 已清理旧 DataScope 孤儿模型与数据库契约：删除旧实体、Mapper/XML、DTO/枚举，新增 V10 下线迁移并同步 `docs/sql`、实体清单、ER 图和 AI 实体字典；数据库安全契约测试已覆盖 V10 的幂等 DROP 与无自动迁移约束。
@@ -1715,6 +1716,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成用户资料与授权解耦：UserSaveFrom、UserService 和 Web 用户表单不再接受 `role_ids`，旧用户角色覆盖路由已删除；后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成 RoleAssignment 只读角色展示迁移：用户分页/当前资料从活动 `spectra_security.role_assignment` 读取角色，并暴露 Role/Assignment version 与独立 Boundary 元数据；查询服务、后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成 Web RoleAssignment Preview/Apply 编辑器：用户编辑器读取目标 Role/Permission Catalog/组织树，支持显式 Access/Grant Boundary 和 Scope 模式校验，并通过短时 Preview token Apply；后端 Permission Catalog 定向测试、Web format/lint/type/test 和数据库安全契约核对通过并已独立提交。
+- [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
