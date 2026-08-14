@@ -32,7 +32,7 @@ tags:
 |---|---|---|
 | UserController | `/user/**` | 用户 CRUD / 分页查询 / 状态管理；旧角色覆盖写入口已冻结 |
 | RoleController | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联写入口已冻结 |
-| AuthorityController | `/authority/**` | 权限 CRUD / 树形查询 |
+| AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
 

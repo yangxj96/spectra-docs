@@ -1381,6 +1381,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：用户/角色创建和编辑接口已移除旧 DataScope 参数及旧 `sys_role.scope` 映射，User/Role service 不再读取或写入旧范围表，`SecurityUser` 不再携带全局 DataScope；Web 用户/角色表单、列表和转换器已同步删除旧范围字段。旧范围实体、Mapper、DTO、枚举及 DDL 尚待独立清理，历史 user-level Scope 不自动映射到新 Permission Boundary。
 - 阶段补充（2026-08-15）：旧 DataScope 实体、Mapper/XML、DTO 和枚举已删除；`V10__remove_legacy_data_scope.sql` 以不带 `CASCADE` 的幂等 DDL 下线四张旧 Scope 表并删除 `sys_role.scope`，schema 文档和实体字典已同步。迁移不自动转换历史 user/role Scope，需在显式 Assignment Boundary 变更中人工消歧。
 - 阶段补充（2026-08-15）：角色目录 CRUD 已切换到 `spectra_security.role`，补齐稳定 `ROLE_*` 编码、`authorityLevel`、`roleKind` 和 `systemManaged` 映射；角色菜单授权读写及当前菜单树已切换到 `spectra_security.role_menu` + `AuthorizationSnapshot`，不再从旧 `sys_rel_role_menu` 或 `sys_user_role` 回退读取。本批角色目录、菜单关系、菜单树和 V1–V10 数据库契约测试均已通过并独立提交；旧 Permission/Authority 目录、用户 RoleAssignment 写入口及旧角色模型清理仍待后续阶段。
+- 阶段补充（2026-08-15）：`/authority/tree` 已切换为只读 Permission Catalog 适配器，从 `spectra_security.permission` 按资源分组返回活动权限；旧 Authority CRUD 路由已移除。角色权限查询和撤销清理已切换到目标 `role_permission`/`role_grantable_permission`，旧角色权限写入口继续 fail-closed，Permission Preview/Apply 前端接入仍待下一阶段。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1705,6 +1706,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
 - [x] Phase 9 已清理旧 DataScope 孤儿模型与数据库契约：删除旧实体、Mapper/XML、DTO/枚举，新增 V10 下线迁移并同步 `docs/sql`、实体清单、ER 图和 AI 实体字典；数据库安全契约测试已覆盖 V10 的幂等 DROP 与无自动迁移约束。
 - [x] Phase 9 已完成目标角色目录与菜单关系切换：Role CRUD 使用 `spectra_security.role`，菜单授权和当前菜单树使用 `spectra_security.role_menu` 与目标 AuthorizationSnapshot；角色、菜单关系、菜单树和数据库安全契约测试通过并已独立提交。
+- [x] Phase 9 已完成 Permission Catalog 只读切换：`/authority/tree` 不再提供旧 Authority CRUD，目标 Permission 按资源分组展示；角色 Permission 读取/撤销使用目标关系表，Catalog、关系服务和数据库安全契约测试通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
