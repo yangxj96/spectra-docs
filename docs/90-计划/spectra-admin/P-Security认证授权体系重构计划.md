@@ -1262,7 +1262,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
 - 依赖：Phase 0。
-- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、V2 运行时权限边界、Flyway 配置、静态 schema 契约和 Break-glass Runbook 草案已交付；V1 已在临时 PostgreSQL 数据库执行通过。现有写入口接入、自动化并发 PostgreSQL 集成测试，以及 Runbook 的运维评审/演练仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
+- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、V2 运行时权限边界、Flyway 配置、静态 schema 契约和 Break-glass Runbook 草案已交付；已加入默认禁用、需显式环境变量开启的真实 PostgreSQL/Flyway 集成测试（覆盖空库 V1/V2 和非空库拒绝自动 baseline），但尚未在 CI/部署环境实际执行。现有写入口接入、并发边界自动化测试，以及 Runbook 的运维评审/演练仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
 - DoD：新环境只需从 V1 初始化完整目标 schema；任何新安全变更必须使用 Change skeleton；应用账号不能更新/删除 Audit；默认支持 2 normal + 1 break-glass 且任何管理变更不能移除最后一个 effective DEV_OPS；独立 break-glass Runbook 完成评审。
 
 ## Phase 2 — Identity Lifecycle and Organization Membership
@@ -1672,8 +1672,8 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 
 - [x] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引、全量业务表汇总和 V2 运行时权限边界的第一版文件级设计；真实部署账号授权核对仍待完成。
 - [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
-- [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试；空库/非空库拒绝 baseline 的真实 PostgreSQL 集成测试仍待补齐。
-- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；非空库拒绝 baseline 的 Flyway 启动测试及并发边界自动化仍待补齐。
+- [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试和默认禁用的真实 PostgreSQL/Flyway 集成测试；集成测试通过专用环境变量显式开启，不会默认触碰本机数据库。
+- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；新增的空库/非空库 Flyway 门禁尚未在 CI/部署隔离数据库实际执行，并发边界自动化仍待补齐。
 - [x] Phase 1 已交付 `V2__security_runtime_privileges.sql`，应用运行时角色不能更新/删除 Security Audit；实际部署登录角色的 membership 和 owner/runtime 分离仍需上线前核对。
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
