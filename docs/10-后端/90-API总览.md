@@ -61,6 +61,8 @@ tags:
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
+用户分页资料与当前用户资料中的角色展示已切换为读取活动 `spectra_security.role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
+
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 写入口保持 fail-closed，菜单 UX 配置仍由 RoleController 管理。
 
 用户生命周期已拆分为高风险写入口：`PUT /user/lock/{uid}`、`/user/unlock/{uid}`、`/user/disable/{uid}`、`/user/enable/{uid}`、`/user/depart/{uid}`、`/user/reinstate/{uid}`；操作原因通过可选 `reason` 查询参数传入，服务层统一执行状态机、Security Audit、securityVersion 递增和全部 Session 撤销。
