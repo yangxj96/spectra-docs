@@ -15,7 +15,7 @@ tags:
 |---|---|---|
 | AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
-| AuthorizationController | `/security/authorization/**` | Role/Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；高风险写入绑定短时 token |
+| AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；高风险写入绑定短时 token |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据 |
 | MfaController | `/security/mfa/**` | TOTP 登记/确认与 Recovery Code 单次消费；DEV_OPS 必须通过 MFA 才能创建 Root Session |
@@ -33,6 +33,8 @@ tags:
 | UserController | `/user/**` | 用户 CRUD / 分页查询 / 状态管理；旧角色覆盖写入口已冻结 |
 | RoleController | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联写入口已冻结 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
+
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`。旧 `/role/{id}/authorities` 写入口继续 fail-closed，菜单 UX 配置仍由 RoleController 管理。
 
 `UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
 

@@ -15,7 +15,7 @@ tags:
 |---|---|---|---|
 | `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
-| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role/Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；所有高风险写入绑定短时 token |
+| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；所有高风险写入绑定短时 token |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
 | `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费；TOTP 密钥加密存储，Recovery Code 仅保存哈希 |
@@ -60,6 +60,8 @@ tags:
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.permission` 的活动资源分组树；Permission code 不提供业务 CRUD。
 
 用户角色覆盖：`PUT /user/{uid}/roles`，请求体需包含 `user_id` 与 `role_ids`，使用 `USER:UPDATE` 权限，并在服务层校验目标角色均为有效角色后执行全量替换。
+
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 写入口保持 fail-closed，菜单 UX 配置仍由 RoleController 管理。
 
 用户生命周期已拆分为高风险写入口：`PUT /user/lock/{uid}`、`/user/unlock/{uid}`、`/user/disable/{uid}`、`/user/enable/{uid}`、`/user/depart/{uid}`、`/user/reinstate/{uid}`；操作原因通过可选 `reason` 查询参数传入，服务层统一执行状态机、Security Audit、securityVersion 递增和全部 Session 撤销。
 
