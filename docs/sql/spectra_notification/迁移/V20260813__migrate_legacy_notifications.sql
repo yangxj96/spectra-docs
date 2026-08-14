@@ -1,3 +1,8 @@
+-- LEGACY INPUT ONLY: this migration belongs to the pre-target tenant-aware
+-- notification schema and is not part of the new Flyway V1 runtime model.
+-- The target schema intentionally removes tenant_id; use the reviewed
+-- export/transform/validate/cutover process instead of applying this file to V1.
+
 -- 统一通知模块历史数据迁移。
 --
 -- 迁移来源：spectra_core.sys_notification、spectra_core.sys_notification_setting。

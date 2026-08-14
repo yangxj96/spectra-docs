@@ -343,3 +343,14 @@ CREATE TABLE spectra_security.security_change_outbox (
 CREATE INDEX idx_security_outbox_pending
     ON spectra_security.security_change_outbox (created_at)
     WHERE processed_at IS NULL;
+
+-- Menu is a navigation capability and remains separate from Permission.
+CREATE TABLE spectra_security.role_menu (
+    role_id       UUID NOT NULL REFERENCES spectra_security.role (id) ON DELETE RESTRICT,
+    menu_id       UUID NOT NULL REFERENCES spectra_core.sys_menu (id) ON DELETE RESTRICT,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (role_id, menu_id)
+);
+
+CREATE INDEX idx_security_role_menu_menu
+    ON spectra_security.role_menu (menu_id);

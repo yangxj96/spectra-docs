@@ -195,7 +195,7 @@ App/H5/小程序支持 PASSWORD、SMS、EMAIL 登录，Access/Refresh Token 使�
 
 ## 1.11 Database / Migration / Tests
 
-- 主建表文档是 `docs/sql/spectra_core/建表.sql`，另有 `docs/sql/db.dump`；项目未引入 Flyway/Liquibase。
+- 目标 schema 已由 `spectra-config/src/main/resources/db/migration/V1__init_target_schema.sql` 引入 Flyway 管理；`docs/sql/*` 继续作为设计/审查输入，`docs/sql/db.dump` 仅保留为 snapshot/fixture，不再是迁移事实源。
 - 核心安全表多数只有主键，缺少外键、状态 CHECK、活动关系唯一索引和稳定 code 唯一约束。
 - `sys_rel_role_menu` 和菜单 routeName 有部分活动唯一索引，可复用。
 - 后端现有 51 个测试文件，但安全 starter 只有验证码服务测试；Token Filter、Refresh、Rotation、Replay、Session Policy、Role Boundary、authorityLevel 和账号状态矩阵没有覆盖。
@@ -1262,7 +1262,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
 - 依赖：Phase 0。
-- 当前状态：骨架与目标安全 DDL 契约已交付；Flyway 完整 V1、全量业务表汇总、数据库角色权限、现有写入口接入、并发 PostgreSQL 集成测试和 break-glass Runbook 仍未完成。
+- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、Flyway 配置和静态 schema 契约已交付；V1 已在临时 PostgreSQL 数据库执行通过。数据库角色权限、现有写入口接入、自动化并发 PostgreSQL 集成测试和 break-glass Runbook 仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
 - DoD：新环境只需从 V1 初始化完整目标 schema；任何新安全变更必须使用 Change skeleton；应用账号不能更新/删除 Audit；默认支持 2 normal + 1 break-glass 且任何管理变更不能移除最后一个 effective DEV_OPS；独立 break-glass Runbook 完成评审。
 
 ## Phase 2 — Identity Lifecycle and Organization Membership
@@ -1535,7 +1535,7 @@ spectra-framework/src/main/java/.../mybatis/security/
   ResourceAuthorizationGuard.java
 
 spectra-config/src/main/resources/db/migration/
-  V1__init_target_schema.sql
+  V1__init_target_schema.sql                       # Phase 1 已实现；Flyway 唯一迁移事实源
 
 docs/50-开发指南/
   DEV_OPS-Break-Glass-Runbook.md
@@ -1669,9 +1669,10 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 
 ## 剩余 Phase-specific 实施项
 
-- [~] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引的第一版文件级设计；完整 V1、全量业务表汇总和数据库权限仍待完成。
+- [x] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引及全量业务表汇总的第一版文件级设计；数据库角色权限和真实库核对仍待完成。
 - [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
-- [ ] Phase 1 将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`，并以空库/非空库拒绝 baseline 的集成测试核对。
+- [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试；空库/非空库拒绝 baseline 的真实 PostgreSQL 集成测试仍待补齐。
+- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；非空库拒绝 baseline 的 Flyway 启动测试及并发边界自动化仍待补齐。
 - [ ] Phase 1 编写并演练 2 normal + 1 break-glass 的独立 Runbook、凭据分权保管、最高等级告警和轮换流程。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
 - [x] 已完成 Permission Catalog 初稿和旧 code mapping 扫描；Phase 3 仍需复核、seed 化和覆盖率门禁。

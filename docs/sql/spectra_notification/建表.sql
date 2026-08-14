@@ -5,7 +5,6 @@ CREATE SCHEMA IF NOT EXISTS spectra_notification;
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     id                    UUID NOT NULL,
-    tenant_id             UUID NOT NULL,
     template_group_code   VARCHAR(100) NOT NULL,
     channel               VARCHAR(16) NOT NULL,
     purpose               VARCHAR(50) NOT NULL,
@@ -28,7 +27,6 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request (
     id                              UUID NOT NULL,
-    tenant_id                       UUID NOT NULL,
     external_request_id             VARCHAR(100) NOT NULL,
     idempotency_key                 VARCHAR(200) NOT NULL,
     purpose                         VARCHAR(50) NOT NULL,
@@ -62,7 +60,6 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request (
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
     id                              UUID NOT NULL,
-    tenant_id                       UUID NOT NULL,
     notification_request_id         UUID NOT NULL,
     channel                         VARCHAR(16) NOT NULL,
     receiver_user_id                UUID,
@@ -106,7 +103,6 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery (
     id                      UUID NOT NULL,
-    tenant_id               UUID NOT NULL,
     notification_task_id    UUID NOT NULL,
     attempt_no              INTEGER NOT NULL,
     provider                VARCHAR(50) NOT NULL,
@@ -133,7 +129,6 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery (
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_inbox_message (
     id                       UUID NOT NULL,
-    tenant_id                UUID NOT NULL,
     notification_task_id     UUID,
     notification_request_id  UUID,
     receiver_user_id         UUID NOT NULL,
@@ -162,7 +157,6 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_inbox_message (
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_user_preference (
     id                    UUID NOT NULL,
-    tenant_id             UUID NOT NULL,
     user_id               UUID NOT NULL,
     purpose               VARCHAR(50) NOT NULL,
     channel               VARCHAR(16) NOT NULL,
@@ -181,16 +175,16 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_user_preference (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_VERSION"
-    ON spectra_notification.ntf_template (tenant_id, template_group_code, channel, version_no)
+    ON spectra_notification.ntf_template (template_group_code, channel, version_no)
     WHERE deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_ENABLED"
-    ON spectra_notification.ntf_template (tenant_id, template_group_code, channel)
+    ON spectra_notification.ntf_template (template_group_code, channel)
     WHERE enabled = TRUE AND deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_REQUEST_EXTERNAL_ID"
-    ON spectra_notification.ntf_request (tenant_id, external_request_id)
+    ON spectra_notification.ntf_request (external_request_id)
     WHERE deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_REQUEST_IDEMPOTENCY"
-    ON spectra_notification.ntf_request (tenant_id, idempotency_key)
+    ON spectra_notification.ntf_request (idempotency_key)
     WHERE deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TASK_RECIPIENT_CHANNEL"
     ON spectra_notification.ntf_task (notification_request_id, recipient_key_hash, channel)
@@ -202,7 +196,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_INBOX_TASK"
     ON spectra_notification.ntf_inbox_message (notification_task_id)
     WHERE notification_task_id IS NOT NULL AND deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_USER_PREFERENCE"
-    ON spectra_notification.ntf_user_preference (tenant_id, user_id, purpose, channel)
+    ON spectra_notification.ntf_user_preference (user_id, purpose, channel)
     WHERE deleted IS NULL;
 
 CREATE INDEX IF NOT EXISTS "IDX_NTF_TASK_PENDING"
@@ -218,13 +212,13 @@ CREATE INDEX IF NOT EXISTS "IDX_NTF_DELIVERY_TASK_CREATED"
     ON spectra_notification.ntf_delivery (notification_task_id, created_at DESC)
     WHERE deleted IS NULL;
 CREATE INDEX IF NOT EXISTS "IDX_NTF_INBOX_RECEIVER_CREATED"
-    ON spectra_notification.ntf_inbox_message (tenant_id, receiver_user_id, created_at DESC)
+    ON spectra_notification.ntf_inbox_message (receiver_user_id, created_at DESC)
     WHERE deleted IS NULL;
 CREATE INDEX IF NOT EXISTS "IDX_NTF_INBOX_RECEIVER_UNREAD"
-    ON spectra_notification.ntf_inbox_message (tenant_id, receiver_user_id, created_at DESC)
+    ON spectra_notification.ntf_inbox_message (receiver_user_id, created_at DESC)
     WHERE deleted IS NULL AND is_read = FALSE;
 CREATE INDEX IF NOT EXISTS "IDX_NTF_USER_PREFERENCE_USER"
-    ON spectra_notification.ntf_user_preference (tenant_id, user_id)
+    ON spectra_notification.ntf_user_preference (user_id)
     WHERE deleted IS NULL;
 
 COMMENT ON TABLE spectra_notification.ntf_template IS '通知模板版本表';
@@ -235,7 +229,6 @@ COMMENT ON TABLE spectra_notification.ntf_inbox_message IS '当前用户站内�
 COMMENT ON TABLE spectra_notification.ntf_user_preference IS '用户用途和渠道偏好表';
 
 COMMENT ON COLUMN spectra_notification.ntf_template.id IS '主键ID';
-COMMENT ON COLUMN spectra_notification.ntf_template.tenant_id IS '租户ID';
 COMMENT ON COLUMN spectra_notification.ntf_template.template_group_code IS '逻辑模板组编码';
 COMMENT ON COLUMN spectra_notification.ntf_template.channel IS '投递渠道：IN_APP、SMS或EMAIL';
 COMMENT ON COLUMN spectra_notification.ntf_template.purpose IS '通知用途';
@@ -254,9 +247,8 @@ COMMENT ON COLUMN spectra_notification.ntf_template.deleted IS '删除时间；N
 COMMENT ON COLUMN spectra_notification.ntf_template.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_request.id IS '主键ID';
-COMMENT ON COLUMN spectra_notification.ntf_request.tenant_id IS '租户ID';
 COMMENT ON COLUMN spectra_notification.ntf_request.external_request_id IS '调用方生成的外部请求ID';
-COMMENT ON COLUMN spectra_notification.ntf_request.idempotency_key IS '业务幂等键；同一租户内唯一';
+COMMENT ON COLUMN spectra_notification.ntf_request.idempotency_key IS '业务幂等键；通知域内唯一';
 COMMENT ON COLUMN spectra_notification.ntf_request.purpose IS '通知用途';
 COMMENT ON COLUMN spectra_notification.ntf_request.template_group_code IS '逻辑模板组编码';
 COMMENT ON COLUMN spectra_notification.ntf_request.source_module IS '发起请求的业务模块编码';
@@ -283,7 +275,6 @@ COMMENT ON COLUMN spectra_notification.ntf_request.deleted IS '删除时间；NU
 COMMENT ON COLUMN spectra_notification.ntf_request.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_task.id IS '主键ID';
-COMMENT ON COLUMN spectra_notification.ntf_task.tenant_id IS '租户ID';
 COMMENT ON COLUMN spectra_notification.ntf_task.notification_request_id IS '所属逻辑通知请求ID';
 COMMENT ON COLUMN spectra_notification.ntf_task.channel IS '投递渠道：IN_APP、SMS或EMAIL';
 COMMENT ON COLUMN spectra_notification.ntf_task.receiver_user_id IS '接收用户ID；直接地址投递时可为空';
@@ -315,7 +306,6 @@ COMMENT ON COLUMN spectra_notification.ntf_task.deleted IS '删除时间；NULL�
 COMMENT ON COLUMN spectra_notification.ntf_task.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_delivery.id IS '主键ID';
-COMMENT ON COLUMN spectra_notification.ntf_delivery.tenant_id IS '租户ID';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.notification_task_id IS '所属通知任务ID';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.attempt_no IS '当前任务的投递尝试序号';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.provider IS '执行投递的渠道供应商编码';
@@ -335,7 +325,6 @@ COMMENT ON COLUMN spectra_notification.ntf_delivery.deleted IS '删除时间；N
 COMMENT ON COLUMN spectra_notification.ntf_delivery.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.id IS '主键ID';
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.tenant_id IS '租户ID';
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.notification_task_id IS '对应的站内信通知任务ID';
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.notification_request_id IS '对应的逻辑通知请求ID';
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.receiver_user_id IS '消息接收用户ID';
@@ -356,7 +345,6 @@ COMMENT ON COLUMN spectra_notification.ntf_inbox_message.deleted IS '删除时�
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_user_preference.id IS '主键ID';
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.tenant_id IS '租户ID';
 COMMENT ON COLUMN spectra_notification.ntf_user_preference.user_id IS '用户ID';
 COMMENT ON COLUMN spectra_notification.ntf_user_preference.purpose IS '通知用途';
 COMMENT ON COLUMN spectra_notification.ntf_user_preference.channel IS '投递渠道：IN_APP、SMS或EMAIL';
