@@ -30,13 +30,15 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| UserController | `/user/**` | 用户 CRUD / 分页查询 / 状态管理；旧角色覆盖写入口已冻结 |
+| UserController | `/user/**` | 用户资料 CRUD / 分页查询 / 状态管理；RoleAssignment 使用 AuthorizationController 独立管理 |
 | RoleController | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联写入口已冻结 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`。旧 `/role/{id}/authorities` 写入口继续 fail-closed，菜单 UX 配置仍由 RoleController 管理。
 
 `UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
+
+用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
 ## 核心 — 系统管理
 

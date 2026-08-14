@@ -1383,6 +1383,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：角色目录 CRUD 已切换到 `spectra_security.role`，补齐稳定 `ROLE_*` 编码、`authorityLevel`、`roleKind` 和 `systemManaged` 映射；角色菜单授权读写及当前菜单树已切换到 `spectra_security.role_menu` + `AuthorizationSnapshot`，不再从旧 `sys_rel_role_menu` 或 `sys_user_role` 回退读取。本批角色目录、菜单关系、菜单树和 V1–V10 数据库契约测试均已通过并独立提交；旧 Permission/Authority 目录、用户 RoleAssignment 写入口及旧角色模型清理仍待后续阶段。
 - 阶段补充（2026-08-15）：`/authority/tree` 已切换为只读 Permission Catalog 适配器，从 `spectra_security.permission` 按资源分组返回活动权限；旧 Authority CRUD 路由已移除。角色权限查询和撤销清理已切换到目标 `role_permission`/`role_grantable_permission`，旧角色权限写入口继续 fail-closed，Permission Preview/Apply 前端接入仍待下一阶段。
 - 阶段补充（2026-08-15）：AuthorizationController 新增目标 Role 当前授权状态查询，返回 role version、authorityLevel、Permission code 与 GrantablePermission code；spectra-ui RBAC 已移除旧角色权限覆盖写 API，改为分别编辑 Role capability 与 Grantable capability，提交前执行 Impact Preview，确认后携带短时 token Apply，菜单仍作为独立 UX 配置保存。
+- 阶段补充（2026-08-15）：用户资料保存已移除 `role_ids`，`UserController` 删除旧 `/user/{uid}/roles` 覆盖写路由；用户资料与 RoleAssignment 写入彻底解耦，Assignment 必须通过 AuthorizationController 的 Preview/Apply 逐条提交 Boundary。目标 RoleAssignment 编辑器仍需后续阶段接入。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1709,6 +1710,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成目标角色目录与菜单关系切换：Role CRUD 使用 `spectra_security.role`，菜单授权和当前菜单树使用 `spectra_security.role_menu` 与目标 AuthorizationSnapshot；角色、菜单关系、菜单树和数据库安全契约测试通过并已独立提交。
 - [x] Phase 9 已完成 Permission Catalog 只读切换：`/authority/tree` 不再提供旧 Authority CRUD，目标 Permission 按资源分组展示；角色 Permission 读取/撤销使用目标关系表，Catalog、关系服务和数据库安全契约测试通过并已独立提交。
 - [x] Phase 9 已完成 Web Role capability 迁移：RBAC 读取目标 Role 授权状态和 version，分别维护 Permission/GrantablePermission，授权写入使用 Impact Preview/Apply，旧角色权限写 API 已从前端移除；后端目标测试、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
+- [x] Phase 9 已完成用户资料与授权解耦：UserSaveFrom、UserService 和 Web 用户表单不再接受 `role_ids`，旧用户角色覆盖路由已删除；后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
