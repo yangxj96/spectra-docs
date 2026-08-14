@@ -79,16 +79,16 @@
 - `.../strategy/RedisSecHolderStrategy.java`
 - `spectra-security-base/.../holder/SecHolderStrategy.java`
 - `spectra-security-base/.../holder/SecUtil.java`
-- `spectra-security-base/.../constant/AuthRedisKey.java`
+- `spectra-security-base/.../constant/SecurityRedisKey.java`
 - `spectra-security-base/.../javabean/entity/SecurityUser.java`
 
 现有模型不是 JWT，而是 UUID Opaque Token，方向与目标一致。默认 Access Token 5 分钟、Refresh Token 7 天。Redis 主要结构为：
 
-- `auth:sess:{accessToken}`：会话 Hash，包含完整 `SecurityUser`。
-- `auth:uc:{userId}:{clientType}`：用户同端唯一 Access Token。
-- `auth:ut:{userId}`：用户 Access Token 集合。
-- `auth:online`：在线用户 ID 集合。
-- `auth:rt:{accessToken}` 与 `auth:rt:{refreshToken}`：双向 Refresh 映射。
+- `sec:v2:sess:{accessDigest}`：会话 Hash，只保存主体标识、客户端和 Token Family 等非敏感会话元数据。
+- `sec:v2:uc:{userId}:{clientType}`：用户同端唯一 Access Token digest。
+- `sec:v2:ut:{userId}`：用户 Access Token digest 集合。
+- `sec:v2:online`：在线用户 ID 集合。
+- `sec:v2:rt:{digest}`、`sec:v2:family:{familyId}` 和 replay/claim key：Refresh Rotation 的摘要映射、Family 和一次性消费状态。
 
 现有 ClientType 只有 WEB、APP、MINI。创建 Token 时同端直接复用既有 Access/Refresh Token；请求经过 `TokenAuthenticationFilter` 时已不再续期 Access Session TTL。Phase 0 的 Refresh Rotation 会先通过 `SecurityUserLoader` 从当前身份源重新加载主体，未配置加载器或主体已不可用时拒绝刷新；普通 Access Session 仍暂存 `SecurityUser` 快照，待 Phase 5 的 v2 Session 聚合移除。
 
@@ -1318,7 +1318,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 
 - 目标：切换到 v2 Redis SecuritySession、完整多端 Token 生命周期和首版可用 TOTP MFA。
 - 模块：security starter Redis adapter、core.security.authentication/session/policy、Web/App auth client。
-- 预计文件：`RedisSecHolderStrategy.java`、`AuthRedisKey.java`、`TokenAuthenticationFilter.java`、`AuthController.java`、`SecurityConfiguration.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts`、Proposed Redis session/Lua 组件。
+- 预计文件：`RedisSecHolderStrategy.java`、`SecurityRedisKey.java`、`TokenAuthenticationFilter.java`、`AuthController.java`、`SecurityConfiguration.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts`、Proposed Redis session/Lua 组件。
 - 新增：SecuritySessionService、TokenDigest、Lua scripts、Client/AuthMethod/SessionPolicy、完整 Challenge/AAL/step-up pipeline、TOTP Factor Provider、MFA Enrollment、单次 Recovery Code；WebAuthn/Passkey 保留 Provider 扩展，首版不实现 OPEN_API Service Principal。
 - 删除：RedisSecHolderStrategy 旧映射、SecurityUser Redis 快照、同端复用、TTL 滑动、Key expiration listener 旧职责。
 - DB：使用 V1 已建立的 client/method/policy/mfa_enrollment/totp_credential/recovery_code 表。
@@ -1414,7 +1414,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | `spectra-security-base/.../javabean/entity/SecurityUser.java` | 用户、权限、单 Scope 快照 | REPLACE 为最小 `AuthenticatedPrincipal` + Assignment-preserving context；不再 Redis 序列化完整用户 |
 | `spectra-security-base/.../holder/SecUtil.java` | 全局认证/Token/踢人工具 | REPLACE 为窄 Port；业务代码移除静态调用 |
 | `spectra-security-base/.../holder/SecHolderStrategy.java` | Token/在线用户大接口 | SPLIT 为 SessionReader、SessionIssuer、SessionRevoker、ContextAccessor |
-| `spectra-security-base/.../constant/AuthRedisKey.java` | 旧明文 Token Key | REMOVE after v2 cutover |
+| `spectra-security-base/.../constant/SecurityRedisKey.java` | `sec:v2:*` Security Session/Rotation key | KEEP as the v2 namespace contract; replace only when a repository/Lua adapter takes over |
 | `spectra-security-base/.../constant/ClientType.java` | WEB/APP/MINI enum | REPLACE 为数据库 SecurityClient code/value object |
 | `.../strategy/provider/*AuthenticationProvider.java` | Spring Authentication provider | KEEP adapter pattern；移除验证码消费和 Session 创建业务 |
 | `.../properties/SecurityProperties.java` | 白名单/TTL/root/验证码配置 | SPLIT；Session Policy 迁 DB，bootstrap secret/白名单保留 typed config |
@@ -1720,7 +1720,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成 Web RoleAssignment Preview/Apply 编辑器：用户编辑器读取目标 Role/Permission Catalog/组织树，支持显式 Access/Grant Boundary 和 Scope 模式校验，并通过短时 Preview token Apply；后端 Permission Catalog 定向测试、Web format/lint/type/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Account 认证因子清理：绑定/解绑切换到 `authentication_identity`，删除旧 Account 实体/Mapper/Service/Controller/XML，新增 V12 下线 `sys_account`；后端认证身份定向测试、全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
-- [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
+- [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将 v2 key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
