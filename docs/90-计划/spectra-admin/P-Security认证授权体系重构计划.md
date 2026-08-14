@@ -1378,6 +1378,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 ## Phase 9 — Cutover, Legacy Removal and Hardening
 
 - 阶段补充（2026-08-15）：`DataScopeInnerInterceptor` 已切换为只读取 Permission-specific `AuthorizationSnapshot`，旧 `DataScopeProvider`/`DataScopeResolver` 全局范围解析端口已删除，通知收件人目录已按 `user:read` Boundary 执行组织影响检查；本阶段框架/核心定向测试、后端全量回归与数据库安全契约核对均已通过。旧 Account/Role/Authority/DataScope 模型、Controller、Mapper 和其他模块旧调用，旧 Redis/表清理及最终端到端验收仍待完成。
+- 阶段补充（2026-08-15）：用户/角色创建和编辑接口已移除旧 DataScope 参数及旧 `sys_role.scope` 映射，User/Role service 不再读取或写入旧范围表，`SecurityUser` 不再携带全局 DataScope；Web 用户/角色表单、列表和转换器已同步删除旧范围字段。旧范围实体、Mapper、DTO、枚举及 DDL 尚待独立清理，历史 user-level Scope 不自动映射到新 Permission Boundary。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1699,6 +1700,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；策略变更生产者、真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
 - [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider 不再读取旧 Account 表，绑定/解绑写入目标 authentication_identity，SecurityUserHelper 删除旧 Account/DataScope 构造路径；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的 SecUtil 业务/框架调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧模型删除、其他模块旧调用迁移、旧 Redis/表清理和最终端到端验收仍待完成。
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
+- [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
