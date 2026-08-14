@@ -1695,7 +1695,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引、全量业务表汇总和 V2 运行时权限边界的第一版文件级设计；真实部署账号授权核对仍待完成。
 - [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
 - [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试和默认禁用的真实 PostgreSQL/Flyway 集成测试；集成测试通过专用环境变量显式开启，不会默认触碰本机数据库。
-- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；已新增隔离 PostgreSQL service 的 CI Flyway workflow，仍待首次 CI 实际执行并补齐并发边界自动化。
+- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；已新增隔离 PostgreSQL service 的 CI Flyway workflow，并加入真实 PostgreSQL Root 新增/撤销并发门禁，仍待首次 CI 实际执行。
 - [x] Phase 1 已交付 `V2__security_runtime_privileges.sql`，应用运行时角色不能更新/删除 Security Audit；实际部署登录角色的 membership 和 owner/runtime 分离仍需上线前核对。
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke。
