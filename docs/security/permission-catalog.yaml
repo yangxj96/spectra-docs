@@ -42,7 +42,7 @@ permissions:
     delegatable: true
     legacy: [USER:UPDATE]
   - code: user:disable
-    name: 用户禁用/离职
+    name: 用户锁定/禁用/离职
     scopeMode: RULES
     highRisk: true
     delegatable: true
@@ -60,7 +60,7 @@ permissions:
     delegatable: true
     source: target-model
   - code: user:unlock
-    name: 用户解锁
+    name: 用户解锁/启用/重新入职
     scopeMode: RULES
     highRisk: true
     delegatable: true

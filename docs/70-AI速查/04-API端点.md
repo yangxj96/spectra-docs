@@ -30,6 +30,8 @@ tags:
 | RoleController | `/role/**` | 角色 CRUD / 分配权限 / 分配菜单 |
 | AuthorityController | `/authority/**` | 权限 CRUD / 树形查询 |
 
+`UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
+
 ## 核心 — 系统管理
 
 | Controller | 路径 | 说明 |

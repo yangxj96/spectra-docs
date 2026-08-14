@@ -1278,7 +1278,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 测试：状态机、绑定所有权、部门 cycle/move、关联部门不扩权。
 - 风险：旧 Account 数据规范化冲突。
 - 依赖：Phase 1 Audit/Change skeleton。
-- 当前进度（2026-08-14）：`UserStatus` 已切换为目标字符串状态模型（`ACTIVE/LOCKED/DISABLED/DEPARTED`），并提供登录允许、显式重新入职和非法状态转换契约测试；User Entity/请求/响应模型已同步该类型。生命周期 Service、认证身份/凭证表运行时接入、Session revoke 和 Audit 仍待完成。
+- 当前进度（2026-08-14）：`UserStatus` 已切换为目标字符串状态模型（`ACTIVE/LOCKED/DISABLED/DEPARTED`），并提供登录允许、显式重新入职和非法状态转换契约测试；User Entity/请求/响应模型已同步该类型。用户生命周期已通过独立 lock/unlock/disable/enable/depart/reinstate 写入口统一执行状态机、Audit、securityVersion 递增和 Session revoke；认证身份/凭证表运行时接入，以及迁移到正式 RoleAssignment 的历史撤销记录仍待完成。
 - DoD：所有生命周期变化有 Audit + revoke；DEPARTED 不恢复旧授权。
 
 ## Phase 3 — Permission, Role, RoleAssignment and Scope Domain
@@ -1677,7 +1677,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；新增的空库/非空库 Flyway 门禁尚未在 CI/部署隔离数据库实际执行，并发边界自动化仍待补齐。
 - [x] Phase 1 已交付 `V2__security_runtime_privileges.sql`，应用运行时角色不能更新/删除 Security Audit；实际部署登录角色的 membership 和 owner/runtime 分离仍需上线前核对。
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
-- [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；运行时生命周期 Service、Audit/revoke 副作用仍待接入。
+- [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke；正式认证身份/凭证表与 RoleAssignment 历史撤销记录仍待接入。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
 - [x] 已完成 Permission Catalog 初稿和旧 code mapping 扫描；Phase 3 仍需复核、seed 化和覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
