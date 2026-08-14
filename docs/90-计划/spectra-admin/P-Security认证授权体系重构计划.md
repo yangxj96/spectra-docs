@@ -1294,7 +1294,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 测试：强制 cross-assignment invariant、scope contains/union、Root all。
 - 风险：旧 Role Scope 迁移歧义。
 - 依赖：Phase 2 Membership/OrganizationVersion。
-- 当前进度（2026-08-14）：security-base 已建立 `ScopeMode`、`AuthorizationScope`、`PermissionBoundary`、`AuthorizationAssignment` 和 assignment-preserving `AuthorizationSnapshot`；单元测试覆盖同 Permission Scope union、跨 Permission Scope 隔离、Access/Grant Boundary 分离和组织子树规则。数据库 Loader、RoleAssignment 持久化和旧 Role/Authority 运行时切换仍待完成。
+- 当前进度（2026-08-14）：security-base 已建立 `ScopeMode`、`AuthorizationScope`、`PermissionBoundary`、`AuthorizationAssignment` 和 assignment-preserving `AuthorizationSnapshot`；core 已接入目标 security schema 的 `JdbcAuthorizationSnapshotLoader`，按 active RoleAssignment 加载 Role capability、GrantablePermission、permission-specific Access/Grant Boundary 和 ScopeRule，并对缺失/停用/不一致引用 fail-closed。单元测试覆盖同 Permission Scope union、跨 Permission Scope 隔离、Access/Grant Boundary 分离、组织子树规则及数据库加载器的 Role capability 绑定。RoleAssignment 写入、正式授权上下文接入、旧 Role/Authority 运行时切换仍待完成。
 - 当前准备工作（2026-08-14）：已根据全仓 Controller `@PreAuthorize` 扫描生成 `docs/security/permission-catalog.yaml`，覆盖 89 个旧 Permission code 的一次性 mapping 和 102 个目标 code 候选；其中 `user:disable`、`user:reset-password`、`role:authority-level:update`、Session/Audit/Security Policy/Root 等高风险能力已与普通 CRUD 拆开，旧 `*` 明确拒绝迁移。该 catalog 仍需业务语义复核后才能作为 Flyway seed。
 - DoD：目标模型可完整计算权限但尚可 shadow；任何 Snapshot 保留 Assignment 边界。
 
@@ -1680,7 +1680,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke。
 - [x] Phase 2 已接入 `authentication_identity`、`password_credential` Entity/Mapper/Service；用户名密码登录、用户创建、密码修改/重置、通知地址解析切换到目标模型；旧 Account 仅保留为短信/邮箱等后续 Factor 的迁移输入。
-- [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约和 cross-assignment/Grant Boundary 单元测试；数据库读取、旧 Role/Authority 删除和正式授权上下文接入仍待完成。
+- [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约、目标 schema 数据库加载器和 cross-assignment/Grant Boundary 单元测试；RoleAssignment 写入、旧 Role/Authority 删除和正式授权上下文接入仍待完成。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
 - [x] 已完成 Permission Catalog 初稿和旧 code mapping 扫描；Phase 3 仍需复核、seed 化和覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
