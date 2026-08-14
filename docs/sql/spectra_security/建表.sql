@@ -25,7 +25,7 @@ CREATE TABLE spectra_security.permission (
     updated_by         UUID,
     updated_at         TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     version            BIGINT NOT NULL DEFAULT 0,
-    CONSTRAINT ck_security_permission_code CHECK (code ~ '^[a-z][a-z0-9_-]*(\\.[a-z][a-z0-9_-]*)?:[a-z][a-z0-9_-]*$'),
+    CONSTRAINT ck_security_permission_code CHECK (code ~ '^[a-z][a-z0-9_-]*(:[a-z][a-z0-9_-]*){1,2}$'),
     CONSTRAINT ck_security_permission_state CHECK (state IN ('ACTIVE', 'DEPRECATED')),
     CONSTRAINT uk_security_permission_code UNIQUE (code)
 );

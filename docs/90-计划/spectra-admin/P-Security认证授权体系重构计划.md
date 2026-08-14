@@ -1293,6 +1293,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 测试：强制 cross-assignment invariant、scope contains/union、Root all。
 - 风险：旧 Role Scope 迁移歧义。
 - 依赖：Phase 2 Membership/OrganizationVersion。
+- 当前准备工作（2026-08-14）：已根据全仓 Controller `@PreAuthorize` 扫描生成 `docs/security/permission-catalog.yaml`，覆盖 89 个旧 Permission code 的一次性 mapping 和 102 个目标 code 候选；其中 `user:disable`、`user:reset-password`、`role:authority-level:update`、Session/Audit/Security Policy/Root 等高风险能力已与普通 CRUD 拆开，旧 `*` 明确拒绝迁移。该 catalog 仍需业务语义复核后才能作为 Flyway seed。
 - DoD：目标模型可完整计算权限但尚可 shadow；任何 Snapshot 保留 Assignment 边界。
 
 ## Phase 4 — Delegation, Authority Level and Impact Analysis
@@ -1540,7 +1541,14 @@ docs/50-开发指南/
   DEV_OPS-Break-Glass-Runbook.md
 ```
 
-## 18.3 Proposed Frontend Files
+## 18.3 Permission Catalog Artifact
+
+```text
+docs/security/permission-catalog.yaml
+  # Phase 3 初稿：89 个旧 code mapping、102 个目标 code 候选；seed 前必须通过业务复核和覆盖率测试。
+```
+
+## 18.4 Proposed Frontend Files
 
 ```text
 spectra-ui/src/plugin/security/auth-session.ts
@@ -1666,6 +1674,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [ ] Phase 1 将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`，并以空库/非空库拒绝 baseline 的集成测试核对。
 - [ ] Phase 1 编写并演练 2 normal + 1 break-glass 的独立 Runbook、凭据分权保管、最高等级告警和轮换流程。
 - [ ] Phase 3 将本计划 Permission Catalog 固化为 machine-readable seed，并生成 Controller/ResourceScopePolicy 覆盖报告。
+- [x] 已完成 Permission Catalog 初稿和旧 code mapping 扫描；Phase 3 仍需复核、seed 化和覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
