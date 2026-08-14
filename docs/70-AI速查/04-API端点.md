@@ -16,6 +16,7 @@ tags:
 | AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
 | AuthorizationController | `/security/authorization/**` | Role/Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；高风险写入绑定短时 token |
+| MfaController | `/security/mfa/**` | TOTP 登记/确认与 Recovery Code 单次消费；DEV_OPS 必须通过 MFA 才能创建 Root Session |
 
 ## 核心 — 公共
 
