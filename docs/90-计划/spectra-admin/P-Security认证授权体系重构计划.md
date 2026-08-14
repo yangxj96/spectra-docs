@@ -1387,7 +1387,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 风险：残留调用链和隐蔽 native SQL。
 - 依赖：前述全部 Phase。
 - DoD：REMOVE 清单为零引用；全局 logout 后新模型唯一生效；文档/DDL/API/实体一致。
-- 当前进度（2026-08-14）：已开始切断旧认证运行时：短信/邮箱登录改读 `authentication_identity` 与 `password_credential`，绑定/解绑同步目标身份状态，`SecurityUserHelper` 已删除旧 Account/DataScope 构造路径；旧 Account/Role/Authority/DataScope 实体、Controller、Mapper 和 SecUtil 业务调用仍需继续迁移或删除，旧表最终清理、Redis 旧键核对及多端/浏览器/真实数据库验收尚未完成。
+- 当前进度（2026-08-15）：已开始切断旧认证运行时：短信/邮箱登录改读 `authentication_identity` 与 `password_credential`，绑定/解绑同步目标身份状态，`SecurityUserHelper` 已删除旧 Account/DataScope 构造路径；新增 `SecurityContextAccessor`、`SecuritySessionQueryPort`、`SecuritySessionRevocationPort` 窄端口并由 security starter 提供 Redis 适配，core 业务层已清零 `SecUtil` 静态调用，同时删除 core 内旧会话撤销适配器。旧 Account/Role/Authority/DataScope 实体、Controller、Mapper 和其他模块旧调用仍需继续迁移或删除，旧表最终清理、Redis 旧键核对及多端/浏览器/真实数据库验收尚未完成；本批后端全量回归与数据库安全契约核对已通过。
 
 ---
 
@@ -1694,7 +1694,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
 - [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；策略变更生产者、真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
-- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider 不再读取旧 Account 表，绑定/解绑写入目标 authentication_identity，SecurityUserHelper 删除旧 Account/DataScope 构造路径；旧模型删除、SecUtil 业务调用迁移、旧 Redis/表清理和最终端到端验收仍待完成。
+- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider 不再读取旧 Account 表，绑定/解绑写入目标 authentication_identity，SecurityUserHelper 删除旧 Account/DataScope 构造路径；SecurityContextAccessor 与 Session 查询/撤销窄端口已接入，core 的 SecUtil 业务调用已清零；旧模型删除、其他模块旧调用迁移、旧 Redis/表清理和最终端到端验收仍待完成。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
