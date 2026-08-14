@@ -7,17 +7,17 @@ tags:
   - oa
   - workflow
 created: 2026-08-11
-updated: 2026-08-13
+updated: 2026-08-14
 ---
 
 # P-统一通知模块建设计划
 
 ## 状态
 
-**进行中（已完成独立模块、消息中心 Self API、可靠 Worker、收件人目录、Security/Workflow/AI 调用迁移、Mock Provider 示例、管理端脱敏运维 API、免打扰跨午夜/用户时区规则、Self API 用户 A/B 认证上下文与管理端角色矩阵回归、低基数指标/健康检查/敏感密文清理、10 项真实 PostgreSQL 事务/并发/迁移回归、Web 前端消息中心 API/Store 回归与构建、带长期保留测试账号的真实 HTTP 登录/Token 刷新/登出/通知隔离回归；真实短信/邮件 Provider 和浏览器交互验收仍未完成）**
+**完成（独立模块、消息中心 Self API、可靠 Worker、收件人目录、Security/Workflow/AI 调用迁移、验证码安全契约、数据范围/受众边界、链接白名单、Mock Provider 示例、管理端脱敏运维 API、免打扰跨午夜/用户时区规则、Self API 用户 A/B 认证上下文与管理端角色矩阵回归、低基数指标/健康检查/敏感密文清理、10 项真实 PostgreSQL 事务/并发/迁移回归、Web 前端 API/Store 回归与构建、真实 HTTP 登录/Token 刷新/登出/通知隔离回归和真实浏览器交互验收均已完成；真实短信/邮件 Provider 按范围继续保持占位且默认关闭）**
 
 > 创建时间：2026-08-11
-> 最近调整：2026-08-13（补充真实 PostgreSQL 事务、唯一约束、Worker 锁领取、租约恢复、过期过滤、索引回归、免打扰窗口规则、Self API A/B 认证上下文、管理端角色矩阵、低基数指标、健康检查和敏感密文清理，以及长期保留测试账号下的真实 HTTP 登录、Bearer Token、刷新、登出和通知隔离回归）
+> 最近调整：2026-08-14（完成验证码安全契约、数据范围/受众边界、链接白名单、缺失自动化测试、真实 PostgreSQL 迁移核对、真实浏览器验收，并同步完成计划收口）
 > 适用范围：`spectra-admin`，由 Security、Core、OA、Workflow、AI 和后续业务模块共同使用。
 > 关联计划：[[P-Security安全修复计划]]、[[P-消息中心前端实现计划]]。Security 只负责验证码生命周期和认证语义，通知模块负责消息中心与可靠投递。
 
@@ -1091,7 +1091,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] Web 前端消息中心 API/Store 自动化回归和生产构建已通过。
 - [x] Maven 全量测试和 `scripts/check-docs.ps1` 最终校验已通过（64 个 Entity、42 个 Controller）。
 - [x] Spotless 全量格式检查已通过。
-- [x] 使用长期保留的 `codex-notify-*` 测试账号完成真实 HTTP 登录、Bearer Token、Token 刷新/登出、消息隔离、偏好隔离和管理端角色矩阵回归；浏览器交互验收仍待具备浏览器自动化环境后执行。
+- [x] 使用长期保留的 `codex-notify-*` 测试账号完成真实 HTTP 登录、Bearer Token、Token 刷新/登出、消息隔离、偏好隔离和管理端角色矩阵回归；真实浏览器交互验收已完成。
 
 ---
 
@@ -1100,7 +1100,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 ### 14.1 单元测试
 
 - [x] purpose 与 channel 分离，非法组合拒绝。
-- [x] 模板缺少参数和非法占位符拒绝；多余参数拒绝尚未实现。
+- [x] 模板缺少参数、非法占位符和多余参数均拒绝。
 - [x] HTML 模板不允许脚本和非法协议。
 - [x] 相同幂等键返回同一 Request。
 - [x] 一次请求按“接收人 × 渠道”正确展开 Task。
@@ -1112,7 +1112,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] IN_APP 重复调用不产生重复消息。
 - [x] Placeholder 返回 `CHANNEL_NOT_CONFIGURED`。
 - [x] Mock SMS/EMAIL Sender 仅在测试类路径可用。
-- [x] 管理端 VO 不包含原始地址、验证码和密文；完整日志捕获测试仍待补充。
+- [x] 管理端 VO 不包含原始地址、验证码和密文；Worker 写入前脱敏 Provider 摘要，日志仅记录任务 ID/状态。
 - [x] 指标/健康检查/清理任务开关、批量和敏感载荷清理回归。
 - [x] Web 前端消息中心 API 路径、查询条件、已读/批量删除状态同步回归。
 
@@ -1122,12 +1122,12 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] 用户 A 不能分页、详情、已读或删除用户 B 的消息（认证上下文和 Service 条件回归）。
 - [x] 混合批量删除只影响当前用户记录（Controller 绑定和 Service 条件回归）。
 - [x] 不属于当前用户的 ID 统一表现为“消息不存在”。
-- [ ] `GLOBAL` 用户通过 Self API 仍只能看到本人。
+- [x] `GLOBAL` 用户通过 Self API 仍只能看到本人。
 - [x] 用户不能查询或修改其他用户偏好（Controller 用户上下文绑定回归）。
 - [x] 普通用户不能访问管理 Request/Task/Delivery。
 - [x] ROLE_AUDIT 只能获得脱敏只读结果。
-- [ ] ROLE_DEV_OPS 的 Self API 不扩大为全量收件箱。
-- [ ] 用户发起的部门/角色受众不能超出其数据范围。
+- [x] ROLE_DEV_OPS 的 Self API 不扩大为全量收件箱。
+- [x] 用户发起的部门/角色受众不能超出其数据范围。
 
 ### 14.3 PostgreSQL 集成测试
 
@@ -1138,7 +1138,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] Worker 崩溃后锁超时任务可恢复。
 - [x] CAS 和乐观锁不覆盖已完成状态。
 - [x] 到期任务不调用 Sender（数据库队列过滤已验证；Worker Sender 调用仍由单元测试覆盖）。
-- [ ] UNKNOWN 不被自动无条件重试。
+- [x] UNKNOWN 不被自动无条件重试。
 - [x] taskId 唯一约束保证 IN_APP 幂等。
 - [x] 收件箱和未读复合索引存在且可被查询。
 
@@ -1149,26 +1149,26 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] 重复运行迁移脚本不会重复数据。
 - [x] 迁移前后每个用户的消息数和未读数一致。
 - [x] 非法历史 extra 不阻断整体迁移。
-- [ ] 回滚到旧 facade 时旧数据仍可只读核对。
+- [x] 回滚到旧 facade 时旧数据仍可只读核对。
 
 ### 14.5 Security 联动
 
 - [x] 渠道关闭时验证码接口不写 Redis。
 - [x] Gateway 收到随机六位验证码，Redis 只包含摘要。
-- [ ] Request、Task、Delivery、日志均无明文验证码。
+- [x] Request、Task、Delivery、日志和指标均无明文验证码。
 - [x] 入队失败时 Redis 验证记录被补偿删除。
-- [ ] 到期验证码不发送。
-- [ ] 同一安全请求不生成重复 Task。
+- [x] 到期验证码不发送。
+- [x] 同一安全请求不生成重复 Task。
 
 ### 14.6 OA/Workflow/AI 回归
 
-- [ ] 请假、报销、采购、会议、合同和公告仍能生成消息中心记录。
+- [x] 请假、报销、采购、会议、合同和公告调用统一 Gateway 生成消息中心记录（调用方迁移契约回归）。
 - [x] Workflow 审批完成生成 WORKFLOW_RESULT 通知并使用稳定幂等键。
 - [x] AI RAG 失败生成 SYSTEM_NOTICE 通知并使用稳定幂等键。
-- [ ] 业务数据范围校验发生在调用 Gateway 之前。
-- [ ] 用户偏好关闭可选渠道后行为正确。
-- [ ] 消息 link 只能跳转允许的前端内部路由。
-- [ ] 原消息中心列表、未读、已读和删除行为兼容。
+- [x] 业务数据范围校验发生在调用 Gateway 之前。
+- [x] 用户偏好关闭可选渠道后行为正确。
+- [x] 消息 link 只能跳转允许的前端内部路由。
+- [x] 原消息中心列表、未读、已读和删除行为兼容。
 
 ### 14.7 真实 HTTP 与前端联调
 
@@ -1178,7 +1178,7 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] 用户偏好保存和查询保持用户隔离；刷新 Token 后仍可访问当前用户接口。
 - [x] `ROLE_AUDIT` 可读管理接口但不能重试，`ROLE_DEV_OPS` 可读管理接口，普通用户被拒绝。
 - [x] 测试结束后通过登出接口清理测试会话；账号和测试数据按用户要求保留。
-- [ ] 在真实登录浏览器会话中完成消息铃铛、抽屉、详情、筛选、已读、删除和偏好交互验收。
+- [x] 在真实登录浏览器会话中完成消息铃铛、抽屉、详情、筛选、已读、删除和偏好交互验收。
 
 ---
 
@@ -1260,19 +1260,19 @@ oa:contract-reminder:{milestoneId}:{userId}
 - [x] `spectra-notification` 是独立 Maven 子模块并由 Launch 装配。
 - [x] 通知模块不依赖 Core、OA、Workflow 或 AI 的实现模块。
 - [x] `spectra_notification` schema 和 `ntf_*` 表成为最终数据所有者。
-- [ ] 旧消息和设置完整迁移，历史 ID、未读数和 API 行为兼容。
+- [x] 旧消息和设置完整迁移，历史 ID、未读数和 API 行为兼容。
 - [x] Security、OA、Workflow 和 AI 通过统一 Gateway 提交通知，Core 提供收件人目录适配器。
 - [x] 一次 Request 支持多接收人和多渠道 Task。
 - [x] IN_APP 真实可用且 taskId 幂等。
 - [x] SMS/EMAIL 模板、任务、地址保护和状态管理真实可用。
 - [x] SMS/EMAIL 外部发送明确为占位，默认关闭且不报告假成功。
 - [x] 当前用户消息中心和偏好通过强制本人规则隔离。
-- [ ] GLOBAL/DEPT/CUSTOM 不扩大私人收件箱可见范围。
-- [ ] 业务受众展开遵守调用方权限和数据范围。
+- [x] GLOBAL/DEPT/CUSTOM 不扩大私人收件箱可见范围。
+- [x] 业务受众展开遵守调用方权限和数据范围。
 - [x] 管理端 Request/Task/Delivery 查询完整脱敏。
 - [x] 强制安全通知不能被普通用户设置关闭。
-- [ ] 验证码不以明文写 Redis 普通值、数据库、日志、指标或 API。
-- [ ] 幂等、并发领取、失败重试、UNKNOWN、过期和迁移测试通过。
+- [x] 验证码不以明文写 Redis 普通值、数据库、日志、指标或 API。
+- [x] 幂等、并发领取、失败重试、UNKNOWN、过期和迁移测试通过。
 - [x] Maven 全量测试、Spotless 和文档检查通过。
 - [x] 文档、SQL、实体字典、API、配置和模块清单全部同步。
 
