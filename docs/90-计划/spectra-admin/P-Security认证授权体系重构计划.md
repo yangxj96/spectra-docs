@@ -77,8 +77,8 @@
 关键文件：
 
 - `.../strategy/RedisSecHolderStrategy.java`
-- `spectra-security-base/.../holder/SecHolderStrategy.java`
-- `spectra-security-base/.../holder/SecUtil.java`
+- `spectra-security-base/.../holder/SecuritySessionIssuer.java`、`SecuritySessionReader.java`、`SecuritySessionRevoker.java`、`SecuritySessionQuery.java`、`SecurityTokenAccessor.java`、`SecurityLoginFailureTracker.java`
+- `spectra-security-spring-boot-starter/.../holder/SecuritySessionContextAccessor.java`
 - `spectra-security-base/.../constant/SecurityRedisKey.java`
 - `spectra-security-base/.../javabean/entity/SecurityUser.java`
 
@@ -1412,8 +1412,8 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | 文件/目录 | 当前职责 | 计划 |
 |---|---|---|
 | `spectra-security-base/.../javabean/entity/SecurityUser.java` | 用户、权限、单 Scope 快照 | REPLACE 为最小 `AuthenticatedPrincipal` + Assignment-preserving context；不再 Redis 序列化完整用户 |
-| `spectra-security-base/.../holder/SecUtil.java` | 全局认证/Token/踢人工具 | REPLACE 为窄 Port；业务代码移除静态调用 |
-| `spectra-security-base/.../holder/SecHolderStrategy.java` | Token/在线用户大接口 | SPLIT 为 SessionReader、SessionIssuer、SessionRevoker、ContextAccessor |
+| `spectra-security-base/.../holder/SecUtil.java`（已删除） | 全局认证/Token/踢人工具 | REMOVED；统一通过窄 Port 和 `SecurityContextAccessor` 访问 |
+| `spectra-security-base/.../holder/SecuritySession*.java` | Session 签发、读取、撤销、查询和锁定窄端口 | KEEP；由 Redis adapter 实现，业务只依赖更上层 change/context port |
 | `spectra-security-base/.../constant/SecurityRedisKey.java` | `sec:v2:*` Security Session/Rotation key | KEEP as the v2 namespace contract; replace only when a repository/Lua adapter takes over |
 | `spectra-security-base/.../constant/ClientType.java` | WEB/APP/MINI enum | REPLACE 为数据库 SecurityClient code/value object |
 | `.../strategy/provider/*AuthenticationProvider.java` | Spring Authentication provider | KEEP adapter pattern；移除验证码消费和 Session 创建业务 |
@@ -1421,7 +1421,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | `.../configuration/SecurityConfiguration.java` | FilterChain | MODIFY 精确 public endpoints、CORS/CSRF/header、注入 Filter Bean |
 | `.../filter/TokenAuthenticationFilter.java` | Redis 用户快照认证和续期 | REPLACE：验证 SecuritySession/版本，绝不计算业务 Scope/续 TTL |
 | `.../eval/SpectraPermissionEvaluator.java` | wildcard + root permission | REPLACE 为 AuthorizationService adapter；删除 `*` 和散落 Root 判断 |
-| `.../strategy/RedisSecHolderStrategy.java` | 旧 Token/Refresh/在线模型 | REMOVE after v2；由 RedisSecuritySessionRepository/Lua scripts 替代 |
+| `.../strategy/RedisSecHolderStrategy.java` | `sec:v2:*` Redis Session/Rotation adapter | KEEP until RedisSecuritySessionRepository/Lua scripts cutover；不再作为业务层接口 |
 | `.../web/controller/AuthController.java` | 登录/刷新/登出/验证码 | MOVE 到 `core.security.authentication.web` 并改为 application orchestration |
 | `.../web/service/impl/AuthServiceImpl.java` | 验证码发送 | MIGRATE 到 purpose-bound VerificationChallengeService |
 | `core/auth/service/impl/SecurityUserHelper.java` | 加载全部权限和单 Scope | REPLACE 为 IdentityStatusLoader + AuthorizationSnapshotLoader |
@@ -1721,6 +1721,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Account 认证因子清理：绑定/解绑切换到 `authentication_identity`，删除旧 Account 实体/Mapper/Service/Controller/XML，新增 V12 下线 `sys_account`；后端认证身份定向测试、全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将 v2 key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
+- [x] Phase 9 已完成 `SecHolderStrategy` 接口拆分：Session 签发、读取、撤销、查询、Token 上下文和登录失败锁定分别使用窄端口，业务上下文适配器不再依赖旧 Holder 大接口；starter 定向测试、后端全量回归和数据库安全契约核对通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
