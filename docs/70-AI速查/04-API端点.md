@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 40 个 `*Controller.java` 端点速查表。
+> 源码当前 43 个 `*Controller.java` 端点速查表。
 
 ## 认证与安全
 
@@ -15,6 +15,7 @@ tags:
 |---|---|---|
 | AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
+| AuthorizationController | `/security/authorization/**` | 目标 RoleAssignment、Access Boundary、Grant Boundary 只读查询；Phase 4 前冻结写入口 |
 
 ## 核心 — 公共
 

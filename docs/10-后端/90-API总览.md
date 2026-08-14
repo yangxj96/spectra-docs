@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 40 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 43 个 `*Controller.java`。
 
 ## 认证与安全
 
@@ -15,6 +15,7 @@ tags:
 |---|---|---|---|
 | `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
+| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 RoleAssignment、Access Boundary、Grant Boundary 只读查询；Phase 4 前冻结写入口 |
 
 ## 核心 — 公共服务
 
