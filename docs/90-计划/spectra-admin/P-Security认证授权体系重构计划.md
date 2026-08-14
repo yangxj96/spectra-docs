@@ -76,7 +76,7 @@
 
 关键文件：
 
-- `.../strategy/RedisSecHolderStrategy.java`
+- `.../strategy/RedisSecuritySessionRepository.java`
 - `spectra-security-base/.../holder/SecuritySessionIssuer.java`、`SecuritySessionReader.java`、`SecuritySessionRevoker.java`、`SecuritySessionQuery.java`、`SecurityTokenAccessor.java`、`SecurityLoginFailureTracker.java`
 - `spectra-security-spring-boot-starter/.../holder/SecuritySessionContextAccessor.java`
 - `spectra-security-base/.../constant/SecurityRedisKey.java`
@@ -212,9 +212,9 @@ App/H5/小程序支持 PASSWORD、SMS、EMAIL 登录，Access/Refresh Token 使�
 | 级别 | 问题 | 直接风险 | 证据位置 |
 |---|---|---|---|
 | Critical | Permission 与 Scope 分别全局 UNION | 跨 Assignment 数据越权 | `DataScopeResolver`、`SecurityUser` |
-| Critical | 用户/角色/范围/状态变化不统一 revoke | 旧 Session 长期保留旧权限；被禁用用户可继续请求或 refresh | `UserServiceImpl`、`RoleServiceImpl`、`RedisSecHolderStrategy` |
-| Critical（Phase 0 已封堵） | 旧实现不强制 Refresh Rotation、无 Replay 检测 | Refresh Token 被盗后可持续复用；当前已使用独立 claim key + 用户级 replay fence，完整 Token Family 仍待 Phase 5 | `RedisSecHolderStrategy`、`RefreshTokenRotationStore` |
-| Critical（Phase 0 已封堵） | 旧实现曾使用 Redis 中旧 `SecurityUser` 重建 Refresh Session | 禁用、离职、角色撤销后可能恢复旧权限；当前已要求 `SecurityUserLoader` 从身份源重载，未配置时 fail-closed | `RedisSecHolderStrategy`、`SecurityUserLoader` |
+| Critical | 用户/角色/范围/状态变化不统一 revoke | 旧 Session 长期保留旧权限；被禁用用户可继续请求或 refresh | `UserServiceImpl`、`RoleServiceImpl`、`RedisSecuritySessionRepository` |
+| Critical（Phase 0 已封堵） | 旧实现不强制 Refresh Rotation、无 Replay 检测 | Refresh Token 被盗后可持续复用；当前已使用独立 claim key + 用户级 replay fence，完整 Token Family 仍待 Phase 5 | `RedisSecuritySessionRepository`、`RefreshTokenRotationStore` |
+| Critical（Phase 0 已封堵） | 旧实现曾使用 Redis 中旧 `SecurityUser` 重建 Refresh Session | 禁用、离职、角色撤销后可能恢复旧权限；当前已要求 `SecurityUserLoader` 从身份源重载，未配置时 fail-closed | `RedisSecuritySessionRepository`、`SecurityUserLoader` |
 | Critical | 手机/邮箱绑定入参 code 未校验 | 攻击者可直接绑定未证明所有权的标识 | `AccountServiceImpl.bindPhone/bindEmail` |
 | High | 用户角色和角色权限没有 Grant Boundary | 普通管理员可分配自己没有的角色/权限，或修改自己依赖的角色提权 | `RelUserRoleServiceImpl`、`RelRoleAuthorityServiceImpl` |
 | High | 无 authorityLevel 管理边界 | 可管理同级/上级管理员 | Role/User Service |
@@ -1239,7 +1239,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 
 - 目标：建立攻击回归基线，先封堵与目标架构无冲突的现有 Critical 风险。
 - 模块：security starter/base、core auth、framework CORS、Web/App 请求层、测试。
-- 预计文件：`AuthServiceImpl.java`、`AccountServiceImpl.java`、`SecurityProperties.java`、`MvcConfiguration.java`、`RedisSecHolderStrategy.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts` 及对应测试。
+- 预计文件：`AuthServiceImpl.java`、`AccountServiceImpl.java`、`SecurityProperties.java`、`MvcConfiguration.java`、`RedisSecuritySessionRepository.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts` 及对应测试。
 - 修改：验证码绑定校验与原子消费、精确 CORS/白名单、文件预览授权、在线用户去 Token、固定 Access Token TTL（移除普通请求续期）、Refresh Token 一次性 Rotation/Replay 撤销并重新加载当前身份源、logout 全量撤销和前后端开发默认凭据清理。
 - 新增：Token/Refresh/disable/password change/DataScope cross-assignment characterization tests；前端 refresh queue tests。
 - DB/Redis：不引入目标 schema；只允许兼容性最小 Redis 修复。
@@ -1318,9 +1318,9 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 
 - 目标：切换到 v2 Redis SecuritySession、完整多端 Token 生命周期和首版可用 TOTP MFA。
 - 模块：security starter Redis adapter、core.security.authentication/session/policy、Web/App auth client。
-- 预计文件：`RedisSecHolderStrategy.java`、`SecurityRedisKey.java`、`TokenAuthenticationFilter.java`、`AuthController.java`、`SecurityConfiguration.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts`、Proposed Redis session/Lua 组件。
+- 预计文件：`RedisSecuritySessionRepository.java`、`SecurityRedisKey.java`、`TokenAuthenticationFilter.java`、`AuthController.java`、`SecurityConfiguration.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts`、Proposed Redis session/Lua 组件。
 - 新增：SecuritySessionService、TokenDigest、Lua scripts、Client/AuthMethod/SessionPolicy、完整 Challenge/AAL/step-up pipeline、TOTP Factor Provider、MFA Enrollment、单次 Recovery Code；WebAuthn/Passkey 保留 Provider 扩展，首版不实现 OPEN_API Service Principal。
-- 删除：RedisSecHolderStrategy 旧映射、SecurityUser Redis 快照、同端复用、TTL 滑动、Key expiration listener 旧职责。
+- 删除：旧 Redis Session 映射、SecurityUser Redis 快照、同端复用、TTL 滑动、Key expiration listener 旧职责。
 - DB：使用 V1 已建立的 client/method/policy/mfa_enrollment/totp_credential/recovery_code 表。
 - Redis：启用 `sec:v2:*`；全局 logout cutover。
 - API/前端：login/refresh/logout/session v2；Web 默认 Host-only + Strict 的 HttpOnly/Secure Cookie、CSRF/App secure storage；TOTP enrollment/challenge/recovery UI；真实 Session 页面。
@@ -1421,7 +1421,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | `.../configuration/SecurityConfiguration.java` | FilterChain | MODIFY 精确 public endpoints、CORS/CSRF/header、注入 Filter Bean |
 | `.../filter/TokenAuthenticationFilter.java` | Redis 用户快照认证和续期 | REPLACE：验证 SecuritySession/版本，绝不计算业务 Scope/续 TTL |
 | `.../eval/SpectraPermissionEvaluator.java` | wildcard + root permission | REPLACE 为 AuthorizationService adapter；删除 `*` 和散落 Root 判断 |
-| `.../strategy/RedisSecHolderStrategy.java` | `sec:v2:*` Redis Session/Rotation adapter | KEEP until RedisSecuritySessionRepository/Lua scripts cutover；不再作为业务层接口 |
+| `.../strategy/RedisSecuritySessionRepository.java` | `sec:v2:*` Redis Session/Rotation adapter | KEEP as the current v2 repository adapter；Lua/原子脚本可作为后续内部实现 |
 | `.../web/controller/AuthController.java` | 登录/刷新/登出/验证码 | MOVE 到 `core.security.authentication.web` 并改为 application orchestration |
 | `.../web/service/impl/AuthServiceImpl.java` | 验证码发送 | MIGRATE 到 purpose-bound VerificationChallengeService |
 | `core/auth/service/impl/SecurityUserHelper.java` | 加载全部权限和单 Scope | REPLACE 为 IdentityStatusLoader + AuthorizationSnapshotLoader |
@@ -1721,7 +1721,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Account 认证因子清理：绑定/解绑切换到 `authentication_identity`，删除旧 Account 实体/Mapper/Service/Controller/XML，新增 V12 下线 `sys_account`；后端认证身份定向测试、全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将 v2 key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
-- [x] Phase 9 已完成 `SecHolderStrategy` 接口拆分：Session 签发、读取、撤销、查询、Token 上下文和登录失败锁定分别使用窄端口，业务上下文适配器不再依赖旧 Holder 大接口；starter 定向测试、后端全量回归和数据库安全契约核对通过并已独立提交。
+- [x] Phase 9 已完成 `SecHolderStrategy` 接口拆分和旧适配层命名收口：Session 签发、读取、撤销、查询、Token 上下文和登录失败锁定分别使用窄端口，业务上下文适配器不再依赖旧 Holder 大接口，Redis v2 适配器和端口配置分别命名为 `RedisSecuritySessionRepository`、`SecuritySessionPortConfiguration`；starter 定向测试、后端全量回归和数据库安全契约核对通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
