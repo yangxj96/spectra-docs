@@ -1385,6 +1385,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：AuthorizationController 新增目标 Role 当前授权状态查询，返回 role version、authorityLevel、Permission code 与 GrantablePermission code；spectra-ui RBAC 已移除旧角色权限覆盖写 API，改为分别编辑 Role capability 与 Grantable capability，提交前执行 Impact Preview，确认后携带短时 token Apply，菜单仍作为独立 UX 配置保存。
 - 阶段补充（2026-08-15）：用户资料保存已移除 `role_ids`，`UserController` 删除旧 `/user/{uid}/roles` 覆盖写路由；用户资料与 RoleAssignment 写入彻底解耦，Assignment 必须通过 AuthorizationController 的 Preview/Apply 逐条提交 Boundary。目标 RoleAssignment 编辑器仍需后续阶段接入。
 - 阶段补充（2026-08-15）：用户分页资料与当前用户资料的角色展示已切换到活动 `spectra_security.role_assignment`；只读 Assignment 查询补充 Role/Assignment version、Role 名称、系统托管标记及分离的 Access/Grant Boundary。旧 `sys_rel_user_role` 仅保留生命周期/删除兼容清理，后续继续下线。
+- 阶段补充（2026-08-15）：Permission Catalog 叶子节点已返回 `allowed_scope_modes`；Web 用户编辑器已接入 RoleAssignment 新增/修改，明确编辑 Permission-specific Access/Grant Boundary，RULES 必须选择组织，保存前执行 Assignment Preview 并携带短时 token Apply。数据库安全契约、后端目录测试与 Web format/lint/type/test 均已通过。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1713,6 +1714,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成 Web Role capability 迁移：RBAC 读取目标 Role 授权状态和 version，分别维护 Permission/GrantablePermission，授权写入使用 Impact Preview/Apply，旧角色权限写 API 已从前端移除；后端目标测试、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成用户资料与授权解耦：UserSaveFrom、UserService 和 Web 用户表单不再接受 `role_ids`，旧用户角色覆盖路由已删除；后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成 RoleAssignment 只读角色展示迁移：用户分页/当前资料从活动 `spectra_security.role_assignment` 读取角色，并暴露 Role/Assignment version 与独立 Boundary 元数据；查询服务、后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
+- [x] Phase 9 已完成 Web RoleAssignment Preview/Apply 编辑器：用户编辑器读取目标 Role/Permission Catalog/组织树，支持显式 Access/Grant Boundary 和 Scope 模式校验，并通过短时 Preview token Apply；后端 Permission Catalog 定向测试、Web format/lint/type/test 和数据库安全契约核对通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。

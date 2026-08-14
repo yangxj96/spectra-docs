@@ -40,7 +40,9 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
-用户分页资料与当前用户资料的角色展示读取活动 `spectra_security.role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。
+用户分页资料与当前用户资料的角色展示读取活动 `spectra_security.role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
+
+Web 用户编辑器对已有用户提供 RoleAssignment 新增/修改：先调用 `/security/authorization/users/{userId}/assignments/preview`，确认影响后再调用 `/apply`；Access Boundary 与 Grant Boundary 独立提交，不从一个边界推导另一个边界。
 
 ## 核心 — 系统管理
 

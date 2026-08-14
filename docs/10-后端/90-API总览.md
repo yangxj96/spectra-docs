@@ -57,11 +57,13 @@ tags:
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。`/notification-center/inbox/**` 是 `/notification/**` 的兼容路径别名。
 
-菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.permission` 的活动资源分组树；Permission code 不提供业务 CRUD。
+菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
 用户分页资料与当前用户资料中的角色展示已切换为读取活动 `spectra_security.role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
+
+Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取 Role/Permission Catalog/组织树，新增或修改 Permission-specific Access/Grant Boundary，先调用 Assignment Preview，再携带短时 token 调用 Apply；Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 写入口保持 fail-closed，菜单 UX 配置仍由 RoleController 管理。
 
