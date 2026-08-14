@@ -107,7 +107,6 @@ CREATE TABLE spectra_core.sys_role (
     name       VARCHAR(100),
     code       VARCHAR(100),
     state      BOOLEAN DEFAULT TRUE,
-    scope      INTEGER,
     builtin    BOOLEAN DEFAULT FALSE,
     remark     TEXT,
     created_by UUID,
@@ -122,7 +121,6 @@ COMMENT ON COLUMN spectra_core.sys_role.id IS '主键ID';
 COMMENT ON COLUMN spectra_core.sys_role.name IS '名称';
 COMMENT ON COLUMN spectra_core.sys_role.code IS '编码';
 COMMENT ON COLUMN spectra_core.sys_role.state IS '状态';
-COMMENT ON COLUMN spectra_core.sys_role.scope IS '范围';
 COMMENT ON COLUMN spectra_core.sys_role.builtin IS '是否内置';
 COMMENT ON COLUMN spectra_core.sys_role.remark IS '备注';
 COMMENT ON COLUMN spectra_core.sys_role.created_by IS '创建人';
@@ -227,116 +225,6 @@ COMMENT ON COLUMN spectra_core.sys_rel_role_menu.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.sys_rel_role_menu.version IS '乐观锁';
 CREATE UNIQUE INDEX uk_sys_rel_role_menu_active
     ON spectra_core.sys_rel_role_menu (role_id, menu_id)
-    WHERE deleted IS NULL;
-
--- 角色数据权限范围
-CREATE TABLE spectra_core.sys_role_data_scope (
-    id         UUID PRIMARY KEY,
-    role_id    UUID NOT NULL,
-    scope_type INTEGER,
-    created_by UUID,
-    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by UUID,
-    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_core.sys_role_data_scope IS '角色数据权限范围';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.role_id IS '角色ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.scope_type IS '数据权限范围';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.created_by IS '创建人';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope.version IS '乐观锁';
-
--- 角色数据权限目标
-CREATE TABLE spectra_core.sys_role_data_scope_target (
-    id         UUID PRIMARY KEY,
-    role_id     UUID NOT NULL,
-    target_id  UUID NOT NULL,
-    target_type INTEGER,
-    created_by UUID,
-    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by UUID,
-    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_core.sys_role_data_scope_target IS '角色数据权限目标';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.role_id IS '角色ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.target_id IS '目标ID';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.target_type IS '目标类型';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.created_by IS '创建人';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_core.sys_role_data_scope_target.version IS '乐观锁';
-
--- 用户数据权限范围
-CREATE TABLE spectra_core.sys_user_data_scope (
-    id         UUID PRIMARY KEY,
-    user_id    UUID NOT NULL,
-    scope_type INTEGER,
-    created_by UUID,
-    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by UUID,
-    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_core.sys_user_data_scope IS '用户数据权限范围';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.user_id IS '用户ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.scope_type IS '数据权限范围';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.created_by IS '创建人';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope.version IS '乐观锁';
-
--- 用户数据权限目标
-CREATE TABLE spectra_core.sys_user_data_scope_target (
-    id         UUID PRIMARY KEY,
-    user_id     UUID NOT NULL,
-    target_id  UUID NOT NULL,
-    target_type INTEGER,
-    created_by UUID,
-    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by UUID,
-    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0
-);
-COMMENT ON TABLE spectra_core.sys_user_data_scope_target IS '用户数据权限目标';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.user_id IS '用户ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.target_id IS '目标ID';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.target_type IS '目标类型';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.created_by IS '创建人';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.created_at IS '创建时间';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.updated_by IS '最后更新人';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.updated_at IS '最后更新时间';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.deleted IS '是否删除';
-COMMENT ON COLUMN spectra_core.sys_user_data_scope_target.version IS '乐观锁';
-
--- 数据权限活动记录及目标查询索引
-CREATE UNIQUE INDEX uk_sys_user_data_scope_active
-    ON spectra_core.sys_user_data_scope (user_id)
-    WHERE deleted IS NULL;
-CREATE UNIQUE INDEX uk_sys_role_data_scope_active
-    ON spectra_core.sys_role_data_scope (role_id)
-    WHERE deleted IS NULL;
-CREATE INDEX idx_sys_user_data_scope_target_active
-    ON spectra_core.sys_user_data_scope_target (user_id, target_id)
-    WHERE deleted IS NULL;
-CREATE INDEX idx_sys_role_data_scope_target_active
-    ON spectra_core.sys_role_data_scope_target (role_id, target_id)
     WHERE deleted IS NULL;
 
 -- ============================================

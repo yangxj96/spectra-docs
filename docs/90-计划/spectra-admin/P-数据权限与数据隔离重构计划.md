@@ -12,7 +12,7 @@ created: 2026-08-01
 
 ## 状态
 
-**执行中（P0/P1 安全基线已落地，统一策略表迁移待后续窗口）**
+**执行中（P0/P1 安全基线与旧 Scope 结构下线已落地，统一策略表迁移待后续窗口）**
 
 > 创建时间：2026-08-01
 > 适用范围：`spectra-admin`，重点覆盖 `spectra-common`、`spectra-framework`、`spectra-security-*`、`spectra-core`、`spectra-oa`。
@@ -56,7 +56,7 @@ created: 2026-08-01
 - 回归测试：新增 `DataScopeIsolationTest`，覆盖请求上下文、绕过作用域、SELF 字段/别名、空 CUSTOM、关系 schema。
 - 文档/SQL：同步 `docs/10-后端/25-数据权限设计.md`、`docs/sql/spectra_core/建表.sql`；活动范围唯一索引和目标查询索引已并入建表 SQL，历史库兼容回填已经完成并纳入全库备份 `docs/sql/db.dump`，不再保留独立迁移脚本。
 
-仍需在独立数据库变更窗口完成：资源策略表（`sys_data_scope_policy`）及 INSERT 写入策略的完整迁移、READ/WRITE 分动作关系策略、PostgreSQL 集成测试和旧 `sys_role.scope` 字段下线。上述内容保留在本计划后续阶段，不能以本轮兼容修复替代。
+仍需在独立数据库变更窗口完成：资源策略表（`sys_data_scope_policy`）及 INSERT 写入策略的完整迁移、READ/WRITE 分动作关系策略和 PostgreSQL 集成测试。旧 `sys_role.scope` 及四张旧 Scope 表已由 Security Phase 9 的 V10 迁移下线，历史 Scope 不自动映射到目标 Boundary。
 
 ---
 

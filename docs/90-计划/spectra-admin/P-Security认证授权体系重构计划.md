@@ -141,16 +141,16 @@ sys_role
 
 ## 1.7 DataScope
 
-当前范围类型为 GLOBAL、SELF、DEPT、DEPT_AND_CHILDREN、CUSTOM，相关实现：
+当前 Permission-specific 范围模式为 NONE、ALL、SELF、RULES，相关实现：
 
 - `spectra-framework/.../mybatis/security/ScopeSqlPolicy.java`
 - `spectra-starter/.../security-base/authorization/AuthorizationSnapshot.java`
 - `spectra-framework/.../mybatis/interceptor/DataScopeInnerInterceptor.java`
 - `spectra-framework/.../mybatis/DataScopeEntityRegistry.java`
 - `spectra-framework/.../mybatis/DataScopeExecutor.java`
-- `sys_user_data_scope*`、`sys_role_data_scope*`
+- `AuthorizationSnapshot` 中的 Access/Grant Boundary（旧 Scope 表仅作为迁移输入）
 
-当前算法先判断用户级 Scope 是否覆盖角色，再把所有角色 Scope 合并成一个 `EffectiveScope`，并把结果写进 `SecurityUser`。MyBatis 拦截器根据实体 `@DataScope` 元数据拼接部门、本人或关联表条件。
+当前算法按 Permission 读取用户有效 Assignment 的 Access Boundary，Grant Boundary 只用于授权委派，不参与业务数据可见性；同一 Permission 的多个 Boundary 取并集，缺失或无法解析时 fail-closed。MyBatis 拦截器根据实体 `@DataScope` 元数据拼接部门、本人或关联表条件，`SecurityUser` 不再保存全局 Scope 快照。
 
 OA 中约 20 个实体使用 `@DataScope`；`Calendar`、`Notice` 显式 `ignore = true`。系统用户列表、权限管理以及未使用 MyBatis/未登记实体的路径不受该拦截器保护。
 
@@ -536,8 +536,8 @@ Break-glass 必须有独立 Runbook，覆盖凭据分权保管、启用条件、
 | `sys_rel_user_role` | MIGRATE 到 RoleAssignment，完成后 REMOVE |
 | `sys_authority` | MIGRATE 到 Permission catalog，完成后 REMOVE/重命名 |
 | `sys_rel_role_authority` | MIGRATE 到 RolePermission，完成后 REMOVE |
-| `sys_user_data_scope*` | REMOVE；迁移为明确 Assignment 时必须人工消歧 |
-| `sys_role_data_scope*` | MIGRATE 到各 RoleAssignment boundary，完成后 REMOVE |
+| `sys_user_data_scope*` | [x] REMOVE（2026-08-15，V10）；历史行不自动映射 |
+| `sys_role_data_scope*` | [x] REMOVE（2026-08-15，V10）；历史行不自动映射 |
 | `sys_account` | MIGRATE 到 AuthenticationIdentity/PasswordCredential，完成后 REMOVE |
 | `sys_log` | KEEP 为 Business Operation Log；新建独立 Security Audit |
 | `sys_rel_role_menu`、`sys_menu` | KEEP + 约束增强 |
@@ -1379,6 +1379,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 
 - 阶段补充（2026-08-15）：`DataScopeInnerInterceptor` 已切换为只读取 Permission-specific `AuthorizationSnapshot`，旧 `DataScopeProvider`/`DataScopeResolver` 全局范围解析端口已删除，通知收件人目录已按 `user:read` Boundary 执行组织影响检查；本阶段框架/核心定向测试、后端全量回归与数据库安全契约核对均已通过。旧 Account/Role/Authority/DataScope 模型、Controller、Mapper 和其他模块旧调用，旧 Redis/表清理及最终端到端验收仍待完成。
 - 阶段补充（2026-08-15）：用户/角色创建和编辑接口已移除旧 DataScope 参数及旧 `sys_role.scope` 映射，User/Role service 不再读取或写入旧范围表，`SecurityUser` 不再携带全局 DataScope；Web 用户/角色表单、列表和转换器已同步删除旧范围字段。旧范围实体、Mapper、DTO、枚举及 DDL 尚待独立清理，历史 user-level Scope 不自动映射到新 Permission Boundary。
+- 阶段补充（2026-08-15）：旧 DataScope 实体、Mapper/XML、DTO 和枚举已删除；`V10__remove_legacy_data_scope.sql` 以不带 `CASCADE` 的幂等 DDL 下线四张旧 Scope 表并删除 `sys_role.scope`，schema 文档和实体字典已同步。迁移不自动转换历史 user/role Scope，需在显式 Assignment Boundary 变更中人工消歧。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1701,6 +1702,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider 不再读取旧 Account 表，绑定/解绑写入目标 authentication_identity，SecurityUserHelper 删除旧 Account/DataScope 构造路径；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的 SecUtil 业务/框架调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧模型删除、其他模块旧调用迁移、旧 Redis/表清理和最终端到端验收仍待完成。
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
+- [x] Phase 9 已清理旧 DataScope 孤儿模型与数据库契约：删除旧实体、Mapper/XML、DTO/枚举，新增 V10 下线迁移并同步 `docs/sql`、实体清单、ER 图和 AI 实体字典；数据库安全契约测试已覆盖 V10 的幂等 DROP 与无自动迁移约束。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
