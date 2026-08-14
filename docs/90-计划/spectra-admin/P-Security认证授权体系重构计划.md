@@ -1254,7 +1254,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 目标：由 Codex 按现有规范锁定完整目标 schema，以 Flyway V1 建立新环境，并交付 append-only Security Audit、SecurityChangeOutbox 和统一 RootPolicy。
 - 模块：spectra-config/core/security、security starter、docs/sql。
 - 预计文件：根/模块 `pom.xml`、`spectra-config` migration 配置、Proposed `core/security/audit/*`、`core/security/change/*`、`RootAuthorizationPolicy.java`、`AuditLogSanitizer.java`、`docs/sql/*`。
-- 已实现骨架（2026-08-14）：security-base 已加入 `SecurityAuditEvent`/`SecurityAuditWriter`/`AuditVisibilityPolicy`、`RootPolicy`/`RootPolicyRepository`/`LastEffectiveDevOpsGuard`/`RootAuthorizationPolicy`、`SecurityChangeExecutor`；core 已加入 JDBC Audit append writer、Root policy repository、最后 Root guard 和同事务 STARTED/RESULT 审计执行器；starter 已注册统一 Root 判定 Bean；`docs/sql/spectra_security/建表.sql` 已形成 permission-specific boundary、Root singleton、append-only Audit、Outbox 的目标 DDL 契约。
+- 已实现骨架（2026-08-14）：security-base 已加入 `SecurityAuditEvent`/`SecurityAuditWriter`/`AuditVisibilityPolicy`、`SecurityAuditSnapshotSanitizer`、`RootPolicy`/`RootPolicyRepository`/`LastEffectiveDevOpsGuard`/`RootAuthorizationPolicy`、`SecurityChangeExecutor`；core 已加入 JDBC Audit append writer、Root policy repository、最后 Root guard 和同事务 STARTED/RESULT 审计执行器；starter 已注册统一 Root 判定 Bean；`docs/sql/spectra_security/建表.sql` 已形成 permission-specific boundary、Root singleton、append-only Audit、Outbox 的目标 DDL 契约。
 - 删除/废弃：新增代码不得使用散落 `hasRole('ROLE_DEV_OPS')`；旧点位记录迁移清单。
 - DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束、索引、catalog seed 与最小数据库权限；`baselineOnMigrate=false`，不建立旧 schema baseline。
 - Redis：仅定义 Port，尚不切 v2。
