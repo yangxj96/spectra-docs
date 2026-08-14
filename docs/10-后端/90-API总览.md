@@ -30,7 +30,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `UserController` | spectra-core | `/user/**` | 用户资料 CRUD / 分页查询 / 状态管理；RoleAssignment 使用 AuthorizationController 独立管理 |
+| `UserController` | spectra-core | `/user/**` | 用户资料维护 / 分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
 | `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 

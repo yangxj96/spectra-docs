@@ -1388,6 +1388,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：Permission Catalog 叶子节点已返回 `allowed_scope_modes`；Web 用户编辑器已接入 RoleAssignment 新增/修改，明确编辑 Permission-specific Access/Grant Boundary，RULES 必须选择组织，保存前执行 Assignment Preview 并携带短时 token Apply。数据库安全契约、后端目录测试与 Web format/lint/type/test 均已通过。
 - 阶段补充（2026-08-15）：旧 `Authority`/`Role`/`RelUserRole`/`RelRoleAuthority` 运行时实体、Mapper、Service、监听器和旧 `RoleController` 权限路由已删除；User 生命周期回收改为将活动 RoleAssignment 标记为 `REVOKED` 并保留 version/validUntil。V11 以无 `CASCADE` 幂等 DDL 下线旧授权表。
 - 阶段补充（2026-08-15）：绑定/解绑已切换到 `authentication_identity` 目标表，新增 `AuthenticationIdentityController` 与 `/security/identities/**`；旧 Account 实体、Mapper、Service、Controller、XML 和 `sys_account` 已删除，V12 以无 `CASCADE` 幂等 DDL 下线旧表。目标身份只返回 method/provider/state/verifiedAt 元数据，不返回原始标识；Redis 旧键核对和真实数据库验收仍待后续。
+- 阶段补充（2026-08-15）：已删除旧 `auth:*` 过期监听器及其 Redis keyspace listener 配置，Rotation 测试样例统一使用 `sec:v2:*`；普通 `DELETE /user/{uid}` 后端路由、Service 方法、Web API 和用户列表删除操作已移除，用户仅通过 LOCKED/DISABLED/DEPARTED 生命周期状态回收并保留历史安全事实。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1400,7 +1401,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 风险：残留调用链和隐蔽 native SQL。
 - 依赖：前述全部 Phase。
 - DoD：REMOVE 清单为零引用；全局 logout 后新模型唯一生效；文档/DDL/API/实体一致。
-- 当前进度（2026-08-15）：已开始切断旧认证运行时：短信/邮箱登录和绑定/解绑改读写 `authentication_identity` 与 `password_credential`，`SecurityUserHelper` 已删除旧 Account/DataScope 构造路径；新增 `SecurityContextAccessor`、`SecuritySessionQueryPort`、`SecuritySessionRevocationPort`、`SecurityAuthenticationPort`、`SecurityUserLookupPort` 窄端口并由 security starter 提供 Redis 适配，core、notification、AI、workflow、framework 与 log 业务/框架层已清零 `SecUtil` 静态调用，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台也已迁移至窄端口，认证控制器、Token 过滤器和 AI token 工具已完成适配，同时删除 core 内旧会话撤销适配器。旧 Account/Role/Authority/DataScope 运行时实体、Controller、Mapper 和其他模块旧调用已清理，V11/V12 旧表迁移已补齐；Redis 旧键核对及多端/浏览器/真实数据库验收尚未完成；本批后端全量回归与数据库安全契约核对已通过。
+- 当前进度（2026-08-15）：已开始切断旧认证运行时：短信/邮箱登录和绑定/解绑改读写 `authentication_identity` 与 `password_credential`，`SecurityUserHelper` 已删除旧 Account/DataScope 构造路径；新增 `SecurityContextAccessor`、`SecuritySessionQueryPort`、`SecuritySessionRevocationPort`、`SecurityAuthenticationPort`、`SecurityUserLookupPort` 窄端口并由 security starter 提供 Redis 适配，core、notification、AI、workflow、framework 与 log 业务/框架层已清零 `SecUtil` 静态调用，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台也已迁移至窄端口，认证控制器、Token 过滤器和 AI token 工具已完成适配，同时删除 core 内旧会话撤销适配器。旧 Account/Role/Authority/DataScope 运行时实体、Controller、Mapper 和其他模块旧调用已清理，V11/V12 旧表迁移已补齐；旧 `auth:*` 过期监听器、Rotation 测试样例和普通 User Delete 已清理，仍需真实 Redis 旧键盘点、真实数据库验收及浏览器/多端端到端验收；本批后端全量回归与数据库安全契约核对已通过。
 
 ---
 
@@ -1438,7 +1439,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | `RelUserRoleServiceImpl.java` | 旧直接 grant | [x] REMOVE（2026-08-15）；RoleAssignment Application Service 替代 |
 | `RelRoleAuthorityServiceImpl.java` | 旧权限树关系更新 | [x] REMOVE（2026-08-15）；RolePermissionCommandService 替代 |
 | `RelRoleMenuServiceImpl.java` | 菜单关系 | KEEP/MODIFY，明确只负责 UX |
-| `core/user/controller/UserController.java` | 宽泛用户 API/online | SPLIT，删除普通 delete 和 mock-like online contract |
+| `core/user/controller/UserController.java` | 用户资料/生命周期/online API | MODIFY（2026-08-15）：删除普通 delete，保留状态机和受保护 online 查询 |
 | `core/user/controller/RoleController.java` | Role/权限/菜单混合 | [x] 已移除旧权限路由；保留 Role CRUD 与菜单 UX 配置 |
 | `core/user/controller/AuthorityController.java` | Permission CRUD/tree | REPLACE 为只读 PermissionCatalogController；Root catalog 治理另设 |
 | `core/system/service/impl/DepartmentServiceImpl.java` | 邻接树 CRUD | REPLACE move/closure/impact transactional service |
@@ -1719,6 +1720,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成 Web RoleAssignment Preview/Apply 编辑器：用户编辑器读取目标 Role/Permission Catalog/组织树，支持显式 Access/Grant Boundary 和 Scope 模式校验，并通过短时 Preview token Apply；后端 Permission Catalog 定向测试、Web format/lint/type/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Account 认证因子清理：绑定/解绑切换到 `authentication_identity`，删除旧 Account 实体/Mapper/Service/Controller/XML，新增 V12 下线 `sys_account`；后端认证身份定向测试、全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
+- [x] Phase 9 已完成旧 Redis 过期监听与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除 `/user/{uid}` 物理删除及 Web 删除操作；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
 - [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
