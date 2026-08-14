@@ -15,7 +15,7 @@ tags:
 |---|---|---|---|
 | `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；认证后可申请绑定手机号/邮箱验证码 |
 | `AccountController` | spectra-core | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
-| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 RoleAssignment、Access Boundary、Grant Boundary 只读查询；Phase 4 前冻结写入口 |
+| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role/Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；所有高风险写入绑定短时 token |
 
 ## 核心 — 公共服务
 
@@ -27,8 +27,8 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `UserController` | spectra-core | `/user/**` | 用户 CRUD / 分页查询 / 角色覆盖 / 状态管理 |
-| `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 分配权限 / 分配菜单 |
+| `UserController` | spectra-core | `/user/**` | 用户 CRUD / 分页查询 / 状态管理；旧角色覆盖写入口已冻结 |
+| `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联写入口已冻结 |
 | `AuthorityController` | spectra-core | `/authority/**` | 权限 CRUD / 树形查询 |
 
 ## 核心 — 系统管理
@@ -36,7 +36,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `MenuController` | spectra-core | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树 |
-| `DepartmentController` | spectra-core | `/department/**` | 部门 CRUD / 树形查询 |
+| `DepartmentController` | spectra-core | `/department/**` | 部门树查询；旧创建/修改写入口已冻结，移动使用 AuthorizationController 的组织 Impact Preview/Apply |
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |

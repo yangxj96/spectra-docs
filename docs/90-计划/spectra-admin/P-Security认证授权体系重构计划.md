@@ -1686,6 +1686,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 2 已接入 `authentication_identity`、`password_credential` Entity/Mapper/Service；用户名密码登录、用户创建、密码修改/重置、通知地址解析切换到目标模型；旧 Account 仅保留为短信/邮箱等后续 Factor 的迁移输入。
 - [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约、目标 schema 数据库加载器和 cross-assignment/Grant Boundary 单元测试；RoleAssignment 写入、旧 Role/Authority 删除和正式授权上下文接入仍待完成。
 - [x] Phase 3 已提供目标 RoleAssignment/Boundary 只读 API；写入继续冻结到 Phase 4 GrantBoundary 流程。
+- [x] Phase 4 已交付 Assignment 与 Role 的 Grant Boundary/authorityLevel 校验、Impact Preview/Apply token、并发 version/securityVersion 门禁、统一 Audit/Session revoke；旧用户角色、旧角色权限和旧 DataScope 写入口已冻结。
 - [~] Phase 3 Permission Catalog 已固化为 `V3__security_permission_catalog_seed.sql`，并有 102 条完整性门禁；Controller/ResourceScopePolicy 覆盖报告和业务语义复核仍待完成。
 - [x] 已完成 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed；仍需业务语义复核及 Controller/ResourceScopePolicy 覆盖率门禁。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
@@ -1704,4 +1705,4 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [ ] 为 Phase 0/1 建立独立 PR 边界，不把架构迁移和漏洞修复混在一个提交。
 - [ ] 每个 Phase 评审 Definition of Done 后再进入下一阶段。
 
-核心安全决策已经确认，实施按 Phase 门禁推进。本轮已完成 Phase 0 提交后的 Phase 1 审计/Root 治理骨架、完整目标数据库 V1 migration 和目标安全 DDL 契约，但尚未完成数据库运行时角色权限、V2 Redis Session、MFA 或完整 Authorization Domain；后续实现必须继续遵守各 Phase 的 Definition of Done。
+核心安全决策已经确认，实施按 Phase 门禁推进。本轮已完成 Phase 0 提交后的 Phase 1 审计/Root 治理骨架、完整目标数据库 V1 migration 和目标安全 DDL 契约，以及 Phase 4 的 Assignment/Role Grant Boundary 与 Impact Preview/Apply 骨架；数据库运行时角色权限、V2 Redis Session、MFA、组织变更 Preview/Apply 和完整业务 ResourceScopePolicy 仍按后续 Phase 继续交付。每个 Phase 必须完成代码测试、数据库契约核对并独立提交后再进入下一阶段。
