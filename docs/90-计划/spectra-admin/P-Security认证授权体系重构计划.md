@@ -1,6 +1,6 @@
 # P-Security 认证授权体系重构计划
 
-> 状态：核心安全决策已确认，待分阶段实施（本轮仍不实施）  
+> 状态：核心安全决策已确认，Phase 0 已开始实施（部分封堵已完成，待完成回归门禁）
 > 基线日期：2026-08-14  
 > 适用范围：`spectra-admin`、`spectra-ui`、`spectra-app`、`docs/sql`  
 > 相关文档：[[00-项目总览]]、[[20-用户与权限]]、[[25-数据权限设计]]、[[30-系统管理]]、[[P-数据权限与数据隔离重构计划]]、[[P-运维管理中心建设计划]]
@@ -1239,13 +1239,15 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 目标：建立攻击回归基线，先封堵与目标架构无冲突的现有 Critical 风险。
 - 模块：security starter/base、core auth、framework CORS、Web/App 请求层、测试。
 - 预计文件：`AuthServiceImpl.java`、`AccountServiceImpl.java`、`SecurityProperties.java`、`MvcConfiguration.java`、`RedisSecHolderStrategy.java`、`spectra-ui/src/plugin/request/*`、`spectra-app/src/services/http.ts` 及对应测试。
-- 修改：验证码绑定校验与原子消费、精确 CORS/白名单、文件预览授权、在线用户去 Token、Refresh/logout 现行缺陷、删除开发默认凭据。
+- 修改：验证码绑定校验与原子消费、精确 CORS/白名单、文件预览授权、在线用户去 Token、固定 Access Token TTL（移除普通请求续期）。Refresh Rotation、logout 全量撤销和开发默认凭据清理仍待后续门禁。
 - 新增：Token/Refresh/disable/password change/DataScope cross-assignment characterization tests；前端 refresh queue tests。
 - DB/Redis：不引入目标 schema；只允许兼容性最小 Redis 修复。
 - API/前端：错误码可补齐；不先重做全部页面。
 - 风险：修复现行 refresh 可能影响已登录用户；测试环境应先全量退出。
 - 依赖：无。
-- DoD：Critical 漏洞有失败测试再修复；CORS/白名单审计通过；无 Token 回显；现行安全测试绿。
+- 当前进度（2026-08-14）：已完成登录/绑定验证码按用途隔离、绑定验证码发送入口与 Redis Lua 一次性原子消费、精确 Origin allowlist、Actuator/file preview 白名单收敛、在线用户和过期日志去 Token、普通请求不再滑动 Access TTL；后端验证码回归和 Web 格式/lint/type/test 已通过。
+- 未完成门禁：Refresh Rotation/Replay 与全量 Session revoke、账号/角色/范围变化的统一 revoke、前端 Refresh single-flight 回归、开发默认凭据清理、CORS/白名单自动化测试、Redis fail-closed 适配器及完整 Phase 0 安全矩阵。
+- DoD：Critical 漏洞有失败测试再修复；CORS/白名单审计通过；无 Token 回显；现行安全测试绿。只有上述未完成门禁全部通过后，Phase 0 才可标记完成。
 
 ## Phase 1 — Complete V1 Schema, Audit Spine, Root Governance
 
@@ -1662,4 +1664,4 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [ ] 为 Phase 0/1 建立独立 PR 边界，不把架构迁移和漏洞修复混在一个提交。
 - [ ] 每个 Phase 评审 Definition of Done 后再进入下一阶段。
 
-核心安全决策已经确认；具体 Phase 仍需按对应门禁实施。当前文件不代表已创建任何代码、数据库 migration 或 Redis Key。
+核心安全决策已经确认，实施按 Phase 门禁推进。本轮已创建 Phase 0 的最小代码改动，但尚未创建目标数据库 migration、V2 Redis Session、MFA 或完整 Authorization Domain；后续实现必须继续遵守各 Phase 的 Definition of Done。

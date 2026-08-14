@@ -13,8 +13,8 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AuthController | `/auth/**` | 登录/登出/刷新 Token/验证码获取 |
-| AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑 |
+| AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；认证后可申请绑定手机号/邮箱验证码 |
+| AccountController | `/account/**` | 当前用户账号绑定列表、手机/邮箱绑定与解绑；绑定必须使用对应用途的一次性验证码 |
 
 ## 核心 — 公共
 
@@ -80,7 +80,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| FileController | `/file/upload/**` | 文件上传/下载/分片上传 |
+| FileController | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `FILE:QUERY`，不再匿名开放 |
 | FileInfoController | `/file/info/**` | 文件信息/类型管理 |
 
 ## 工作流
