@@ -1257,13 +1257,13 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 预计文件：根/模块 `pom.xml`、`spectra-config` migration 配置、Proposed `core/security/audit/*`、`core/security/change/*`、`RootAuthorizationPolicy.java`、`AuditLogSanitizer.java`、`docs/sql/*`。
 - 已实现骨架（2026-08-14）：security-base 已加入 `SecurityAuditEvent`/`SecurityAuditWriter`/`AuditVisibilityPolicy`、`SecurityAuditSnapshotSanitizer`、`RootPolicy`/`RootPolicyRepository`/`LastEffectiveDevOpsGuard`/`RootAuthorizationPolicy`、`SecurityChangeExecutor`；core 已加入 JDBC Audit append writer、Root policy repository、最后 Root guard 和同事务 STARTED/RESULT 审计执行器；starter 已注册统一 Root 判定 Bean；`docs/sql/spectra_security/建表.sql` 已形成 permission-specific boundary、Root singleton、append-only Audit、Outbox 的目标 DDL 契约。
 - 删除/废弃：新增代码不得使用散落 `hasRole('ROLE_DEV_OPS')`；旧点位记录迁移清单。
-- DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束和索引，`V2__security_runtime_privileges.sql` 建立运行时/迁移角色边界与 Audit 最小权限，`V3__security_permission_catalog_seed.sql` 写入 102 个目标 Permission；`V4__complete_schema_comments_and_ai_tables.sql` 补齐跨模块结构注释并创建 `spectra_ai` 的会话/记忆表，`V5__remove_legacy_core_ai_session.sql` 删除 Core 遗留 `ai_session`，`V6__seed_core_reference_data.sql` 写入 Core 必要参考种子；`baselineOnMigrate=false`，不建立旧 schema baseline。
-- Redis：仅定义 Port，尚不切 v2。
+- DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束和索引，`V2__security_runtime_privileges.sql` 建立运行时/迁移角色边界与 Audit 最小权限，`V3__security_permission_catalog_seed.sql` 写入 102 个目标 Permission；`V4__complete_schema_comments_and_ai_tables.sql` 补齐跨模块结构注释并创建 `spectra_ai` 的会话/记忆表，`V5__remove_legacy_core_ai_session.sql` 删除 Core 遗留 `ai_session`，`V6__seed_core_reference_data.sql` 写入 Core 必要参考种子，V7-V13 补齐数据范围索引、权限目录、审计保留元数据、旧运行时清理和安全策略，V14 写入默认 Root 种子；`baselineOnMigrate=false`，不建立旧 schema baseline。
+- Redis：已切换到 `sec:v2:*` 服务端 Session/Refresh Rotation 运行态模型；旧 `auth:*` 遗留键已盘点并清理。
 - API/前端：可暂不开放 Audit UI；当前已提供审计写入与高风险事务端口，现有 Root/角色/账号写入口尚未全部接入，接入完成前不得宣称 Phase 1 完成。
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
 - 依赖：Phase 0。
-- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1、V2 运行时权限边界、V3 Permission seed、V4/V5 结构注释与 AI 表清理、V6 Core 参考种子、Flyway 配置、静态 schema 契约和 Break-glass Runbook 草案已交付；开发数据库已真实启动验证 V1-V6，Flyway 历史为连续成功的 6 个版本，`sys_region` 仍由独立大批量数据流程保留。已加入默认禁用、需显式环境变量开启的真实 PostgreSQL/Flyway 集成测试（覆盖空库 V1-V3、Permission 数量和非空库拒绝自动 baseline），但尚未在 CI/部署环境实际执行。现有写入口接入、并发边界自动化测试，以及 Runbook 的运维评审/演练仍未完成。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id，运行时切换需在后续 Phase 完成。
+- 当前状态：append-only Audit/Root 治理骨架、全量业务 schema 的目标 Flyway V1-V14、V2 运行时权限边界、115 条 Permission Catalog、V4/V5 结构注释与 AI 表清理、V6 Core 参考种子、V7-V13 安全增量、Flyway 配置、静态 schema 契约和生产部署 Runbook 已交付；开发数据库已从 V6 补齐并真实验证 V7-V14，当前 Flyway 历史连续成功 14 个版本，已创建 `devops00.com` 默认 Root 种子，`sys_region` 仍由独立大批量数据流程保留。已加入默认禁用、需显式环境变量开启的真实 PostgreSQL/Flyway 集成测试（覆盖空库连续迁移、Permission 数量和非空库拒绝自动 baseline），CI 首次实际结果和生产配置评审仍待完成。默认 Root 的 TOTP enrollment、Recovery Code 保管、引导密码轮换、备份恢复/归档演练及浏览器/多端 E2E 仍是外部门禁。V1 明确移除旧 sys_account/sys_role/sys_authority/data_scope 表，并按无 Tenant 目标移除通知表 tenant_id。
 - DoD：新环境只需从 V1 初始化完整目标 schema；任何新安全变更必须使用 Change skeleton；应用账号不能更新/删除 Audit；默认支持 2 normal + 1 break-glass 且任何管理变更不能移除最后一个 effective DEV_OPS；独立 break-glass Runbook 完成评审。
 
 ## Phase 2 — Identity Lifecycle and Organization Membership
@@ -1406,7 +1406,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 ### 收尾核对（2026-08-15）
 
 - 后端全量 Maven 测试已通过（18 个模块）；安全基础、框架 CORS、MFA 密钥迁移/Recovery Code、审计归档完整性、上传上下文和 S3 测试均已覆盖。上传模块中依赖旧 `spectra_upload.file_type` 的两个手工读取测试已明确跳过；当前目标 DDL 使用 `spectra_core.file_type`，未以测试跳过掩盖安全逻辑失败。
-- 临时 PostgreSQL Flyway 集成已在两套一次性数据库通过并清理；实际开发库只读核对通过：目标安全表 7 张存在，active DEV_OPS/Root、RoleAssignment、身份、MFA 和旧表均为 0，不能据此代替业务方建立管理员或逐账号 Scope 映射。
+- 临时 PostgreSQL Flyway 集成已在两套一次性数据库通过并清理；实际开发库已备份并完成 V7-V14 迁移：`devops00.com` 为 1 个 ACTIVE 默认 Root，`ROLE_DEV_OPS`、有效 RoleAssignment、密码身份和凭据关联正常，MFA enrollment 仍为 0（等待受控首次 enrollment），旧表仍为 0；当前没有待清理的业务测试用户/单据，保留的区域、字典、菜单、权限、OA/流程定义均来自参考种子。
 - 实际 Redis DB4 已完成连通、旧键审计和清理：发现并 `UNLINK` 6 个 `auth:*` 遗留 Session key，复核 `auth:* = 0`、`sec:v2:* = 0`；这 6 个旧 Session 已失效且不可恢复。
 - 已交付部署 Cookie/CSRF/Origin/CORS fail-closed 配置门禁、TOTP 双密钥迁移与 Recovery Code 轮换、S3 Object Lock Compliance 归档 SPI/完整性校验，以及管理员盘点、备份恢复、审计归档和 break-glass Runbook；生产配置填写、独立归档 bucket/真实恢复演练、Root/告警/凭据演练和浏览器/多端 E2E 仍是外部门禁。
 - 本轮变更保持在工作区，未执行 `git add`、`git commit`、`git push`；独立 PR 边界和逐阶段 DoD 评审需在用户允许 Git 操作并完成人工评审后关闭。
@@ -1740,7 +1740,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] 人工批准目标 Authorization/Session/Audit 核心行为模型。
 - [x] 明确目标物理模型由 Codex 依据项目规范设计，Flyway 从完整 V1 开始且不启用 baselineOnMigrate。
 - [x] 明确 Permission Catalog 由 Codex 扫描生成，scopeMode 为 NONE/ALL/SELF/RULES，旧 code 只做一次性 mapping。
-- [~] 已建立管理员/Root/角色/旧 user-level Scope 盘点 SQL、人工映射表和结果报告；当前实库目标安全表已安装但业务用户、Root、RoleAssignment 和旧 Scope 数据均为 0，不能代替业务方确认逐账号映射或擅自创建 Root。
+- [x] 已建立管理员/Root/角色/旧 user-level Scope 盘点 SQL、人工映射表和结果报告；当前实库无旧用户/旧 Scope 测试数据，V14 已按用户明确要求创建 `devops00.com` 默认 Root，后续只需完成 MFA enrollment、Recovery Code 和凭据轮换。
 - [~] 已建立数据库备份、隔离恢复、全局 logout、Flyway 回滚和证据留存 Runbook；真实备份恢复、全局 logout 和回滚演练仍需运维窗口执行。
 - [~] 已提交独立 break-glass Runbook 草案；仍需完成首版 TOTP/Recovery Code 运维流程评审和隔离环境演练。
 - [ ] 为 Phase 0/1 建立独立 PR 边界，不把架构迁移和漏洞修复混在一个提交。
