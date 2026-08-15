@@ -28,7 +28,7 @@ CREATE TABLE spectra_core.sys_user (
     city           VARCHAR(50),
     language       VARCHAR(10) DEFAULT 'zh-CN',
     timezone       VARCHAR(40) DEFAULT 'Asia/Shanghai',
-    department_id  UUID NOT NULL,
+    primary_department_id UUID,
     created_by     UUID,
     created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by     UUID,
@@ -50,7 +50,7 @@ COMMENT ON COLUMN spectra_core.sys_user.country IS '国家';
 COMMENT ON COLUMN spectra_core.sys_user.city IS '城市';
 COMMENT ON COLUMN spectra_core.sys_user.language IS '语言';
 COMMENT ON COLUMN spectra_core.sys_user.timezone IS '时区';
-COMMENT ON COLUMN spectra_core.sys_user.department_id IS '组织机构ID';
+COMMENT ON COLUMN spectra_core.sys_user.primary_department_id IS '主部门ID；完整组织关系由用户部门成员关系表维护';
 COMMENT ON COLUMN spectra_core.sys_user.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_user.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_user.updated_by IS '最后更新人';
@@ -143,7 +143,7 @@ CREATE TABLE spectra_core.sys_region (
     pid        UUID,
     name       VARCHAR(100),
     code       VARCHAR(100),
-    level      VARCHAR(50),
+    level      INTEGER,
     sort       INTEGER,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
@@ -173,8 +173,13 @@ COMMENT ON COLUMN spectra_core.sys_region.version IS '乐观锁';
 -- 字典组
 CREATE TABLE spectra_core.sys_dict_group (
     id         UUID PRIMARY KEY,
+    pid        UUID,
     name       VARCHAR(100),
     code       VARCHAR(100),
+    state      BOOLEAN NOT NULL DEFAULT TRUE,
+    remark     VARCHAR(255),
+    builtin    BOOLEAN NOT NULL DEFAULT FALSE,
+    hide       BOOLEAN NOT NULL DEFAULT FALSE,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by UUID,
@@ -184,8 +189,13 @@ CREATE TABLE spectra_core.sys_dict_group (
 );
 COMMENT ON TABLE spectra_core.sys_dict_group IS '字典组';
 COMMENT ON COLUMN spectra_core.sys_dict_group.id IS '主键ID';
+COMMENT ON COLUMN spectra_core.sys_dict_group.pid IS '上级字典组 ID';
 COMMENT ON COLUMN spectra_core.sys_dict_group.name IS '字典组名称';
 COMMENT ON COLUMN spectra_core.sys_dict_group.code IS '字典组编码';
+COMMENT ON COLUMN spectra_core.sys_dict_group.state IS '是否启用';
+COMMENT ON COLUMN spectra_core.sys_dict_group.remark IS '备注';
+COMMENT ON COLUMN spectra_core.sys_dict_group.builtin IS '是否内置字典组';
+COMMENT ON COLUMN spectra_core.sys_dict_group.hide IS '是否隐藏';
 COMMENT ON COLUMN spectra_core.sys_dict_group.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_dict_group.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_dict_group.updated_by IS '最后更新人';
@@ -257,40 +267,57 @@ COMMENT ON COLUMN spectra_core.sys_config.version IS '乐观锁版本号,默认0
 
 -- 操作日志
 CREATE TABLE spectra_core.sys_log (
-    id         UUID PRIMARY KEY,
-    user_id    UUID,
-    module     VARCHAR(100),
-    action     VARCHAR(100),
-    target     VARCHAR(255),
-    ip         VARCHAR(50),
-    user_agent VARCHAR(500),
-    request_params TEXT,
+    id          UUID PRIMARY KEY,
+    type        INTEGER,
+    explain     TEXT,
+    status      SMALLINT,
+    ip          VARCHAR(50),
+    method      VARCHAR(32),
+    url         VARCHAR(1000),
+    args        JSONB,
+    result      JSONB,
+    time_cost   BIGINT,
+    created_by  UUID,
+    created_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    updated_by  UUID,
+    updated_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    deleted     TIMESTAMP(6) WITH TIME ZONE,
+    version     BIGINT DEFAULT 0,
+    -- V1 compatibility columns retained by V15/V16 for old log records.
+    user_id     UUID,
+    module      VARCHAR(100),
+    action      VARCHAR(100),
+    target      VARCHAR(255),
+    user_agent  VARCHAR(500),
+    request_params  TEXT,
     response_result TEXT,
-    duration   BIGINT,
-    created_by UUID,
-    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    updated_by UUID,
-    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0
+    duration    BIGINT
 );
 COMMENT ON TABLE spectra_core.sys_log IS '操作日志表';
 COMMENT ON COLUMN spectra_core.sys_log.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_log.user_id IS '操作用户ID';
-COMMENT ON COLUMN spectra_core.sys_log.module IS '操作模块';
-COMMENT ON COLUMN spectra_core.sys_log.action IS '操作类型';
-COMMENT ON COLUMN spectra_core.sys_log.target IS '操作对象';
+COMMENT ON COLUMN spectra_core.sys_log.type IS '日志类型：0 常规，1 安全，2 系统异常，3 自动化';
+COMMENT ON COLUMN spectra_core.sys_log.explain IS '日志说明';
+COMMENT ON COLUMN spectra_core.sys_log.status IS '请求响应状态码';
 COMMENT ON COLUMN spectra_core.sys_log.ip IS '操作IP';
-COMMENT ON COLUMN spectra_core.sys_log.user_agent IS '客户端信息';
-COMMENT ON COLUMN spectra_core.sys_log.request_params IS '请求参数';
-COMMENT ON COLUMN spectra_core.sys_log.response_result IS '响应结果';
-COMMENT ON COLUMN spectra_core.sys_log.duration IS '执行耗时(ms)';
+COMMENT ON COLUMN spectra_core.sys_log.method IS '请求方法';
+COMMENT ON COLUMN spectra_core.sys_log.url IS '请求 URL';
+COMMENT ON COLUMN spectra_core.sys_log.args IS '脱敏后的请求参数 JSON';
+COMMENT ON COLUMN spectra_core.sys_log.result IS '脱敏后的响应结果 JSON';
+COMMENT ON COLUMN spectra_core.sys_log.time_cost IS '请求耗时（毫秒）';
 COMMENT ON COLUMN spectra_core.sys_log.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_log.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_log.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_core.sys_log.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_core.sys_log.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.sys_log.version IS '乐观锁';
+COMMENT ON COLUMN spectra_core.sys_log.user_id IS 'V1 兼容字段：旧操作用户ID';
+COMMENT ON COLUMN spectra_core.sys_log.module IS 'V1 兼容字段：旧操作模块';
+COMMENT ON COLUMN spectra_core.sys_log.action IS 'V1 兼容字段：旧操作类型';
+COMMENT ON COLUMN spectra_core.sys_log.target IS 'V1 兼容字段：旧操作对象';
+COMMENT ON COLUMN spectra_core.sys_log.user_agent IS 'V1 兼容字段：旧客户端信息';
+COMMENT ON COLUMN spectra_core.sys_log.request_params IS 'V1 兼容字段：旧请求参数';
+COMMENT ON COLUMN spectra_core.sys_log.response_result IS 'V1 兼容字段：旧响应结果';
+COMMENT ON COLUMN spectra_core.sys_log.duration IS 'V1 兼容字段：旧执行耗时（毫秒）';
 
 -- ============================================
 -- 文件管理
