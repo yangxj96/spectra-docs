@@ -13,15 +13,25 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；认证后可申请绑定手机号/邮箱验证码 |
+| `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
 | `AuthenticationIdentityController` | spectra-core | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；所有高风险写入绑定短时 token |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
-| `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；旧 TOTP 密钥在成功验证时按版本条件迁移，Recovery Code 仅保存哈希 |
+| `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 
 ## 核心 — 公共服务
+
+### 二阶段 MFA 登录
+
+| 方法 | 路径 | 认证 | 说明 |
+|---|---|---|---|
+| `POST` | `/auth/login` | `permitAll` | DEV_OPS 密码正确但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`，不返回普通 Token |
+| `POST` | `/auth/mfa/verify` | `permitAll` | 使用 challenge + TOTP 或 Recovery Code 完成第二阶段并签发正式会话 |
+| `POST` | `/auth/mfa/complete` | `permitAll` | 首次 TOTP 登记成功后消费 challenge 并签发正式会话 |
+| `POST` | `/security/mfa/setup/totp/enroll` | `permitAll` | 仅接受首次登录 challenge，生成 TOTP secret 和 provisioning URI |
+| `POST` | `/security/mfa/setup/totp/confirm` | `permitAll` | 使用首次登录 challenge + enrollmentId + TOTP 验证码确认登记并返回 Recovery Code |
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
@@ -58,11 +68,11 @@ tags:
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。`/notification-center/inbox/**` 是 `/notification/**` 的兼容路径别名。
 
-菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
+菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.sec_permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
-用户分页资料与当前用户资料中的角色展示已切换为读取活动 `spectra_security.role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
+用户分页资料与当前用户资料中的角色展示已切换为读取活动 `spectra_security.sec_role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
 
 Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取 Role/Permission Catalog/组织树，新增或修改 Permission-specific Access/Grant Boundary，先调用 Assignment Preview，再携带短时 token 调用 Apply；Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 

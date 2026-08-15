@@ -85,18 +85,18 @@ spectra-core ← 被以下模块依赖
 | Entity | 表名 | 说明 |
 |---|---|---|
 | User | sys_user | 用户信息 |
-| AuthenticationIdentity | spectra_security.authentication_identity | 认证身份摘要 |
-| PasswordCredential | spectra_security.password_credential | 密码凭证 |
-| SecurityRole | spectra_security.role | 目标角色目录 |
-| Permission | spectra_security.permission | Permission Catalog |
-| RoleAssignment | spectra_security.role_assignment | 用户角色授权分配 |
-| RolePermission | spectra_security.role_permission | 角色能力 |
-| RoleGrantablePermission | spectra_security.role_grantable_permission | 可授予能力 |
-| AssignmentPermissionBoundary | spectra_security.assignment_permission_boundary | Access Boundary |
-| AssignmentGrantBoundary | spectra_security.assignment_grant_boundary | Grant Boundary |
-| AuthorizationScope | spectra_security.authorization_scope | 授权范围 |
-| ScopeRule | spectra_security.scope_rule | 组织范围规则 |
-| SecurityRoleMenu | spectra_security.role_menu | 角色菜单 UX 关系 |
+| AuthenticationIdentity | spectra_security.sec_authentication_identity | 认证身份摘要 |
+| PasswordCredential | spectra_security.sec_password_credential | 密码凭证 |
+| SecurityRole | spectra_security.sec_role | 目标角色目录 |
+| Permission | spectra_security.sec_permission | Permission Catalog |
+| RoleAssignment | spectra_security.sec_role_assignment | 用户角色授权分配 |
+| RolePermission | spectra_security.sec_role_permission | 角色能力 |
+| RoleGrantablePermission | spectra_security.sec_role_grantable_permission | 可授予能力 |
+| AssignmentPermissionBoundary | spectra_security.sec_assignment_permission_boundary | Access Boundary |
+| AssignmentGrantBoundary | spectra_security.sec_assignment_grant_boundary | Grant Boundary |
+| AuthorizationScope | spectra_security.sec_authorization_scope | 授权范围 |
+| ScopeRule | spectra_security.sec_scope_rule | 组织范围规则 |
+| SecurityRoleMenu | spectra_security.sec_role_menu | 角色菜单 UX 关系 |
 | Department | sys_department | 部门 |
 | Menu | sys_menu | 菜单 |
 | Region | sys_region | 行政区划 |

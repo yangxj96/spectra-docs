@@ -13,12 +13,12 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；认证后可申请绑定手机号/邮箱验证码 |
+| AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
 | AuthenticationIdentityController | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply 与只读查询；高风险写入绑定短时 token |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据 |
-| MfaController | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；DEV_OPS 必须通过 MFA 才能创建 Root Session |
+| MfaController | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 
 ## 核心 — 公共
@@ -26,6 +26,8 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | CommonController | `/common/**` | 验证码生成、公共接口 |
+
+二阶段 MFA 登录接口：`POST /auth/login` 在密码阶段成功但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`；已有 TOTP 账号调用 `POST /auth/mfa/verify`，首次账号依次调用 `POST /security/mfa/setup/totp/enroll`、`POST /security/mfa/setup/totp/confirm`、`POST /auth/mfa/complete`。challenge 成功消费、过期或达到失败次数上限后失效。
 
 ## 核心 — 用户权限
 
@@ -41,7 +43,7 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
-用户分页资料与当前用户资料的角色展示读取活动 `spectra_security.role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
+用户分页资料与当前用户资料的角色展示读取活动 `spectra_security.sec_role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
 
 Web 用户编辑器对已有用户提供 RoleAssignment 新增/修改：先调用 `/security/authorization/users/{userId}/assignments/preview`，确认影响后再调用 `/apply`；Access Boundary 与 Grant Boundary 独立提交，不从一个边界推导另一个边界。
 

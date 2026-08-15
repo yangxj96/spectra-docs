@@ -457,7 +457,7 @@ Access Boundary 与 Grant Boundary 相互独立：操作者可以被明确授权
    - `department_id` 迁移到 Membership 后废弃。
    - 保留历史行；取消普通删除 API。
 2. `spectra_core.sys_role`
-   - 迁入/改建为 `spectra_security.role` 时新增 stable code、authority_level、state、system_managed、role_kind、version。
+   - 迁入/改建为 `spectra_security.sec_role` 时新增 stable code、authority_level、state、system_managed、role_kind、version。
    - 移除旧 `scope` 字段。
 3. `spectra_core.sys_department`
    - 增加 active code 唯一、parent FK、版本和移动约束；path 不再作为安全判断事实源。
@@ -469,28 +469,28 @@ Access Boundary 与 Grant Boundary 相互独立：操作者可以被明确授权
 - `spectra_core.sys_user_department_membership`
 - `spectra_core.sys_department_closure`
 - `spectra_core.sys_organization_version`
-- `spectra_security.authentication_identity`
-- `spectra_security.password_credential`
-- `spectra_security.permission`
-- `spectra_security.role`
-- `spectra_security.role_permission`
-- `spectra_security.role_grantable_permission`
-- `spectra_security.role_assignment`
-- `spectra_security.authorization_scope`
-- `spectra_security.assignment_permission_boundary`
-- `spectra_security.assignment_grant_boundary`
-- `spectra_security.scope_rule`
-- `spectra_security.security_client`
-- `spectra_security.authentication_method`
-- `spectra_security.client_auth_method`
-- `spectra_security.session_policy`
-- `spectra_security.password_policy`
-- `spectra_security.mfa_enrollment`
-- `spectra_security.totp_credential`
-- `spectra_security.recovery_code`
-- `spectra_security.root_policy`（singleton，含默认 1 的 `min_effective_dev_ops_users`、默认 3 且可配置的 `max_dev_ops_users` 和 version）
-- `spectra_security.security_audit_event`（按时间分区）
-- `spectra_security.security_change_outbox`
+- `spectra_security.sec_authentication_identity`
+- `spectra_security.sec_password_credential`
+- `spectra_security.sec_permission`
+- `spectra_security.sec_role`
+- `spectra_security.sec_role_permission`
+- `spectra_security.sec_role_grantable_permission`
+- `spectra_security.sec_role_assignment`
+- `spectra_security.sec_authorization_scope`
+- `spectra_security.sec_assignment_permission_boundary`
+- `spectra_security.sec_assignment_grant_boundary`
+- `spectra_security.sec_scope_rule`
+- `spectra_security.sec_security_client`
+- `spectra_security.sec_authentication_method`
+- `spectra_security.sec_client_auth_method`
+- `spectra_security.sec_session_policy`
+- `spectra_security.sec_password_policy`
+- `spectra_security.sec_mfa_enrollment`
+- `spectra_security.sec_totp_credential`
+- `spectra_security.sec_recovery_code`
+- `spectra_security.sec_root_policy`（singleton，含默认 1 的 `min_effective_dev_ops_users`、默认 3 且可配置的 `max_dev_ops_users` 和 version）
+- `spectra_security.sec_security_audit_event`（按时间分区）
+- `spectra_security.sec_security_change_outbox`
 
 ## 6.3 Constraints and Indexes
 
@@ -1380,11 +1380,11 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：`DataScopeInnerInterceptor` 已切换为只读取 Permission-specific `AuthorizationSnapshot`，旧 `DataScopeProvider`/`DataScopeResolver` 全局范围解析端口已删除，通知收件人目录已按 `user:read` Boundary 执行组织影响检查；本阶段框架/核心定向测试、后端全量回归与数据库安全契约核对均已通过。旧 Account/Role/Authority/DataScope 模型、Controller、Mapper 和其他模块旧调用，旧 Redis/表清理及最终端到端验收仍待完成。
 - 阶段补充（2026-08-15）：用户/角色创建和编辑接口已移除旧 DataScope 参数及旧 `sys_role.scope` 映射，User/Role service 不再读取或写入旧范围表，`SecurityUser` 不再携带全局 DataScope；Web 用户/角色表单、列表和转换器已同步删除旧范围字段。旧范围实体、Mapper、DTO、枚举及 DDL 尚待独立清理，历史 user-level Scope 不自动映射到新 Permission Boundary。
 - 阶段补充（2026-08-15）：旧 DataScope 实体、Mapper/XML、DTO 和枚举已删除；`V10__remove_legacy_data_scope.sql` 以不带 `CASCADE` 的幂等 DDL 下线四张旧 Scope 表并删除 `sys_role.scope`，schema 文档和实体字典已同步。迁移不自动转换历史 user/role Scope，需在显式 Assignment Boundary 变更中人工消歧。
-- 阶段补充（2026-08-15）：角色目录 CRUD 已切换到 `spectra_security.role`，补齐稳定 `ROLE_*` 编码、`authorityLevel`、`roleKind` 和 `systemManaged` 映射；角色菜单授权读写及当前菜单树已切换到 `spectra_security.role_menu` + `AuthorizationSnapshot`，不再从旧 `sys_rel_role_menu` 或 `sys_user_role` 回退读取。本批角色目录、菜单关系、菜单树和 V1–V10 数据库契约测试均已通过并独立提交；旧 Permission/Authority 目录、用户 RoleAssignment 写入口及旧角色模型清理已在后续阶段完成。
-- 阶段补充（2026-08-15）：`/authority/tree` 已切换为只读 Permission Catalog 适配器，从 `spectra_security.permission` 按资源分组返回活动权限；旧 Authority CRUD 路由已移除。角色权限查询和撤销清理已切换到目标 `role_permission`/`role_grantable_permission`，旧角色权限写入口已删除，Permission Preview/Apply 前端已接入。
+- 阶段补充（2026-08-15）：角色目录 CRUD 已切换到 `spectra_security.sec_role`，补齐稳定 `ROLE_*` 编码、`authorityLevel`、`roleKind` 和 `systemManaged` 映射；角色菜单授权读写及当前菜单树已切换到 `spectra_security.sec_role_menu` + `AuthorizationSnapshot`，不再从旧 `sys_rel_role_menu` 或 `sys_user_role` 回退读取。本批角色目录、菜单关系、菜单树和 V1–V10 数据库契约测试均已通过并独立提交；旧 Permission/Authority 目录、用户 RoleAssignment 写入口及旧角色模型清理已在后续阶段完成。
+- 阶段补充（2026-08-15）：`/authority/tree` 已切换为只读 Permission Catalog 适配器，从 `spectra_security.sec_permission` 按资源分组返回活动权限；旧 Authority CRUD 路由已移除。角色权限查询和撤销清理已切换到目标 `role_permission`/`role_grantable_permission`，旧角色权限写入口已删除，Permission Preview/Apply 前端已接入。
 - 阶段补充（2026-08-15）：AuthorizationController 新增目标 Role 当前授权状态查询，返回 role version、authorityLevel、Permission code 与 GrantablePermission code；spectra-ui RBAC 已移除旧角色权限覆盖写 API，改为分别编辑 Role capability 与 Grantable capability，提交前执行 Impact Preview，确认后携带短时 token Apply，菜单仍作为独立 UX 配置保存。
 - 阶段补充（2026-08-15）：用户资料保存已移除 `role_ids`，`UserController` 删除旧 `/user/{uid}/roles` 覆盖写路由；用户资料与 RoleAssignment 写入彻底解耦，Assignment 必须通过 AuthorizationController 的 Preview/Apply 逐条提交 Boundary。Web RoleAssignment 编辑器已完成接入。
-- 阶段补充（2026-08-15）：用户分页资料与当前用户资料的角色展示已切换到活动 `spectra_security.role_assignment`；只读 Assignment 查询补充 Role/Assignment version、Role 名称、系统托管标记及分离的 Access/Grant Boundary。旧 `sys_rel_user_role` 已不再作为运行时来源，并由 V11 迁移下线。
+- 阶段补充（2026-08-15）：用户分页资料与当前用户资料的角色展示已切换到活动 `spectra_security.sec_role_assignment`；只读 Assignment 查询补充 Role/Assignment version、Role 名称、系统托管标记及分离的 Access/Grant Boundary。旧 `sys_rel_user_role` 已不再作为运行时来源，并由 V11 迁移下线。
 - 阶段补充（2026-08-15）：Permission Catalog 叶子节点已返回 `allowed_scope_modes`；Web 用户编辑器已接入 RoleAssignment 新增/修改，明确编辑 Permission-specific Access/Grant Boundary，RULES 必须选择组织，保存前执行 Assignment Preview 并携带短时 token Apply。数据库安全契约、后端目录测试与 Web format/lint/type/test 均已通过。
 - 阶段补充（2026-08-15）：旧 `Authority`/`Role`/`RelUserRole`/`RelRoleAuthority` 运行时实体、Mapper、Service、监听器和旧 `RoleController` 权限路由已删除；User 生命周期回收改为将活动 RoleAssignment 标记为 `REVOKED` 并保留 version/validUntil。V11 以无 `CASCADE` 幂等 DDL 下线旧授权表。
 - 阶段补充（2026-08-15）：绑定/解绑已切换到 `authentication_identity` 目标表，新增 `AuthenticationIdentityController` 与 `/security/identities/**`；旧 Account 实体、Mapper、Service、Controller、XML 和 `sys_account` 已删除，V12 以无 `CASCADE` 幂等 DDL 下线旧表。目标身份只返回 method/provider/state/verifiedAt 元数据，不返回原始标识；Redis 旧键核对和真实数据库验收仍待后续。
@@ -1720,11 +1720,11 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
 - [x] Phase 9 已清理旧 DataScope 孤儿模型与数据库契约：删除旧实体、Mapper/XML、DTO/枚举，新增 V10 下线迁移并同步 `docs/sql`、实体清单、ER 图和 AI 实体字典；数据库安全契约测试已覆盖 V10 的幂等 DROP 与无自动迁移约束。
-- [x] Phase 9 已完成目标角色目录与菜单关系切换：Role CRUD 使用 `spectra_security.role`，菜单授权和当前菜单树使用 `spectra_security.role_menu` 与目标 AuthorizationSnapshot；角色、菜单关系、菜单树和数据库安全契约测试通过并已独立提交。
+- [x] Phase 9 已完成目标角色目录与菜单关系切换：Role CRUD 使用 `spectra_security.sec_role`，菜单授权和当前菜单树使用 `spectra_security.sec_role_menu` 与目标 AuthorizationSnapshot；角色、菜单关系、菜单树和数据库安全契约测试通过并已独立提交。
 - [x] Phase 9 已完成 Permission Catalog 只读切换：`/authority/tree` 不再提供旧 Authority CRUD，目标 Permission 按资源分组展示；角色 Permission 读取/撤销使用目标关系表，Catalog、关系服务和数据库安全契约测试通过并已独立提交。
 - [x] Phase 9 已完成 Web Role capability 迁移：RBAC 读取目标 Role 授权状态和 version，分别维护 Permission/GrantablePermission，授权写入使用 Impact Preview/Apply，旧角色权限写 API 已从前端移除；后端目标测试、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成用户资料与授权解耦：UserSaveFrom、UserService 和 Web 用户表单不再接受 `role_ids`，旧用户角色覆盖路由已删除；后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
-- [x] Phase 9 已完成 RoleAssignment 只读角色展示迁移：用户分页/当前资料从活动 `spectra_security.role_assignment` 读取角色，并暴露 Role/Assignment version 与独立 Boundary 元数据；查询服务、后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
+- [x] Phase 9 已完成 RoleAssignment 只读角色展示迁移：用户分页/当前资料从活动 `spectra_security.sec_role_assignment` 读取角色，并暴露 Role/Assignment version 与独立 Boundary 元数据；查询服务、后端编译、Web format/type/lint/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成 Web RoleAssignment Preview/Apply 编辑器：用户编辑器读取目标 Role/Permission Catalog/组织树，支持显式 Access/Grant Boundary 和 Scope 模式校验，并通过短时 Preview token Apply；后端 Permission Catalog 定向测试、Web format/lint/type/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Account 认证因子清理：绑定/解绑切换到 `authentication_identity`，删除旧 Account 实体/Mapper/Service/Controller/XML，新增 V12 下线 `sys_account`；后端认证身份定向测试、全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。

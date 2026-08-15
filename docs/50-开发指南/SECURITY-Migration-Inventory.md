@@ -29,8 +29,8 @@ SELECT r.code,
        r.state,
        COUNT(DISTINCT ra.user_id) FILTER (WHERE ra.state = 'ACTIVE') AS active_user_count,
        COUNT(*) FILTER (WHERE ra.state = 'ACTIVE') AS active_assignment_count
-FROM spectra_security.role r
-LEFT JOIN spectra_security.role_assignment ra ON ra.role_id = r.id
+FROM spectra_security.sec_role r
+LEFT JOIN spectra_security.sec_role_assignment ra ON ra.role_id = r.id
 GROUP BY r.code, r.role_kind, r.state
 ORDER BY r.role_kind, r.code;
 
@@ -38,24 +38,24 @@ ORDER BY r.role_kind, r.code;
 SELECT rp.min_effective_dev_ops_users,
        rp.max_dev_ops_users,
        COUNT(DISTINCT ra.user_id) AS effective_dev_ops_users
-FROM spectra_security.root_policy rp
-LEFT JOIN spectra_security.role r ON r.role_kind = 'DEV_OPS' AND r.state = 'ACTIVE'
-LEFT JOIN spectra_security.role_assignment ra
+FROM spectra_security.sec_root_policy rp
+LEFT JOIN spectra_security.sec_role r ON r.role_kind = 'DEV_OPS' AND r.state = 'ACTIVE'
+LEFT JOIN spectra_security.sec_role_assignment ra
        ON ra.role_id = r.id AND ra.state = 'ACTIVE'
 GROUP BY rp.min_effective_dev_ops_users, rp.max_dev_ops_users;
 
 -- 4. 认证身份、密码和 MFA 覆盖率（只返回数量）
 SELECT
     (SELECT COUNT(*) FROM spectra_core.sys_user WHERE deleted IS NULL) AS users,
-    (SELECT COUNT(DISTINCT user_id) FROM spectra_security.authentication_identity WHERE state = 'ACTIVE') AS users_with_identity,
-    (SELECT COUNT(*) FROM spectra_security.password_credential) AS password_credentials,
-    (SELECT COUNT(DISTINCT user_id) FROM spectra_security.mfa_enrollment WHERE state = 'ACTIVE') AS users_with_mfa;
+    (SELECT COUNT(DISTINCT user_id) FROM spectra_security.sec_authentication_identity WHERE state = 'ACTIVE') AS users_with_identity,
+    (SELECT COUNT(*) FROM spectra_security.sec_password_credential) AS password_credentials,
+    (SELECT COUNT(DISTINCT user_id) FROM spectra_security.sec_mfa_enrollment WHERE state = 'ACTIVE') AS users_with_mfa;
 
 -- 5. Permission-specific Boundary 覆盖情况
 SELECT COUNT(*) AS access_boundary_count
-FROM spectra_security.assignment_permission_boundary;
+FROM spectra_security.sec_assignment_permission_boundary;
 SELECT COUNT(*) AS grant_boundary_count
-FROM spectra_security.assignment_grant_boundary;
+FROM spectra_security.sec_assignment_grant_boundary;
 ```
 
 ## Scope 人工映射清单
