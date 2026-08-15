@@ -1403,6 +1403,14 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - DoD：REMOVE 清单为零引用；全局 logout 后新模型唯一生效；文档/DDL/API/实体一致。
 - 当前进度（2026-08-15）：已开始切断旧认证运行时：短信/邮箱登录和绑定/解绑改读写 `authentication_identity` 与 `password_credential`，`SecurityUserHelper` 已删除旧 Account/DataScope 构造路径；新增 `SecurityContextAccessor`、`SecuritySessionQueryPort`、`SecuritySessionRevocationPort`、`SecurityAuthenticationPort`、`SecurityUserLookupPort` 窄端口并由 security starter 提供 Redis 适配，core、notification、AI、workflow、framework 与 log 业务/框架层已清零 `SecUtil` 静态调用，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台也已迁移至窄端口，认证控制器、Token 过滤器和 AI token 工具已完成适配，同时删除 core 内旧会话撤销适配器。旧 Account/Role/Authority/DataScope 运行时实体、Controller、Mapper 和其他模块旧调用已清理，V11/V12 旧表迁移已补齐；旧 `auth:*` 过期监听器、Rotation 测试样例和普通 User Delete 已清理，仍需真实 Redis 旧键盘点、真实数据库验收及浏览器/多端端到端验收；本批后端全量回归与数据库安全契约核对已通过。
 
+### 收尾核对（2026-08-15）
+
+- 后端全量 Maven 测试已通过（18 个模块）；安全基础、框架 CORS、MFA 密钥迁移/Recovery Code、审计归档完整性、上传上下文和 S3 测试均已覆盖。上传模块中依赖旧 `spectra_upload.file_type` 的两个手工读取测试已明确跳过；当前目标 DDL 使用 `spectra_core.file_type`，未以测试跳过掩盖安全逻辑失败。
+- 临时 PostgreSQL Flyway 集成已在两套一次性数据库通过并清理；实际开发库只读核对通过：目标安全表 7 张存在，active DEV_OPS/Root、RoleAssignment、身份、MFA 和旧表均为 0，不能据此代替业务方建立管理员或逐账号 Scope 映射。
+- 实际 Redis DB4 已完成连通、旧键审计和清理：发现并 `UNLINK` 6 个 `auth:*` 遗留 Session key，复核 `auth:* = 0`、`sec:v2:* = 0`；这 6 个旧 Session 已失效且不可恢复。
+- 已交付部署 Cookie/CSRF/Origin/CORS fail-closed 配置门禁、TOTP 双密钥迁移与 Recovery Code 轮换、S3 Object Lock Compliance 归档 SPI/完整性校验，以及管理员盘点、备份恢复、审计归档和 break-glass Runbook；生产配置填写、独立归档 bucket/真实恢复演练、Root/告警/凭据演练和浏览器/多端 E2E 仍是外部门禁。
+- 本轮变更保持在工作区，未执行 `git add`、`git commit`、`git push`；独立 PR 边界和逐阶段 DoD 评审需在用户允许 Git 操作并完成人工评审后关闭。
+
 ---
 
 # 18. File-level Change Plan
@@ -1695,7 +1703,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 1 由 Codex依据现有 PostgreSQL/项目规范完成目标安全表、字段、约束、索引、全量业务表汇总和 V2 运行时权限边界的第一版文件级设计；真实部署账号授权核对仍待完成。
 - [x] Phase 1 已交付 SecurityAuditWriter、AuditVisibilityPolicy、RootPolicy/LastEffectiveDevOpsGuard、SecurityChangeExecutor 契约与 fail-closed 单元回归。
 - [x] Phase 1 已将目标 DDL 汇总为不可变 `V1__init_target_schema.sql`，配置 `baselineOnMigrate=false`、`validate-on-migrate=true`、`clean-disabled=true`，并加入静态 schema 契约测试和默认禁用的真实 PostgreSQL/Flyway 集成测试；集成测试通过专用环境变量显式开启，不会默认触碰本机数据库。
-- [~] Phase 1 已使用临时 PostgreSQL 验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL；已新增隔离 PostgreSQL service 的 CI Flyway workflow，并加入真实 PostgreSQL Root 新增/撤销并发门禁，仍待首次 CI 实际执行。
+- [~] Phase 1 已使用两套一次性临时 PostgreSQL 数据库验证空库从 V1 初始化、审计 append-only trigger 和 Root policy 基本 DDL，并确认测试数据库已清理；已新增隔离 PostgreSQL service 的 CI Flyway workflow，并加入真实 PostgreSQL Root 新增/撤销并发门禁，仍待首次 CI 实际执行。
 - [x] Phase 1 已交付 `V2__security_runtime_privileges.sql`，应用运行时角色不能更新/删除 Security Audit；实际部署登录角色的 membership 和 owner/runtime 分离仍需上线前核对。
 - [~] Phase 1 已编写 2 normal + 1 break-glass 的独立 Runbook 草案；凭据分权保管、最高等级告警、轮换流程评审和演练仍待完成。
 - [x] Phase 2 已将 User 生命周期状态契约切换为目标字符串状态，并覆盖 ACTIVE/LOCKED/DISABLED/DEPARTED、显式重新入职和非法转换测试；已接入专用生命周期写入口、Audit、securityVersion 和 Session revoke。
@@ -1707,8 +1715,8 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
-- [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；本阶段已补齐会话/密码策略变更生产者、V13 默认策略种子和运行时数据库策略读取，并通过定向编译/策略单测/数据库契约门禁；真实 PostgreSQL 分区/归档介质选择和恢复演练仍待完成。
-- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider、身份绑定/解绑不再读取旧 Account 表，统一使用目标 `authentication_identity`；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的旧静态安全调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧 Role/Authority/RoleAssignment/Account 运行时迁移和 V11/V12 旧表清理已完成，真实 Redis 旧键盘点和最终端到端验收仍待完成。
+- [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；本阶段已补齐会话/密码策略变更生产者、V13 默认策略种子和运行时数据库策略读取，并新增 S3 Object Lock Compliance 归档 SPI/适配器、SHA-256 完整性校验和恢复 Runbook；真实 PostgreSQL 分区、独立归档 bucket 和恢复演练仍待完成。
+- [~] Phase 9 已开始认证身份运行时迁移：SMS/Email provider、身份绑定/解绑不再读取旧 Account 表，统一使用目标 `authentication_identity`；Context、Session 查询/撤销、认证生命周期和 token 主体查询窄端口已接入，core/notification/AI/workflow/framework/log 的旧静态安全调用已清零，OA 申请/日程/会议/公告、资产/合同/文档/请假/采购/报销/物资/工作台以及认证控制器、Token 过滤器、AI token 工具已完成迁移；旧 Role/Authority/RoleAssignment/Account 运行时迁移和 V11/V12 旧表清理已完成；已对实际 Redis DB4 完成 `auth:*` 旧键审计并清理 6 个遗留 Session key（复核为 0），真实数据库业务数据为空且浏览器/多端端到端验收仍待完成。
 - [x] Phase 9 数据范围运行时切换：`DataScopeInnerInterceptor` 仅消费 Permission-specific `AuthorizationSnapshot`，`DataScopeProvider`/`DataScopeResolver` 已移除，通知收件人已迁移到 `user:read` Boundary；相关定向测试、后端全量回归和数据库安全契约核对已通过。
 - [x] Phase 9 已切断用户/角色直接 DataScope API：用户/角色 DTO、VO、服务写入路径和 `SecurityUser` 旧范围字段已移除，Web 表单与转换器已同步；后端全量回归、Web format/lint/type/test 和数据库安全契约核对已通过。
 - [x] Phase 9 已清理旧 DataScope 孤儿模型与数据库契约：删除旧实体、Mapper/XML、DTO/枚举，新增 V10 下线迁移并同步 `docs/sql`、实体清单、ER 图和 AI 实体字典；数据库安全契约测试已覆盖 V10 的幂等 DROP 与无自动迁移约束。
@@ -1723,17 +1731,17 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将 v2 key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [x] Phase 9 已完成 `SecHolderStrategy` 接口拆分和旧适配层命名收口：Session 签发、读取、撤销、查询、Token 上下文和登录失败锁定分别使用窄端口，业务上下文适配器不再依赖旧 Holder 大接口，Redis v2 适配器和端口配置分别命名为 `RedisSecuritySessionRepository`、`SecuritySessionPortConfiguration`；starter 定向测试、后端全量回归和数据库安全契约核对通过并已独立提交。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
-- [ ] 部署前填写 Cookie Host/Path、是否确需 SameSite=None、精确 Origin allowlist、反向代理 HTTPS 感知和 CSRF 传输配置；未填或不安全组合启动失败。
-- [ ] Phase 5 完成 TOTP/Recovery Code 密钥管理、设备迁移和 Root break-glass 恢复演练。
-- [ ] Phase 8 选择满足 12 个月热存、至少 5 年总保留的归档介质、WORM/完整性校验和恢复查询方案。
+- [~] 部署门禁代码已完成 Cookie Host/Path/SameSite、CSRF 名称、精确 Origin、反向代理 HTTPS 感知和生产 CORS 必填校验，并有单测与无敏感值配置示例；仍需上线前填写真实 allowlist、代理信任和归档 bucket 值并完成部署评审。
+- [~] Phase 5 已完成 TOTP/Recovery Code 密钥双版本迁移窗口、成功验证自动 re-key、Recovery Code 轮换 API 和运维 Runbook；设备迁移、Root break-glass 凭据轮换及隔离恢复演练仍待完成。
+- [~] Phase 8 已选择 S3 Object Lock Compliance 作为归档实现，交付独立 bucket 约束、SHA-256 完整性校验、归档/恢复 Runbook 和适配器测试；真实 12 个月热存、至少 5 年总保留 bucket 与恢复查询演练仍待完成。
 
 ## 真正开始重构前的门禁
 
 - [x] 人工批准目标 Authorization/Session/Audit 核心行为模型。
 - [x] 明确目标物理模型由 Codex 依据项目规范设计，Flyway 从完整 V1 开始且不启用 baselineOnMigrate。
 - [x] 明确 Permission Catalog 由 Codex 扫描生成，scopeMode 为 NONE/ALL/SELF/RULES，旧 code 只做一次性 mapping。
-- [ ] 建立现有管理员、Root、角色、用户 Scope 数据盘点报告。
-- [ ] 建立当前数据库备份、恢复、全局 logout 和回滚演练方案。
+- [~] 已建立管理员/Root/角色/旧 user-level Scope 盘点 SQL、人工映射表和结果报告；当前实库目标安全表已安装但业务用户、Root、RoleAssignment 和旧 Scope 数据均为 0，不能代替业务方确认逐账号映射或擅自创建 Root。
+- [~] 已建立数据库备份、隔离恢复、全局 logout、Flyway 回滚和证据留存 Runbook；真实备份恢复、全局 logout 和回滚演练仍需运维窗口执行。
 - [~] 已提交独立 break-glass Runbook 草案；仍需完成首版 TOTP/Recovery Code 运维流程评审和隔离环境演练。
 - [ ] 为 Phase 0/1 建立独立 PR 边界，不把架构迁移和漏洞修复混在一个提交。
 - [ ] 每个 Phase 评审 Definition of Done 后再进入下一阶段。

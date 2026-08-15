@@ -18,8 +18,10 @@ tags:
 ```
 spectra-admin/spectra-modules/spectra-core/
 └── src/main/java/com/devops00/spectra/core/
-    ├── auth/           ← 认证（Account）
-    ├── user/           ← 用户/角色/权限
+    ├── auth/           ← 认证身份与密码凭证
+    ├── user/           ← 用户资料与生命周期
+    ├── authorization/  ← Role/Permission/Assignment/Boundary
+    ├── security/       ← MFA、审计、策略与安全变更
     ├── system/         ← 部门/菜单/字典/区域/配置/日志
     ├── controller/     ← REST 端点
     ├── service/        ← 业务逻辑
@@ -47,9 +49,10 @@ spectra-admin/spectra-modules/spectra-core/
 
 ### 权限体系
 
-- 角色管理（CRUD、分配权限、分配菜单）
-- 权限管理（菜单/按钮/接口三级权限）
-- 数据权限（@DataScope 二维数据过滤）
+- 角色管理（目标 Role CRUD、菜单 UX 配置）
+- Permission Catalog 与 Role capability/grantable capability 管理
+- RoleAssignment 及 Permission-specific Access/Grant Boundary
+- 数据权限（Permission-specific `AuthorizationSnapshot` 与 `@DataScope` 过滤）
 
 ### 系统管理
 
@@ -81,13 +84,19 @@ spectra-core ← 被以下模块依赖
 
 | Entity | 表名 | 说明 |
 |---|---|---|
-| Account | sys_account | 登录账号 |
 | User | sys_user | 用户信息 |
-| Role | sys_role | 角色 |
-| Authority | sys_authority | 权限 |
-| RelUserRole | sys_rel_user_role | 用户-角色关联 |
-| RelRoleAuthority | sys_rel_role_authority | 角色-权限关联 |
-| RelRoleMenu | sys_rel_role_menu | 角色-菜单关联 |
+| AuthenticationIdentity | spectra_security.authentication_identity | 认证身份摘要 |
+| PasswordCredential | spectra_security.password_credential | 密码凭证 |
+| SecurityRole | spectra_security.role | 目标角色目录 |
+| Permission | spectra_security.permission | Permission Catalog |
+| RoleAssignment | spectra_security.role_assignment | 用户角色授权分配 |
+| RolePermission | spectra_security.role_permission | 角色能力 |
+| RoleGrantablePermission | spectra_security.role_grantable_permission | 可授予能力 |
+| AssignmentPermissionBoundary | spectra_security.assignment_permission_boundary | Access Boundary |
+| AssignmentGrantBoundary | spectra_security.assignment_grant_boundary | Grant Boundary |
+| AuthorizationScope | spectra_security.authorization_scope | 授权范围 |
+| ScopeRule | spectra_security.scope_rule | 组织范围规则 |
+| SecurityRoleMenu | spectra_security.role_menu | 角色菜单 UX 关系 |
 | Department | sys_department | 部门 |
 | Menu | sys_menu | 菜单 |
 | Region | sys_region | 行政区划 |
@@ -103,7 +112,9 @@ spectra-core ← 被以下模块依赖
 |---|---|---|
 | UserController | `/user/**` | 用户 CRUD |
 | RoleController | `/role/**` | 角色 CRUD |
-| AuthorityController | `/authority/**` | 权限 CRUD |
+| AuthenticationIdentityController | `/security/identities/**` | 认证身份绑定/解绑 |
+| AuthorizationController | `/security/authorization/**` | Role capability 与 Assignment Preview/Apply |
+| AuthorityController | `/authority/tree` | Permission Catalog 只读树 |
 | MenuController | `/menu/**` | 菜单 CRUD |
 | DepartmentController | `/department/**` | 部门 CRUD |
 | RegionController | `/region/**` | 区域查询 |
