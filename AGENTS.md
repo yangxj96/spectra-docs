@@ -95,6 +95,12 @@ pnpm run build
 
 PowerShell 中 `-Dspotless.ratchetFrom=NONE` 必须作为带引号的单个参数传入，否则可能被 Maven Wrapper 误解析。`pnpm start` 已通过 `prestart` 执行对应项目的格式化、lint 和类型检查，不要在启动命令中重复串联。
 
+## Python 环境
+
+- 如需执行 Python 脚本或安装 Python 依赖，必须使用工作空间根目录的 `.venv/`，不得向全局 Python 环境安装包，避免污染全局环境。
+- 根目录虚拟环境不存在时，在工作空间根目录创建：`python -m venv .venv`。
+- 执行脚本和安装依赖统一使用 `.\.venv\Scripts\python.exe`，例如：`.\.venv\Scripts\python.exe -m pip install <package>`、`.\.venv\Scripts\python.exe <script.py>`。
+
 ## 文档同步
 
 代码变更后必须检查知识库是否需要同步，笔记之间使用 `[[wikilink]]`：
