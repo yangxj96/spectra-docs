@@ -1028,7 +1028,7 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 
 ## 与后端连接
 
-仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；开发环境的 `VITE_API_URL=http://127.0.0.1:4004/` 直接连接后端 4004。开发配置会使用非 Secure 的 Host-only Cookie，因此请使用 `http://127.0.0.1:5173` 访问 Web，确保 Web 与 API 使用相同主机，浏览器才能正常携带并读取 CSRF Cookie。生产环境必须改用 HTTPS 和 Secure 的 `__Host-` Cookie。启用本地 HTTPS、修改后端端口或连接远程后端时，只修改本机环境文件。
+仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；开发环境的 `VITE_API_URL=https://127.0.0.1:4004/` 直接连接后端 4004。Vite 通过 `SSL_PASSWORD` 加载后端同一份 `files/ssl/keystore.p12`，因此 Web 使用 `https://localhost:5173` 访问，浏览器才能正常携带 Secure Cookie 和读取 CSRF Cookie。修改后端端口或连接远程后端时，只修改本机环境文件。
 
 > **环境变量命名约定**：spectra-ui 使用 `VITE_API_URL`（带尾部 `/`），spectra-app 使用 `VITE_API_BASE_URL`（无尾部 `/`）。这是两个项目的既定约定，不强制统一（Vite SPA 和 uni-app 的 base URL 处理逻辑不同）。
 

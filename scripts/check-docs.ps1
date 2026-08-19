@@ -63,9 +63,9 @@ if ($overview -notmatch [regex]::Escape("$($controllerNames.Count) 个 Controlle
 
 $configExpectations = @(
     [pscustomobject]@{ Path = 'spectra-admin/.mise.local.toml.example'; Pattern = 'SERVER_PORT\s*=\s*"4004"'; Description = '后端模板端口 4004' }
-    [pscustomobject]@{ Path = 'spectra-admin/.mise.local.toml.example'; Pattern = 'SERVER_SSL_ENABLED\s*=\s*"false"'; Description = '后端模板首次启动关闭 HTTPS' }
-    [pscustomobject]@{ Path = 'spectra-ui/.env.example'; Pattern = 'VITE_API_URL=http://127\.0\.0\.1:4004/'; Description = 'Web 模板直连 HTTP 4004' }
-    [pscustomobject]@{ Path = 'spectra-app/.env.example'; Pattern = 'VITE_API_BASE_URL\s*=\s*"http://127\.0\.0\.1:4004"'; Description = 'App 模板 HTTP 4004' }
+    [pscustomobject]@{ Path = 'spectra-admin/.mise.local.toml.example'; Pattern = 'SERVER_SSL_ENABLED\s*=\s*"true"'; Description = '后端模板首次启动启用 HTTPS' }
+    [pscustomobject]@{ Path = 'spectra-ui/.env.example'; Pattern = 'VITE_API_URL=https://127\.0\.0\.1:4004/'; Description = 'Web 模板直连 HTTPS 4004' }
+    [pscustomobject]@{ Path = 'spectra-app/.env.example'; Pattern = 'VITE_API_BASE_URL\s*=\s*"https://127\.0\.0\.1:4004"'; Description = 'App 模板 HTTPS 4004' }
 )
 foreach ($expectation in $configExpectations) {
     $configPath = Join-Path $projectRoot $expectation.Path

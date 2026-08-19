@@ -65,7 +65,7 @@ server {
 
 开发端口 4004 与容器端口 8888 是两套场景：
 
-- 本机 `dev` profile：默认 HTTP 4004。
+- 本机 `dev` profile：默认 HTTPS 4004，直接访问时需要信任本机开发证书。
 - Compose/生产 `prod` profile：模板显式设置容器 HTTP 8888，由 Nginx 终止 TLS。
 
 ## 验证
