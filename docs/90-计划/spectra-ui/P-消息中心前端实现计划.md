@@ -47,21 +47,26 @@ tags:
 
 **内容**：
 ```typescript
-/** 消息类型枚举 - 可扩展 */
-type NotificationType = 
-  | 'system'        // 系统通知
-  | 'workflow'      // 工作流通知
-  | 'oa'           // OA通知（会议、公告等）
-  | 'inner_mail'   // 站内信
-  | 'approval'     // 待我审批（兼容展示值，后端映射 WORKFLOW_TODO）
-  | string;        // 支持自定义扩展类型
+/** 通知用途枚举 */
+type NotificationPurpose =
+  | 'LOGIN_CODE'
+  | 'BIND_PHONE_CODE'
+  | 'BIND_EMAIL_CODE'
+  | 'RESET_PASSWORD_CODE'
+  | 'SECURITY_ALERT'
+  | 'SYSTEM_NOTICE'
+  | 'WORKFLOW_TODO'
+  | 'WORKFLOW_RESULT'
+  | 'OA_NOTICE'
+  | 'OA_REMINDER'
+  | 'INNER_MESSAGE';
 
 /** 消息实体 */
 interface Notification {
   id: string;
   title: string;
   content: string;
-  type: NotificationType;
+  purpose: NotificationPurpose;
   isRead: boolean;
   createdAt: string;
   link?: string;              // 点击跳转路径
@@ -74,16 +79,16 @@ interface Notification {
 interface NotificationQueryParams {
   page_num: number;
   page_size: number;
-  type?: NotificationType | 'all';
+  purpose?: NotificationPurpose | 'all';
   is_read?: boolean;
   keyword?: string;
   start_time?: string;
   end_time?: string;
 }
 
-/** 消息类型配置 */
-interface NotificationTypeConfig {
-  type: NotificationType;
+/** 通知用途配置 */
+interface NotificationPurposeConfig {
+  purpose: NotificationPurpose;
   label: string;
   color: string;
   icon: string;
@@ -100,7 +105,7 @@ interface NotificationTypeConfig {
 **功能**：
 - `notifications`: 消息列表
 - `unreadCount`: 未读数量（计算属性）
-- `currentType`: 当前筛选类型
+- `currentPurpose`: 当前筛选用途
 - `fetchNotifications()`: 获取消息列表
 - `markAsRead(id)`: 标记单条已读
 - `markAllAsRead()`: 全部标记已读
@@ -139,7 +144,7 @@ export const NotificationApi = {
 };
 ```
 
-后端同时兼容 `/notification-center/inbox/**` 路径；详情使用 `GET /api/notification/{id}`。偏好设置另用 `GET/PUT /api/notification-center/preferences`，提交 `purpose`、`channel`、`enabled` 和 `doNotDisturb`，不能关闭登录验证码、绑定、重置密码和安全告警等强制安全用途。
+详情使用 `GET /api/notification/{id}`。偏好设置使用 `GET/PUT /api/notification-center/preferences`，提交 `purpose`、`channel`、`enabled` 和 `doNotDisturb`，不能关闭登录验证码、绑定、重置密码和安全告警等强制安全用途。
 
 ### 阶段二：头部组件（NotificationBell + Drawer）
 

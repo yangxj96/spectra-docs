@@ -23,14 +23,14 @@
 - `root_policy` 和有效 DEV_OPS 数量满足最小 Root 约束；
 - RoleAssignment、Permission Boundary、AuthenticationIdentity、PasswordCredential、MFA 和 Recovery Code 数量与备份报告一致；
 - `security_audit_archive_manifest` 的摘要、对象 URI 和状态可查询；
-- Redis 使用 `sec:v2:*` namespace，抽样 Token Digest 不会在日志或响应中出现；
+- Redis 使用 `sec:*` namespace，抽样 Token Digest 不会在日志或响应中出现；
 - 使用测试账户完成登录、刷新、logout、全局 revoke 后，旧 Access/Refresh Token 均被拒绝。
 
 ## 全局登出步骤
 
 1. 先写入 `SECURITY_GLOBAL_LOGOUT_STARTED` 审计事件；Audit 不可用则停止。
 2. 通过 `SecuritySessionRevocationPort` 按用户、Client 或全量撤销；禁止直接删除任意业务 Redis key。
-3. 验证 `sec:v2:session:*`、Token family 和 replay revoke 结果，并保留数量证据；不记录 token 原文。
+3. 验证 `sec:session:*`、Token family 和 replay revoke 结果，并保留数量证据；不记录 token 原文。
 4. 追加 `SECURITY_GLOBAL_LOGOUT_SUCCEEDED` 或 `SECURITY_GLOBAL_LOGOUT_FAILED`。
 5. 让 Web/App 重新登录并验证 Refresh rotation；旧 Refresh Token 必须被拒绝。
 

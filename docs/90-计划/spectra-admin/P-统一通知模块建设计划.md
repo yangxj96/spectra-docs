@@ -675,7 +675,7 @@ spectra_notification
 
 ### 7.1 当前用户消息中心
 
-保持现有路径兼容，后续可统一 REST 命名：
+当前用户消息 API 统一使用 `/notification/**`：
 
 | 方法 | 路径 | 权限 | 说明 |
 |---|---|---|---|
@@ -686,8 +686,6 @@ spectra_notification
 | PUT | `/notification/read-all` | `NOTIFICATION:UPDATE` | 本人全部已读 |
 | DELETE | `/notification/{id}` | `NOTIFICATION:DELETE` | 本人软删除 |
 | POST | `/notification/batch-delete` | `NOTIFICATION:DELETE` | 本人批量软删除 |
-| GET | `/notification/setting` | `NOTIFICATION_SETTING:QUERY` | 当前用户偏好矩阵 |
-| PUT | `/notification/setting` | `NOTIFICATION_SETTING:UPDATE` | 更新当前用户偏好 |
 
 列表支持：
 

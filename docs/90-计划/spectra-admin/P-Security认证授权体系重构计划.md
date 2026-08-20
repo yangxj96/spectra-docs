@@ -84,11 +84,11 @@
 
 现有模型不是 JWT，而是 UUID Opaque Token，方向与目标一致。默认 Access Token 5 分钟、Refresh Token 7 天。Redis 主要结构为：
 
-- `sec:v2:sess:{accessDigest}`：会话 Hash，只保存主体标识、客户端和 Token Family 等非敏感会话元数据。
-- `sec:v2:uc:{userId}:{clientType}`：用户同端唯一 Access Token digest。
-- `sec:v2:ut:{userId}`：用户 Access Token digest 集合。
-- `sec:v2:online`：在线用户 ID 集合。
-- `sec:v2:rt:{digest}`、`sec:v2:family:{familyId}` 和 replay/claim key：Refresh Rotation 的摘要映射、Family 和一次性消费状态。
+- `sec:sess:{accessDigest}`：会话 Hash，只保存主体标识、客户端和 Token Family 等非敏感会话元数据。
+- `sec:uc:{userId}:{clientType}`：用户同端唯一 Access Token digest。
+- `sec:ut:{userId}`：用户 Access Token digest 集合。
+- `sec:online`：在线用户 ID 集合。
+- `sec:rt:{digest}`、`sec:family:{familyId}` 和 replay/claim key：Refresh Rotation 的摘要映射、Family 和一次性消费状态。
 
 现有 ClientType 只有 WEB、APP、MINI。创建 Token 时同端直接复用既有 Access/Refresh Token；请求经过 `TokenAuthenticationFilter` 时已不再续期 Access Session TTL。Phase 0 的 Refresh Rotation 会先通过 `SecurityUserLoader` 从当前身份源重新加载主体，未配置加载器或主体已不可用时拒绝刷新；普通 Access Session 仍暂存 `SecurityUser` 快照，待 Phase 5 的 v2 Session 聚合移除。
 
@@ -565,19 +565,19 @@ Web 端 Refresh Token 只通过 Cookie 传输：
 建议 Key namespace：
 
 ```text
-sec:v2:access:{tokenDigest}                 -> sessionId
-sec:v2:refresh:{tokenDigest}                -> sessionId,familyId,generation,state
-sec:v2:refresh-used:{oldTokenDigest}        -> familyId,generation,replayedAt
-sec:v2:session:{sessionId}                  -> SecuritySession
-sec:v2:user-sessions:{userId}               -> ZSET(sessionId, expiresAt)
-sec:v2:client-sessions:{clientId}            -> ZSET(sessionId, expiresAt)
-sec:v2:user-client-sessions:{userId}:{clientId} -> ZSET
-sec:v2:user-device-sessions:{userId}:{deviceIdHash} -> ZSET
-sec:v2:subject-version:{userId}              -> securityVersion
-sec:v2:policy-version:{clientId}             -> sessionPolicyVersion
-sec:v2:login-lock:{normalizedIdentityDigest} -> attempts/lockedUntil
-sec:v2:challenge:{challengeId}                -> subject/client/requiredAal/attempts/expiresAt
-sec:v2:step-up-proof:{proofDigest}            -> userId/sessionId/commandHash/aal/oneTime/expiresAt
+sec:access:{tokenDigest}                 -> sessionId
+sec:refresh:{tokenDigest}                -> sessionId,familyId,generation,state
+sec:refresh-used:{oldTokenDigest}        -> familyId,generation,replayedAt
+sec:session:{sessionId}                  -> SecuritySession
+sec:user-sessions:{userId}               -> ZSET(sessionId, expiresAt)
+sec:client-sessions:{clientId}            -> ZSET(sessionId, expiresAt)
+sec:user-client-sessions:{userId}:{clientId} -> ZSET
+sec:user-device-sessions:{userId}:{deviceIdHash} -> ZSET
+sec:subject-version:{userId}              -> securityVersion
+sec:policy-version:{clientId}             -> sessionPolicyVersion
+sec:login-lock:{normalizedIdentityDigest} -> attempts/lockedUntil
+sec:challenge:{challengeId}                -> subject/client/requiredAal/attempts/expiresAt
+sec:step-up-proof:{proofDigest}            -> userId/sessionId/commandHash/aal/oneTime/expiresAt
 ```
 
 索引只保存 sessionId，不保存可使用的 Token。Online API 返回 sessionId、token fingerprint 后 6 位、Client、Device、IP、登录/活跃时间和状态，绝不返回 Token。
@@ -790,7 +790,7 @@ Primary Authentication
 
 # 9. API Change Plan
 
-所有路径为 Proposed；最终采用项目 API 版本机制发布 v2，不长期保留 v1/v2 双写。
+所有路径为 Proposed；当前开发阶段统一采用项目 API 版本 `1.0.0`，不保留多版本双写。
 
 ## 9.1 Authentication / Session
 
@@ -1225,7 +1225,7 @@ Assignment D:
 10. Closure Table 从现有 Department tree 构建，检测 cycle、孤儿、重复 code；异常先修数据。
 11. 在隔离迁移环境做新旧授权差异计算；任何“新模型更宽”必须显式确认，差异工具不得进入生产请求链。
 12. 校验至少存在一个 effective DEV_OPS，默认最多 3；目标布局为 2 normal + 1 break-glass。导入超出配置上限或无法建立最后 Root 保护时阻断 cutover。
-13. 切换窗口强制全局 logout，启用 `sec:v2:*` namespace，不迁移旧 Redis Token/Session。
+13. 切换窗口强制全局 logout，启用 `sec:*` namespace，不迁移旧 Redis Token/Session。
 14. 前后端同一发布窗口切换 v2 auth/refresh/cookie/CSRF/MFA contract；不保留长期兼容 adapter。
 15. 验证与回滚观察期内旧库仅作为离线只读备份；新运行时不读取旧表。cutover 验收后删除旧表、旧 Resolver、旧 Redis key listener、旧 API 和 temporary mapping code。
 
@@ -1258,7 +1258,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 已实现骨架（2026-08-14）：security-base 已加入 `SecurityAuditEvent`/`SecurityAuditWriter`/`AuditVisibilityPolicy`、`SecurityAuditSnapshotSanitizer`、`RootPolicy`/`RootPolicyRepository`/`LastEffectiveDevOpsGuard`/`RootAuthorizationPolicy`、`SecurityChangeExecutor`；core 已加入 JDBC Audit append writer、Root policy repository、最后 Root guard 和同事务 STARTED/RESULT 审计执行器；starter 已注册统一 Root 判定 Bean；`docs/sql/spectra_security/建表.sql` 已形成 permission-specific boundary、Root singleton、append-only Audit、Outbox 的目标 DDL 契约。
 - 删除/废弃：新增代码不得使用散落 `hasRole('ROLE_DEV_OPS')`；旧点位记录迁移清单。
 - DB：`V1__init_target_schema.sql` 一次性建立第 6 节全部目标表、约束和索引，`V2__security_runtime_privileges.sql` 建立运行时/迁移角色边界与 Audit 最小权限，`V3__security_permission_catalog_seed.sql` 写入 102 个目标 Permission；`V4__complete_schema_comments_and_ai_tables.sql` 补齐跨模块结构注释并创建 `spectra_ai` 的会话/记忆表，`V5__remove_legacy_core_ai_session.sql` 删除 Core 遗留 `ai_session`，`V6__seed_core_reference_data.sql` 写入 Core 必要参考种子，V7-V13 补齐数据范围索引、权限目录、审计保留元数据、旧运行时清理和安全策略，V14 写入默认 Root 种子，V15 对齐结构化操作日志表，V16 扩展操作日志说明字段以保留异常上下文；`baselineOnMigrate=false`，不建立旧 schema baseline。
-- Redis：已切换到 `sec:v2:*` 服务端 Session/Refresh Rotation 运行态模型；旧 `auth:*` 遗留键已盘点并清理。
+- Redis：已切换到 `sec:*` 服务端 Session/Refresh Rotation 运行态模型；旧 `auth:*` 遗留键已盘点并清理。
 - API/前端：可暂不开放 Audit UI；当前已提供审计写入与高风险事务端口，现有 Root/角色/账号写入口尚未全部接入，接入完成前不得宣称 Phase 1 完成。
 - 测试：空库从 V1 可完整启动、非空无历史库拒绝自动 baseline、audit insert-only、Audit unavailable fail-closed、Root bypass 但 audit 不 bypass、默认 max=3/可配置、多 Root 并发与最后有效 DEV_OPS 保护、事务失败回滚。
 - 风险：审计 fail-closed 影响可用性，需要监控/告警。
@@ -1291,11 +1291,11 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 废弃：随机 Role code、用户直接 Scope、全局 EffectiveScope。
 - DB：使用 V1 已建立的 permission/role/relations/assignment/scope tables；如实现发现目标设计缺陷，只追加 versioned migration，不改写已发布 V1。
 - Redis：授权 Snapshot cache key/version，可先不切 Session v2。
-- API/前端：Role/Assignment v2 read API；旧写 API冻结。
+- API/前端：Role/Assignment `1.0.0` read API；旧写 API 冻结。
 - 测试：强制 cross-assignment invariant、scope contains/union、Root all。
 - 风险：旧 Role Scope 迁移歧义。
 - 依赖：Phase 2 Membership/OrganizationVersion。
-- 当前进度（2026-08-14）：security-base 已建立 `ScopeMode`、`AuthorizationScope`、`PermissionBoundary`、`AuthorizationAssignment` 和 assignment-preserving `AuthorizationSnapshot`；core 已接入目标 security schema 的 `JdbcAuthorizationSnapshotLoader`，按 active RoleAssignment 加载 Role capability、GrantablePermission、permission-specific Access/Grant Boundary 和 ScopeRule，并对缺失/停用/不一致引用 fail-closed。已提供 `/security/authorization/users/{userId}/assignments` v2 只读查询，保留 Assignment 内 Access/Grant Boundary 绑定。单元测试覆盖同 Permission Scope union、跨 Permission Scope 隔离、Access/Grant Boundary 分离、组织子树规则、数据库加载器和只读查询映射。RoleAssignment 写入、正式授权上下文接入、旧 Role/Authority 运行时切换仍待完成。
+- 当前进度（2026-08-14）：security-base 已建立 `ScopeMode`、`AuthorizationScope`、`PermissionBoundary`、`AuthorizationAssignment` 和 assignment-preserving `AuthorizationSnapshot`；core 已接入目标 security schema 的 `JdbcAuthorizationSnapshotLoader`，按 active RoleAssignment 加载 Role capability、GrantablePermission、permission-specific Access/Grant Boundary 和 ScopeRule，并对缺失/停用/不一致引用 fail-closed。已提供 `/security/authorization/users/{userId}/assignments` `1.0.0` 只读查询，保留 Assignment 内 Access/Grant Boundary 绑定。单元测试覆盖同 Permission Scope union、跨 Permission Scope 隔离、Access/Grant Boundary 分离、组织子树规则、数据库加载器和只读查询映射。RoleAssignment 写入、正式授权上下文接入、旧 Role/Authority 运行时切换仍待完成。
 - 当前准备工作（2026-08-14）：已根据全仓 Controller `@PreAuthorize` 扫描生成 `docs/security/permission-catalog.yaml`，覆盖 89 个旧 Permission code 的一次性 mapping 和 102 个目标 code 候选；其中 `user:disable`、`user:reset-password`、`role:authority-level:update`、Session/Audit/Security Policy/Root 等高风险能力已与普通 CRUD 拆开，旧 `*` 明确拒绝迁移。该初稿已在 Phase 7 完成业务动作复核，升级为 version 2 并扩展至 115 个目标 Permission，同时由 V8 migration 负责增量 seed。
 - DoD：目标模型可完整计算权限但尚可 shadow；任何 Snapshot 保留 Assignment 边界。
 
@@ -1322,8 +1322,8 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 新增：SecuritySessionService、TokenDigest、Lua scripts、Client/AuthMethod/SessionPolicy、完整 Challenge/AAL/step-up pipeline、TOTP Factor Provider、MFA Enrollment、单次 Recovery Code；WebAuthn/Passkey 保留 Provider 扩展，首版不实现 OPEN_API Service Principal。
 - 删除：旧 Redis Session 映射、SecurityUser Redis 快照、同端复用、TTL 滑动、Key expiration listener 旧职责。
 - DB：使用 V1 已建立的 client/method/policy/mfa_enrollment/totp_credential/recovery_code 表。
-- Redis：启用 `sec:v2:*`；全局 logout cutover。
-- API/前端：login/refresh/logout/session v2；Web 默认 Host-only + Strict 的 HttpOnly/Secure Cookie、CSRF/App secure storage；TOTP enrollment/challenge/recovery UI；真实 Session 页面。
+- Redis：启用 `sec:*`；全局 logout cutover。
+- API/前端：login/refresh/logout/session `1.0.0`；Web 默认 Host-only + Strict 的 HttpOnly/Secure Cookie、CSRF/App secure storage；TOTP enrollment/challenge/recovery UI；真实 Session 页面。
 - 测试：rotation/replay/race/policy/revoke、Redis fail-closed、Host-only/Strict/受控 None Cookie 与 CSRF、Challenge/AAL/step-up、TOTP 时间窗口/重放、Recovery Code 单次消费、DEV_OPS 强制 MFA。
 - 风险：前后端必须原子发布；并行 refresh 会触发 replay。
 - 依赖：Phase 1 Audit、Phase 3 Snapshot、Phase 4 Change fence。
@@ -1353,7 +1353,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 删除：旧大写 CRUD code、前端 fabricated role permission、`Token.roles` 错误类型、开发默认凭据。
 - DB：catalog/role mapping/menu seed 更新。
 - Redis：Snapshot cache 失效。
-- API/前端：全部 v2 Permission；DEV_OPS 默认全部菜单，SYSTEM_ADMIN 仅被授予业务菜单。
+- API/前端：全部目标 Permission 使用 API `1.0.0`；DEV_OPS 默认全部菜单，SYSTEM_ADMIN 仅被授予业务菜单。
 - 测试：Controller-permission contract、menu/button UX、direct API 后端拒绝。
 - 风险：业务动作粒度需要产品确认。
 - 依赖：Phase 6 资源策略稳定。
@@ -1388,7 +1388,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 - 阶段补充（2026-08-15）：Permission Catalog 叶子节点已返回 `allowed_scope_modes`；Web 用户编辑器已接入 RoleAssignment 新增/修改，明确编辑 Permission-specific Access/Grant Boundary，RULES 必须选择组织，保存前执行 Assignment Preview 并携带短时 token Apply。数据库安全契约、后端目录测试与 Web format/lint/type/test 均已通过。
 - 阶段补充（2026-08-15）：旧 `Authority`/`Role`/`RelUserRole`/`RelRoleAuthority` 运行时实体、Mapper、Service、监听器和旧 `RoleController` 权限路由已删除；User 生命周期回收改为将活动 RoleAssignment 标记为 `REVOKED` 并保留 version/validUntil。V11 以无 `CASCADE` 幂等 DDL 下线旧授权表。
 - 阶段补充（2026-08-15）：绑定/解绑已切换到 `authentication_identity` 目标表，新增 `AuthenticationIdentityController` 与 `/security/identities/**`；旧 Account 实体、Mapper、Service、Controller、XML 和 `sys_account` 已删除，V12 以无 `CASCADE` 幂等 DDL 下线旧表。目标身份只返回 method/provider/state/verifiedAt 元数据，不返回原始标识；Redis 旧键核对和真实数据库验收仍待后续。
-- 阶段补充（2026-08-15）：已删除旧 `auth:*` 过期监听器及其 Redis keyspace listener 配置，Rotation 测试样例统一使用 `sec:v2:*`；普通 `DELETE /user/{uid}` 后端路由、Service 方法、Web API 和用户列表删除操作已移除，用户仅通过 LOCKED/DISABLED/DEPARTED 生命周期状态回收并保留历史安全事实；同时删除无调用者的旧 `refreshToken()` 滑动续期接口、TTL 刷新实现、`tokenRefreshInterval` 配置、`SecUtil` 静态工具和 `SecStrategyBridge` 初始化桥接，Access TTL 只在显式会话签发时设定，续期仅允许 Refresh Token Rotation。
+- 阶段补充（2026-08-15）：已删除旧 `auth:*` 过期监听器及其 Redis keyspace listener 配置，Rotation 测试样例统一使用 `sec:*`；普通 `DELETE /user/{uid}` 后端路由、Service 方法、Web API 和用户列表删除操作已移除，用户仅通过 LOCKED/DISABLED/DEPARTED 生命周期状态回收并保留历史安全事实；同时删除无调用者的旧 `refreshToken()` 滑动续期接口、TTL 刷新实现、`tokenRefreshInterval` 配置、`SecUtil` 静态工具和 `SecStrategyBridge` 初始化桥接，Access TTL 只在显式会话签发时设定，续期仅允许 Refresh Token Rotation。
 
 - 目标：删除新旧双体系，完成真实数据库和浏览器/多端验收。
 - 模块：全仓库、SQL、docs、CI。
@@ -1407,7 +1407,7 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 
 - 后端全量 Maven 测试已通过（18 个模块）；安全基础、框架 CORS、MFA 密钥迁移/Recovery Code、审计归档完整性、上传上下文和 S3 测试均已覆盖。上传模块中依赖旧 `spectra_upload.file_type` 的两个手工读取测试已明确跳过；当前目标 DDL 使用 `spectra_core.file_type`，未以测试跳过掩盖安全逻辑失败。
 - 临时 PostgreSQL Flyway 集成已在两套一次性数据库通过并清理；实际开发库已备份并完成 V7-V15 迁移，V16 的 `sys_log.explain` 扩展迁移待下一次应用重启执行：`devops00.com` 为 1 个 ACTIVE 默认 Root，`ROLE_DEV_OPS`、有效 RoleAssignment、密码身份和凭据关联正常，MFA enrollment 仍为 0（等待受控首次 enrollment），旧表仍为 0；当前没有待清理的业务测试用户/单据，保留的区域、字典、菜单、权限、OA/流程定义均来自参考种子。
-- 实际 Redis DB4 已完成连通、旧键审计和清理：发现并 `UNLINK` 6 个 `auth:*` 遗留 Session key，复核 `auth:* = 0`、`sec:v2:* = 0`；这 6 个旧 Session 已失效且不可恢复。
+- 实际 Redis DB4 已完成连通、旧键审计和清理：发现并 `UNLINK` 6 个 `auth:*` 遗留 Session key，复核 `auth:* = 0`、`sec:* = 0`；这 6 个旧 Session 已失效且不可恢复。
 - 已交付部署 Cookie/CSRF/Origin/CORS fail-closed 配置门禁、TOTP 双密钥迁移与 Recovery Code 轮换、S3 Object Lock Compliance 归档 SPI/完整性校验，以及管理员盘点、备份恢复、审计归档和 break-glass Runbook；生产配置填写、独立归档 bucket/真实恢复演练、Root/告警/凭据演练和浏览器/多端 E2E 仍是外部门禁。
 - 本轮变更保持在工作区，未执行 `git add`、`git commit`、`git push`；独立 PR 边界和逐阶段 DoD 评审需在用户允许 Git 操作并完成人工评审后关闭。
 
@@ -1422,14 +1422,14 @@ Rollback 原则：V1 目标库和旧库分离，失败时保持全局下线并�
 | `spectra-security-base/.../javabean/entity/SecurityUser.java` | 用户、权限、单 Scope 快照 | REPLACE 为最小 `AuthenticatedPrincipal` + Assignment-preserving context；不再 Redis 序列化完整用户 |
 | `spectra-security-base/.../holder/SecUtil.java`（已删除） | 全局认证/Token/踢人工具 | REMOVED；统一通过窄 Port 和 `SecurityContextAccessor` 访问 |
 | `spectra-security-base/.../holder/SecuritySession*.java` | Session 签发、读取、撤销、查询和锁定窄端口 | KEEP；由 Redis adapter 实现，业务只依赖更上层 change/context port |
-| `spectra-security-base/.../constant/SecurityRedisKey.java` | `sec:v2:*` Security Session/Rotation key | KEEP as the v2 namespace contract; replace only when a repository/Lua adapter takes over |
+| `spectra-security-base/.../constant/SecurityRedisKey.java` | `sec:*` Security Session/Rotation key | KEEP as the security namespace contract; replace only when a repository/Lua adapter takes over |
 | `spectra-security-base/.../constant/ClientType.java` | WEB/APP/MINI enum | REPLACE 为数据库 SecurityClient code/value object |
 | `.../strategy/provider/*AuthenticationProvider.java` | Spring Authentication provider | KEEP adapter pattern；移除验证码消费和 Session 创建业务 |
 | `.../properties/SecurityProperties.java` | 白名单/TTL/root/验证码配置 | SPLIT；Session Policy 迁 DB，bootstrap secret/白名单保留 typed config |
 | `.../configuration/SecurityConfiguration.java` | FilterChain | MODIFY 精确 public endpoints、CORS/CSRF/header、注入 Filter Bean |
 | `.../filter/TokenAuthenticationFilter.java` | Redis 用户快照认证和续期 | REPLACE：验证 SecuritySession/版本，绝不计算业务 Scope/续 TTL |
 | `.../eval/SpectraPermissionEvaluator.java` | wildcard + root permission | REPLACE 为 AuthorizationService adapter；删除 `*` 和散落 Root 判断 |
-| `.../strategy/RedisSecuritySessionRepository.java` | `sec:v2:*` Redis Session/Rotation adapter | KEEP as the current v2 repository adapter；Lua/原子脚本可作为后续内部实现 |
+| `.../strategy/RedisSecuritySessionRepository.java` | `sec:*` Redis Session/Rotation adapter | KEEP as the current repository adapter；Lua/原子脚本可作为后续内部实现 |
 | `.../web/controller/AuthController.java` | 登录/刷新/登出/验证码 | MOVE 到 `core.security.authentication.web` 并改为 application orchestration |
 | `.../web/service/impl/AuthServiceImpl.java` | 验证码发送 | MIGRATE 到 purpose-bound VerificationChallengeService |
 | `core/auth/service/impl/SecurityUserHelper.java` | 加载全部权限和单 Scope | REPLACE 为 IdentityStatusLoader + AuthorizationSnapshotLoader |
@@ -1711,7 +1711,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 3 已交付 assignment-preserving AuthorizationSnapshot 纯领域契约、目标 schema 数据库加载器和 cross-assignment/Grant Boundary 单元测试；RoleAssignment 写入、旧 Role/Authority 删除和正式授权上下文接入已在后续 Phase 完成。
 - [x] Phase 3 已提供目标 RoleAssignment/Boundary 只读 API；写入继续冻结到 Phase 4 GrantBoundary 流程。
 - [x] Phase 4 已交付 Assignment 与 Role 的 Grant Boundary/authorityLevel 校验、Impact Preview/Apply token、并发 version/securityVersion 门禁、统一 Audit/Session revoke；旧用户角色、旧角色权限和旧 DataScope 写入口已冻结。
-- [x] Phase 5 已交付 `sec:v2:*` Redis Session、Token Digest、Token Family Rotation/Replay 撤销、并发策略、Web HttpOnly Host-only Refresh Cookie + CSRF、App Token 存储/设备 ID 适配，以及 TOTP/AAL2/Recovery Code MFA 核心和 DEV_OPS 强制 MFA。
+- [x] Phase 5 已交付 `sec:*` Redis Session、Token Digest、Token Family Rotation/Replay 撤销、并发策略、Web HttpOnly Host-only Refresh Cookie + CSRF、App Token 存储/设备 ID 适配，以及 TOTP/AAL2/Recovery Code MFA 核心和 DEV_OPS 强制 MFA。
 - [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
@@ -1728,8 +1728,9 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成 Web RoleAssignment Preview/Apply 编辑器：用户编辑器读取目标 Role/Permission Catalog/组织树，支持显式 Access/Grant Boundary 和 Scope 模式校验，并通过短时 Preview token Apply；后端 Permission Catalog 定向测试、Web format/lint/type/test 和数据库安全契约核对通过并已独立提交。
 - [x] Phase 9 已完成旧授权运行时清理：删除旧 Authority/Role/RelUserRole/RelRoleAuthority 模型、Mapper、Service、监听器和旧 Role 权限路由，User 生命周期回收切换为撤销活动 RoleAssignment；V11 数据库迁移、后端定向/全量回归和文档检查通过并已独立提交。
 - [x] Phase 9 已完成旧 Account 认证因子清理：绑定/解绑切换到 `authentication_identity`，删除旧 Account 实体/Mapper/Service/Controller/XML，新增 V12 下线 `sys_account`；后端认证身份定向测试、全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
-- [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:v2:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将 v2 key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
+- [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将安全 Redis Key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [x] Phase 9 已完成 `SecHolderStrategy` 接口拆分和旧适配层命名收口：Session 签发、读取、撤销、查询、Token 上下文和登录失败锁定分别使用窄端口，业务上下文适配器不再依赖旧 Holder 大接口，Redis v2 适配器和端口配置分别命名为 `RedisSecuritySessionRepository`、`SecuritySessionPortConfiguration`；starter 定向测试、后端全量回归和数据库安全契约核对通过并已独立提交。
+- [x] 本轮硬切换清理已完成：部门旧写入/删除入口、通知旧设置门面/路径别名/`type` 映射、菜单兼容过滤和旧短构造器均已移除；会话策略缺失改为 fail-closed，V19 下线旧通知运行表并废弃 `department:disable`。后端全量 Maven 测试、Web format/lint/type/test/build、App lint/type/H5 build、数据库契约和文档检查已完成并标记为通过；App 的 format 检查仅提示本轮未修改的既有 `README.md`。浏览器、多端运行和部署演练仍由人工验收。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [~] 部署门禁代码已完成 Cookie Host/Path/SameSite、CSRF 名称、精确 Origin、反向代理 HTTPS 感知和生产 CORS 必填校验，并有单测与无敏感值配置示例；仍需上线前填写真实 allowlist、代理信任和归档 bucket 值并完成部署评审。
 - [~] Phase 5 已完成 TOTP/Recovery Code 密钥双版本迁移窗口、成功验证自动 re-key、Recovery Code 轮换 API 和运维 Runbook；设备迁移、Root break-glass 凭据轮换及隔离恢复演练仍待完成。

@@ -10,15 +10,35 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 
 > 来源：[[00-项目总览|项目 VitePress 文档]]
 >
-> 适用于 spectra-admin 中作为缓存层使用 Redis。不含消息队列、分布式锁等特殊用法。
+> 适用于 spectra-admin 中作为缓存层使用 Redis。不含消息队列、分布式锁等特殊用法。安全模块的 Token、Session、MFA、验证码、防重放和请求 nonce Redis 不属于本规范中的普通缓存，见下文“安全 Redis 强依赖”。
 
 ## 核心原则
 
-> **Redis 是性能工具，不是业务工具**
+> **普通 Redis 是性能工具，不是业务事实源**
 
 - 只作为缓存，不作为唯一数据源
 - 任何 Redis 数据都允许丢失
 - Redis ≠ 数据库
+
+### 安全 Redis 强依赖
+
+安全模块使用 Redis 作为以下状态的唯一事实源：
+
+- Access Token / Refresh Token / Session 及 Token Family
+- Refresh Token 一次性轮换声明和重放围栏
+- MFA 登录 Challenge、失败次数和消费状态
+- 登录、绑定流程验证码摘要
+- 加密请求 nonce 防重放状态
+- 登录失败次数和锁定状态
+
+这些状态不能使用本地缓存、旧快照或内存数据替代。安全 Redis 发生连接失败、超时、命令异常，或者 Lua 脚本未返回预期结果时，必须立即 fail-closed：
+
+- Token 鉴权请求清理安全上下文并停止过滤器链，返回 HTTP 503；
+- Controller/Service 请求由统一异常处理返回 HTTP 503 `安全会话服务暂不可用`；
+- 不得将故障解释成“Token 无效”“验证码错误”“Challenge 不存在”或“已消费”；
+- 不得继续传递 Token、创建/刷新会话或进入业务层。
+
+生产代码统一使用 `SecurityRedisExecutor` 包裹安全 Redis 操作。普通业务缓存仍可按缓存策略处理，但不得把普通缓存降级模式用于上述安全事实源。
 
 ## Key 设计
 
@@ -135,7 +155,7 @@ public void updateDepartment(...) { ... }
 | 禁止 | 原因 |
 |---|---|
 | Redis 当数据库 | 数据允许丢失 |
-| 业务强依赖 Redis | 缓存穿透风险 |
+| 普通业务强依赖 Redis | 缓存穿透风险；安全事实源除外，必须 fail-closed |
 | cacheNames 随意命名 | 无法运维 |
 | 永不过期 Key | 内存泄漏 |
 | 手写 key 字符串 | 冲突风险 |

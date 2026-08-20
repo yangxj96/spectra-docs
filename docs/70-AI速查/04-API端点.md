@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 47 个 `*Controller.java` 端点速查表。
+> 源码当前 46 个 `*Controller.java` 端点速查表。
 
 ## 认证与安全
 
@@ -65,8 +65,7 @@ Web 用户编辑器对已有用户提供 RoleAssignment 新增/修改：先调�
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| NotificationController | `/notification/**`、`/notification-center/inbox/**` | 当前用户消息列表/详情/未读数/已读/删除/批量删除 |
-| NotificationSettingController | `/notification/setting/**` | 兼容旧路径的当前用户消息设置查询与保存 |
+| NotificationController | `/notification/**` | 当前用户消息列表/详情/未读数/已读/删除/批量删除 |
 | NotificationPreferenceController | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好查询与保存 |
 | NotificationAdminController | `/notification/admin/**` | 运维/审计脱敏查询、渠道状态、任务重试和取消 |
 

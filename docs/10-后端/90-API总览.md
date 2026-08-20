@@ -61,12 +61,11 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `NotificationController` | spectra-notification | `/notification/**`、`/notification-center/inbox/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
-| `NotificationSettingController` | spectra-notification | `/notification/setting/**` | 兼容旧 API 的当前用户消息设置查询与保存 |
+| `NotificationController` | spectra-notification | `/notification/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
 | `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的脱敏查询、渠道状态、重试和取消 |
 
-消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。`/notification-center/inbox/**` 是 `/notification/**` 的兼容路径别名。
+消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。
 
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.sec_permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
 

@@ -95,7 +95,7 @@ spectra-app/
 
 > **环境变量命名约定**：spectra-app 使用 `VITE_API_BASE_URL`（无尾部 `/`），spectra-ui 使用 `VITE_API_URL`（带尾部 `/`）。这是两个项目的既定约定，不强制统一。
 
-> 接口加解密（`VITE_CRYPTO_ENABLED`）基于 Web Crypto API，仅 H5 平台可用。密钥通过后端 API 动态获取（`initCrypto` + `fetchClientPrivateKey`），不再硬编码在 `.env` 中。
+> 接口加解密（`VITE_CRYPTO_ENABLED`）基于 Web Crypto API，仅 H5 平台可用。密钥通过 `src/platform/crypto` 平台抽象按生命周期动态获取，不再从 HTTP 服务导出兼容初始化函数，也不硬编码在 `.env` 中。
 
 > ⚠️ **技术债务**：`utils/crypto/` 下的 `aes-utils.ts`、`rsa-utils.ts`、`crypto-utils.ts` 与 spectra-ui 中完全重复。未来应抽取为共享包 `@spectra/crypto`。
 
