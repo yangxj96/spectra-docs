@@ -1,5 +1,7 @@
 # Security Audit 归档与恢复 Runbook
 
+> 当前开发阶段不要求真实 S3 Object Lock bucket 或归档恢复演练；确定 `1.0.0` 发布版本后，必须完成本文的独立 bucket、Compliance retention、完整性校验和隔离恢复门禁。
+
 ## 已选后端
 
 首版选择 S3-compatible Object Lock（Compliance mode）作为安全审计归档介质：

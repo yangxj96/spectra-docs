@@ -377,5 +377,5 @@ updated: 2026-08-14
 - [[20-前端/10-spectra-ui]]
 - [[90-计划/spectra-admin/P-统一通知模块建设计划]]
 - [[90-计划/spectra-ui/P-消息中心前端实现计划]]
-- [[90-计划/spectra-admin/P-Security认证授权体系重构计划]]
+- [[10-后端/20-用户与权限]]
 - [[90-计划/spectra-admin/P-数据权限与数据隔离重构计划]]

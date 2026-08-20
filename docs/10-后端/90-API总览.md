@@ -9,6 +9,8 @@ tags:
 
 > spectra-admin 全部 REST API 控制器速查表。源码当前共 47 个 `*Controller.java`。
 
+当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。项目处于开发阶段，已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
+
 ## 认证与安全
 
 | Controller | 模块 | 基础路径 | 说明 |

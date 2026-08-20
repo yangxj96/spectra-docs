@@ -9,6 +9,8 @@ tags:
 
 > 源码当前 46 个 `*Controller.java` 端点速查表。
 
+当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。开发阶段不保留旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
+
 ## 认证与安全
 
 | Controller | 路径 | 说明 |

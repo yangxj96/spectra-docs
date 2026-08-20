@@ -12,11 +12,11 @@ created: 2026-08-01
 
 ## 状态
 
-**执行中（P0/P1 安全基线与旧 Scope 结构下线已落地，统一策略表迁移待后续窗口）**
+**历史设计记录（当前实现以 [[../../10-后端/25-数据权限设计]] 为准）**
 
 > 创建时间：2026-08-01
 > 适用范围：`spectra-admin`，重点覆盖 `spectra-common`、`spectra-framework`、`spectra-security-*`、`spectra-core`、`spectra-oa`。
-> 本计划替代当前“Entity 上 `@DataScope` + 每条 SQL 动态解析权限”的实现路线；迁移完成前保留兼容开关。
+> 本文保留数据权限重构的原始设计与实施记录；当前实现和后续变更以 [[../../10-后端/25-数据权限设计]] 为准。项目开发阶段不维护旧 Scope、旧 Provider/Resolver 或兼容开关，当前 `DataScopeExecutor` 仅作为受控系统运维绕过。
 
 ## 执行摘要
 

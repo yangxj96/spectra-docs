@@ -40,6 +40,18 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 
 生产代码统一使用 `SecurityRedisExecutor` 包裹安全 Redis 操作。普通业务缓存仍可按缓存策略处理，但不得把普通缓存降级模式用于上述安全事实源。
 
+安全运行态统一使用 `sec:*` 命名空间，Key 中只允许摘要或非敏感标识，不允许出现明文 Token：
+
+| Key 前缀 | 用途 |
+|---|---|
+| `sec:sess:*` | Access Session 事实源 |
+| `sec:uc:*` / `sec:ut:*` / `sec:online` | 用户-客户端索引、用户 Token 集合和在线用户集合 |
+| `sec:family:*` / `sec:rt:family:*` | Access/Refresh Token Family |
+| `sec:rt:*` / `sec:rt:claim:*` / `sec:replay:*` | Refresh 映射、一次性消费声明和重放撤销围栏 |
+| `sec:mfa:challenge:*` / `sec:fail:*` | MFA Challenge 和登录失败锁定 |
+
+旧 `auth:*`、`sec:v2:*` 和兼容 Key 不再由运行时读取或写入；开发阶段不维护双命名空间迁移逻辑。
+
 ## Key 设计
 
 ### cacheNames 结构（强制）
