@@ -112,8 +112,13 @@ spectra-ui/
 │   │   ├── Common/       # 通用页面（404、401、Redirect）
 │   │   ├── Dashboard/
 │   │   ├── Login/
-│   │   ├── Monitor/
 │   │   ├── OA/
+│   │   ├── Devops/      # 运维管理（devops 路由前缀）
+│   │   │   ├── Monitor/
+│   │   │   ├── Placeholder/    # 尚未接入真实接口的预定义页面
+│   │   │   ├── Scheduler/
+│   │   │   ├── Security/
+│   │   │   └── SystemMaintenance/
 │   │   ├── System/       # 系统管理
 │   │   │   ├── Dict/     # 字典管理
 │   │   │   │   ├── index.vue
@@ -878,7 +883,7 @@ export default [
 
 ### 静态路由与授权菜单
 
-- 页面路由在 `src/plugin/router/modules/` 中按 `common/system/monitor/oa/example` 静态定义，由 `routes.ts` 聚合。
+- 页面路由在 `src/plugin/router/modules/` 中按 `common/system/devops/oa/example` 静态定义，由 `routes.ts` 聚合。
 - 登录后调用 `GET /menu/current` 获取当前用户授权导航树，不再根据数据库组件路径动态注册路由。
 - `MenuApi` 在 API 边界将后端 `menu_type/route_name` 递归归一化为前端 `menuType/routeName`，内部菜单工具统一使用 camelCase。
 - 可见页面通过 `meta.requiredMenu` 绑定数据库 `routeName`；详情和编辑页用 `activeMenu` 继承所属菜单权限和高亮。
@@ -904,10 +909,14 @@ src/views/
 │   ├── 404/
 │   ├── 401/
 │   └── Redirect/
-├── Monitor/                # 监控模块
 ├── OA/                     # OA 办公
+├── Devops/                 # 运维管理（/devops，Devops* 命名路由）
+│   ├── Monitor/             # 服务监控、缓存监控
+│   ├── Placeholder/         # 应用健康、通知、调度、安全等预定义占位页
+│   ├── Scheduler/           # 定时任务
+│   ├── Security/            # 安全上下文、安全审计、在线用户
+│   └── SystemMaintenance/   # 系统配置、文件管理
 ├── System/                 # 系统管理
-│   ├── Configured/
 │   ├── Dept/
 │   ├── Dict/
 │   │   ├── index.vue
@@ -917,7 +926,6 @@ src/views/
 │   ├── Menu/
 │   ├── RBAC/
 │   ├── Region/
-│   ├── Storage/
 │   ├── User/
 │   └── Workflow/
 │       ├── index.vue
