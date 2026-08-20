@@ -1,7 +1,7 @@
 -- ============================================
 -- spectra_security 目标安全 schema
 --
--- 该文件是当前目标 DDL 契约；已部署数据库由 Flyway V18 增量迁移到该命名结果。
+-- 该文件是当前目标 DDL 契约；已部署数据库由 Flyway V20 增量迁移到该命名结果。
 -- 不包含兼容旧 user_role、authority 或全局 data_scope 的表。
 -- ============================================
 
@@ -12,7 +12,7 @@ CREATE SCHEMA IF NOT EXISTS spectra_security;
 -- ============================================
 
 CREATE TABLE spectra_security.sec_permission (
-    id                 UUID CONSTRAINT pk_sec_permission PRIMARY KEY,
+    id                 UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_permission PRIMARY KEY,
     code               VARCHAR(120) NOT NULL,
     name               VARCHAR(120) NOT NULL,
     resource_code      VARCHAR(80) NOT NULL,
@@ -24,6 +24,7 @@ CREATE TABLE spectra_security.sec_permission (
     created_at         TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by         UUID,
     updated_at         TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted            TIMESTAMP(6) WITH TIME ZONE,
     version            BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_permission_code CHECK (code ~ '^[a-z][a-z0-9_-]*(:[a-z][a-z0-9_-]*){1,2}$'),
     CONSTRAINT ck_sec_permission_state CHECK (state IN ('ACTIVE', 'DEPRECATED')),
@@ -31,7 +32,7 @@ CREATE TABLE spectra_security.sec_permission (
 );
 
 CREATE TABLE spectra_security.sec_role (
-    id              UUID CONSTRAINT pk_sec_role PRIMARY KEY,
+    id              UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_role PRIMARY KEY,
     code            VARCHAR(80) NOT NULL,
     name            VARCHAR(120) NOT NULL,
     authority_level SMALLINT NOT NULL,
@@ -43,6 +44,7 @@ CREATE TABLE spectra_security.sec_role (
     created_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by      UUID,
     updated_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted         TIMESTAMP(6) WITH TIME ZONE,
     version         BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_role_code CHECK (code ~ '^ROLE_[A-Z0-9_]+$'),
     CONSTRAINT ck_sec_role_authority CHECK (authority_level > 0),
@@ -52,21 +54,33 @@ CREATE TABLE spectra_security.sec_role (
 );
 
 CREATE TABLE spectra_security.sec_role_permission (
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_role_permission PRIMARY KEY,
     role_id       UUID NOT NULL CONSTRAINT fk_sec_role_permission_role_id REFERENCES spectra_security.sec_role (id) ON DELETE RESTRICT,
     permission_id UUID NOT NULL CONSTRAINT fk_sec_role_permission_permission_id REFERENCES spectra_security.sec_permission (id) ON DELETE RESTRICT,
+    created_by    UUID,
     created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_sec_role_permission PRIMARY KEY (role_id, permission_id)
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sec_role_permission_role_permission UNIQUE (role_id, permission_id)
 );
 
 CREATE TABLE spectra_security.sec_role_grantable_permission (
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_role_grantable_permission PRIMARY KEY,
     role_id       UUID NOT NULL CONSTRAINT fk_sec_role_grantable_permission_role_id REFERENCES spectra_security.sec_role (id) ON DELETE RESTRICT,
     permission_id UUID NOT NULL CONSTRAINT fk_sec_role_grantable_permission_permission_id REFERENCES spectra_security.sec_permission (id) ON DELETE RESTRICT,
+    created_by    UUID,
     created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_sec_role_grantable_permission PRIMARY KEY (role_id, permission_id)
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sec_role_grantable_permission_role_permission UNIQUE (role_id, permission_id)
 );
 
 CREATE TABLE spectra_security.sec_role_assignment (
-    id            UUID CONSTRAINT pk_sec_role_assignment PRIMARY KEY,
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_role_assignment PRIMARY KEY,
     user_id       UUID NOT NULL CONSTRAINT fk_sec_role_assignment_user_id REFERENCES spectra_core.sys_user (id) ON DELETE RESTRICT,
     role_id       UUID NOT NULL CONSTRAINT fk_sec_role_assignment_role_id REFERENCES spectra_security.sec_role (id) ON DELETE RESTRICT,
     state         VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
@@ -76,6 +90,11 @@ CREATE TABLE spectra_security.sec_role_assignment (
     assigned_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     revoked_by    UUID,
     revoked_at    TIMESTAMP(6) WITH TIME ZONE,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
     version       BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_role_assignment_state CHECK (state IN ('ACTIVE', 'REVOKED', 'EXPIRED')),
     CONSTRAINT ck_sec_role_assignment_period CHECK (valid_until IS NULL OR valid_from IS NULL OR valid_until > valid_from)
@@ -91,38 +110,60 @@ CREATE INDEX idx_sec_role_assignment_role_state
 -- ============================================
 
 CREATE TABLE spectra_security.sec_authorization_scope (
-    id            UUID CONSTRAINT pk_sec_authorization_scope PRIMARY KEY,
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_authorization_scope PRIMARY KEY,
     scope_mode    VARCHAR(8) NOT NULL,
     resource_code VARCHAR(80),
+    created_by    UUID,
     created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_authorization_scope_mode CHECK (scope_mode IN ('NONE', 'ALL', 'SELF', 'RULES')),
     CONSTRAINT ck_sec_authorization_scope_resource CHECK (scope_mode IN ('NONE', 'SELF') OR resource_code IS NOT NULL)
 );
 
 CREATE TABLE spectra_security.sec_assignment_permission_boundary (
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_assignment_permission_boundary PRIMARY KEY,
     assignment_id UUID NOT NULL CONSTRAINT fk_sec_assignment_permission_boundary_assignment_id REFERENCES spectra_security.sec_role_assignment (id) ON DELETE RESTRICT,
     permission_id UUID NOT NULL CONSTRAINT fk_sec_assignment_permission_boundary_permission_id REFERENCES spectra_security.sec_permission (id) ON DELETE RESTRICT,
     scope_id      UUID NOT NULL CONSTRAINT fk_sec_assignment_permission_boundary_scope_id REFERENCES spectra_security.sec_authorization_scope (id) ON DELETE RESTRICT,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
     version       BIGINT NOT NULL DEFAULT 0,
-    CONSTRAINT pk_sec_assignment_permission_boundary PRIMARY KEY (assignment_id, permission_id)
+    CONSTRAINT uk_sec_assignment_permission_boundary_assignment_permission UNIQUE (assignment_id, permission_id)
 );
 
 CREATE TABLE spectra_security.sec_assignment_grant_boundary (
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_assignment_grant_boundary PRIMARY KEY,
     assignment_id UUID NOT NULL CONSTRAINT fk_sec_assignment_grant_boundary_assignment_id REFERENCES spectra_security.sec_role_assignment (id) ON DELETE RESTRICT,
     permission_id UUID NOT NULL CONSTRAINT fk_sec_assignment_grant_boundary_permission_id REFERENCES spectra_security.sec_permission (id) ON DELETE RESTRICT,
     scope_id      UUID NOT NULL CONSTRAINT fk_sec_assignment_grant_boundary_scope_id REFERENCES spectra_security.sec_authorization_scope (id) ON DELETE RESTRICT,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
     version       BIGINT NOT NULL DEFAULT 0,
-    CONSTRAINT pk_sec_assignment_grant_boundary PRIMARY KEY (assignment_id, permission_id)
+    CONSTRAINT uk_sec_assignment_grant_boundary_assignment_permission UNIQUE (assignment_id, permission_id)
 );
 
 CREATE TABLE spectra_security.sec_scope_rule (
-    id                  UUID CONSTRAINT pk_sec_scope_rule PRIMARY KEY,
+    id                  UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_scope_rule PRIMARY KEY,
     scope_id             UUID NOT NULL CONSTRAINT fk_sec_scope_rule_scope_id REFERENCES spectra_security.sec_authorization_scope (id) ON DELETE RESTRICT,
     rule_type            VARCHAR(24) NOT NULL,
     department_id        UUID CONSTRAINT fk_sec_scope_rule_department_id REFERENCES spectra_core.sys_department (id) ON DELETE RESTRICT,
     include_descendants  BOOLEAN NOT NULL DEFAULT FALSE,
     rule_payload         JSONB NOT NULL DEFAULT '{}'::JSONB,
+    created_by           UUID,
     created_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by           UUID,
+    updated_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted              TIMESTAMP(6) WITH TIME ZONE,
+    version              BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_scope_rule_type CHECK (rule_type IN ('DEPARTMENT', 'RESOURCE_RULE')),
     CONSTRAINT ck_sec_scope_rule_department CHECK (rule_type <> 'DEPARTMENT' OR department_id IS NOT NULL)
 );
@@ -138,7 +179,7 @@ CREATE INDEX idx_sec_scope_rule_department
 -- ============================================
 
 CREATE TABLE spectra_security.sec_authentication_identity (
-    id             UUID CONSTRAINT pk_sec_authentication_identity PRIMARY KEY,
+    id             UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_authentication_identity PRIMARY KEY,
     user_id        UUID NOT NULL CONSTRAINT fk_sec_authentication_identity_user_id REFERENCES spectra_core.sys_user (id) ON DELETE RESTRICT,
     method_code    VARCHAR(32) NOT NULL,
     provider_code  VARCHAR(64) NOT NULL DEFAULT 'LOCAL',
@@ -146,8 +187,11 @@ CREATE TABLE spectra_security.sec_authentication_identity (
     state          VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
     verified_at    TIMESTAMP(6) WITH TIME ZONE,
     last_used_at   TIMESTAMP(6) WITH TIME ZONE,
+    created_by     UUID,
     created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by     UUID,
     updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted        TIMESTAMP(6) WITH TIME ZONE,
     version        BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_authentication_identity_state CHECK (state IN ('ACTIVE', 'DISABLED', 'REVOKED')),
     CONSTRAINT uk_sec_authentication_identity_identifier UNIQUE (method_code, provider_code, identifier_hash)
@@ -157,49 +201,70 @@ CREATE INDEX idx_sec_authentication_identity_user_state
     ON spectra_security.sec_authentication_identity (user_id, state);
 
 CREATE TABLE spectra_security.sec_password_credential (
-    user_id          UUID CONSTRAINT pk_sec_password_credential PRIMARY KEY CONSTRAINT fk_sec_password_credential_user_id REFERENCES spectra_core.sys_user (id) ON DELETE RESTRICT,
+    id               UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_password_credential PRIMARY KEY,
+    user_id          UUID NOT NULL CONSTRAINT fk_sec_password_credential_user_id REFERENCES spectra_core.sys_user (id) ON DELETE RESTRICT,
     password_hash    VARCHAR(255) NOT NULL,
     changed_at       TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     expires_at       TIMESTAMP(6) WITH TIME ZONE,
     must_change      BOOLEAN NOT NULL DEFAULT FALSE,
     failed_attempts  INTEGER NOT NULL DEFAULT 0,
     locked_until     TIMESTAMP(6) WITH TIME ZONE,
-    version          BIGINT NOT NULL DEFAULT 0
+    created_by       UUID,
+    created_at       TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by       UUID,
+    updated_at       TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted          TIMESTAMP(6) WITH TIME ZONE,
+    version          BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sec_password_credential_user UNIQUE (user_id)
 );
 
 CREATE TABLE spectra_security.sec_security_client (
-    id          UUID CONSTRAINT pk_sec_security_client PRIMARY KEY,
+    id          UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_security_client PRIMARY KEY,
     code        VARCHAR(32) NOT NULL,
     name        VARCHAR(80) NOT NULL,
     state       VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+    created_by  UUID,
     created_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by  UUID,
     updated_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted     TIMESTAMP(6) WITH TIME ZONE,
     version     BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_security_client_state CHECK (state IN ('ACTIVE', 'DISABLED')),
     CONSTRAINT uk_sec_security_client_code UNIQUE (code)
 );
 
 CREATE TABLE spectra_security.sec_authentication_method (
-    id            UUID CONSTRAINT pk_sec_authentication_method PRIMARY KEY,
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_authentication_method PRIMARY KEY,
     code          VARCHAR(32) NOT NULL,
     name          VARCHAR(80) NOT NULL,
     state         VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
     secret_ref    VARCHAR(255),
+    created_by    UUID,
     created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by    UUID,
     updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
     version       BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_authentication_method_state CHECK (state IN ('ACTIVE', 'DISABLED')),
     CONSTRAINT uk_sec_authentication_method_code UNIQUE (code)
 );
 
 CREATE TABLE spectra_security.sec_client_auth_method (
+    id                     UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_client_auth_method PRIMARY KEY,
     client_id              UUID NOT NULL CONSTRAINT fk_sec_client_auth_method_client_id REFERENCES spectra_security.sec_security_client (id) ON DELETE RESTRICT,
     authentication_method_id UUID NOT NULL CONSTRAINT fk_sec_client_auth_method_authentication_method_id REFERENCES spectra_security.sec_authentication_method (id) ON DELETE RESTRICT,
-    CONSTRAINT pk_sec_client_auth_method PRIMARY KEY (client_id, authentication_method_id)
+    created_by             UUID,
+    created_at             TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by             UUID,
+    updated_at             TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted                TIMESTAMP(6) WITH TIME ZONE,
+    version                BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sec_client_auth_method_client_method UNIQUE (client_id, authentication_method_id)
 );
 
 CREATE TABLE spectra_security.sec_session_policy (
-    client_id          UUID CONSTRAINT pk_sec_session_policy PRIMARY KEY CONSTRAINT fk_sec_session_policy_client_id REFERENCES spectra_security.sec_security_client (id) ON DELETE RESTRICT,
+    id                 UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_session_policy PRIMARY KEY,
+    client_id          UUID NOT NULL CONSTRAINT fk_sec_session_policy_client_id REFERENCES spectra_security.sec_security_client (id) ON DELETE RESTRICT,
     concurrency_mode   VARCHAR(16) NOT NULL DEFAULT 'ALLOW',
     allow_concurrent   BOOLEAN NOT NULL DEFAULT TRUE,
     max_sessions       INTEGER NOT NULL DEFAULT 1,
@@ -207,22 +272,35 @@ CREATE TABLE spectra_security.sec_session_policy (
     refresh_ttl_seconds INTEGER NOT NULL DEFAULT 604800,
     absolute_ttl_seconds INTEGER,
     idle_ttl_seconds INTEGER,
+    created_by          UUID,
+    created_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by          UUID,
+    updated_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted             TIMESTAMP(6) WITH TIME ZONE,
     version            BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_security_session_policy_mode CHECK (concurrency_mode IN ('ALLOW', 'KICK_OLD', 'REJECT_NEW')),
-    CONSTRAINT ck_sec_security_session_policy_limits CHECK (max_sessions > 0 AND access_ttl_seconds > 0 AND refresh_ttl_seconds > 0)
+    CONSTRAINT ck_sec_security_session_policy_limits CHECK (max_sessions > 0 AND access_ttl_seconds > 0 AND refresh_ttl_seconds > 0),
+    CONSTRAINT uk_sec_session_policy_client UNIQUE (client_id)
 );
 
 CREATE TABLE spectra_security.sec_password_policy (
-    policy_key          VARCHAR(32) CONSTRAINT pk_sec_password_policy PRIMARY KEY DEFAULT 'SYSTEM',
+    id                  UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_password_policy PRIMARY KEY,
+    policy_key          VARCHAR(32) NOT NULL DEFAULT 'SYSTEM',
     min_length          INTEGER NOT NULL DEFAULT 12,
     require_uppercase   BOOLEAN NOT NULL DEFAULT TRUE,
     require_lowercase   BOOLEAN NOT NULL DEFAULT TRUE,
     require_digit       BOOLEAN NOT NULL DEFAULT TRUE,
     require_special     BOOLEAN NOT NULL DEFAULT TRUE,
     max_age_days        INTEGER,
+    created_by          UUID,
+    created_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by          UUID,
+    updated_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted             TIMESTAMP(6) WITH TIME ZONE,
     version             BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_password_policy_key CHECK (policy_key = 'SYSTEM'),
-    CONSTRAINT ck_sec_password_policy_length CHECK (min_length >= 8)
+    CONSTRAINT ck_sec_password_policy_length CHECK (min_length >= 8),
+    CONSTRAINT uk_sec_password_policy_key UNIQUE (policy_key)
 );
 
 -- ============================================
@@ -230,13 +308,17 @@ CREATE TABLE spectra_security.sec_password_policy (
 -- ============================================
 
 CREATE TABLE spectra_security.sec_mfa_enrollment (
-    id           UUID CONSTRAINT pk_sec_mfa_enrollment PRIMARY KEY,
+    id           UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_mfa_enrollment PRIMARY KEY,
     user_id      UUID NOT NULL CONSTRAINT fk_sec_mfa_enrollment_user_id REFERENCES spectra_core.sys_user (id) ON DELETE RESTRICT,
     factor_type  VARCHAR(24) NOT NULL,
     state        VARCHAR(16) NOT NULL DEFAULT 'PENDING',
     enrolled_at  TIMESTAMP(6) WITH TIME ZONE,
     revoked_at   TIMESTAMP(6) WITH TIME ZONE,
+    created_by   UUID,
     created_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by   UUID,
+    updated_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted      TIMESTAMP(6) WITH TIME ZONE,
     version      BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_mfa_enrollment_factor CHECK (factor_type IN ('TOTP', 'WEBAUTHN', 'PASSKEY')),
     CONSTRAINT ck_sec_mfa_enrollment_state CHECK (state IN ('PENDING', 'ACTIVE', 'REVOKED'))
@@ -247,17 +329,29 @@ CREATE UNIQUE INDEX uk_sec_mfa_enrollment_user_factor_active
     WHERE state = 'ACTIVE';
 
 CREATE TABLE spectra_security.sec_totp_credential (
-    enrollment_id UUID CONSTRAINT pk_sec_totp_credential PRIMARY KEY CONSTRAINT fk_sec_totp_credential_enrollment_id REFERENCES spectra_security.sec_mfa_enrollment (id) ON DELETE RESTRICT,
+    id             UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_totp_credential PRIMARY KEY,
+    enrollment_id  UUID NOT NULL CONSTRAINT fk_sec_totp_credential_enrollment_id REFERENCES spectra_security.sec_mfa_enrollment (id) ON DELETE RESTRICT,
     encrypted_secret BYTEA NOT NULL,
     key_version    VARCHAR(64) NOT NULL,
-    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_by     UUID,
+    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by     UUID,
+    updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted        TIMESTAMP(6) WITH TIME ZONE,
+    version        BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sec_totp_credential_enrollment UNIQUE (enrollment_id)
 );
 
 CREATE TABLE spectra_security.sec_recovery_code (
-    id            UUID CONSTRAINT pk_sec_recovery_code PRIMARY KEY,
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_recovery_code PRIMARY KEY,
     enrollment_id UUID NOT NULL CONSTRAINT fk_sec_recovery_code_enrollment_id REFERENCES spectra_security.sec_mfa_enrollment (id) ON DELETE RESTRICT,
     code_hash     VARCHAR(255) NOT NULL,
     used_at       TIMESTAMP(6) WITH TIME ZONE,
+    created_by    UUID,
+    created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
     version       BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT uk_sec_recovery_code_hash UNIQUE (enrollment_id, code_hash)
 );
@@ -267,15 +361,20 @@ CREATE TABLE spectra_security.sec_recovery_code (
 -- ============================================
 
 CREATE TABLE spectra_security.sec_root_policy (
-    policy_key                    VARCHAR(32) CONSTRAINT pk_sec_root_policy PRIMARY KEY DEFAULT 'SYSTEM',
+    id                            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_root_policy PRIMARY KEY,
+    policy_key                    VARCHAR(32) NOT NULL DEFAULT 'SYSTEM',
     min_effective_dev_ops_users   INTEGER NOT NULL DEFAULT 1,
     max_dev_ops_users             INTEGER NOT NULL DEFAULT 3,
     version                       BIGINT NOT NULL DEFAULT 0,
+    created_by                    UUID,
     created_at                    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by                    UUID,
     updated_at                    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted                       TIMESTAMP(6) WITH TIME ZONE,
     CONSTRAINT ck_sec_root_policy_key CHECK (policy_key = 'SYSTEM'),
     CONSTRAINT ck_sec_root_policy_limits CHECK (min_effective_dev_ops_users >= 1
-        AND max_dev_ops_users >= min_effective_dev_ops_users)
+        AND max_dev_ops_users >= min_effective_dev_ops_users),
+    CONSTRAINT uk_sec_root_policy_key UNIQUE (policy_key)
 );
 
 INSERT INTO spectra_security.sec_root_policy (policy_key, min_effective_dev_ops_users, max_dev_ops_users)
@@ -283,6 +382,7 @@ VALUES ('SYSTEM', 1, 3)
 ON CONFLICT (policy_key) DO NOTHING;
 
 CREATE TABLE spectra_security.sec_security_audit_event (
+    id                UUID DEFAULT gen_random_uuid() NOT NULL,
     event_id          UUID NOT NULL,
     event_type        VARCHAR(100) NOT NULL,
     operator_id       UUID,
@@ -296,6 +396,12 @@ CREATE TABLE spectra_security.sec_security_audit_event (
     occurred_at       TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     result            VARCHAR(16) NOT NULL,
     correlation_id    VARCHAR(100),
+    created_by        UUID,
+    created_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by        UUID,
+    updated_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted           TIMESTAMP(6) WITH TIME ZONE,
+    version           BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT pk_sec_security_audit_event PRIMARY KEY (event_id, occurred_at),
     CONSTRAINT ck_sec_security_audit_event_result CHECK (result IN ('STARTED', 'SUCCEEDED', 'FAILED', 'DENIED'))
 ) PARTITION BY RANGE (occurred_at);
@@ -328,14 +434,18 @@ CREATE TRIGGER trg_sec_security_audit_event_immutable
 REVOKE UPDATE, DELETE ON spectra_security.sec_security_audit_event FROM PUBLIC;
 
 CREATE TABLE spectra_security.sec_security_audit_retention_policy (
-    policy_key             VARCHAR(64) CONSTRAINT pk_sec_security_audit_retention_policy PRIMARY KEY,
+    id                     UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_security_audit_retention_policy PRIMARY KEY,
+    policy_key             VARCHAR(64) NOT NULL,
     hot_retention_months   INTEGER NOT NULL DEFAULT 12,
     total_retention_years  INTEGER NOT NULL DEFAULT 5,
     archive_backend        VARCHAR(64) NOT NULL DEFAULT 'PENDING',
     state                  VARCHAR(32) NOT NULL DEFAULT 'ACTIVE',
     version                BIGINT NOT NULL DEFAULT 0,
+    created_by             UUID,
     created_at             TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by             UUID,
     updated_at             TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted                TIMESTAMP(6) WITH TIME ZONE,
     CONSTRAINT ck_sec_security_audit_retention_policy_hot_retention CHECK (hot_retention_months >= 12),
     CONSTRAINT ck_sec_security_audit_retention_policy_total_retention CHECK (total_retention_years >= 5),
     CONSTRAINT ck_sec_security_audit_retention_policy_state CHECK (state IN ('ACTIVE', 'PAUSED'))
@@ -347,7 +457,8 @@ VALUES ('DEFAULT', 12, 5, 'PENDING', 'ACTIVE')
 ON CONFLICT (policy_key) DO NOTHING;
 
 CREATE TABLE spectra_security.sec_security_audit_archive_manifest (
-    manifest_id       UUID CONSTRAINT pk_sec_security_audit_archive_manifest PRIMARY KEY,
+    id                UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_security_audit_archive_manifest PRIMARY KEY,
+    manifest_id       UUID NOT NULL,
     partition_name    VARCHAR(128) NOT NULL CONSTRAINT uk_sec_security_audit_archive_manifest_partition_name UNIQUE,
     range_start       TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     range_end         TIMESTAMP(6) WITH TIME ZONE NOT NULL,
@@ -358,11 +469,16 @@ CREATE TABLE spectra_security.sec_security_audit_archive_manifest (
     archived_at       TIMESTAMP(6) WITH TIME ZONE,
     verified_at       TIMESTAMP(6) WITH TIME ZONE,
     last_error        VARCHAR(2000),
+    created_by        UUID,
     created_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by        UUID,
     updated_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted           TIMESTAMP(6) WITH TIME ZONE,
+    version           BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT ck_sec_security_audit_archive_manifest_range CHECK (range_end > range_start),
     CONSTRAINT ck_sec_security_audit_archive_manifest_state CHECK (state IN ('PLANNED', 'ARCHIVED', 'VERIFIED', 'RESTORE_PENDING', 'RESTORED', 'FAILED')),
-    CONSTRAINT ck_sec_security_audit_archive_manifest_hash CHECK (content_sha256 IS NULL OR content_sha256 ~ '^[0-9a-fA-F]{64}$')
+    CONSTRAINT ck_sec_security_audit_archive_manifest_hash CHECK (content_sha256 IS NULL OR content_sha256 ~ '^[0-9a-fA-F]{64}$'),
+    CONSTRAINT uk_sec_security_audit_archive_manifest_id UNIQUE (manifest_id)
 );
 
 CREATE INDEX idx_sec_security_audit_archive_manifest_range
@@ -380,7 +496,11 @@ CREATE TABLE spectra_security.sec_security_change_outbox (
     aggregate_type  VARCHAR(80) NOT NULL,
     aggregate_id    UUID,
     payload         JSONB NOT NULL DEFAULT '{}'::JSONB,
+    created_by      UUID,
     created_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by      UUID,
+    updated_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted         TIMESTAMP(6) WITH TIME ZONE,
     processed_at    TIMESTAMP(6) WITH TIME ZONE,
     attempts        INTEGER NOT NULL DEFAULT 0,
     last_error      VARCHAR(1000),
@@ -393,10 +513,16 @@ CREATE INDEX idx_sec_security_change_outbox_created_at
 
 -- Menu is a navigation capability and remains separate from Permission.
 CREATE TABLE spectra_security.sec_role_menu (
+    id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_role_menu PRIMARY KEY,
     role_id       UUID NOT NULL CONSTRAINT fk_sec_role_menu_role_id REFERENCES spectra_security.sec_role (id) ON DELETE RESTRICT,
     menu_id       UUID NOT NULL CONSTRAINT fk_sec_role_menu_menu_id REFERENCES spectra_core.sys_menu (id) ON DELETE RESTRICT,
+    created_by    UUID,
     created_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_sec_role_menu PRIMARY KEY (role_id, menu_id)
+    updated_by    UUID,
+    updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted       TIMESTAMP(6) WITH TIME ZONE,
+    version       BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sec_role_menu_role_menu UNIQUE (role_id, menu_id)
 );
 
 CREATE INDEX idx_sec_role_menu_menu_id

@@ -31,7 +31,7 @@ services:
     image: postgres:18-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-spectra_db}
+      POSTGRES_DB: ${POSTGRES_DB:-devops00_spectra_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
     volumes:
@@ -61,7 +61,7 @@ services:
       SERVER_PORT: "8888"
       SERVER_SSL_ENABLED: "false"
       DEFAULT_PASSWORD: ${DEFAULT_PASSWORD:?set DEFAULT_PASSWORD}
-      DB_URL: jdbc:postgresql://spectra-postgres:5432/${POSTGRES_DB:-spectra_db}
+      DB_URL: jdbc:postgresql://spectra-postgres:5432/${POSTGRES_DB:-devops00_spectra_db}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       REDIS_HOST: spectra-redis
@@ -101,7 +101,7 @@ volumes:
 ```dotenv
 SPECTRA_IMAGE_TAG=<固定发布版本>
 SPECTRA_HTTP_PORT=8888
-POSTGRES_DB=spectra_db
+POSTGRES_DB=devops00_spectra_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=<强随机密码>
 REDIS_PASSWORD=<另一个强随机密码>

@@ -4,7 +4,7 @@
 
 ## 当前开发阶段结论
 
-当前开发数据库 `spectra_db` 没有待迁移的旧账号、旧 user-level Scope 或旧业务数据，旧账号已清理，因此本阶段 Scope 到 Permission Boundary 的逐账号映射为“不适用”，不是未完成事项。只有未来导入历史业务库或恢复包含旧 Scope 的备份时，才需要重新执行本文的逐条盘点和人工映射门禁。
+当前开发数据库 `devops00_spectra_db` 没有待迁移的旧账号、旧 user-level Scope 或旧业务数据，旧账号已清理，因此本阶段 Scope 到 Permission Boundary 的逐账号映射为“不适用”，不是未完成事项。只有未来导入历史业务库或恢复包含旧 Scope 的备份时，才需要重新执行本文的逐条盘点和人工映射门禁。
 
 ## 目标
 
