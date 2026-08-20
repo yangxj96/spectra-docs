@@ -1,6 +1,7 @@
 -- ============================================
 -- spectra_core schema 建表语句
--- 共 14 张表（不含 BaseEntity；旧认证/授权运行时表由 V11/V12 下线）
+-- 共 16 张表（不含 BaseEntity；旧认证/授权运行时表由 V11/V12 下线）
+-- 当前物理字段顺序由 Flyway V21/V22/V23 固化；种子审计元数据和完整注释由 V24/V25/V26 固化。
 -- ============================================
 
 CREATE SCHEMA IF NOT EXISTS spectra_core;
@@ -18,7 +19,10 @@ CREATE TABLE spectra_core.sys_user (
     id             UUID PRIMARY KEY,
     username       VARCHAR(100) NOT NULL,
     avatar         VARCHAR(255),
-    status         SMALLINT NOT NULL DEFAULT 1,
+    status         VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+    status_reason  VARCHAR(500),
+    locked_until   TIMESTAMP(6) WITH TIME ZONE,
+    departed_at    TIMESTAMP(6) WITH TIME ZONE,
     real_name      VARCHAR(50),
     gender         SMALLINT DEFAULT 0,
     birthday       TIMESTAMP(6) WITH TIME ZONE,
@@ -29,6 +33,7 @@ CREATE TABLE spectra_core.sys_user (
     language       VARCHAR(10) DEFAULT 'zh-CN',
     timezone       VARCHAR(40) DEFAULT 'Asia/Shanghai',
     primary_department_id UUID,
+    security_version BIGINT NOT NULL DEFAULT 0,
     created_by     UUID,
     created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by     UUID,
@@ -41,6 +46,9 @@ COMMENT ON COLUMN spectra_core.sys_user.id IS '主键ID';
 COMMENT ON COLUMN spectra_core.sys_user.username IS '显示名称';
 COMMENT ON COLUMN spectra_core.sys_user.avatar IS '头像';
 COMMENT ON COLUMN spectra_core.sys_user.status IS '状态 (1:正常 0:禁用)';
+COMMENT ON COLUMN spectra_core.sys_user.status_reason IS '状态变更原因';
+COMMENT ON COLUMN spectra_core.sys_user.locked_until IS '账号锁定截止时间';
+COMMENT ON COLUMN spectra_core.sys_user.departed_at IS '离职时间';
 COMMENT ON COLUMN spectra_core.sys_user.real_name IS '真实姓名';
 COMMENT ON COLUMN spectra_core.sys_user.gender IS '性别(从字典中获取)';
 COMMENT ON COLUMN spectra_core.sys_user.birthday IS '生日';
@@ -51,6 +59,7 @@ COMMENT ON COLUMN spectra_core.sys_user.city IS '城市';
 COMMENT ON COLUMN spectra_core.sys_user.language IS '语言';
 COMMENT ON COLUMN spectra_core.sys_user.timezone IS '时区';
 COMMENT ON COLUMN spectra_core.sys_user.primary_department_id IS '主部门ID；完整组织关系由用户部门成员关系表维护';
+COMMENT ON COLUMN spectra_core.sys_user.security_version IS '安全版本号，用于权限变更和会话失效';
 COMMENT ON COLUMN spectra_core.sys_user.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_user.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_user.updated_by IS '最后更新人';
@@ -71,14 +80,14 @@ CREATE TABLE spectra_core.sys_department (
     type       VARCHAR(50),
     path       VARCHAR(255),
     remark     VARCHAR(255),
+    region_id  UUID,
+    sort       INTEGER DEFAULT 0,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by UUID,
     updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     deleted    TIMESTAMP(6) WITH TIME ZONE,
-    version    BIGINT DEFAULT 0,
-    region_id  UUID,
-    sort       INTEGER DEFAULT 0
+    version    BIGINT DEFAULT 0
 );
 COMMENT ON TABLE spectra_core.sys_department IS '部门表';
 COMMENT ON COLUMN spectra_core.sys_department.id IS '主键ID';
@@ -96,6 +105,64 @@ COMMENT ON COLUMN spectra_core.sys_department.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.sys_department.version IS '乐观锁';
 COMMENT ON COLUMN spectra_core.sys_department.region_id IS '所属行政区划ID';
 COMMENT ON COLUMN spectra_core.sys_department.sort IS '排序,默认0';
+
+-- 用户部门关系表
+CREATE TABLE spectra_core.sys_user_department_membership (
+    id              UUID DEFAULT uuidv7() PRIMARY KEY,
+    user_id         UUID NOT NULL REFERENCES spectra_core.sys_user (id) ON DELETE RESTRICT,
+    department_id   UUID NOT NULL REFERENCES spectra_core.sys_department (id) ON DELETE RESTRICT,
+    membership_type VARCHAR(16) NOT NULL,
+    created_by      UUID,
+    created_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by      UUID,
+    updated_at      TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted         TIMESTAMP(6) WITH TIME ZONE,
+    version         BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sys_user_department_membership_pair UNIQUE (user_id, department_id),
+    CONSTRAINT ck_sys_user_department_membership_type
+        CHECK (membership_type IN ('PRIMARY', 'ASSOCIATED'))
+);
+
+-- 组织闭包关系表
+CREATE TABLE spectra_core.sys_department_closure (
+    id           UUID DEFAULT uuidv7() PRIMARY KEY,
+    ancestor_id  UUID NOT NULL REFERENCES spectra_core.sys_department (id) ON DELETE CASCADE,
+    descendant_id UUID NOT NULL REFERENCES spectra_core.sys_department (id) ON DELETE CASCADE,
+    depth        INTEGER NOT NULL,
+    created_by   UUID,
+    created_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by   UUID,
+    updated_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted      TIMESTAMP(6) WITH TIME ZONE,
+    version      BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sys_department_closure_pair UNIQUE (ancestor_id, descendant_id),
+    CONSTRAINT ck_sys_department_closure_depth CHECK (depth >= 0)
+);
+
+-- 组织树安全版本单例
+CREATE TABLE spectra_core.sys_organization_version (
+    id                   UUID DEFAULT uuidv7() PRIMARY KEY,
+    singleton_key        VARCHAR(16) NOT NULL DEFAULT 'SYSTEM',
+    organization_version BIGINT NOT NULL DEFAULT 0,
+    changed_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by           UUID,
+    created_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by           UUID,
+    updated_at           TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted              TIMESTAMP(6) WITH TIME ZONE,
+    version              BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sys_organization_version_key UNIQUE (singleton_key),
+    CONSTRAINT ck_sys_organization_version_key CHECK (singleton_key = 'SYSTEM'),
+    CONSTRAINT ck_sys_organization_version_value CHECK (organization_version >= 0)
+);
+
+INSERT INTO spectra_core.sys_organization_version
+    (id, singleton_key, organization_version, created_by, created_at, updated_by, updated_at, version)
+VALUES
+    ('00000000-0000-0000-0000-000000000000', 'SYSTEM', 0,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
+ON CONFLICT (singleton_key) DO NOTHING;
 
 -- 菜单表
 CREATE TABLE spectra_core.sys_menu (
@@ -142,8 +209,12 @@ CREATE TABLE spectra_core.sys_region (
     id         UUID PRIMARY KEY,
     pid        UUID,
     name       VARCHAR(100),
+    full_name  VARCHAR(255),
+    short_name VARCHAR(100),
     code       VARCHAR(100),
+    path       VARCHAR(255),
     level      INTEGER,
+    status     BOOLEAN NOT NULL DEFAULT TRUE,
     sort       INTEGER,
     created_by UUID,
     created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
@@ -169,6 +240,33 @@ COMMENT ON COLUMN spectra_core.sys_region.updated_by IS '最后更新人';
 COMMENT ON COLUMN spectra_core.sys_region.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_core.sys_region.deleted IS '删除标识';
 COMMENT ON COLUMN spectra_core.sys_region.version IS '乐观锁';
+
+-- 系统首次初始化状态
+CREATE TABLE spectra_core.sys_system_state (
+    id                UUID DEFAULT uuidv7() PRIMARY KEY,
+    state_key         VARCHAR(32) NOT NULL,
+    state             VARCHAR(32) NOT NULL DEFAULT 'UNINITIALIZED',
+    initialization_id UUID,
+    initialized_at    TIMESTAMP(6) WITH TIME ZONE,
+    initialized_by    UUID,
+    created_by        UUID,
+    created_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by        UUID,
+    updated_at        TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted           TIMESTAMP(6) WITH TIME ZONE,
+    version           BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uk_sys_system_state_key UNIQUE (state_key),
+    CONSTRAINT ck_sys_system_state_key CHECK (state_key = 'SYSTEM'),
+    CONSTRAINT ck_sys_system_state_value CHECK (state IN ('UNINITIALIZED', 'INITIALIZING', 'INITIALIZED'))
+);
+
+INSERT INTO spectra_core.sys_system_state
+    (id, state_key, state, created_by, created_at, updated_by, updated_at, version)
+VALUES
+    ('00000000-0000-0000-0000-000000000000', 'SYSTEM', 'UNINITIALIZED',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
+ON CONFLICT (state_key) DO NOTHING;
 
 -- 字典组
 CREATE TABLE spectra_core.sys_dict_group (
@@ -212,13 +310,13 @@ CREATE TABLE spectra_core.sys_dict_item (
     sort         SMALLINT NOT NULL DEFAULT 0,
     state        SMALLINT NOT NULL,
     remark       VARCHAR(255),
+    default_flag BOOLEAN DEFAULT FALSE,
     created_by   UUID,
     created_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     updated_by   UUID,
     updated_at   TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     deleted      TIMESTAMP(6) WITH TIME ZONE,
-    version      BIGINT DEFAULT 0,
-    default_flag BOOLEAN DEFAULT FALSE
+    version      BIGINT DEFAULT 0
 );
 COMMENT ON TABLE spectra_core.sys_dict_item IS '字典项';
 COMMENT ON COLUMN spectra_core.sys_dict_item.id IS '主键ID';
@@ -268,10 +366,18 @@ COMMENT ON COLUMN spectra_core.sys_config.version IS '乐观锁版本号,默认0
 -- 操作日志
 CREATE TABLE spectra_core.sys_log (
     id          UUID PRIMARY KEY,
+    user_id     UUID,
+    module      VARCHAR(100),
+    action      VARCHAR(100),
+    target      VARCHAR(255),
+    ip          VARCHAR(50),
+    user_agent  VARCHAR(500),
+    request_params  TEXT,
+    response_result TEXT,
+    duration    BIGINT,
     type        INTEGER,
     explain     TEXT,
     status      SMALLINT,
-    ip          VARCHAR(50),
     method      VARCHAR(32),
     url         VARCHAR(1000),
     args        JSONB,
@@ -282,16 +388,7 @@ CREATE TABLE spectra_core.sys_log (
     updated_by  UUID,
     updated_at  TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     deleted     TIMESTAMP(6) WITH TIME ZONE,
-    version     BIGINT DEFAULT 0,
-    -- V1 compatibility columns retained by V15/V16 for old log records.
-    user_id     UUID,
-    module      VARCHAR(100),
-    action      VARCHAR(100),
-    target      VARCHAR(255),
-    user_agent  VARCHAR(500),
-    request_params  TEXT,
-    response_result TEXT,
-    duration    BIGINT
+    version     BIGINT DEFAULT 0
 );
 COMMENT ON TABLE spectra_core.sys_log IS '操作日志表';
 COMMENT ON COLUMN spectra_core.sys_log.id IS '主键ID';
@@ -452,3 +549,53 @@ COMMENT ON COLUMN spectra_core.file_upload_chunk.version IS '乐观锁';
 -- 消息中心已迁移到 spectra_notification.ntf_*。
 -- 旧 sys_notification* 仅在不可变历史迁移和离线数据迁移脚本中出现，
 -- V19 后不属于 spectra_core 运行库结构。
+
+-- V25/V26 补齐列重建后遗漏的表及技术字段注释。
+COMMENT ON TABLE spectra_core.sys_user_department_membership IS '用户与部门成员关系表';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.id IS '主键ID';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.user_id IS '用户ID';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.department_id IS '部门ID';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.membership_type IS '成员关系：PRIMARY-主部门，ASSOCIATED-关联部门';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.created_by IS '创建人';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.updated_by IS '最后更新人';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.updated_at IS '最后更新时间';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.deleted IS '删除时间（NULL表示未删除）';
+COMMENT ON COLUMN spectra_core.sys_user_department_membership.version IS '乐观锁版本号';
+
+COMMENT ON TABLE spectra_core.sys_department_closure IS '部门层级闭包关系表';
+COMMENT ON COLUMN spectra_core.sys_department_closure.id IS '主键ID';
+COMMENT ON COLUMN spectra_core.sys_department_closure.ancestor_id IS '祖先部门ID';
+COMMENT ON COLUMN spectra_core.sys_department_closure.descendant_id IS '后代部门ID';
+COMMENT ON COLUMN spectra_core.sys_department_closure.depth IS '层级深度，0表示部门自身';
+COMMENT ON COLUMN spectra_core.sys_department_closure.created_by IS '创建人';
+COMMENT ON COLUMN spectra_core.sys_department_closure.created_at IS '创建时间';
+COMMENT ON COLUMN spectra_core.sys_department_closure.updated_by IS '最后更新人';
+COMMENT ON COLUMN spectra_core.sys_department_closure.updated_at IS '最后更新时间';
+COMMENT ON COLUMN spectra_core.sys_department_closure.deleted IS '删除时间（NULL表示未删除）';
+COMMENT ON COLUMN spectra_core.sys_department_closure.version IS '乐观锁版本号';
+
+COMMENT ON TABLE spectra_core.sys_organization_version IS '组织结构版本单例表';
+COMMENT ON COLUMN spectra_core.sys_organization_version.id IS '主键ID';
+COMMENT ON COLUMN spectra_core.sys_organization_version.singleton_key IS '单例键，固定为 SYSTEM';
+COMMENT ON COLUMN spectra_core.sys_organization_version.organization_version IS '组织结构版本号';
+COMMENT ON COLUMN spectra_core.sys_organization_version.changed_at IS '最近变更时间';
+COMMENT ON COLUMN spectra_core.sys_organization_version.created_by IS '创建人';
+COMMENT ON COLUMN spectra_core.sys_organization_version.created_at IS '创建时间';
+COMMENT ON COLUMN spectra_core.sys_organization_version.updated_by IS '最后更新人';
+COMMENT ON COLUMN spectra_core.sys_organization_version.updated_at IS '最后更新时间';
+COMMENT ON COLUMN spectra_core.sys_organization_version.deleted IS '删除时间（NULL表示未删除）';
+COMMENT ON COLUMN spectra_core.sys_organization_version.version IS '乐观锁版本号';
+
+COMMENT ON TABLE spectra_core.sys_system_state IS '系统初始化状态单例表';
+COMMENT ON COLUMN spectra_core.sys_system_state.id IS '主键ID';
+COMMENT ON COLUMN spectra_core.sys_system_state.state_key IS '状态键，固定为 SYSTEM';
+COMMENT ON COLUMN spectra_core.sys_system_state.state IS '初始化状态：UNINITIALIZED/INITIALIZING/INITIALIZED';
+COMMENT ON COLUMN spectra_core.sys_system_state.initialization_id IS '初始化流程ID';
+COMMENT ON COLUMN spectra_core.sys_system_state.initialized_at IS '系统初始化完成时间';
+COMMENT ON COLUMN spectra_core.sys_system_state.initialized_by IS '完成初始化的用户ID';
+COMMENT ON COLUMN spectra_core.sys_system_state.created_by IS '创建人';
+COMMENT ON COLUMN spectra_core.sys_system_state.created_at IS '创建时间';
+COMMENT ON COLUMN spectra_core.sys_system_state.updated_by IS '最后更新人';
+COMMENT ON COLUMN spectra_core.sys_system_state.updated_at IS '最后更新时间';
+COMMENT ON COLUMN spectra_core.sys_system_state.deleted IS '删除时间（NULL表示未删除）';
+COMMENT ON COLUMN spectra_core.sys_system_state.version IS '乐观锁版本号';

@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 46 个 `*Controller.java` 端点速查表。
+> 源码当前 47 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。开发阶段不保留旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -22,6 +22,7 @@ tags:
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据 |
 | MfaController | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
+| SystemInitializationController | `/system/initialization/**` | 首次创建 DEV_OPS 用户、密码凭证、TOTP MFA、Recovery Code 和 RoleAssignment；启动需要初始化令牌，MFA 挑战依赖 Redis |
 
 ## 核心 — 公共
 
@@ -30,6 +31,8 @@ tags:
 | CommonController | `/common/**` | 验证码生成、公共接口 |
 
 二阶段 MFA 登录接口：`POST /auth/login` 在密码阶段成功但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`；已有 TOTP 账号调用 `POST /auth/mfa/verify`，首次账号依次调用 `POST /security/mfa/setup/totp/enroll`、`POST /security/mfa/setup/totp/confirm`、`POST /auth/mfa/complete`。challenge 成功消费、过期或达到失败次数上限后失效。
+
+首次系统初始化接口：先调用 `GET /system/initialization/status`；未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，再调用 `POST /system/initialization/mfa/confirm` 完成 TOTP 登记并离线保存 Recovery Code，最后调用 `POST /system/initialization/complete` 激活用户、创建 `ROLE_DEV_OPS` Assignment 并获得首个 Token。初始化状态写入 `spectra_core.sys_system_state`，Redis 不可用时挑战和最终初始化均 fail-closed。
 
 ## 核心 — 用户权限
 

@@ -1,6 +1,7 @@
 -- ============================================
 -- spectra_oa schema 建表语句
 -- OA 业务、申请、资产、库存、采购、报销、文档和合同最终结构（33 张表）
+-- 固定种子的审计元数据由 V25 统一为零 UUID 和 1996-10-15 00:00:00+08。
 -- ============================================
 
 CREATE SCHEMA IF NOT EXISTS spectra_oa;
@@ -565,10 +566,13 @@ CREATE INDEX IF NOT EXISTS idx_oa_attendance_record_user_date
 -- P0 最小内置配置：请假类型与流程定义 KEY 对齐，流程图由 Workflow 模块部署。
 INSERT INTO spectra_oa.oa_application_type
     (id, code, name, process_definition_key, enabled, sort_order, description,
-     created_at, updated_at, version)
+     created_by, created_at, updated_by, updated_at, version)
 VALUES
     ('00000000-0000-0000-0000-000000000001', 'leave', '请假申请', 'oa_leave_approval', TRUE, 10,
-     '通用 OA 请假审批', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+     '通用 OA 请假审批', '00000000-0000-0000-0000-000000000000',
+     TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000',
+     TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
 ON CONFLICT (code) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS spectra_oa.oa_asset_category (
@@ -600,12 +604,20 @@ CREATE INDEX IF NOT EXISTS idx_oa_asset_source_receipt_item
 CREATE INDEX IF NOT EXISTS idx_oa_asset_operation_asset_date
     ON spectra_oa.oa_asset_operation (asset_id, operation_date DESC, created_at DESC);
 INSERT INTO spectra_oa.oa_asset_category
-    (id, code, name, asset_type, sort, enabled, created_at, updated_at, version)
+    (id, code, name, asset_type, sort, enabled, created_by, created_at, updated_by, updated_at, version)
 VALUES
-    ('00000000-0000-0000-0000-000000000101', 'OFFICE_EQUIPMENT', '办公设备', 'FIXED', 10, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
-    ('00000000-0000-0000-0000-000000000102', 'IT_EQUIPMENT', '信息设备', 'FIXED', 20, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
-    ('00000000-0000-0000-0000-000000000103', 'FURNITURE', '办公家具', 'FIXED', 30, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
-    ('00000000-0000-0000-0000-000000000104', 'VEHICLE', '车辆', 'FIXED', 40, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+    ('00000000-0000-0000-0000-000000000101', 'OFFICE_EQUIPMENT', '办公设备', 'FIXED', 10, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0),
+    ('00000000-0000-0000-0000-000000000102', 'IT_EQUIPMENT', '信息设备', 'FIXED', 20, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0),
+    ('00000000-0000-0000-0000-000000000103', 'FURNITURE', '办公家具', 'FIXED', 30, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0),
+    ('00000000-0000-0000-0000-000000000104', 'VEHICLE', '车辆', 'FIXED', 40, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
 ON CONFLICT DO NOTHING;
 
 -- P1 阶段 3：办公用品库存 MVP
@@ -726,10 +738,13 @@ CREATE INDEX IF NOT EXISTS idx_oa_purchase_receipt_item_receipt
 
 INSERT INTO spectra_oa.oa_application_type
     (id, code, name, process_definition_key, enabled, sort_order, description,
-     created_at, updated_at, version)
+     created_by, created_at, updated_by, updated_at, version)
 VALUES
     ('00000000-0000-0000-0000-000000000003', 'purchase', '采购申请', 'oa_purchase_approval', TRUE, 30,
-     'P1 采购申请审批', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+    'P1 采购申请审批', '00000000-0000-0000-0000-000000000000',
+    TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+    '00000000-0000-0000-0000-000000000000',
+    TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
 ON CONFLICT (code) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS spectra_oa.oa_notice_reader (
@@ -807,18 +822,27 @@ CREATE INDEX IF NOT EXISTS idx_oa_reimbursement_item_reimbursement
 
 INSERT INTO spectra_oa.oa_application_type
     (id, code, name, process_definition_key, enabled, sort_order, description,
-     created_at, updated_at, version)
+     created_by, created_at, updated_by, updated_at, version)
 VALUES
     ('00000000-0000-0000-0000-000000000002', 'reimbursement', '费用报销', 'oa_reimbursement_approval', TRUE, 20,
-     'P1 费用报销审批', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+     'P1 费用报销审批', '00000000-0000-0000-0000-000000000000',
+     TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000',
+     TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
 ON CONFLICT (code) DO NOTHING;
 
 INSERT INTO spectra_oa.oa_leave_type
-    (id, code, name, unit, default_hours, enabled, created_at, updated_at, version)
+    (id, code, name, unit, default_hours, enabled, created_by, created_at, updated_by, updated_at, version)
 VALUES
-    ('00000000-0000-0000-0000-000000000011', 'annual', '年假', 'HOUR', 80, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
-    ('00000000-0000-0000-0000-000000000012', 'sick', '病假', 'HOUR', NULL, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0),
-    ('00000000-0000-0000-0000-000000000013', 'personal', '事假', 'HOUR', NULL, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0)
+    ('00000000-0000-0000-0000-000000000011', 'annual', '年假', 'HOUR', 80, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0),
+    ('00000000-0000-0000-0000-000000000012', 'sick', '病假', 'HOUR', NULL, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0),
+    ('00000000-0000-0000-0000-000000000013', 'personal', '事假', 'HOUR', NULL, TRUE,
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
 ON CONFLICT (code) DO NOTHING;
 
 -- ============================================================

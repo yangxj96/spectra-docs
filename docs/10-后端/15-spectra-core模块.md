@@ -98,6 +98,8 @@ spectra-core ← 被以下模块依赖
 | ScopeRule | spectra_security.sec_scope_rule | 组织范围规则 |
 | SecurityRoleMenu | spectra_security.sec_role_menu | 角色菜单 UX 关系 |
 | Department | sys_department | 部门 |
+| OrganizationVersion | sys_organization_version | 组织树安全版本单例 |
+| SystemState | sys_system_state | 系统首次初始化状态 |
 | Menu | sys_menu | 菜单 |
 | Region | sys_region | 行政区划 |
 | DictGroup | sys_dict_group | 字典组 |
