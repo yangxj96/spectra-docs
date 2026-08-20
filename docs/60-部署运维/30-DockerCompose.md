@@ -15,7 +15,7 @@ tags:
 |---|---|---|
 | 服务名、容器内端口 8888、数据库/Redis 内部地址 | 可复用 | 同一 Compose 网络内按服务名访问 |
 | Named Volume | 可直接使用 | Docker 管理真实宿主机路径，避免写死 `/data/...` |
-| `POSTGRES_PASSWORD`、`REDIS_PASSWORD`、`DEFAULT_PASSWORD` | 必须配置 | 只写入部署机 `.env` 或 Secret 管理系统 |
+| `POSTGRES_PASSWORD`、`REDIS_PASSWORD` | 必须配置 | 只写入部署机 `.env` 或 Secret 管理系统 |
 | S3/AI/RAG 地址和凭据 | 必须按功能配置 | 示例不提供真实 Provider |
 | 宿主机映射端口、域名、镜像 Tag、资源限制 | 每套环境配置 | 不同服务器可能冲突或有不同规范 |
 
@@ -60,7 +60,6 @@ services:
     environment:
       SERVER_PORT: "8888"
       SERVER_SSL_ENABLED: "false"
-      DEFAULT_PASSWORD: ${DEFAULT_PASSWORD:?set DEFAULT_PASSWORD}
       DB_URL: jdbc:postgresql://spectra-postgres:5432/${POSTGRES_DB:-devops00_spectra_db}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
@@ -105,8 +104,6 @@ POSTGRES_DB=devops00_spectra_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=<强随机密码>
 REDIS_PASSWORD=<另一个强随机密码>
-DEFAULT_PASSWORD=<首次登录后立即更换的随机密码>
-
 S3_ENDPOINT=<真实 S3/MinIO URL>
 S3_ACCESS_KEY=<真实值>
 S3_SECRET_KEY=<真实值>

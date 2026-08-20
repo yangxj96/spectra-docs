@@ -256,14 +256,25 @@ CREATE TABLE spectra_core.sys_system_state (
     deleted           TIMESTAMP(6) WITH TIME ZONE,
     version           BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT uk_sys_system_state_key UNIQUE (state_key),
-    CONSTRAINT ck_sys_system_state_key CHECK (state_key = 'SYSTEM'),
-    CONSTRAINT ck_sys_system_state_value CHECK (state IN ('UNINITIALIZED', 'INITIALIZING', 'INITIALIZED'))
+    CONSTRAINT ck_sys_system_state_key CHECK (state_key IN ('SYSTEM', 'SYSTEM_GUIDE')),
+    CONSTRAINT ck_sys_system_state_value CHECK (
+        (state_key = 'SYSTEM' AND state IN ('UNINITIALIZED', 'INITIALIZING', 'INITIALIZED'))
+            OR (state_key = 'SYSTEM_GUIDE' AND state IN ('PENDING', 'COMPLETED'))
+    )
 );
 
 INSERT INTO spectra_core.sys_system_state
     (id, state_key, state, created_by, created_at, updated_by, updated_at, version)
 VALUES
     ('00000000-0000-0000-0000-000000000000', 'SYSTEM', 'UNINITIALIZED',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
+     '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
+ON CONFLICT (state_key) DO NOTHING;
+
+INSERT INTO spectra_core.sys_system_state
+    (id, state_key, state, created_by, created_at, updated_by, updated_at, version)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 'SYSTEM_GUIDE', 'PENDING',
      '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00',
      '00000000-0000-0000-0000-000000000000', TIMESTAMPTZ '1996-10-15 00:00:00+08:00', 0)
 ON CONFLICT (state_key) DO NOTHING;
@@ -586,13 +597,13 @@ COMMENT ON COLUMN spectra_core.sys_organization_version.updated_at IS '最后更
 COMMENT ON COLUMN spectra_core.sys_organization_version.deleted IS '删除时间（NULL表示未删除）';
 COMMENT ON COLUMN spectra_core.sys_organization_version.version IS '乐观锁版本号';
 
-COMMENT ON TABLE spectra_core.sys_system_state IS '系统初始化状态单例表';
+COMMENT ON TABLE spectra_core.sys_system_state IS '系统初始化与系统设置引导状态表；每个状态键只保留一条记录';
 COMMENT ON COLUMN spectra_core.sys_system_state.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_system_state.state_key IS '状态键，固定为 SYSTEM';
-COMMENT ON COLUMN spectra_core.sys_system_state.state IS '初始化状态：UNINITIALIZED/INITIALIZING/INITIALIZED';
-COMMENT ON COLUMN spectra_core.sys_system_state.initialization_id IS '初始化流程ID';
-COMMENT ON COLUMN spectra_core.sys_system_state.initialized_at IS '系统初始化完成时间';
-COMMENT ON COLUMN spectra_core.sys_system_state.initialized_by IS '完成初始化的用户ID';
+COMMENT ON COLUMN spectra_core.sys_system_state.state_key IS '状态机键：SYSTEM=首次系统初始化；SYSTEM_GUIDE=系统设置引导';
+COMMENT ON COLUMN spectra_core.sys_system_state.state IS '状态值按状态机解释：SYSTEM=UNINITIALIZED/INITIALIZING/INITIALIZED；SYSTEM_GUIDE=PENDING/COMPLETED';
+COMMENT ON COLUMN spectra_core.sys_system_state.initialization_id IS '首次系统初始化流程ID，仅 SYSTEM 状态机使用';
+COMMENT ON COLUMN spectra_core.sys_system_state.initialized_at IS '首次系统初始化完成时间，仅 SYSTEM 状态机使用';
+COMMENT ON COLUMN spectra_core.sys_system_state.initialized_by IS '完成首次系统初始化的用户ID，仅 SYSTEM 状态机使用';
 COMMENT ON COLUMN spectra_core.sys_system_state.created_by IS '创建人';
 COMMENT ON COLUMN spectra_core.sys_system_state.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_core.sys_system_state.updated_by IS '最后更新人';

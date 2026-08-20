@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 47 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 49 个 `*Controller.java`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。项目处于开发阶段，已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -22,7 +22,7 @@ tags:
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
 | `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
-| `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次初始化状态查询、DEV_OPS 账号创建、TOTP 确认和完成初始化；完成后不自动登录，由客户端返回登录页 |
+| `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次保存系统基础配置、创建 DEV_OPS 账号、确认 TOTP 和完成初始化；完成后不自动登录，由客户端返回登录页 |
 
 ## 核心 — 公共服务
 
@@ -59,6 +59,8 @@ tags:
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/service/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
+| `SystemBootstrapController` | spectra-core | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
+| `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
 
 ## 消息中心
 
