@@ -32,7 +32,7 @@ tags:
 
 二阶段 MFA 登录接口：`POST /auth/login` 在密码阶段成功但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`；已有 TOTP 账号调用 `POST /auth/mfa/verify`，首次账号依次调用 `POST /security/mfa/setup/totp/enroll`、`POST /security/mfa/setup/totp/confirm`、`POST /auth/mfa/complete`。challenge 成功消费、过期或达到失败次数上限后失效。
 
-首次系统初始化接口：先调用 `GET /system/initialization/status`；未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，再调用 `POST /system/initialization/mfa/confirm` 完成 TOTP 登记并离线保存 Recovery Code，最后调用 `POST /system/initialization/complete` 激活用户、创建 `ROLE_DEV_OPS` Assignment 并获得首个 Token。初始化状态写入 `spectra_core.sys_system_state`，Redis 不可用时挑战和最终初始化均 fail-closed。
+首次系统初始化接口：先调用 `GET /system/initialization/status`；未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，再调用 `POST /system/initialization/mfa/confirm` 完成 TOTP 登记并离线保存 Recovery Code，最后调用 `POST /system/initialization/complete` 激活用户并创建 `ROLE_DEV_OPS` Assignment。完成接口不签发登录 Token，客户端应返回登录页并通过正常登录流程建立会话。初始化状态写入 `spectra_core.sys_system_state`，Redis 不可用时挑战和最终初始化均 fail-closed。
 
 ## 核心 — 用户权限
 

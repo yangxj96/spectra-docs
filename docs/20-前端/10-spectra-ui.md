@@ -1030,7 +1030,7 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 
 ### 首次系统初始化
 
-Web 管理端提供 `/initialization` 首次初始化页面，仅用于首次创建 DEV_OPS 用户、绑定 TOTP MFA、保存 Recovery Code 并完成首个登录。登录页会在后端返回 `UNINITIALIZED` 时自动跳转到该页面；初始化流程不属于 `spectra-app` 移动端范围。页面通过 `/api/system/initialization/status`、`/start`、`/mfa/confirm` 和 `/complete` 四个接口完成流程，启动请求使用用户手工输入的 `X-Spectra-Initialization-Token`，令牌只保存在当前页面内存中。
+Web 管理端提供 `/initialization` 首次初始化页面，仅用于首次创建 DEV_OPS 用户、绑定 TOTP MFA、保存 Recovery Code 并完成初始化。初始化完成后页面返回登录页，由用户通过正常登录流程建立会话；登录页会在后端返回 `UNINITIALIZED` 时自动跳转到初始化页面。初始化流程不属于 `spectra-app` 移动端范围。应用首次启动时会把初始化令牌输出到受控的后端控制台，页面通过 `/api/system/initialization/status`、`/start`、`/mfa/confirm` 和 `/complete` 四个接口完成流程，启动请求使用用户手工输入的 `X-Spectra-Initialization-Token`，令牌只保存在当前页面内存中。
 
 仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；开发环境的 `VITE_API_URL=https://127.0.0.1:4004/` 直接连接后端 4004。Vite 通过 `SSL_PASSWORD` 加载后端同一份 `files/ssl/keystore.p12`，因此 Web 使用 `https://localhost:5173` 访问，浏览器才能正常携带 Secure Cookie 和读取 CSRF Cookie。修改后端端口或连接远程后端时，只修改本机环境文件。
 

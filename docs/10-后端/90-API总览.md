@@ -22,7 +22,7 @@ tags:
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
 | `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
-| `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次初始化状态查询、DEV_OPS 账号创建、TOTP 确认、完成初始化并签发首个 Session |
+| `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次初始化状态查询、DEV_OPS 账号创建、TOTP 确认和完成初始化；完成后不自动登录，由客户端返回登录页 |
 
 ## 核心 — 公共服务
 
