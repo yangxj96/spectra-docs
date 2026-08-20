@@ -35,7 +35,7 @@ tags:
 ```powershell
 Copy-Item .env.example .env.development
 pnpm install         # 安装依赖
-pnpm start           # H5 开发（http://localhost:5174），自动 type-check+lint+format
+pnpm start           # H5 开发（https://localhost:5174），自动 type-check+lint+format
 pnpm dev:mp-weixin   # 微信小程序开发
 ```
 
@@ -91,7 +91,7 @@ spectra-app/
 
 ## 与后端连接
 
-仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；模板中的 `VITE_API_BASE_URL=https://127.0.0.1:4004` 连接后端首次 HTTPS 启动。H5 开发服务器仍使用 `http://localhost:5174`，修改 API 端口或连接远程后端时，只修改本机环境文件。
+仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；模板中的 `VITE_API_BASE_URL=https://127.0.0.1:4004` 连接后端首次 HTTPS 启动。H5 开发服务器使用 `spectra-admin/files/ssl/keystore.p12` 和 `SSL_PASSWORD` 启动 `https://localhost:5174`，修改 API 端口或连接远程后端时，只修改本机环境文件。
 
 > **环境变量命名约定**：spectra-app 使用 `VITE_API_BASE_URL`（无尾部 `/`），spectra-ui 使用 `VITE_API_URL`（带尾部 `/`）。这是两个项目的既定约定，不强制统一。
 

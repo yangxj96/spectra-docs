@@ -1712,7 +1712,7 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 3 已提供目标 RoleAssignment/Boundary 只读 API；写入继续冻结到 Phase 4 GrantBoundary 流程。
 - [x] Phase 4 已交付 Assignment 与 Role 的 Grant Boundary/authorityLevel 校验、Impact Preview/Apply token、并发 version/securityVersion 门禁、统一 Audit/Session revoke；旧用户角色、旧角色权限和旧 DataScope 写入口已冻结。
 - [x] Phase 5 已交付 `sec:*` Redis Session、Token Digest、Token Family Rotation/Replay 撤销、并发策略、Web HttpOnly Host-only Refresh Cookie + CSRF、App Token 存储/设备 ID 适配，以及 TOTP/AAL2/Recovery Code MFA 核心和 DEV_OPS 强制 MFA。
-- [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收仍需部署环境凭据后执行。
+- [x] Phase 6 已交付 Permission-Aware DataScope 基础门禁：Permission-specific `ScopeSqlPolicy`、`ScopedAuthorization`/`ExecutionContext`、资源授权 Guard、OA 资源策略标注、V7 归属索引及数据库契约测试；真实 PostgreSQL cross-assignment 集成验收已在本地 `spectra_db` 通过，生产部署账号核对仍属于部署门禁。
 - [x] Phase 3 Permission Catalog 初稿、旧 code mapping 扫描和 V3 seed 已交付；Phase 7 已完成 Controller/ResourceScopePolicy 覆盖复核、旧大写运行时引用清理，并通过 115 条 Catalog、Controller 权限契约和 Menu != Permission 门禁。
 - [x] Phase 7 已完成 Permission Catalog version 2、V8 Permission/Menu seed、RoleAssignment 驱动菜单树、`/security/context`、Web/App 权限上下文迁移和安全运维三级菜单；后端全量回归、前端 type/lint/test、文档检查及数据库静态契约核对均已通过，并已独立提交。
 - [~] Phase 8 已完成审计查询/详情/导出、可见性矩阵、查询侧二次脱敏、V9 保留策略与 archive manifest、runtime 只读权限、Web 安全审计页面，以及登录/登出/刷新、MFA、用户生命周期/密码、Role/Assignment/组织 Preview/Apply、归档状态事件生产者；本阶段已补齐会话/密码策略变更生产者、V13 默认策略种子和运行时数据库策略读取，并新增 S3 Object Lock Compliance 归档 SPI/适配器、SHA-256 完整性校验和恢复 Runbook；真实 PostgreSQL 分区、独立归档 bucket 和恢复演练仍待完成。
@@ -1731,6 +1731,8 @@ Security Audit 默认热存 12 个月、总保留至少 5 年，允许未来归�
 - [x] Phase 9 已完成旧 Redis 过期监听、滑动 TTL、静态工具与普通 User Delete 清理：删除旧 `auth:*` listener/config，Rotation 测试统一使用 `sec:*`，移除无调用者的旧 `refreshToken()`/TTL 刷新、`SecUtil`/`SecStrategyBridge` 和 `/user/{uid}` 物理删除及 Web 删除操作，并将安全 Redis Key 类型收口为 `SecurityRedisKey`；后端定向/全量回归、Web format/lint/type/test、数据库契约和文档检查通过并已独立提交。
 - [x] Phase 9 已完成 `SecHolderStrategy` 接口拆分和旧适配层命名收口：Session 签发、读取、撤销、查询、Token 上下文和登录失败锁定分别使用窄端口，业务上下文适配器不再依赖旧 Holder 大接口，Redis v2 适配器和端口配置分别命名为 `RedisSecuritySessionRepository`、`SecuritySessionPortConfiguration`；starter 定向测试、后端全量回归和数据库安全契约核对通过并已独立提交。
 - [x] 本轮硬切换清理已完成：部门旧写入/删除入口、通知旧设置门面/路径别名/`type` 映射、菜单兼容过滤和旧短构造器均已移除；会话策略缺失改为 fail-closed，V19 下线旧通知运行表并废弃 `department:disable`。后端全量 Maven 测试、Web format/lint/type/test/build、App lint/type/H5 build、数据库契约和文档检查已完成并标记为通过；App 的 format 检查仅提示本轮未修改的既有 `README.md`。浏览器、多端运行和部署演练仍由人工验收。
+- [x] 2026-08-20 本地安全集成验收完成：`spectra_db` 空库已连续迁移至 V19；真实 PostgreSQL Root 并发治理、cross-assignment、PostgreSQL 故障 fail-closed，以及真实 Redis 正常读写与故障 fail-closed 均通过；故障注入期间 PostgreSQL 和 Redis 均由维护者手动停止并恢复。
+- [~] 2026-08-20 本地 HTTPS 运行时验收完成：后端 `https://127.0.0.1:4004/api/actuator/health` 返回 `200/UP`，Web `5173` 与 App H5 `5174` 均通过 Node TLS 客户端返回 `200`；浏览器交互、多端业务流程和部署演练仍由人工验收。
 - [ ] 数据迁移前逐账号确认旧 user-level Scope 应映射到哪些 Permission Boundary；不自动生成 GrantablePermission/Grant Boundary。
 - [~] 部署门禁代码已完成 Cookie Host/Path/SameSite、CSRF 名称、精确 Origin、反向代理 HTTPS 感知和生产 CORS 必填校验，并有单测与无敏感值配置示例；仍需上线前填写真实 allowlist、代理信任和归档 bucket 值并完成部署评审。
 - [~] Phase 5 已完成 TOTP/Recovery Code 密钥双版本迁移窗口、成功验证自动 re-key、Recovery Code 轮换 API 和运维 Runbook；设备迁移、Root break-glass 凭据轮换及隔离恢复演练仍待完成。

@@ -71,9 +71,9 @@ spectra/
 
 | 服务 | 默认地址 | 备注 |
 |---|---|---|
-| spectra-admin | `http://127.0.0.1:4004/api` | 首次启动模板默认关闭本地 TLS；配置证书后可改为 HTTPS |
-| spectra-ui | `http://localhost:5173` | API 地址来自本机环境文件 |
-| spectra-app H5 | `http://localhost:5174` | API 地址来自本机环境文件 |
+| spectra-admin | `https://127.0.0.1:4004/api` | 首次启动模板默认启用本地 TLS，使用 `files/ssl/keystore.p12` |
+| spectra-ui | `https://localhost:5173` | 使用共享 P12 证书和 `SSL_PASSWORD`，API 地址来自本机环境文件 |
+| spectra-app H5 | `https://localhost:5174` | 使用共享 P12 证书和 `SSL_PASSWORD`，API 地址来自本机环境文件 |
 | PostgreSQL | `127.0.0.1:5432` | 数据库名、账号和密码由本机配置决定 |
 | Redis | `127.0.0.1:6379` | 当前后端连接串要求配置密码 |
 
