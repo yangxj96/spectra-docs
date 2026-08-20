@@ -12,7 +12,7 @@
 - 对象写入携带 SHA-256 metadata、归档保留截止时间和不可变 key；
 - 应用只拥有归档对象写入/读取校验能力，不拥有删除、覆盖、缩短保留期限或修改 manifest 的权限。
 
-代码端口为 `SecurityAuditArchiveBackend`，S3 实现仅在 `spectra.security.audit-archive-backend=S3_OBJECT_LOCK` 时装配。V9 manifest 仍是归档状态事实，归档自身通过 `SecurityAuditArchiveAuditTrail` 写入 started/completed/failed/verified 事件。
+代码端口为 `SecurityAuditArchiveBackend`，S3 实现仅在 `spectra.security.audit-archive-backend=S3_OBJECT_LOCK` 时装配。当前 V1 中的 archive manifest 仍是归档状态事实，归档自身通过 `SecurityAuditArchiveAuditTrail` 写入 started/completed/failed/verified 事件。
 
 ## 归档流程
 

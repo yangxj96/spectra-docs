@@ -78,7 +78,7 @@ FROM spectra_security.sec_assignment_grant_boundary;
 | `business_reviewer` / `security_reviewer` | 姓名、工号或外部审批单号 |
 | `reviewed_at` / `applied_at` | 复核和实际 Apply 时间 |
 
-迁移门禁：存在未映射、重复映射、无 Permission、无 Assignment、规则无法编译或超出 Root/权限边界的记录时，停止 cutover。V10/V11/V12 只负责删除旧运行时结构，不负责猜测业务权限。
+迁移门禁：存在未映射、重复映射、无 Permission、无 Assignment、规则无法编译或超出 Root/权限边界的记录时，停止 cutover。旧运行时结构的清理已合并到当前 V1 基线，不负责猜测业务权限。
 
 ## 报告结论模板
 

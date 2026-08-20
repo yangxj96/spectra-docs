@@ -1,7 +1,7 @@
 -- ============================================
 -- spectra_core schema 建表语句
--- 共 16 张表（不含 BaseEntity；旧认证/授权运行时表由 V11/V12 下线）
--- 当前物理字段顺序由 Flyway V21/V22/V23 固化；种子审计元数据和完整注释由 V24/V25/V26 固化。
+-- 共 16 张表（不含 BaseEntity；旧认证/授权运行时表已不属于当前目标模型）
+-- 当前物理字段顺序、种子审计元数据和完整注释由 Flyway V1 干净基线固化。
 -- ============================================
 
 CREATE SCHEMA IF NOT EXISTS spectra_core;
@@ -548,9 +548,9 @@ COMMENT ON COLUMN spectra_core.file_upload_chunk.version IS '乐观锁';
 
 -- 消息中心已迁移到 spectra_notification.ntf_*。
 -- 旧 sys_notification* 仅在不可变历史迁移和离线数据迁移脚本中出现，
--- V19 后不属于 spectra_core 运行库结构。
+-- 当前 V1 基线不属于 spectra_core 运行库结构。
 
--- V25/V26 补齐列重建后遗漏的表及技术字段注释。
+-- 当前 V1 基线包含完整的表及字段注释。
 COMMENT ON TABLE spectra_core.sys_user_department_membership IS '用户与部门成员关系表';
 COMMENT ON COLUMN spectra_core.sys_user_department_membership.id IS '主键ID';
 COMMENT ON COLUMN spectra_core.sys_user_department_membership.user_id IS '用户ID';

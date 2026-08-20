@@ -1,7 +1,7 @@
 -- ============================================
 -- spectra_security 目标安全 schema
 --
--- 该文件是当前目标 DDL 契约；开发数据库由 Flyway V21/V22/V23 重建到该命名结果，种子元数据和完整注释由 V24/V25/V26 固化。
+-- 该文件是当前目标 DDL 契约；开发数据库由 Flyway V1 干净基线直接初始化，包含种子元数据和完整注释。
 -- 不包含兼容旧 user_role、authority 或全局 data_scope 的表。
 -- ============================================
 
@@ -773,7 +773,7 @@ COMMENT ON COLUMN spectra_security.sec_role_menu.role_id IS '角色ID';
 COMMENT ON COLUMN spectra_security.sec_role_menu.menu_id IS '菜单ID';
 COMMENT ON COLUMN spectra_security.sec_role_menu.created_at IS '创建时间';
 
--- V25/V26 补齐列重建后遗漏的技术字段注释。
+-- 当前 V1 基线包含完整的技术字段注释。
 COMMENT ON COLUMN spectra_security.sec_permission.deleted IS '删除时间（NULL表示未删除）';
 COMMENT ON COLUMN spectra_security.sec_role.deleted IS '删除时间（NULL表示未删除）';
 
