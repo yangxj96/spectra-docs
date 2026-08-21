@@ -18,6 +18,7 @@ tags:
 | `AuthenticationController` | spectra-core.security.authentication | `/security/authentication/**` | 登录/登出/刷新 Token/验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
 | `AuthenticationIdentityController` | spectra-core | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；所有高风险写入绑定短时 token |
+| `AuthorizationProfileController` | spectra-core | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改和停用；方案保存使用稳定业务编码和版本校验 |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
 | `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
@@ -83,6 +84,8 @@ Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要、版本、授权边界，并在事务内维护闭包表、递增 organizationVersion、推进受影响用户安全版本及撤销会话。
+
+授权方案管理：`GET /security/authorization/profiles` 查询活动和停用方案，`GET /security/authorization/profiles/{id}` 查询详情，`POST` 创建，`PUT` 按 `expected_version` 修改，`DELETE` 停用。方案只保存 Role/Permission/部门业务编码和版本快照，不保存运行时授权 UUID；应用方案到用户时仍复用 RoleAssignment Preview/Apply。
 
 用户生命周期已拆分为高风险写入口：`PUT /user/lock/{uid}`、`/user/unlock/{uid}`、`/user/disable/{uid}`、`/user/enable/{uid}`、`/user/depart/{uid}`、`/user/reinstate/{uid}`；操作原因通过可选 `reason` 查询参数传入，服务层统一执行状态机、Security Audit、securityVersion 递增和全部 Session 撤销。
 

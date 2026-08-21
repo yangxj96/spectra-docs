@@ -27,6 +27,8 @@ created: 2026-08-21
 - [x] 增加管理员用户详情接口 `GET /api/user/{uid}`，支持编辑页刷新和直接访问。
 - [x] 创建用户后返回用户 ID，并在同一开通流程中继续完成角色授权。
 - [x] 用户列表返回后端计算的授权状态，并提供直接进入授权步骤的入口。
+- [x] 建立授权方案、方案 Role 配置和方案 Permission Boundary 的独立数据模型，并提供版本化管理接口。
+- [x] 授权方案保存时校验当前 Role/Permission/Scope/部门编码，禁止通过普通方案配置 DEV_OPS Role。
 - [ ] 继续实现授权方案和批量导入流程。
 
 ## 问题背景
@@ -317,6 +319,14 @@ RoleAssignment + AssignmentPermissionBoundary + AssignmentGrantBoundary
 - 方案发布后使用版本快照，避免修改方案导致历史导入语义不明确。
 - 方案不能绕过当前操作人的 Grant Boundary。
 - 方案只作为默认配置来源，应用时仍需重新校验目标用户、Role、Permission 和 Boundary。
+
+**当前已实现**：
+
+- `sec_authorization_profile` 保存方案元数据、状态和版本；
+- `sec_authorization_profile_assignment` 保存 Role 业务编码与 Role version 快照；
+- `sec_authorization_profile_boundary` 使用 JSONB 保存 Permission-specific Access/Grant Boundary，RULES 使用部门业务编码；
+- `/security/authorization/profiles` 已提供列表、详情、创建、修改和停用接口；
+- 单用户流程选择方案并通过 RoleAssignment Preview/Apply、批量导入后端和管理界面仍待实现。
 
 #### 4.3 建设授权方案管理界面
 
