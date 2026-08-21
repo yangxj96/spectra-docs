@@ -15,7 +15,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AuthController | `/auth/**` | 登录/登出/刷新 Token/登录验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
+| AuthenticationController（spectra-core.security.authentication） | `/security/authentication/**` | 登录/登出/刷新 Token/登录验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
 | AuthenticationIdentityController | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；高风险写入绑定短时 token |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
@@ -31,7 +31,7 @@ tags:
 |---|---|---|
 | CommonController | `/common/**` | 验证码生成、公共接口 |
 
-二阶段 MFA 登录接口：`POST /auth/login` 在密码阶段成功但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`；已有 TOTP 账号调用 `POST /auth/mfa/verify`，首次账号依次调用 `POST /security/mfa/setup/totp/enroll`、`POST /security/mfa/setup/totp/confirm`、`POST /auth/mfa/complete`。challenge 成功消费、过期或达到失败次数上限后失效。
+二阶段 MFA 登录接口：`POST /security/authentication/login` 在密码阶段成功但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`；已有 TOTP 账号调用 `POST /security/authentication/mfa/verify`，首次账号依次调用 `POST /security/mfa/setup/totp/enroll`、`POST /security/mfa/setup/totp/confirm`、`POST /security/authentication/mfa/complete`。challenge 成功消费、过期或达到失败次数上限后失效。
 
  Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息、加解密配置和初始化状态；该接口面向未登录页面开放，只返回系统名称、简称、Logo、默认语言、默认时区、版权开关、版权名称、版权跳转地址、加解密开关、服务端公钥和初始化状态，不返回安全策略或任何私钥。首次系统初始化接口：未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，请求同时提交 `system_name`、`system_short_name`、`system_logo`、`default_locale`、`default_timezone` 和 `security_profile`，后端将六项非敏感配置写入 `spectra_core.sys_config`，只创建 DEV_OPS 用户及其认证材料，不创建部门。再调用 `POST /system/initialization/mfa/confirm` 完成 TOTP 登记并离线保存 Recovery Code，最后调用 `POST /system/initialization/complete` 激活用户并创建 `ROLE_DEV_OPS` Assignment。完成接口不签发登录 Token，客户端应返回登录页并通过正常登录流程建立会话。初始化状态和引导状态分别使用 `sys_system_state` 的 `SYSTEM` 与 `SYSTEM_GUIDE` 种子行；Redis 不可用时挑战和最终初始化均 fail-closed。DEV_OPS 首次登录后调用 `GET /system/guide/status`，必须通过 `POST /system/guide/complete` 提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`crypto_enabled`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url`，其中根部门名称、区域和类型均必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。后端在当前用户上下文中创建根部门、建立 DEV_OPS 主部门关系并自动生成所需密钥，版权设置同时写入 `sys_config`。
 

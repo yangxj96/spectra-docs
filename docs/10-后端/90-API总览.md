@@ -15,7 +15,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `AuthController` | security-starter | `/auth/**` | 登录/登出/刷新 Token/验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
+| `AuthenticationController` | spectra-core.security.authentication | `/security/authentication/**` | 登录/登出/刷新 Token/验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
 | `AuthenticationIdentityController` | spectra-core | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；所有高风险写入绑定短时 token |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
@@ -30,9 +30,9 @@ tags:
 
 | 方法 | 路径 | 认证 | 说明 |
 |---|---|---|---|
-| `POST` | `/auth/login` | `permitAll` | DEV_OPS 密码正确但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`，不返回普通 Token |
-| `POST` | `/auth/mfa/verify` | `permitAll` | 使用 challenge + TOTP 或 Recovery Code 完成第二阶段并签发正式会话 |
-| `POST` | `/auth/mfa/complete` | `permitAll` | 首次 TOTP 登记成功后消费 challenge 并签发正式会话 |
+| `POST` | `/security/authentication/login` | `permitAll` | DEV_OPS 密码正确但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`，不返回普通 Token |
+| `POST` | `/security/authentication/mfa/verify` | `permitAll` | 使用 challenge + TOTP 或 Recovery Code 完成第二阶段并签发正式会话 |
+| `POST` | `/security/authentication/mfa/complete` | `permitAll` | 首次 TOTP 登记成功后消费 challenge 并签发正式会话 |
 | `POST` | `/security/mfa/setup/totp/enroll` | `permitAll` | 仅接受首次登录 challenge，生成 TOTP secret 和 provisioning URI |
 | `POST` | `/security/mfa/setup/totp/confirm` | `permitAll` | 使用首次登录 challenge + enrollmentId + TOTP 验证码确认登记并返回 Recovery Code |
 

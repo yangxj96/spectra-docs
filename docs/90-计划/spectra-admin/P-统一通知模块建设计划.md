@@ -190,11 +190,11 @@ spectra-admin/
 依赖方向：
 
 ```text
-security-starter ─┐
-spectra-core ─────┼──> spectra-common.notification <── spectra-notification
-spectra-oa ───────┤                                      │
-spectra-workflow ─┤                                      │ runtime ports
-spectra-ai ───────┘                                      ▼
+spectra-core ─────┐
+spectra-oa ───────┼──> spectra-common.notification <── spectra-notification
+spectra-workflow ─┤                                      │
+spectra-ai ───────┘                                      │ runtime ports
+                                                           ▼
                                              CoreRecipientDirectory
 ```
 

@@ -18,10 +18,9 @@ tags:
 ```
 spectra-admin/spectra-modules/spectra-core/
 └── src/main/java/com/devops00/spectra/core/
-    ├── auth/           ← 认证身份与密码凭证
+    ├── security/       ← 认证、授权、审计、策略与安全变更
     ├── user/           ← 用户资料与生命周期
     ├── authorization/  ← Role/Permission/Assignment/Boundary
-    ├── security/       ← MFA、审计、策略与安全变更
     ├── system/         ← 部门/菜单/字典/区域/配置/日志
     ├── controller/     ← REST 端点
     ├── service/        ← 业务逻辑
@@ -114,6 +113,7 @@ spectra-core ← 被以下模块依赖
 |---|---|---|
 | UserController | `/user/**` | 用户 CRUD |
 | RoleController | `/role/**` | 角色 CRUD |
+| AuthenticationController | `/security/authentication/**` | 登录、登出、刷新 Token、登录验证码与绑定验证码 |
 | AuthenticationIdentityController | `/security/identities/**` | 认证身份绑定/解绑 |
 | AuthorizationController | `/security/authorization/**` | Role capability 与 Assignment Preview/Apply |
 | AuthorityController | `/authority/tree` | Permission Catalog 只读树 |
