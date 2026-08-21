@@ -520,6 +520,7 @@ GET  /api/user/imports/{importId}/errors
 - 授权方案选择、复制和停用状态。
 - [x] 批量导入文件解析支持 CSV/TXT/Excel，错误分类和错误明细导出已覆盖工具测试。
 - [x] 批量导入进度计算覆盖零总量、正常比例和超过总量的边界。
+- [x] 批量导入 API 契约覆盖 Preview、Apply、任务详情和错误明细查询，并校验统一 API 版本头。
 - 导入文件校验、错误下载、Preview、Apply 和结果展示。
 
 #### 7.2 后端测试
@@ -553,7 +554,7 @@ GET  /api/user/imports/{importId}/errors
 
 批量导入本轮 API、实体、SQL、后端和 Web 领域文档已同步，`check-docs.ps1` 已通过；其余流程和安全验收仍待继续补齐。
 
-本轮验证结果：`spectra-core` 全量测试 115 个通过、11 个 PostgreSQL 集成测试因环境条件跳过；Web 端 49 个测试、格式检查、lint、类型检查和生产构建均通过。后端 `spotless:check` 尚未完成，当前受本机 Spotless Eclipse/P2 依赖缓存缺失影响。
+本轮验证结果：`spectra-core` 全量测试 115 个通过、11 个 PostgreSQL 集成测试因环境条件跳过；Web 端 50 个测试、格式检查、lint、类型检查和生产构建均通过。后端 `spotless:check` 尚未完成，当前受本机 Spotless Eclipse/P2 依赖缓存缺失影响。
 
 ## 推荐实施顺序
 
