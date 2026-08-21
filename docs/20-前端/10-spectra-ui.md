@@ -887,6 +887,7 @@ export default [
 - 登录后调用 `GET /menu/current` 获取当前用户授权导航树，不再根据数据库组件路径动态注册路由。
 - `MenuApi` 在 API 边界将后端 `menu_type/route_name` 递归归一化为前端 `menuType/routeName`，内部菜单工具统一使用 camelCase。
 - 可见页面通过 `meta.requiredMenu` 绑定数据库 `routeName`；详情和编辑页用 `activeMenu` 继承所属菜单权限和高亮。
+- 用户管理的新增和编辑使用完整页面路由 `/system/user/create`、`/system/user/:id/edit`，不使用抽屉；编辑页通过用户详情接口独立加载数据，刷新或直接访问地址仍可正常回显。页面按“基本信息 → 角色授权”步骤展示，新增用户保存后再进入授权步骤。
 - 一级授权节点显示在顶部导航，后代由递归 `MenuItem` 显示在侧栏，支持任意层级。
 - 未授权的已定义路由进入 `/401`，未定义地址由 catch-all 路由进入 `/404`。
 

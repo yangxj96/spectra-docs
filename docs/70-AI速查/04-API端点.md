@@ -39,7 +39,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| UserController | `/user/**` | 用户资料维护 / 分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
+| UserController | `/user/**` | 用户资料维护、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
 | RoleController | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
@@ -48,6 +48,8 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要和版本，并在事务内维护闭包表、递增 organizationVersion、撤销受影响会话。
 
 `UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
+
+管理员用户编辑页通过 `GET /user/{uid}` 加载完整用户详情，前端页面路由为 `/system/user/create` 和 `/system/user/:id/edit`；编辑页使用 `activeMenu: SystemUser` 继承用户管理菜单高亮。
 
 用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
