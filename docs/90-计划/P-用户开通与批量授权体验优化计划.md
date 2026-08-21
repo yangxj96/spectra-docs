@@ -553,6 +553,8 @@ GET  /api/user/imports/{importId}/errors
 
 批量导入本轮 API、实体、SQL、后端和 Web 领域文档已同步，`check-docs.ps1` 已通过；其余流程和安全验收仍待继续补齐。
 
+本轮验证结果：`spectra-core` 全量测试 115 个通过、11 个 PostgreSQL 集成测试因环境条件跳过；Web 端 49 个测试、格式检查、lint、类型检查和生产构建均通过。后端 `spotless:check` 尚未完成，当前受本机 Spotless Eclipse/P2 依赖缓存缺失影响。
+
 ## 推荐实施顺序
 
 ```text
