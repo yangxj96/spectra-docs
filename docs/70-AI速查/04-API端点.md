@@ -59,7 +59,7 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
-用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要和 `completed_rows`，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 校验通过后返回 `APPLYING` 任务并异步应用通过校验的行。请求字段为固定模板的 `username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`，另带 `file_hash` 和 `idempotency_key`；后端不接收内部授权 UUID，Excel/CSV 文件解析由前端负责。
+用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要和 `completed_rows`，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 校验通过后返回 `APPLYING` 任务并异步应用通过校验的行。请求字段为固定模板的 `username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`，另带 `file_hash` 和 `idempotency_key`；Web 下载的 Excel 模板使用中文表头，并为部门编码和授权方案编码提供显示“名称｜编码”的下拉校验，前端解析后还原为上述接口字段；后端不接收内部授权 UUID，Excel/CSV 文件解析由前端负责。
 
 用户分页资料与当前用户资料的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
 

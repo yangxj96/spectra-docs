@@ -80,7 +80,7 @@ tags:
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
-用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收固定模板的结构化行（`username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`，不接受 Role/Permission/Scope UUID。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。CSV/Excel 解析由前端完成。
+用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收固定模板的结构化行（`username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`，不接受 Role/Permission/Scope UUID；Web 下载的 Excel 模板使用中文表头，并为部门编码和授权方案编码提供显示“名称｜编码”的下拉校验，前端解析后还原为上述接口字段。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。CSV/Excel 解析由前端完成。
 
 用户分页资料与当前用户资料中的角色展示已切换为读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
 
