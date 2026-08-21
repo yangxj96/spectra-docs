@@ -888,6 +888,7 @@ export default [
 - `MenuApi` 在 API 边界将后端 `menu_type/route_name` 递归归一化为前端 `menuType/routeName`，内部菜单工具统一使用 camelCase。
 - 可见页面通过 `meta.requiredMenu` 绑定数据库 `routeName`；详情和编辑页用 `activeMenu` 继承所属菜单权限和高亮。
 - 用户管理的新增和编辑使用完整页面路由 `/system/user/create`、`/system/user/:id/edit`，不使用抽屉；编辑页通过用户详情接口独立加载数据，刷新或直接访问地址仍可正常回显。页面按“基本信息 → 角色授权”步骤展示，新增用户保存后再进入授权步骤。
+- 授权方案管理使用 `/system/authorization-profiles` 页面，挂在访问控制菜单权限下；方案编辑按 Role、Permission、Access/Grant Boundary 配置，用户授权步骤可以套用单 Role 方案作为初始值，最终仍走后端 Preview/Apply。
 - 一级授权节点显示在顶部导航，后代由递归 `MenuItem` 显示在侧栏，支持任意层级。
 - 未授权的已定义路由进入 `/401`，未定义地址由 catch-all 路由进入 `/404`。
 
@@ -926,6 +927,7 @@ src/views/
 │   │       └── DictDataEdit/
 │   ├── Menu/
 │   ├── RBAC/
+│   ├── AuthorizationProfile/
 │   ├── Region/
 │   ├── User/
 │   └── Workflow/
