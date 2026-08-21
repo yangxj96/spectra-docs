@@ -30,7 +30,7 @@ created: 2026-08-21
 - [x] 建立授权方案、方案 Role 配置和方案 Permission Boundary 的独立数据模型，并提供版本化管理接口。
 - [x] 授权方案保存时校验当前 Role/Permission/Scope/部门编码，禁止通过普通方案配置 DEV_OPS Role。
 - [x] 用户授权步骤支持套用单 Role 授权方案，并在提交前继续允许调整 Boundary。
-- [x] 提供授权方案列表、创建、修改和停用页面，并复用访问控制菜单入口。
+- [x] 提供授权方案列表、独立创建/修改页面和停用操作，并复用访问控制菜单入口。
 - [x] 授权方案管理和单用户套用已完成；批量导入后端的结构化行契约、任务、校验和 Preview/Apply 已完成。
 - [x] Web 端已完成固定 CSV/TXT/Excel 的模板下载、粘贴/上传、行编辑、Preview、Apply、错误处理和结果查看闭环。
 - [x] 大批量 Apply 已改为有界后台任务，Web 端轮询任务详情展示处理进度和最终错误明细。
@@ -330,6 +330,7 @@ RoleAssignment + AssignmentPermissionBoundary + AssignmentGrantBoundary
 - `sec_authorization_profile_assignment` 保存 Role 业务编码与 Role version 快照；
 - `sec_authorization_profile_boundary` 使用 JSONB 保存 Permission-specific Access/Grant Boundary，RULES 使用部门业务编码；
 - `/security/authorization/profiles` 已提供列表、详情、创建、修改和停用接口；
+- Web 端授权方案列表采用系统管理页布局，新建和编辑使用独立页面；授权方案编辑采用“基本信息 → 选择角色 → 权限范围设置”三步流程，角色支持多选并为每个角色生成独立 Assignment，权限支持多选添加，并可勾选多个权限批量应用访问组织、子部门和授权范围，最后一步统一提交；批量设置遵循选中 Permission 的共同 `allowed_scope_modes`，右侧提供“全选权限”“清空选择”“选中按组织规则”“选中按仅当前主体数据”快捷操作，避免把 `RULES` 与 `SELF` 权限混在一起配置；仅支持 `NONE` 的权限不会显示组织选择；页面明确区分授权方案与运行时 RoleAssignment，套用后仍须按当前用户完成 Preview/Apply，停用方案不会撤销已生效授权；
 - 单用户流程已支持选择单 Role 方案并通过 RoleAssignment Preview/Apply；多 Role 方案和批量导入后端仍待实现。
 
 #### 4.3 建设授权方案管理界面

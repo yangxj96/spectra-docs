@@ -888,8 +888,9 @@ export default [
 - `MenuApi` 在 API 边界将后端 `menu_type/route_name` 递归归一化为前端 `menuType/routeName`，内部菜单工具统一使用 camelCase。
 - 可见页面通过 `meta.requiredMenu` 绑定数据库 `routeName`；详情和编辑页用 `activeMenu` 继承所属菜单权限和高亮。
 - 用户管理的新增和编辑使用完整页面路由 `/system/user/create`、`/system/user/:id/edit`，不使用抽屉；编辑页通过用户详情接口独立加载数据，刷新或直接访问地址仍可正常回显。页面按“基本信息 → 角色授权”步骤展示，新增用户保存后再进入授权步骤。
+- 用户管理的“重置密码”使用一次性临时密码弹窗展示接口响应，支持复制并显示 24 小时有效期；关闭弹窗后不再保留明文，遗失时重新执行重置。使用临时密码登录的用户会被引导到修改密码页。
 - 用户批量导入使用完整页面路由 `/system/user/import`，挂在用户管理菜单下；页面支持固定 CSV/TXT/Excel 模板下载、粘贴/上传、行编辑、后端 Preview、Apply、错误分类筛选、错误明细下载和结果查看。Apply 返回后台任务后，页面轮询任务详情展示已处理行数和进度，完成后加载错误明细；API 封装位于 `src/api/user/user-import-api.ts`，文件解析与摘要工具位于 `src/utils/user-import.ts`。
-- 授权方案管理使用 `/system/authorization-profiles` 页面，挂在访问控制菜单权限下；方案编辑按 Role、Permission、Access/Grant Boundary 配置，用户授权步骤可以套用单 Role 方案作为初始值，最终仍走后端 Preview/Apply。
+- 授权方案列表使用 `/system/authorization-profiles` 页面，采用系统管理页的查询区/数据区布局；新建和编辑分别使用 `/system/authorization-profiles/create`、`/system/authorization-profiles/:id/edit` 独立页面，不再使用弹窗。方案编辑采用“基本信息 → 选择角色 → 权限范围设置”三步流程，角色支持多选并为每个角色生成独立 Assignment，权限选择支持多选后一次性加入，已加入的权限支持勾选后批量应用访问组织、子部门和授权范围，最后一步统一提交；批量设置遵循所选 Permission 的共同 `allowed_scope_modes`，右侧提供“全选权限”“清空选择”“选中按组织规则”“选中按仅当前主体数据”快捷操作，避免把 `RULES` 与 `SELF` 权限混在一起配置；仅支持 `NONE` 的权限不会显示组织选择。用户授权步骤可以套用单角色方案作为初始值，最终仍走当前用户对应的 Preview/Apply；授权方案停用不会撤销已经生效的运行时授权实例。
 - 一级授权节点显示在顶部导航，后代由递归 `MenuItem` 显示在侧栏，支持任意层级。
 - 未授权的已定义路由进入 `/401`，未定义地址由 catch-all 路由进入 `/404`。
 
@@ -929,6 +930,8 @@ src/views/
 │   ├── Menu/
 │   ├── RBAC/
 │   ├── AuthorizationProfile/
+│   │   ├── index.vue
+│   │   └── components/AuthorizationProfileEdit/
 │   ├── Region/
 │   ├── User/
 │   └── Workflow/
