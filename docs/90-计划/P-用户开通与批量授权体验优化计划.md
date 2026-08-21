@@ -518,6 +518,8 @@ GET  /api/user/imports/{importId}/errors
 - 高级 Permission 级范围覆盖默认范围。
 - Grant Boundary 仅在角色允许时可用。
 - 授权方案选择、复制和停用状态。
+- [x] 批量导入文件解析支持 CSV/TXT/Excel，错误分类和错误明细导出已覆盖工具测试。
+- [x] 批量导入进度计算覆盖零总量、正常比例和超过总量的边界。
 - 导入文件校验、错误下载、Preview、Apply 和结果展示。
 
 #### 7.2 后端测试
@@ -528,6 +530,7 @@ GET  /api/user/imports/{importId}/errors
 - Role、Permission 和 Boundary 不一致时拒绝。
 - Grant Boundary 越权时拒绝。
 - 授权方案版本变化时要求重新 Preview。
+- [x] 批量导入 Apply 返回 `APPLYING`，重复 Apply 不重复派发后台任务，预览错误行计入完成进度。
 - 批量导入幂等和重复应用拒绝。
 - 单行用户和授权事务一致性。
 - 导入错误精确定位到文件行和字段。
@@ -547,6 +550,8 @@ GET  /api/user/imports/{importId}/errors
 - `docs/70-AI速查/03-实体字典.md`；
 - `docs/70-AI速查/04-API端点.md`；
 - `docs/70-AI速查/05-配置清单.md`（如果新增配置项）。
+
+批量导入本轮 API、实体、SQL、后端和 Web 领域文档已同步，`check-docs.ps1` 已通过；其余流程和安全验收仍待继续补齐。
 
 ## 推荐实施顺序
 
@@ -647,7 +652,7 @@ pnpm run build
 - [ ] 授权方案可以复用并安全应用到用户。
 - [x] 批量导入后端不再依赖前端循环调用单用户接口。
 - [x] 批量导入后端具备校验、Preview、Apply、幂等、版本校验和错误追踪能力。
-- [x] Web 端具备固定 CSV/TXT 的上传、校验、预览、应用和结果展示闭环。
+- [x] Web 端具备固定 CSV/TXT/Excel 的上传、校验、预览、应用和结果展示闭环。
 - [ ] 前后端测试和文档检查全部通过。
 - [ ] 文档、API、实体和项目总览与实际源码一致。
 
