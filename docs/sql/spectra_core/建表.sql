@@ -612,7 +612,7 @@ COMMENT ON COLUMN spectra_core.sys_system_state.deleted IS '删除时间（NULL�
 COMMENT ON COLUMN spectra_core.sys_system_state.version IS '乐观锁版本号';
 
 -- ============================================
--- 用户批量导入（Flyway V9）
+-- 用户批量导入（Flyway V9/V10）
 -- ============================================
 
 CREATE TABLE spectra_core.sys_user_import_task (
@@ -633,6 +633,7 @@ CREATE TABLE spectra_core.sys_user_import_task (
     error_rows           INTEGER NOT NULL DEFAULT 0,
     skipped_rows         INTEGER NOT NULL DEFAULT 0,
     applied_rows         INTEGER NOT NULL DEFAULT 0,
+    completed_rows       INTEGER NOT NULL DEFAULT 0,
     assignment_count     INTEGER NOT NULL DEFAULT 0,
     access_boundary_count INTEGER NOT NULL DEFAULT 0,
     grant_boundary_count INTEGER NOT NULL DEFAULT 0,
@@ -650,6 +651,7 @@ CREATE TABLE spectra_core.sys_user_import_task (
     CONSTRAINT ck_sys_user_import_task_counts CHECK (
         total_rows >= 0 AND valid_rows >= 0 AND error_rows >= 0
         AND skipped_rows >= 0 AND applied_rows >= 0
+        AND completed_rows >= 0
         AND assignment_count >= 0 AND access_boundary_count >= 0 AND grant_boundary_count >= 0
     )
 );
@@ -695,5 +697,6 @@ COMMENT ON TABLE spectra_core.sys_user_import_row IS '用户批量导入暂存�
 COMMENT ON COLUMN spectra_core.sys_user_import_task.file_hash IS '上传文件摘要，不保存文件内容';
 COMMENT ON COLUMN spectra_core.sys_user_import_task.request_hash IS '规范化导入请求摘要，防止 Preview/Apply 参数漂移';
 COMMENT ON COLUMN spectra_core.sys_user_import_task.profile_version_hash IS '导入引用授权方案版本摘要';
+COMMENT ON COLUMN spectra_core.sys_user_import_task.completed_rows IS 'Apply 阶段已处理行数，包含预览阶段已发现的错误行';
 COMMENT ON COLUMN spectra_core.sys_user_import_row.raw_data IS '固定模板原始字段；接口错误响应不回传';
 COMMENT ON COLUMN spectra_core.sys_user_import_row.normalized_data IS '校验后的结构化字段；接口错误响应不回传';
