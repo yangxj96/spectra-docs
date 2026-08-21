@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 49 个 `*Controller.java` 端点速查表。
+> 源码当前 51 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。开发阶段不保留旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -41,6 +41,7 @@ tags:
 | Controller | 路径 | 说明 |
 |---|---|---|
 | UserController | `/user/**` | 用户资料维护、`POST /user` 创建后返回用户 ID、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
+| UserImportController | `/user/imports/**` | 用户批量导入 Preview/Apply、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
 | RoleController | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
@@ -55,6 +56,8 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 管理员用户编辑页通过 `GET /user/{uid}` 加载完整用户详情，前端页面路由为 `/system/user/create` 和 `/system/user/:id/edit`；编辑页使用 `activeMenu: SystemUser` 继承用户管理菜单高亮。
 
 用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
+
+用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 一次性应用通过校验的行。请求字段为固定模板的 `username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`，另带 `file_hash` 和 `idempotency_key`；后端不接收内部授权 UUID，Excel/CSV 文件解析暂由前端负责。
 
 用户分页资料与当前用户资料的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
 

@@ -31,7 +31,8 @@ created: 2026-08-21
 - [x] 授权方案保存时校验当前 Role/Permission/Scope/部门编码，禁止通过普通方案配置 DEV_OPS Role。
 - [x] 用户授权步骤支持套用单 Role 授权方案，并在提交前继续允许调整 Boundary。
 - [x] 提供授权方案列表、创建、修改和停用页面，并复用访问控制菜单入口。
-- [ ] 继续实现授权方案和批量导入流程。
+- [x] 授权方案管理和单用户套用已完成；批量导入后端的结构化行契约、任务、校验和 Preview/Apply 已完成。
+- [ ] 继续实现批量导入文件解析、Web 导入页面和结果下载。
 
 ## 问题背景
 
@@ -353,6 +354,8 @@ RoleAssignment + AssignmentPermissionBoundary + AssignmentGrantBoundary
 
 #### 5.1 导入任务和暂存数据
 
+> 状态：已完成。后端当前接受固定模板的结构化行和文件摘要，Excel/CSV 文件解析放在阶段六；正式 User、RoleAssignment 和 Boundary 只在 Apply 阶段写入。
+
 **操作**：
 
 - 创建导入任务，保存上传文件摘要、操作人、状态和过期时间。
@@ -371,6 +374,8 @@ UPLOADED
 ```
 
 #### 5.2 固定模板和字段
+
+> 状态：固定字段契约已完成，文件上传和 Excel/CSV 解析尚未接入。
 
 **普通模板**：
 
@@ -404,6 +409,8 @@ UPLOADED
 
 #### 5.3 导入校验
 
+> 状态：已完成。后端校验必填字段、手机号/邮箱/用户名重复、部门、语言、时区、授权方案、已存在用户策略；Apply 继续复用 RoleAssignment Preview/Apply 完成 Role、Permission、Scope 和 Grant Boundary 校验。
+
 **校验内容**：
 
 - 必填字段；
@@ -422,6 +429,8 @@ UPLOADED
 所有授权校验必须由后端完成，不能因为是批量接口而只做前端校验。
 
 #### 5.4 批量 Preview/Apply
+
+> 状态：已完成。任务响应包含行数、跳过数、错误数、预计授权实例/Access Boundary/Grant Boundary 数量、短时 Preview Token 和过期时间。
 
 **接口方向**：
 
@@ -452,6 +461,8 @@ GET  /api/user/imports/{importId}/errors
 - 不能由前端按用户循环调用单用户 Preview/Apply。
 
 #### 5.5 批量写入和失败处理
+
+> 状态：已完成。Apply 在服务端逐行处理，每行使用独立事务并记录 `APPLIED`、`SKIPPED` 或 `ERROR`；用户创建与该用户授权方案应用处于同一行事务内。导入文件解析和结果下载仍属于阶段六。
 
 **操作**：
 
@@ -631,8 +642,8 @@ pnpm run build
 - [ ] 普通管理员不需要直接操作 RoleAssignment 内部字段。
 - [ ] 角色权限支持默认范围快速配置和 Permission 级高级配置。
 - [ ] 授权方案可以复用并安全应用到用户。
-- [ ] 批量导入不再依赖前端循环调用单用户接口。
-- [ ] 批量导入具备校验、Preview、Apply、幂等、审计和错误追踪能力。
+- [x] 批量导入后端不再依赖前端循环调用单用户接口。
+- [x] 批量导入后端具备校验、Preview、Apply、幂等、版本校验和错误追踪能力。
 - [ ] 前后端测试和文档检查全部通过。
 - [ ] 文档、API、实体和项目总览与实际源码一致。
 

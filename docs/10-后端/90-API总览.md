@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 49 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 51 个 `*Controller.java`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。项目处于开发阶段，已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -46,6 +46,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `UserController` | spectra-core | `/user/**` | 用户资料维护、`POST /user` 创建后返回用户 ID、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
+| `UserImportController` | spectra-core | `/user/imports/**` | 用户批量导入 Preview/Apply、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
 | `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
@@ -76,6 +77,8 @@ tags:
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.sec_permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
+
+用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收固定模板的结构化行（`username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`，不接受 Role/Permission/Scope UUID。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，并逐行复用用户创建与 RoleAssignment Preview/Apply；Excel/CSV 解析由后续前端阶段负责。
 
 用户分页资料与当前用户资料中的角色展示已切换为读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
 
