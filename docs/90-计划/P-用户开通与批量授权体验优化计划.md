@@ -26,7 +26,8 @@ created: 2026-08-21
 - [x] 完整页面按“基本信息 → 角色授权”步骤条分开展示，避免表单和授权配置连续纵向堆叠。
 - [x] 增加管理员用户详情接口 `GET /api/user/{uid}`，支持编辑页刷新和直接访问。
 - [x] 创建用户后返回用户 ID，并在同一开通流程中继续完成角色授权。
-- [ ] 继续实现授权状态展示、授权方案和批量导入流程。
+- [x] 用户列表返回后端计算的授权状态，并提供直接进入授权步骤的入口。
+- [ ] 继续实现授权方案和批量导入流程。
 
 ## 问题背景
 
@@ -232,6 +233,12 @@ type UserProvisionStep = "profile" | "authorization" | "completed";
 
 - 用户列表或用户详情返回有效 RoleAssignment 授权状态摘要。
 - 授权状态由后端根据有效 Assignment、Permission Boundary 和 Role 状态计算，前端不自行推断。
+
+**当前实现**：
+
+- `UserPageVO.authorizationStatus` 返回 `UNCONFIGURED`、`INCOMPLETE`、`ACTIVE` 或 `PARTIAL`。
+- 用户列表以标签和说明展示授权状态；“配置授权”入口直接打开用户编辑页的角色授权步骤。
+- 授权状态计算使用 Assignment 生效时间、Assignment 状态、Role 状态、Role Permission 数量和 Access Boundary 数量；前端不通过角色列表自行推断。
 
 ### 阶段三：优化角色授权编辑体验
 

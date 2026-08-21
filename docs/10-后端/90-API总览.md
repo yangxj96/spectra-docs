@@ -76,7 +76,7 @@ tags:
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
 
-用户分页资料与当前用户资料中的角色展示已切换为读取活动 `spectra_security.sec_role_assignment`；`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
+用户分页资料与当前用户资料中的角色展示已切换为读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
 
 Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取 Role/Permission Catalog/组织树，新增或修改 Permission-specific Access/Grant Boundary，先调用 Assignment Preview，再携带短时 token 调用 Apply；Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 
