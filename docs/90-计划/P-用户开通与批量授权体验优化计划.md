@@ -29,6 +29,7 @@ created: 2026-08-21
 - [x] 用户列表返回后端计算的授权状态，并提供直接进入授权步骤的入口。
 - [x] 建立授权方案、方案 Role 配置和方案 Permission Boundary 的独立数据模型，并提供版本化管理接口。
 - [x] 授权方案保存时校验当前 Role/Permission/Scope/部门编码，禁止通过普通方案配置 DEV_OPS Role。
+- [x] 用户授权步骤支持套用单 Role 授权方案，并在提交前继续允许调整 Boundary。
 - [ ] 继续实现授权方案和批量导入流程。
 
 ## 问题背景
@@ -326,7 +327,7 @@ RoleAssignment + AssignmentPermissionBoundary + AssignmentGrantBoundary
 - `sec_authorization_profile_assignment` 保存 Role 业务编码与 Role version 快照；
 - `sec_authorization_profile_boundary` 使用 JSONB 保存 Permission-specific Access/Grant Boundary，RULES 使用部门业务编码；
 - `/security/authorization/profiles` 已提供列表、详情、创建、修改和停用接口；
-- 单用户流程选择方案并通过 RoleAssignment Preview/Apply、批量导入后端和管理界面仍待实现。
+- 单用户流程已支持选择单 Role 方案并通过 RoleAssignment Preview/Apply；多 Role 方案、方案管理界面和批量导入后端仍待实现。
 
 #### 4.3 建设授权方案管理界面
 
