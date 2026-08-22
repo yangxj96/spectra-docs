@@ -40,7 +40,7 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| UserController | `/user/**` | 用户资料维护、`POST /user` 创建后返回用户 ID、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
+| UserController | `/user/**` | 用户资料查询、`POST /user/onboarding` 新增用户及多角色 RoleAssignment、`PUT /user/onboarding` 编辑用户并增改/移除多个 RoleAssignment、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；提交接口在同一事务内完成资料和授权 |
 | UserImportController | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
 | RoleController | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、`PUT /role/{id}/enable`、`PUT /role/{id}/disable`、逻辑删除和菜单查询；旧角色创建、修改和菜单独立写入路由已移除 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
@@ -57,13 +57,13 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 管理员用户编辑页通过 `GET /user/{uid}` 加载完整用户详情，前端页面路由为 `/system/user/create` 和 `/system/user/:id/edit`；编辑页使用 `activeMenu: SystemUser` 继承用户管理菜单高亮。
 
-用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
+用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；独立授权编辑使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。用户新增/编辑页面按“基本信息 → 授权方案 → 角色授权”流转，最后一步调用 `POST/PUT /user/onboarding`，一次提交多个角色授权和移除列表，由后端在同一事务中保存用户资料、逐条复用 Assignment Preview/Apply 并撤销被移除角色。
 
 用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要和 `completed_rows`，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 校验通过后返回 `APPLYING` 任务并异步应用通过校验的行。请求字段为固定模板的 `username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`，另带 `file_hash` 和 `idempotency_key`；Web 下载的 Excel 模板使用中文表头，并为部门编码和授权方案编码提供显示“名称｜编码”的下拉校验，前端解析后还原为上述接口字段；后端不接收内部授权 UUID，Excel/CSV 文件解析由前端负责。
 
 用户分页资料与当前用户资料的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
 
-Web 用户编辑器对已有用户提供 RoleAssignment 新增/修改：也可以套用单 Role 授权方案作为初始配置；先调用 `/security/authorization/users/{userId}/assignments/preview`，确认影响后再调用 `/apply`。Access Boundary 与 Grant Boundary 独立提交，不从一个边界推导另一个边界。
+Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改和移除：第 02 步加载已有活动角色，也可以套用多 Role 授权方案；方案中的重复角色会跳过并提示。第 03 步按角色分别调整 Access Boundary 与 Grant Boundary，至少保留一个角色，最后调用 `/user/onboarding` 一次性提交；独立授权页面仍可调用 `/security/authorization/users/{userId}/assignments/preview` 和 `/apply`。Access Boundary 与 Grant Boundary 独立提交，不从一个边界推导另一个边界。
 
 ## 核心 — 系统管理
 

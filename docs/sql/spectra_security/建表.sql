@@ -133,9 +133,12 @@ CREATE TABLE spectra_security.sec_assignment_permission_boundary (
     updated_by    UUID,
     updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted       TIMESTAMP(6) WITH TIME ZONE,
-    version       BIGINT NOT NULL DEFAULT 0,
-    CONSTRAINT uk_sec_assignment_permission_boundary_assignment_permission UNIQUE (assignment_id, permission_id)
+    version       BIGINT NOT NULL DEFAULT 0
 );
+
+CREATE UNIQUE INDEX uk_sec_assignment_permission_boundary_assignment_permission
+    ON spectra_security.sec_assignment_permission_boundary (assignment_id, permission_id)
+    WHERE deleted IS NULL;
 
 CREATE TABLE spectra_security.sec_assignment_grant_boundary (
     id            UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_assignment_grant_boundary PRIMARY KEY,
@@ -147,9 +150,12 @@ CREATE TABLE spectra_security.sec_assignment_grant_boundary (
     updated_by    UUID,
     updated_at    TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted       TIMESTAMP(6) WITH TIME ZONE,
-    version       BIGINT NOT NULL DEFAULT 0,
-    CONSTRAINT uk_sec_assignment_grant_boundary_assignment_permission UNIQUE (assignment_id, permission_id)
+    version       BIGINT NOT NULL DEFAULT 0
 );
+
+CREATE UNIQUE INDEX uk_sec_assignment_grant_boundary_assignment_permission
+    ON spectra_security.sec_assignment_grant_boundary (assignment_id, permission_id)
+    WHERE deleted IS NULL;
 
 CREATE TABLE spectra_security.sec_scope_rule (
     id                  UUID DEFAULT gen_random_uuid() CONSTRAINT pk_sec_scope_rule PRIMARY KEY,

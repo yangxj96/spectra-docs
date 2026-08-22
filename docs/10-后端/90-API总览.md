@@ -45,7 +45,7 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `UserController` | spectra-core | `/user/**` | 用户资料维护、`POST /user` 创建后返回用户 ID、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
+| `UserController` | spectra-core | `/user/**` | 用户资料查询、`POST /user/onboarding` 新增用户及多角色 RoleAssignment、`PUT /user/onboarding` 编辑用户并增改/移除多个 RoleAssignment、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；提交接口在同一事务内完成资料和授权 |
 | `UserImportController` | spectra-core | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
 | `RoleController` | spectra-core | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、启用/禁用、逻辑删除和菜单查询；旧角色创建、修改和菜单独立写入路由已移除 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
@@ -78,13 +78,13 @@ tags:
 
 菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.sec_permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
 
-用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。
+用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；独立授权编辑仍使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。用户新增/编辑页面使用“基本信息 → 授权方案 → 角色授权”三步流程，最后改用 UserController 的 `/user/onboarding` 提交接口，一次接收多个保留/新增/修改的角色授权和被移除的授权实例，由后端在同一事务中逐条复用授权 Preview/Apply 并处理撤销。
 
 用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收固定模板的结构化行（`username`、`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`，不接受 Role/Permission/Scope UUID；Web 下载的 Excel 模板使用中文表头，并为部门编码和授权方案编码提供显示“名称｜编码”的下拉校验，前端解析后还原为上述接口字段。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。CSV/Excel 解析由前端完成。
 
 用户分页资料与当前用户资料中的角色展示已切换为读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
 
-Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取 Role/Permission Catalog/组织树，新增或修改 Permission-specific Access/Grant Boundary，也可以套用单 Role 授权方案作为初始配置；先调用 Assignment Preview，再携带短时 token 调用 Apply。Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
+Web 用户编辑器在编辑已有用户时提供多 RoleAssignment 管理：第 02 步自动加载当前活动角色并允许移除或新增多个角色，也可以套用包含多个角色的授权方案；方案中已经存在当前用户的角色会跳过并提示角色名称。第 03 步按角色分别调整 Permission-specific Access/Grant Boundary，至少保留一个角色，最后统一调用 `/user/onboarding`，由后端完成各 Assignment 的 Preview/Apply 和撤销。Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 仅允许对 ACTIVE 业务角色执行高风险授权变更。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
 
