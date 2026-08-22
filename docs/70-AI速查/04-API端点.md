@@ -74,7 +74,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | RegionController | `/region/**` | 区域查询（省/市/区县） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |
 | ConfiguredController | `/configured/**` | 配置表管理 |
-| ServiceMonitorController | `/service/monitor/**` | 服务器状态监控（CPU/内存/磁盘） |
+| ServiceMonitorController | `/service/monitor/overview` | 服务监控总览；返回 CPU、系统内存、JVM、线程、GC、HTTP 请求趋势和 PostgreSQL/Redis 脱敏健康状态 |
 | CryptoController | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | SystemBootstrapController | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | SystemGuideController | `/system/guide/**` | DEV_OPS 系统设置引导状态查询与完成 |
