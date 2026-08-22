@@ -30,7 +30,7 @@ created: 2026-08-21
 - [x] 建立授权方案、方案 Role 配置和方案 Permission Boundary 的独立数据模型，并提供版本化管理接口。
 - [x] 授权方案保存时校验当前 Role/Permission/Scope/部门编码，禁止通过普通方案配置 DEV_OPS Role。
 - [x] 用户授权步骤支持套用单 Role 授权方案，并在提交前继续允许调整 Boundary。
-- [x] 提供授权方案列表、独立创建/修改页面和停用操作，并复用访问控制菜单入口。
+- [x] 提供授权方案列表、独立创建/修改页面、启用、停用和删除操作，并复用访问控制菜单入口。
 - [x] 授权方案管理和单用户套用已完成；批量导入后端的结构化行契约、任务、校验和 Preview/Apply 已完成。
 - [x] Web 端已完成带中文表头和编码下拉校验的 Excel 模板下载、CSV/TXT/Excel 上传、行编辑、Preview、Apply、错误处理和结果查看闭环。
 - [x] 大批量 Apply 已改为有界后台任务，Web 端轮询任务详情展示处理进度和最终错误明细。
@@ -329,19 +329,19 @@ RoleAssignment + AssignmentPermissionBoundary + AssignmentGrantBoundary
 - `sec_authorization_profile` 保存方案元数据、状态和版本；
 - `sec_authorization_profile_assignment` 保存 Role 业务编码与 Role version 快照；
 - `sec_authorization_profile_boundary` 使用 JSONB 保存 Permission-specific Access/Grant Boundary，RULES 使用部门业务编码；
-- `/security/authorization/profiles` 已提供列表、详情、创建、修改和停用接口；
-- Web 端授权方案列表采用系统管理页布局，新建和编辑使用独立页面；授权方案编辑采用“基本信息 → 选择角色 → 权限范围设置”三步流程，角色支持多选并为每个角色生成独立 Assignment，权限支持多选添加，并可勾选多个权限批量应用访问组织、子部门和授权范围，最后一步统一提交；批量设置遵循选中 Permission 的共同 `allowed_scope_modes`，右侧提供“全选权限”“清空选择”“选中按组织规则”“选中按仅当前主体数据”快捷操作，避免把 `RULES` 与 `SELF` 权限混在一起配置；仅支持 `NONE` 的权限不会显示组织选择；页面明确区分授权方案与运行时 RoleAssignment，套用后仍须按当前用户完成 Preview/Apply，停用方案不会撤销已生效授权；
+- `/security/authorization/profiles` 已提供列表、详情、创建、修改、停用和删除接口；
+- Web 端授权方案列表采用系统管理页布局，新建和编辑使用独立页面；授权方案编辑采用“基本信息 → 选择角色 → 权限范围设置”三步流程，角色支持多选并为每个角色生成独立 Assignment，权限支持多选添加，并可勾选多个权限批量应用访问组织、子部门和授权范围，最后一步统一提交；批量设置遵循选中 Permission 的共同 `allowed_scope_modes`，右侧提供“全选权限”“清空选择”“选中按组织规则”“选中按仅当前主体数据”快捷操作，避免把 `RULES` 与 `SELF` 权限混在一起配置；仅支持 `NONE` 的权限不会显示组织选择；页面明确区分授权方案与运行时 RoleAssignment，套用后仍须按当前用户完成 Preview/Apply，停用或删除方案不会撤销已生效授权；
 - 单用户流程已支持选择单 Role 方案并通过 RoleAssignment Preview/Apply；多 Role 方案和批量导入后端仍待实现。
 
 #### 4.3 建设授权方案管理界面
 
 **操作**：
 
-- 新增、编辑、停用授权方案。
+- 新增、编辑、启用、停用、删除授权方案。
 - 从现有用户授权复制为授权方案。
 - 预览方案会生成哪些 Permission Boundary。
 - 查看使用中的用户数和最近应用记录。
-- 方案停用后不能用于新建用户或导入，但不影响已经生成的 RoleAssignment。
+- 方案停用后不能用于新建用户或导入，但不影响已经生成的 RoleAssignment；删除方案模板也不影响已生成的 RoleAssignment。
 
 #### 4.4 接入单用户开通流程
 
@@ -518,7 +518,7 @@ GET  /api/user/imports/{importId}/errors
 - 默认范围生成多个 Permission Boundary。
 - 高级 Permission 级范围覆盖默认范围。
 - Grant Boundary 仅在角色允许时可用。
-- 授权方案选择、复制和停用状态。
+- 授权方案选择、复制以及启用、停用和删除状态。
 - [x] 批量导入文件解析支持 CSV/TXT/Excel，错误分类和错误明细导出已覆盖工具测试。
 - [x] 批量导入进度计算覆盖零总量、正常比例和超过总量的边界。
 - [x] 批量导入 API 契约覆盖 Preview、Apply、任务详情和错误明细查询，并校验统一 API 版本头。
@@ -589,7 +589,7 @@ GET  /api/user/imports/{importId}/errors
 - [ ] 默认范围可以生成合法的 Permission-specific Access Boundary。
 - [ ] 高级模式可以单独修改某个 Permission 的范围。
 - [ ] Grant Boundary 和 Access Boundary 的界面含义清晰且互不混淆。
-- [ ] 授权方案可以复用、停用和复制。
+- [ ] 授权方案可以复用、启用、停用、删除和复制。
 - [ ] 导入可以完成上传、校验、预览、应用和结果下载。
 
 ### 安全验收

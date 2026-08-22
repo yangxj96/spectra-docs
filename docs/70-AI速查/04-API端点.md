@@ -18,7 +18,7 @@ tags:
 | AuthenticationController（spectra-core.security.authentication） | `/security/authentication/**` | 登录/登出/刷新 Token/登录验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
 | AuthenticationIdentityController | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；高风险写入绑定短时 token |
-| AuthorizationProfileController | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改和停用 |
+| AuthorizationProfileController | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除 |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据 |
 | MfaController | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
@@ -51,7 +51,7 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要和版本，并在事务内维护闭包表、递增 organizationVersion、撤销受影响会话。
 
-授权方案管理：`GET /security/authorization/profiles` 查询方案列表，`GET /security/authorization/profiles/{id}` 查询详情，`POST` 创建，`PUT` 按 `expected_version` 修改，`DELETE` 停用。方案保存 Role/Permission/部门业务编码和版本快照，后续应用仍需经过 RoleAssignment Preview/Apply。
+授权方案管理：`GET /security/authorization/profiles` 查询方案列表，`GET /security/authorization/profiles/{id}` 查询详情，`POST` 创建，`PUT /security/authorization/profiles/{id}` 按 `expected_version` 修改，`PUT /security/authorization/profiles/{id}/enable` 启用，`PUT /security/authorization/profiles/{id}/disable` 停用，`DELETE /security/authorization/profiles/{id}` 删除方案模板。删除采用逻辑删除，并同步移除方案下的角色配置和边界模板，不影响已经生成的运行时授权；方案保存 Role/Permission/部门业务编码和版本快照，后续应用仍需经过 RoleAssignment Preview/Apply。
 
 `UserController` 生命周期写入口：`PUT /user/lock/{uid}`、`/unlock/{uid}`、`/disable/{uid}`、`/enable/{uid}`、`/depart/{uid}`、`/reinstate/{uid}`；状态变更必须经过后端状态机，不能通过普通资料更新接口绕过。
 
