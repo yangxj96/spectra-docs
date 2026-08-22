@@ -47,7 +47,7 @@ tags:
 |---|---|---|---|
 | `UserController` | spectra-core | `/user/**` | 用户资料维护、`POST /user` 创建后返回用户 ID、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
 | `UserImportController` | spectra-core | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
-| `RoleController` | spectra-core | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
+| `RoleController` | spectra-core | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、启用/禁用、逻辑删除和菜单查询；旧角色创建、修改和菜单独立写入路由已移除 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`，包含临时密码、过期时间和必须修改密码标记。临时密码只在该次响应返回，服务端只保存哈希；用户使用临时密码登录后必须先修改密码。
@@ -86,7 +86,7 @@ tags:
 
 Web 用户编辑器在编辑已有用户时提供 RoleAssignment 管理：读取 Role/Permission Catalog/组织树，新增或修改 Permission-specific Access/Grant Boundary，也可以套用单 Role 授权方案作为初始配置；先调用 Assignment Preview，再携带短时 token 调用 Apply。Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 
-Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 负责高风险授权变更。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 仅允许对 ACTIVE 业务角色执行高风险授权变更。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要、版本、授权边界，并在事务内维护闭包表、递增 organizationVersion、推进受影响用户安全版本及撤销会话。
 

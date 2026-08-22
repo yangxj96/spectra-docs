@@ -42,12 +42,12 @@ tags:
 |---|---|---|
 | UserController | `/user/**` | 用户资料维护、`POST /user` 创建后返回用户 ID、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；RoleAssignment 使用 AuthorizationController 独立管理 |
 | UserImportController | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
-| RoleController | `/role/**` | 角色 CRUD / 菜单 UX 配置；旧角色权限关联路由已移除 |
+| RoleController | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、`PUT /role/{id}/enable`、`PUT /role/{id}/disable`、逻辑删除和菜单查询；旧角色创建、修改和菜单独立写入路由已移除 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`（临时密码、`expires_at`、`must_change`）。临时密码 24 小时有效，只在本次响应返回明文，服务端只保存哈希；临时会话必须先修改密码。
 
-Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role 的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`，且仅允许对 ACTIVE 业务角色执行。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要和版本，并在事务内维护闭包表、递增 organizationVersion、撤销受影响会话。
 
