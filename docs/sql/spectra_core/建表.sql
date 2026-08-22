@@ -1,7 +1,7 @@
 -- ============================================
 -- spectra_core schema 建表语句
 -- 共 18 张表（不含 BaseEntity；旧认证/授权运行时表已不属于当前目标模型）
--- 当前物理字段顺序、种子审计元数据和完整注释由 Flyway V1 干净基线固化。
+-- 当前物理字段顺序、种子审计元数据和完整注释由 Flyway 基线及增量迁移固化。
 -- ============================================
 
 CREATE SCHEMA IF NOT EXISTS spectra_core;
@@ -17,19 +17,14 @@ CREATE SCHEMA IF NOT EXISTS spectra_core;
 -- 用户表
 CREATE TABLE spectra_core.sys_user (
     id             UUID PRIMARY KEY,
-    username       VARCHAR(100) NOT NULL,
+    employee_no    VARCHAR(64) NOT NULL,
     avatar         VARCHAR(255),
     status         VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
     status_reason  VARCHAR(500),
-    locked_until   TIMESTAMP(6) WITH TIME ZONE,
     departed_at    TIMESTAMP(6) WITH TIME ZONE,
     real_name      VARCHAR(50),
-    gender         SMALLINT DEFAULT 0,
-    birthday       TIMESTAMP(6) WITH TIME ZONE,
     phone          VARCHAR(20),
     email          VARCHAR(100),
-    country        VARCHAR(50),
-    city           VARCHAR(50),
     language       VARCHAR(10) DEFAULT 'zh-CN',
     timezone       VARCHAR(40) DEFAULT 'Asia/Shanghai',
     primary_department_id UUID,
@@ -43,19 +38,14 @@ CREATE TABLE spectra_core.sys_user (
 );
 COMMENT ON TABLE spectra_core.sys_user IS '用户表';
 COMMENT ON COLUMN spectra_core.sys_user.id IS '主键ID';
-COMMENT ON COLUMN spectra_core.sys_user.username IS '显示名称';
+COMMENT ON COLUMN spectra_core.sys_user.employee_no IS '工号/员工编号';
 COMMENT ON COLUMN spectra_core.sys_user.avatar IS '头像';
-COMMENT ON COLUMN spectra_core.sys_user.status IS '状态 (1:正常 0:禁用)';
+COMMENT ON COLUMN spectra_core.sys_user.status IS '账号生命周期状态：ACTIVE-正常，LOCKED-锁定，DISABLED-禁用，DEPARTED-离职';
 COMMENT ON COLUMN spectra_core.sys_user.status_reason IS '状态变更原因';
-COMMENT ON COLUMN spectra_core.sys_user.locked_until IS '账号锁定截止时间';
 COMMENT ON COLUMN spectra_core.sys_user.departed_at IS '离职时间';
-COMMENT ON COLUMN spectra_core.sys_user.real_name IS '真实姓名';
-COMMENT ON COLUMN spectra_core.sys_user.gender IS '性别(从字典中获取)';
-COMMENT ON COLUMN spectra_core.sys_user.birthday IS '生日';
+COMMENT ON COLUMN spectra_core.sys_user.real_name IS '姓名';
 COMMENT ON COLUMN spectra_core.sys_user.phone IS '手机号';
 COMMENT ON COLUMN spectra_core.sys_user.email IS '邮箱';
-COMMENT ON COLUMN spectra_core.sys_user.country IS '国家';
-COMMENT ON COLUMN spectra_core.sys_user.city IS '城市';
 COMMENT ON COLUMN spectra_core.sys_user.language IS '语言';
 COMMENT ON COLUMN spectra_core.sys_user.timezone IS '时区';
 COMMENT ON COLUMN spectra_core.sys_user.primary_department_id IS '主部门ID；完整组织关系由用户部门成员关系表维护';
