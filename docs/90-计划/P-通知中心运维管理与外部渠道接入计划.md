@@ -14,7 +14,7 @@ updated: 2026-08-23
 
 ## 状态
 
-**规划中（跨前后端完整闭环，阶段一待启动）**
+**规划中（跨前后端完整闭环，阶段一进行中）**
 
 > 本计划承接已完成的 `P-统一通知模块建设计划`，不重新建设用户消息 Self API、站内信基础投递或既有业务调用迁移。
 >
@@ -157,7 +157,17 @@ flowchart LR
 
 目标：在写代码前固定模板、Provider、受众预览、状态和权限契约，避免后端和前端各自定义一套模型。
 
-- [ ] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
+- [x] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
+  - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
+  - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；Delivery 已具备 Provider、Provider Message ID、结果状态和脱敏响应摘要字段，但没有模板管理、Provider 配置、受控发送 Preview/Apply 和通知运行概览 API。
+  - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
+  - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel`；模板、Provider 和受控发送的细粒度权限尚未落地。
+
+#### 阶段一实施记录
+
+| 日期 | 步骤 | 结论 |
+|---|---|---|
+| 2026-08-23 | 基线盘点 | 后端可靠投递和基础管理 API 可复用；模板管理、Provider 接入、受控发送、运行概览及 4 个 Web 运维页面需要从契约到验收完整建设。 |
 - [ ] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
 - [ ] 固定 Provider 状态：`NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED`，明确任务状态与渠道状态的映射。
 - [ ] 固定受控发送三阶段：Preview、Confirm、Apply；Preview Token、请求摘要、模板版本和过期时间必须绑定。
