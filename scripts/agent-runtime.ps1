@@ -68,16 +68,19 @@ $env:Path = (($agentPathPrefixes + $existingPathParts) | Select-Object -Unique) 
 $env:CI = 'true'
 
 $workspaceMavenRepo = Join-Path $projectRoot '.maven-repository'
-if (-not (Test-Path -LiteralPath $workspaceMavenRepo -PathType Container)) {
-    New-Item -ItemType Directory -Path $workspaceMavenRepo -Force | Out-Null
-}
-
+$platformMavenRepo = 'D:\Develop\Platform\mavenrepo'
 $agentMavenRepoCandidates = @(
     $env:SPECTRA_AGENT_MAVEN_REPO
+    $platformMavenRepo
     (Join-Path $env:USERPROFILE '.m2\repository')
     $workspaceMavenRepo
     (Join-Path $env:TEMP 'spectra-maven-repository')
 ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) }
+
+if (-not $agentMavenRepoCandidates) {
+    New-Item -ItemType Directory -Path $workspaceMavenRepo -Force | Out-Null
+    $agentMavenRepoCandidates = @($workspaceMavenRepo)
+}
 
 $agentMavenRepo = $null
 foreach ($candidate in $agentMavenRepoCandidates) {

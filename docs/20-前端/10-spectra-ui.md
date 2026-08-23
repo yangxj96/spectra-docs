@@ -61,6 +61,16 @@ pnpm start      # 启动开发服务器（:5173），自动执行 format+lint+ty
 
 DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；当后端返回 `required=true` 时强制进入 `/system-guide`，在完成前不加载业务菜单。引导页提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`crypto_enabled`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url` 到 `POST /api/system/guide/complete`，其中根部门名称、区域和类型均为必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。后端在当前 DEV_OPS 用户上下文中创建根部门并建立主部门关系；接口加解密密钥以及通知模块所需的 AES 密钥由后端自动生成并保存到 `sys_config`，底部版权配置也保存到 `sys_config`。完成后刷新加解密配置并返回登录后的目标页面。
 
+## 消息中心
+
+消息中心通过静态认证路由 `/notification` 加载，不写入数据库菜单。`src/components/NotificationBell/` 在头部显示铃铛和未读数，点击后打开右侧抽屉，支持消息类型筛选、标记已读、全部已读和跳转完整消息中心；完整页面位于 `src/views/Notification/`，支持关键词/用途/已读状态筛选、分页、批量删除、详情查看和用途×渠道偏好设置。
+
+`src/api/notification/notification-api.ts` 对接 `/api/notification/list`、详情、未读数、单条/全部已读、单条/批量删除以及 `/api/notification-center/preferences`。Self API 不接受 `userId`，查询、已读和偏好均由后端绑定当前用户；前端已覆盖 API/Store 状态同步、真实登录 Bearer Token、刷新 Token、登出、用户隔离和浏览器交互验收。
+
+## 运维管理中心
+
+运维路由集中在 `src/plugin/router/modules/devops.ts`，统一使用 `/devops` 路径、`Devops` 命名路由前缀和 `src/views/Devops/` 目录。数据库菜单只负责导航可见性，叶子路由通过 `meta.requiredMenu` 绑定；未接入真实接口的预定义能力统一指向占位页，不以模拟数据冒充正式功能。后端 `ROLE_DEV_OPS` 通过 `*` 权限和全部有效菜单契约获得运维入口，页面仍通过路由守卫和后端接口权限双重保护。
+
 ## 目录结构
 
 ```
@@ -84,7 +94,9 @@ spectra-ui/
 │   │   ├── FileUpload/
 │   │   ├── IconPicker/
 │   │   ├── JsonEditor/
-│   │   └── PDFViewer/
+│   │   ├── NotificationBell/
+│   │   ├── PDFViewer/
+│   │   └── StepNavigation/
 │   ├── hooks/            # 组合式函数（kebab-case）
 │   │   ├── use-table.ts
 │   │   └── use-file-upload.ts
