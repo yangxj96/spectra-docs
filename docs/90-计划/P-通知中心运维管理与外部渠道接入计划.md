@@ -161,7 +161,7 @@ flowchart LR
   - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
   - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；Delivery 已具备 Provider、Provider Message ID、结果状态和脱敏响应摘要字段，但没有模板管理、Provider 配置、受控发送 Preview/Apply 和通知运行概览 API。
   - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
-  - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel`；模板、Provider 和受控发送的细粒度权限尚未落地。
+  - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel` 和 `notification:template:read/write/publish`；Provider 和受控发送的细粒度权限仍待落地。
 
 #### 阶段一实施记录
 
@@ -170,6 +170,7 @@ flowchart LR
 | 2026-08-23 | 基线盘点 | 后端可靠投递和基础管理 API 可复用；模板管理、Provider 接入、受控发送、运行概览及 4 个 Web 运维页面需要从契约到验收完整建设。 |
 | 2026-08-23 | 契约冻结 | 模板直接采用最终生命周期和版本 API；Provider、受控发送、管理分页与权限均以本节契约为唯一实现依据，不保留旧入口或兼容字段。 |
 | 2026-08-23 | 模板后端核心 | `spectra-admin` 已落地模板四态、草稿 CRUD、发布/停用/归档、版本历史、回滚草稿、预览校验和模板权限接口；前端页面、复制入口、版本摘要和菜单权限种子仍待收口。 |
+| 2026-08-23 | 模板权限与菜单 | 已通过 `V23__seed_notification_template_permissions_and_menu.sql` 固化模板查看、维护、发布/回滚权限，并将“模板管理”接入通知中心菜单；`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -202,11 +203,12 @@ flowchart LR
 
 #### 后端
 
-- [ ] 盘点现有 `NotificationTemplateEntity` 的用途、版本、状态、语言、渠道和变量字段；不足部分通过新的 Flyway 增量迁移补齐。
+- [x] 盘点现有 `NotificationTemplateEntity` 的用途、版本、状态、语言、渠道和变量字段；已通过 `V22__complete_notification_template_lifecycle.sql` 将模板状态收敛为四态，并移除旧的 `enabled` 字段。
+- [x] 固化模板管理权限和通知中心“模板管理”菜单；`ROLE_DEV_OPS` 拥有完整维护权限，`ROLE_AUDIT` 仅可查看。
 - [ ] 实现模板列表、详情、草稿创建、编辑、复制、停用和归档 API。
 - [ ] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
 - [ ] 实现变量声明和模板校验：缺失变量、多余变量、非法占位符、HTML/URL 安全、用途/渠道不匹配均拒绝发布。
-- [ ] 实现模板预览 API，只允许使用脱敏的示例参数，不落库真实收件人和敏感载荷。
+- [x] 实现模板预览 API，只允许使用脱敏的示例参数，不落库真实收件人和敏感载荷。
 - [ ] 发布时生成不可变版本摘要；Request/Task/Delivery 保存版本标识和渲染快照。
 - [ ] 增加模板操作审计：创建、修改、发布、停用、回滚、预览和失败原因。
 
