@@ -177,6 +177,7 @@ flowchart LR
 | 2026-08-23 | 模板 Web 版本对比 | `spectra-ui` 版本历史已支持选择两个版本并并列查看摘要、用途、标题模板和正文模板；发布影响范围、浏览器回归和其他通知运维页面仍待完成。 |
 | 2026-08-23 | 通知运行概览后端 | `GET /notification/admin/overview` 已接入真实 PostgreSQL 聚合，支持 1–168 小时窗口、渠道可用性、队列/失败/UNKNOWN 摘要、连续小时趋势和脱敏最近错误；Mapper 同步补齐模板快照与投递渲染快照字段映射。 |
 | 2026-08-23 | 通知运行概览 Web 页面 | `DevopsNotificationOverview` 已替换 Placeholder，接入真实概览 API，支持窗口选择、自动刷新、指标卡、渠道状态、投递趋势和脱敏错误展示；Request/Task/Delivery 页面仍待接入。 |
+| 2026-08-23 | Request 运维链路 | Request/Task/Delivery 管理查询统一默认最近 31 天，显式范围不得超过 31 天；Request 精确详情和关联 Task 查询不受默认窗口影响；`DevopsNotificationRequest` 已接入真实列表、详情摘要和关联 Task 展示。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -285,7 +286,7 @@ flowchart LR
 #### 后端
 
 - [x] 补充通知运行概览 API：`GET /notification/admin/overview` 支持 1–168 小时窗口，返回渠道可用性、待处理/处理中数量、最早待处理时间、失败率、UNKNOWN 数量、脱敏最近错误和连续小时趋势。
-- [ ] 完善 Request/Task/Delivery 查询的过滤、排序、时间范围上限、详情摘要和分页契约。
+- [x] 完善 Request/Task/Delivery 查询的时间范围上限和 Request 详情摘要契约：普通管理查询默认最近 31 天且最大 31 天，按 Request/Task 精确 ID 关联查询不受默认窗口影响；Request 详情返回脱敏摘要和任务/接收人数。
 - [ ] 为重试、取消、Provider 测试、模板发布和受控发送补齐权限、幂等和审计。
 - [ ] 确认管理端 VO 永不返回原始地址、Secret、验证码、敏感载荷、完整模板敏感参数或异常堆栈。
 - [ ] 所有运维查询和写操作增加服务层权限边界测试，不能只依赖 Controller 注解。
@@ -293,7 +294,7 @@ flowchart LR
 #### 前端
 
 - [x] 将 `DevopsNotificationOverview` 从 Placeholder 替换为真实运行概览页面：接入 24/72/168 小时窗口、自动刷新、队列/失败/UNKNOWN 指标、渠道状态、投递趋势和脱敏最近错误。
-- [ ] 将 `DevopsNotificationRequest` 替换为 Request 列表、详情和关联 Task 页面。
+- [x] 将 `DevopsNotificationRequest` 替换为 Request 列表、详情和关联 Task 页面：支持状态、用途、来源模块、业务对象、时间范围筛选，展示脱敏详情和关联任务。
 - [ ] 将 `DevopsNotificationDeliveryTask` 替换为 Task 列表、状态筛选、重试/取消和投递详情页面。
 - [ ] 将 `DevopsNotificationDeliveryRecord` 替换为 Delivery 列表、渠道、供应商回执和脱敏错误详情页面。
 - [ ] 统一使用真实 API、分页、时间范围、局部 loading、错误保留上一份数据和轮询退出条件。
