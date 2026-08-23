@@ -242,8 +242,8 @@ flowchart LR
 - [x] 设计 Provider 配置模型：供应商类型、启用状态、端点、超时、限流、重试、模板映射和加密 Secret 引用；SMS/EMAIL 非敏感配置写入 `spectra_core.sys_config` 的 `notification.provider.*`。
 - [x] Secret 使用现有 AES-GCM 能力保存，API 只返回是否配置、Key ID、更新时间和脱敏摘要，不返回原文；Secret 密文单独存储在对应的 `.secret` 配置键中。
 - [x] 增加 Provider 测试发送/健康检查；测试发送必须使用明确的测试地址和 `SEND_TEST` 操作确认，目标只在内存中加密使用，不从用户数据推导，也不写入业务 Request/Task/Delivery。
-- [ ] 扩展 Delivery 记录供应商消息 ID、回执状态、回执时间和脱敏错误码；重复回执必须幂等。
-- [ ] 处理成功、明确失败、限流、超时和未知结果；UNKNOWN 进入人工确认或受控重试流程。
+- [x] Delivery 已记录供应商消息 ID、标准化结果状态、完成时间和脱敏错误码；外部回执入口及重复回执幂等仍待接入。
+- [ ] 处理成功、明确失败、限流、超时和未知结果；当前 Worker 对明确限流按任务最大尝试次数退避，对超时/UNKNOWN 写入 Delivery 后停止自动重试；UNKNOWN 的人工确认或受控重试入口仍待完成。
 - [x] 保留测试 scope 的 Placeholder/Mock Sender，并由 Provider Runtime 对未配置、未健康或未注册 Provider 做 `BLOCKED` 安全回退，默认不报告成功。
 
 #### 前端
@@ -265,6 +265,7 @@ flowchart LR
 | 2026-08-23 | 渠道 Sender 与健康门禁 | 已接入 `SmsNotificationSender`、`EmailNotificationSender` 和 Provider Runtime；健康检查结果按配置更新时间缓存，配置变更自动失效，未通过健康检查的任务不会调用外部网络。新增 `POST /notification/admin/providers/{channel}/health`，测试发送接口已接入，回执和重试分类仍待完成。 |
 | 2026-08-23 | Provider 测试发送 | 新增 `POST /notification/admin/providers/{channel}/test`；只接受 SMS/EMAIL、明确测试地址和 `SEND_TEST` 确认词，测试任务只在内存中组装并复用健康门禁，不写业务 Request/Task/Delivery，响应不回显地址或原始供应商响应。 |
 | 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除、健康检查和确认后的测试发送，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；具体供应商回执仍待完成。 |
+| 2026-08-23 | Delivery 结果与重试分类 | Worker 已为每次 Provider 结果写入 Delivery；明确 `PROVIDER_RATE_LIMITED` 按任务最大尝试次数退避，明确失败终止，Provider 异常和 `UNKNOWN` 写入 Delivery 后停止无条件重试。外部回执幂等和 UNKNOWN 人工确认/受控重试仍待完成。 |
 
 ### 阶段四：受控发送与受众预览闭环
 
