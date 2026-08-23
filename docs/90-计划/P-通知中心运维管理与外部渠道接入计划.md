@@ -28,7 +28,7 @@ updated: 2026-08-23
 
 当前仍存在两个产品断点：
 
-1. `SMS`、`EMAIL` 只有明确阻断的 Placeholder Sender，尚未接入真实供应商、供应商配置、回执和未知结果处理。
+1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器和健康门禁，但尚未完成具体供应商、测试发送、回执和未知结果处理。
 2. 还没有受控发送流程：运维人员不能从模板开始选择受众、预览实际接收人和渠道、确认发送，再回到 Request/Task/Delivery 观察结果。
 
 ## 二、目标
@@ -80,7 +80,7 @@ flowchart LR
 | 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照 | 已接入模板管理页、复制、版本摘要和版本对比 | 与受控发送和外部渠道串联 |
 | 受控发送 | 无完整预览/确认闭环 | 无发送页 | 新增 Preview/Confirm/Apply 全流程 |
 | `IN_APP` | 真实可用 | 已接入 | 保持基线 |
-| `SMS` / `EMAIL` | Placeholder，默认阻断 | 无渠道配置和发送结果页 | 接入 Provider SPI、配置、健康、回执和页面 |
+| `SMS` / `EMAIL` | 已接入 Provider SPI、配置、通用 HTTP JSON 适配器和健康门禁；具体供应商投递仍默认阻断 | 已接入渠道配置和健康检查页，发送结果仍在 Delivery 运维页观察 | 接入具体供应商、测试发送、回执、失败/UNKNOWN 处理和受控发送 |
 | 指标/健康检查/清理 | 已有低基数指标、健康检查、敏感密文清理 | 已接入通知运行概览、渠道状态、趋势和脱敏错误 | 与实际发送和 Provider 结果串联 |
 | 权限/审计 | Self、Audit、DevOps 边界已存在 | 运维路由和菜单已有骨架 | 收敛细粒度权限和操作审计 |
 
@@ -248,11 +248,11 @@ flowchart LR
 
 #### 前端
 
-- [ ] 新增 `/devops/notification/provider` 渠道配置页面，按 SMS/EMAIL/IN_APP 分组展示状态。
-- [ ] 支持 Provider 类型、非敏感参数、Secret 更新、启停、健康检查和测试发送确认。
-- [ ] Secret 输入只允许覆盖更新，不回显原文；离开页面和刷新后不得保留明文。
-- [ ] 展示渠道健康、最近检查时间、队列积压、成功/失败/UNKNOWN 摘要和脱敏错误原因。
-- [ ] Provider 未配置或健康检查失败时，前端明确显示阻断状态，不展示“发送成功”。
+- [x] 新增 `/devops/notification/provider` 渠道配置页面，按 SMS/EMAIL/IN_APP 分组展示状态。
+- [x] 支持 Provider 类型、非敏感参数、Secret 更新、启停和健康检查；测试发送确认待测试发送闭环完成后接入。
+- [x] Secret 输入只允许覆盖更新，不回显原文；离开页面和刷新后不得保留明文。
+- [x] 展示渠道健康、最近检查时间、队列积压、成功/失败/UNKNOWN 摘要和脱敏错误原因。
+- [x] Provider 未配置或健康检查失败时，前端明确显示阻断状态，不展示“发送成功”。
 
 阶段门禁：Provider 配置、健康检查、测试发送、真实/Mock 投递、回执、失败、超时、UNKNOWN 和重复回执均有后端测试和前端验收；没有真实沙箱或可重复 Mock 验收不得关闭阶段。
 
@@ -263,6 +263,7 @@ flowchart LR
 | 2026-08-23 | Provider 配置与 Secret 保护 | `spectra-admin` 已增加全局 SMS/EMAIL Provider 配置契约、脱敏管理 API、`notification:provider:read/configure` 权限和“渠道配置”菜单；非敏感配置写入 `spectra_core.sys_config`，Secret 使用通知模块 AES-GCM 密文和 Key ID 保存。配置完整但未健康检查前统一返回 `UNHEALTHY`，未配置或密钥缺失时返回 `NOT_CONFIGURED/BLOCKED`，不会报告发送成功。 |
 | 2026-08-23 | Provider SPI 与 HTTP 适配器 | 已增加 `NotificationProvider` SPI、`HTTP_JSON` 通用适配器和本地 HTTP 沙箱测试；适配器负责地址解密、标准 JSON 请求、健康检查、供应商消息 ID提取和成功/失败/未知结果脱敏映射。SMS/EMAIL Sender、健康状态缓存、测试发送和回执闭环仍待接入，当前生产 Worker 继续使用安全阻断 Sender。 |
 | 2026-08-23 | 渠道 Sender 与健康门禁 | 已接入 `SmsNotificationSender`、`EmailNotificationSender` 和 Provider Runtime；健康检查结果按配置更新时间缓存，配置变更自动失效，未通过健康检查的任务不会调用外部网络。新增 `POST /notification/admin/providers/{channel}/health`，测试发送、回执和重试分类仍待完成。 |
+| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除和健康检查，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；测试发送仍待完成。 |
 
 ### 阶段四：受控发送与受众预览闭环
 
