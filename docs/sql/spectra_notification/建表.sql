@@ -6,6 +6,7 @@ CREATE SCHEMA IF NOT EXISTS spectra_notification;
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     id                    UUID NOT NULL,
     template_group_code   VARCHAR(100) NOT NULL,
+    template_name         VARCHAR(200) NOT NULL,
     channel               VARCHAR(16) NOT NULL,
     purpose               VARCHAR(50) NOT NULL,
     version_no            INTEGER NOT NULL,
@@ -282,6 +283,7 @@ COMMENT ON TABLE spectra_notification.ntf_send_preview IS '受控发送短时 Pr
 
 COMMENT ON COLUMN spectra_notification.ntf_template.id IS '主键ID';
 COMMENT ON COLUMN spectra_notification.ntf_template.template_group_code IS '逻辑模板组编码';
+COMMENT ON COLUMN spectra_notification.ntf_template.template_name IS '模板名称，供管理端识别和展示';
 COMMENT ON COLUMN spectra_notification.ntf_template.channel IS '投递渠道：IN_APP、SMS或EMAIL';
 COMMENT ON COLUMN spectra_notification.ntf_template.purpose IS '通知用途';
 COMMENT ON COLUMN spectra_notification.ntf_template.version_no IS '模板版本号';
