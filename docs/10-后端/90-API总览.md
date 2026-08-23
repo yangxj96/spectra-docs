@@ -74,7 +74,7 @@ tags:
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
 | `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的运行概览、Request/Task/Delivery 脱敏查询与详情、渠道状态、重试和取消；运行概览支持 `hours=1..168` |
 | `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板分页/详情、草稿创建/编辑/复制、发布、停用、归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
-| `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询与 SMS/EMAIL 配置保存；按 `notification:provider:read/configure` 权限保护，Secret 不回显 |
+| `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存和健康检查；按 `notification:provider:read/configure` 权限保护，Secret 不回显 |
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。
 
