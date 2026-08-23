@@ -191,6 +191,32 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_user_preference (
     CONSTRAINT "CK_NTF_USER_PREFERENCE_CHANNEL" CHECK (channel IN ('IN_APP', 'SMS', 'EMAIL'))
 );
 
+CREATE TABLE IF NOT EXISTS spectra_notification.ntf_send_preview (
+    id                  UUID NOT NULL,
+    operator_user_id    UUID NOT NULL,
+    request_hash        VARCHAR(64) NOT NULL,
+    preview_token_hash  VARCHAR(64) NOT NULL,
+    resolution_hash     VARCHAR(64) NOT NULL,
+    request_snapshot    JSONB NOT NULL DEFAULT '{}'::jsonb,
+    expires_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    consumed_at         TIMESTAMP(6) WITH TIME ZONE,
+    applied_request_id  UUID,
+    status              VARCHAR(20) NOT NULL DEFAULT 'PREVIEWED',
+    created_by          UUID,
+    created_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by          UUID,
+    updated_at          TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted             TIMESTAMP(6) WITH TIME ZONE,
+    version             BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT "PK_NTF_SEND_PREVIEW" PRIMARY KEY (id),
+    CONSTRAINT "CK_NTF_SEND_PREVIEW_STATUS"
+        CHECK (status IN ('PREVIEWED', 'APPLYING', 'APPLIED', 'EXPIRED')),
+    CONSTRAINT "CK_NTF_SEND_PREVIEW_HASH"
+        CHECK (request_hash ~ '^[0-9a-f]{64}$'
+               AND preview_token_hash ~ '^[0-9a-f]{64}$'
+               AND resolution_hash ~ '^[0-9a-f]{64}$')
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_VERSION"
     ON spectra_notification.ntf_template (template_group_code, channel, version_no)
     WHERE deleted IS NULL;
@@ -217,6 +243,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_INBOX_TASK"
     WHERE notification_task_id IS NOT NULL AND deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_USER_PREFERENCE"
     ON spectra_notification.ntf_user_preference (user_id, purpose, channel)
+    WHERE deleted IS NULL;
+CREATE INDEX IF NOT EXISTS "IDX_NTF_SEND_PREVIEW_EXPIRES"
+    ON spectra_notification.ntf_send_preview (expires_at, status);
+CREATE INDEX IF NOT EXISTS "IDX_NTF_SEND_PREVIEW_OPERATOR"
+    ON spectra_notification.ntf_send_preview (operator_user_id, created_at DESC)
     WHERE deleted IS NULL;
 
 CREATE INDEX IF NOT EXISTS "IDX_NTF_TASK_PENDING"
@@ -247,6 +278,7 @@ COMMENT ON TABLE spectra_notification.ntf_task IS '接收人和渠道维度的�
 COMMENT ON TABLE spectra_notification.ntf_delivery IS '通知渠道单次投递尝试审计表';
 COMMENT ON TABLE spectra_notification.ntf_inbox_message IS '当前用户站内信收件箱表';
 COMMENT ON TABLE spectra_notification.ntf_user_preference IS '用户用途和渠道偏好表';
+COMMENT ON TABLE spectra_notification.ntf_send_preview IS '受控发送短时 Preview 快照，不保存完整用户清单、地址或敏感参数';
 
 COMMENT ON COLUMN spectra_notification.ntf_template.id IS '主键ID';
 COMMENT ON COLUMN spectra_notification.ntf_template.template_group_code IS '逻辑模板组编码';
@@ -266,6 +298,23 @@ COMMENT ON COLUMN spectra_notification.ntf_template.updated_by IS '最后更新�
 COMMENT ON COLUMN spectra_notification.ntf_template.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_notification.ntf_template.deleted IS '删除时间；NULL表示未删除';
 COMMENT ON COLUMN spectra_notification.ntf_template.version IS '乐观锁版本号';
+
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.id IS '主键ID';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.operator_user_id IS '受控发送操作人ID';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.request_hash IS 'Preview 请求 SHA-256 摘要';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.preview_token_hash IS '一次性 Preview token 的 SHA-256 摘要';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.resolution_hash IS '受众、数据范围和渠道状态解析摘要';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.request_snapshot IS '非敏感受控发送请求快照，过期后物理删除';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.expires_at IS 'Preview 过期时间';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.consumed_at IS 'Apply 消费时间';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.applied_request_id IS 'Apply 创建的逻辑通知请求ID';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.status IS 'Preview 状态：PREVIEWED、APPLYING、APPLIED 或 EXPIRED';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.created_by IS '创建人ID';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.created_at IS '创建时间';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.updated_by IS '最后更新人ID';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.updated_at IS '最后更新时间';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.deleted IS '删除时间；NULL表示未删除';
+COMMENT ON COLUMN spectra_notification.ntf_send_preview.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_request.id IS '主键ID';
 COMMENT ON COLUMN spectra_notification.ntf_request.external_request_id IS '调用方生成的外部请求ID';

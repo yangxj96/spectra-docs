@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 52 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 55 个 `*Controller.java`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。项目处于开发阶段，已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -76,6 +76,7 @@ tags:
 | `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板分页/详情、草稿创建/编辑/复制、发布、停用、归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
 | `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、健康检查和明确测试地址的测试发送；按 `notification:provider:read/configure` 权限保护，Secret 和测试地址不回显 |
 | `NotificationProviderCallbackController` | spectra-notification | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执入口；匿名但必须使用当前渠道 Secret 的 HMAC 签名，重复回执幂等更新既有 Delivery/Task，不创建孤立投递记录 |
+| `NotificationControlledSendController` | spectra-notification | `/notification/admin/send/**` | 受控发送 Preview/Apply；Preview 按当前受众、模板版本、用户偏好和渠道状态返回脱敏结果，Apply 绑定短时令牌并通过统一 Gateway 创建通知请求；分别受 `notification:send:preview/apply` 保护 |
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。
 

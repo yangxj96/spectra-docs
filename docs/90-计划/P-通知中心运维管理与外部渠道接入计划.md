@@ -14,7 +14,7 @@ updated: 2026-08-24
 
 ## 状态
 
-**规划中（跨前后端完整闭环，阶段三进行中；模板生命周期、版本追溯、发布前安全校验和 Provider 回执幂等已完成）**
+**规划中（跨前后端完整闭环，阶段四进行中；模板生命周期、版本追溯、发布前安全校验、Provider 回执幂等和受控发送 Preview/Apply 已接入）**
 
 > 本计划承接已完成的 `P-统一通知模块建设计划`，不重新建设用户消息 Self API、站内信基础投递或既有业务调用迁移。
 >
@@ -29,7 +29,7 @@ updated: 2026-08-24
 当前仍存在两个产品断点：
 
 1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器、健康门禁、受确认保护的测试发送和签名回执幂等；具体供应商适配、UNKNOWN 人工确认/受控重试仍待完成。
-2. 还没有受控发送流程：运维人员不能从模板开始选择受众、预览实际接收人和渠道、确认发送，再回到 Request/Task/Delivery 观察结果。
+2. 受控发送后端 Preview/Apply 与 Web 页面已经接入：运维人员可以从已发布模板选择受众、预览当前渠道结果、确认发送并回到 Request 观察结果；真实 Worker/Provider 和浏览器全链路验收仍待完成。
 
 ## 二、目标
 
@@ -68,6 +68,7 @@ flowchart LR
 - 不以日志、调试接口、固定验证码或“已入队”伪装为外部渠道发送成功。
 - 不在正式运维菜单中保留本计划范围内的空白占位页作为最终交付。
 - 不把营销自动化、群发活动、用户画像和复杂编排混入本计划。
+- 这是单体项目，不引入租户字段、租户隔离或多租户路由；通知受众边界只按当前用户、部门层级、角色授权和用户状态执行。
 - WebSocket/SSE 实时推送不是本计划的完成条件；运维页面首版通过轮询和手动刷新展示真实状态。
 
 ## 四、当前能力基线
@@ -156,10 +157,10 @@ flowchart LR
 目标：在写代码前固定模板、Provider、受众预览、状态和权限契约，避免后端和前端各自定义一套模型。
 
 - [x] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
-  - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
+   - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。受控发送 Preview/Apply 已由 `NotificationControlledSendController` 接入。
   - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；模板管理、通知运行概览和 Provider 配置/健康/测试发送 API 已接入，受控发送 Preview/Apply 仍待落地。
   - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 已接入真实页面；`DevopsNotificationTemplate` 已接入真实模板管理页；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
-  - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel`、`notification:template:read/write/publish` 和 `notification:provider:read/configure`；受控发送的细粒度权限仍待落地。
+   - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel`、`notification:template:read/write/publish`、`notification:provider:read/configure` 和 `notification:send:preview/apply`。
 
 #### 阶段一实施记录
 
@@ -216,7 +217,7 @@ flowchart LR
 - [x] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
 - [x] 实现变量声明和模板校验：缺失变量、多余变量、非法占位符、HTML/URL 安全均由后端渲染器在保存、预览和发布前拒绝，Web 页面同步提供即时预校验。
 - [x] 建立用途/渠道兼容矩阵；`NotificationPolicy` 固化验证码仅允许 SMS/EMAIL、普通用途允许三种渠道，模板保存、预览、发布和 Gateway 按矩阵拒绝不匹配组合。
-- [ ] 受控发送 Preview/Apply 复用同一用途/渠道矩阵，并在最终确认时再次拒绝不匹配组合。
+   - [x] 受控发送 Preview/Apply 复用同一用途/渠道矩阵，并在最终确认时再次拒绝不匹配组合。
 - [x] 实现模板预览 API，只允许使用脱敏的示例参数，不落库真实收件人和敏感载荷。
 - [x] 发布时生成不可变版本摘要；Request/Task/Delivery 保存版本标识和渲染快照。
 - [x] 增加模板操作审计：创建、修改、复制、发布、停用、归档、回滚、预览和失败原因均由管理 Controller 写入操作日志。
@@ -240,7 +241,7 @@ flowchart LR
 |---|---|---|
 | 2026-08-23 | 模板前后端安全校验 | 后端模板渲染器和 Web 页面均校验声明变量、引用变量、非法双大括号以及 HTML/URL 安全；通知模块测试、Spotless 和 Web 类型/测试/构建均通过。真实浏览器回归仍待完成。 |
 | 2026-08-23 | 发布影响摘要 | 模板发布确认展示渠道、版本和变量影响摘要；保存、预览、发布均先执行前端预校验，并由后端执行最终校验。 |
-| 2026-08-23 | 用途渠道兼容矩阵 | `NotificationPolicy` 固化验证码模板仅允许 SMS/EMAIL、普通用途允许 IN_APP/SMS/EMAIL；模板服务、Gateway 和 Web 编辑器已统一校验，受控发送复用和浏览器回归仍待完成。 |
+| 2026-08-23 | 用途渠道兼容矩阵 | `NotificationPolicy` 固化验证码模板仅允许 SMS/EMAIL、普通用途允许 IN_APP/SMS/EMAIL；模板服务、Gateway、受控发送 Preview/Apply 和 Web 编辑器已统一校验，浏览器回归仍待完成。 |
 
 ### 阶段三：Provider 与外部渠道闭环
 
@@ -285,22 +286,29 @@ flowchart LR
 
 #### 后端
 
-- [ ] 新增受控发送 Preview API：接收模板版本、用途、受众条件、渠道和非敏感参数，返回脱敏统计、样例、冲突、跳过原因和预览有效期。
-- [ ] 受众支持明确用户、部门/子部门、角色等范围，但每一种受众都必须经过当前操作人的数据范围和授权边界校验。
-- [ ] Preview 生成请求摘要和短时一次性 Token；Apply 必须校验 Token、模板版本、请求摘要、当前权限和幂等键。
-- [ ] Apply 只调用 `NotificationGateway`，禁止受控发送服务直接写 Request/Task/Inbox 表。
-- [ ] 对发送规模、渠道数量、并发、频率、单用户重复通知和单次任务时长设置服务端上限。
-- [ ] 记录受控发送审计：操作人、模板版本、受众摘要、渠道、规模、确认时间、幂等键和结果统计，不记录完整用户清单或敏感正文。
+- [x] 新增受控发送 Preview API：`POST /notification/admin/send/preview` 接收模板版本、用途、受众条件、渠道和非敏感参数，返回脱敏统计、样例、跳过原因、渠道状态和 10 分钟有效期。
+- [x] 受众支持明确用户、部门/子部门、角色等范围；后端通过 Core 受众目录展开当前有效用户，并在 Preview/Apply 重新执行当前操作人的数据范围、用户状态、用户偏好和渠道地址校验。
+- [x] Preview 生成请求摘要、受众解析摘要和短时一次性 Token；Apply 校验 Token、模板版本、请求摘要、当前解析结果、操作人和幂等键，Preview 只能消费一次。
+- [x] Apply 只通过 `NotificationGateway` 创建通知请求，受控发送服务不直接写 Request/Task/Inbox 表；渠道模板版本通过 Gateway 精确锁定。
+- [x] 服务端设置受众选择项最多 5000、渠道最多 3、明确用户最多 5000、部门/角色各最多 100，并由模板参数安全校验拒绝验证码、密码、Token、Secret 等敏感字段。
+- [x] 记录受控发送操作审计：Controller 使用 `@ULog`，Preview 表绑定操作人、模板/受众摘要、渠道、规模、幂等键和 Apply 结果；不保存完整用户清单、地址或敏感正文。
 
 #### 前端
 
-- [ ] 新增 `/devops/notification/send` 受控发送页面：选择模板版本、填写参数、选择受众、选择渠道。
-- [ ] 分步展示基本信息、受众预览、渠道确认、最终确认和发送结果，Preview 前不允许 Apply。
-- [ ] 展示新增/跳过/无地址/渠道不可用/超出边界等统计；受众和地址默认脱敏。
-- [ ] Apply 后跳转或联动到 Request/Task 页面，轮询展示处理进度、成功、失败、跳过和 UNKNOWN。
-- [ ] 处理刷新、重复点击、Preview 过期、权限变化、模板版本变化和网络失败，不重复派发任务。
+- [x] 新增 `/devops/notification/send` 受控发送页面：选择已发布模板版本、填写非敏感参数、选择用户/部门下级/角色受众和渠道。
+- [x] 页面按“发送条件 → Preview 结果 → Apply 确认 → Request 结果”展示，Preview 前不允许 Apply；修改任一条件会清空当前 Preview。
+- [x] 展示候选用户、可创建任务、跳过原因、无地址、渠道不可用、模板渲染样例和脱敏受众样例；不回显完整受众地址。
+- [x] Apply 后提供 Request 详情跳转，后续投递结果复用既有 Request/Task/Delivery 运维页面查看。
+- [x] Apply 使用 Preview ID、一次性 Token 和请求摘要，后端重新校验过期、权限、模板版本、受众解析和网络失败，不因重复点击重复派发任务。
 
 阶段门禁：使用一个真实模板和一个真实测试受众完成 Preview → Confirm → Apply → Worker → Delivery → 页面结果查看；任一环节只能通过手工数据库操作都不能关闭阶段。
+
+#### 阶段四实施记录
+
+| 日期 | 步骤 | 结论 |
+|---|---|---|
+| 2026-08-24 | 受控发送后端 | `spectra-admin` 已新增 Preview/Apply Controller、受众解析、模板版本锁定、10 分钟短时快照、Token/请求摘要/受众解析摘要校验、Gateway 精确模板入队、V27/V28 数据库与权限菜单；单元测试和通知模块测试通过。 |
+| 2026-08-24 | 受控发送 Web 页面 | `spectra-ui` 已接入 `/devops/notification/send`、受控发送 API 和类型，页面支持已发布模板、用户/部门下级/角色受众、非敏感参数、Preview 统计和 Apply 后 Request 跳转；format、lint、type-check、59 项测试和 build 通过，真实浏览器回归待完成。 |
 
 ### 阶段五：通知运维页面与后端管理 API 完整接入
 
@@ -329,13 +337,13 @@ flowchart LR
 
 - [x] 增加模板生命周期、版本快照、变量校验和 HTML/URL 安全测试；通知模块测试已覆盖模板渲染器边界并通过。
 - [ ] 增加 Provider Mock 测试：成功、失败、限流、超时、UNKNOWN、重复回执、重复发送和密钥不可用。
-- [ ] 增加受控发送 Preview/Apply 幂等、Token 过期、权限变化、数据范围、规模上限和审计测试。
+- [x] 增加受控发送 Preview/Apply 幂等、Token 过期、权限变化、数据范围、规模上限和审计测试；服务层测试覆盖一次性消费、重复 Apply、摘要/受众变化、渠道不可用和 Gateway 入队边界。
 - [ ] 增加 `ROLE_USER`、`ROLE_AUDIT`、`ROLE_ADMIN_SYSTEM`、`ROLE_DEV_OPS` 的 API/页面矩阵回归。
 - [ ] 增加用户 A/B、部门边界、角色边界和受控发送目标隔离测试。
 - [ ] 通过真实 PostgreSQL 迁移、事务、并发 Worker、Delivery 回执和敏感配置清理测试。
 - [ ] 在真实 HTTP 登录、Token 刷新/登出和浏览器会话中完成模板、发送、运维查询和错误处理验收。
-- [ ] 同步 `docs/10-后端/75-统一通知模块.md`、`docs/10-后端/90-API总览.md`、`docs/20-前端/10-spectra-ui.md`、实体字典、API 端点、配置清单、ER 图和 SQL。
-- [ ] 运行前端格式、Lint、类型检查、测试、构建；运行后端 Spotless、测试和文档检查。
+- [x] 同步 `docs/10-后端/75-统一通知模块.md`、`docs/10-后端/90-API总览.md`、`docs/20-前端/10-spectra-ui.md`、实体字典、API 端点、配置清单、ER 图和 SQL。
+- [x] 运行前端格式、Lint、类型检查、测试、构建；运行后端 Spotless、测试和文档检查。
 - [ ] 编写部署/回滚说明：Provider 默认关闭、配置校验失败阻断发送、数据库迁移可回滚边界和旧数据处理策略。
 
 ## 八、建议 API 与页面清单
@@ -363,8 +371,8 @@ flowchart LR
 - [ ] 如现有模板实体不足，新增不可变模板版本表或等价版本字段；禁止覆盖在途任务使用的模板快照。
 - [ ] 如 Provider 配置需要落库，新增独立配置表或受控配置结构，Secret 只能保存密文和 Key ID，不能复用普通明文配置字段。
 - [x] 为外部回执和供应商消息 ID 增加唯一约束/索引，确保重复回调幂等；V26 新增 `UK_NTF_DELIVERY_PROVIDER_MESSAGE`，并以回执正文 SHA-256 摘要识别同一事件。
-- [ ] 受控发送 Preview 的短期数据必须具备过期时间和操作人绑定；不长期保存完整受众清单和敏感正文。
-- [ ] 所有数据库变更使用新的 Flyway 增量迁移，已执行迁移不可改写；同步 ER 图、建表 SQL、实体清单和数据字典。
+- [x] 受控发送 Preview 的短期数据必须具备过期时间和操作人绑定；不长期保存完整受众清单和敏感正文，已由 V27 `ntf_send_preview` 固化。
+- [x] 所有数据库变更使用新的 Flyway 增量迁移，已执行迁移不可改写；V27/V28 已同步 ER 图、建表 SQL、实体清单和数据字典。
 - [ ] 迁移失败时不启用 Provider、不生成半配置菜单，不影响现有 IN_APP Self API。
 
 ## 十、完成定义

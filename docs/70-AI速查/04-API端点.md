@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 52 个 `*Controller.java` 端点速查表。
+> 源码当前 55 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。开发阶段不保留旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -89,6 +89,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | NotificationTemplateAdminController | `/notification/admin/templates/**` | 模板分页/详情、草稿创建/编辑/复制、发布/停用/归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
 | NotificationProviderAdminController | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、`POST /{channel}/health` 健康检查和 `POST /{channel}/test` 受确认保护的测试发送；Secret/测试地址只在服务端短暂使用，不回显原文 |
 | NotificationProviderCallbackController | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执；必须带 `X-Notification-Signature: sha256=<HMAC-SHA256(raw body)>`，重复正文返回 `DUPLICATE`，不创建新 Delivery |
+| NotificationControlledSendController | `/notification/admin/send/**` | `POST /preview` 和 `POST /apply`；绑定当前受众、已发布模板、渠道状态、请求摘要和短时令牌，Apply 只通过统一 Gateway 创建通知请求；权限为 `notification:send:preview/apply` |
 
 `POST /notification/batch-delete` 使用 `NotificationBatchDeleteFrom` 请求体：`{"ids":["消息ID"]}`。
 
