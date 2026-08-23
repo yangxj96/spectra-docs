@@ -74,7 +74,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | RegionController | `/region/**` | 区域查询（省/市/区县） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |
 | ConfiguredController | `/configured/**` | 配置表管理 |
-| ServiceMonitorController | `/service/monitor/overview`、`/service/monitor/history` | 服务监控总览、按 30 分钟/6 小时/24 小时查询历史趋势；返回 CPU、系统内存、JVM、线程、GC、HTTP 请求趋势、健康组件和 PostgreSQL/Redis 脱敏状态 |
+| ServiceMonitorController | `/service/monitor/**` | 服务监控总览/历史趋势、告警摘要/规则/事件、运行时诊断和受控诊断任务；分别使用 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 权限 |
 | CryptoController | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | SystemBootstrapController | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | SystemGuideController | `/system/guide/**` | DEV_OPS 系统设置引导状态查询与完成 |

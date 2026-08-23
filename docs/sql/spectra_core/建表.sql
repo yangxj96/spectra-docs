@@ -1,6 +1,6 @@
 -- ============================================
 -- spectra_core schema 建表语句
--- 共 18 张表（不含 BaseEntity；旧认证/授权运行时表已不属于当前目标模型）
+-- 共 21 张表（不含 BaseEntity；旧认证/授权运行时表已不属于当前目标模型）
 -- 当前物理字段顺序、种子审计元数据和完整注释由 Flyway 基线及增量迁移固化。
 -- ============================================
 
@@ -770,3 +770,147 @@ COMMENT ON COLUMN spectra_core.sys_service_monitor_sample.updated_by IS '最后�
 COMMENT ON COLUMN spectra_core.sys_service_monitor_sample.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_core.sys_service_monitor_sample.deleted IS '删除时间';
 COMMENT ON COLUMN spectra_core.sys_service_monitor_sample.version IS '乐观锁版本';
+-- 第三阶段服务监控增量结构（与 spectra-config V21 一致）。
+ALTER TABLE spectra_core.sys_service_monitor_sample
+    ADD COLUMN IF NOT EXISTS database_status VARCHAR(16) NOT NULL DEFAULT 'UNKNOWN',
+    ADD COLUMN IF NOT EXISTS redis_status VARCHAR(16) NOT NULL DEFAULT 'UNKNOWN';
+
+CREATE TABLE IF NOT EXISTS spectra_core.sys_service_monitor_alert_rule (
+    id UUID DEFAULT uuidv7() PRIMARY KEY,
+    code VARCHAR(80) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    metric_code VARCHAR(80) NOT NULL,
+    operator_code VARCHAR(16) NOT NULL DEFAULT 'GTE',
+    threshold_value DOUBLE PRECISION,
+    expected_value VARCHAR(80),
+    severity VARCHAR(16) NOT NULL DEFAULT 'WARNING',
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    consecutive_failures INTEGER NOT NULL DEFAULT 1,
+    cooldown_seconds INTEGER NOT NULL DEFAULT 300,
+    remark VARCHAR(500),
+    created_by UUID,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by UUID,
+    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted TIMESTAMP(6) WITH TIME ZONE,
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT ck_sys_service_monitor_alert_rule_operator CHECK (operator_code IN ('GTE', 'GT', 'LTE', 'LT', 'EQ', 'NE')),
+    CONSTRAINT ck_sys_service_monitor_alert_rule_severity CHECK (severity IN ('WARNING', 'CRITICAL')),
+    CONSTRAINT ck_sys_service_monitor_alert_rule_values CHECK (consecutive_failures BETWEEN 1 AND 10 AND cooldown_seconds BETWEEN 0 AND 86400)
+);
+
+COMMENT ON TABLE spectra_core.sys_service_monitor_alert_rule IS '单体服务监控告警规则表';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.code IS '稳定规则编码';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.metric_code IS '监控指标编码';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.operator_code IS '比较运算符';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.threshold_value IS '数值指标阈值';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.expected_value IS '状态指标期望值';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.severity IS '告警级别：WARNING/CRITICAL';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.enabled IS '是否启用';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.consecutive_failures IS '连续触发次数';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_rule.cooldown_seconds IS '通知冷却时间（秒）';
+
+CREATE TABLE IF NOT EXISTS spectra_core.sys_service_monitor_alert_event (
+    id UUID DEFAULT uuidv7() PRIMARY KEY,
+    rule_id UUID NOT NULL,
+    rule_code VARCHAR(80) NOT NULL,
+    rule_name VARCHAR(100) NOT NULL,
+    metric_code VARCHAR(80) NOT NULL,
+    severity VARCHAR(16) NOT NULL,
+    state VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+    current_value VARCHAR(120),
+    threshold_value DOUBLE PRECISION,
+    expected_value VARCHAR(80),
+    message VARCHAR(500) NOT NULL,
+    first_occurred_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    last_occurred_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    recovered_at TIMESTAMP(6) WITH TIME ZONE,
+    occurrence_count INTEGER NOT NULL DEFAULT 1,
+    last_notified_at TIMESTAMP(6) WITH TIME ZONE,
+    created_by UUID,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by UUID,
+    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted TIMESTAMP(6) WITH TIME ZONE,
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT ck_sys_service_monitor_alert_event_severity CHECK (severity IN ('WARNING', 'CRITICAL')),
+    CONSTRAINT ck_sys_service_monitor_alert_event_state CHECK (state IN ('ACTIVE', 'RECOVERED')),
+    CONSTRAINT ck_sys_service_monitor_alert_event_occurrence CHECK (occurrence_count >= 1)
+);
+
+COMMENT ON TABLE spectra_core.sys_service_monitor_alert_event IS '单体服务监控告警事件表';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_event.rule_id IS '告警规则ID';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_event.state IS '事件状态：ACTIVE/RECOVERED';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_event.message IS '脱敏告警说明';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_alert_event.last_notified_at IS '最近通知时间';
+CREATE UNIQUE INDEX IF NOT EXISTS uk_sys_service_monitor_alert_event_active_rule
+    ON spectra_core.sys_service_monitor_alert_event (rule_id) WHERE state = 'ACTIVE' AND deleted IS NULL;
+CREATE INDEX IF NOT EXISTS idx_sys_service_monitor_alert_event_state_time
+    ON spectra_core.sys_service_monitor_alert_event (state, last_occurred_at DESC);
+
+CREATE TABLE IF NOT EXISTS spectra_core.sys_service_monitor_diagnostic_task (
+    id UUID DEFAULT uuidv7() PRIMARY KEY,
+    task_type VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    file_name VARCHAR(120),
+    display_name VARCHAR(200),
+    file_size BIGINT,
+    error_message VARCHAR(300),
+    requested_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    started_at TIMESTAMP(6) WITH TIME ZONE,
+    completed_at TIMESTAMP(6) WITH TIME ZONE,
+    expires_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    created_by UUID,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by UUID,
+    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted TIMESTAMP(6) WITH TIME ZONE,
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT ck_sys_service_monitor_diagnostic_task_type CHECK (task_type IN ('THREAD_DUMP', 'HEAP_DUMP')),
+    CONSTRAINT ck_sys_service_monitor_diagnostic_task_status CHECK (status IN ('PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', 'EXPIRED')),
+    CONSTRAINT ck_sys_service_monitor_diagnostic_task_size CHECK (file_size IS NULL OR file_size >= 0)
+);
+
+COMMENT ON TABLE spectra_core.sys_service_monitor_diagnostic_task IS '单体服务监控诊断任务表';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_diagnostic_task.task_type IS '诊断类型：THREAD_DUMP/HEAP_DUMP';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_diagnostic_task.status IS '任务状态';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_diagnostic_task.file_name IS '系统生成的相对文件名';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_diagnostic_task.error_message IS '脱敏失败原因';
+COMMENT ON COLUMN spectra_core.sys_service_monitor_diagnostic_task.expires_at IS '文件过期时间';
+CREATE INDEX IF NOT EXISTS idx_sys_service_monitor_diagnostic_task_status_time
+    ON spectra_core.sys_service_monitor_diagnostic_task (status, requested_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sys_service_monitor_diagnostic_task_expires_at
+    ON spectra_core.sys_service_monitor_diagnostic_task (expires_at);
+
+INSERT INTO spectra_security.sec_permission
+    (id, code, name, resource_code, action_code, allowed_scope_modes, state, system_managed,
+     created_by, created_at, updated_by, updated_at, deleted, version)
+SELECT uuidv7(), permission.code, permission.name, 'system:monitor', permission.action, 'NONE', 'ACTIVE', TRUE,
+       '00000000-0000-0000-0000-000000000000', CURRENT_TIMESTAMP,
+       '00000000-0000-0000-0000-000000000000', CURRENT_TIMESTAMP, NULL, 0
+FROM (VALUES
+    ('system:monitor:alert', '服务监控告警查看', 'alert'),
+    ('system:monitor:configure', '服务监控告警配置', 'configure'),
+    ('system:monitor:diagnose', '服务监控诊断', 'diagnose')
+) AS permission(code, name, action)
+WHERE NOT EXISTS (
+    SELECT 1 FROM spectra_security.sec_permission existing WHERE existing.code = permission.code
+);
+
+INSERT INTO spectra_core.sys_service_monitor_alert_rule
+    (code, name, metric_code, operator_code, threshold_value, expected_value, severity, enabled,
+     consecutive_failures, cooldown_seconds, remark)
+SELECT rule.code, rule.name, rule.metric_code, rule.operator_code, rule.threshold_value, rule.expected_value,
+       rule.severity, TRUE, 1, 300, rule.remark
+FROM (VALUES
+    ('CPU_USAGE', 'CPU 使用率过高', 'CPU_USAGE', 'GTE', 80::DOUBLE PRECISION, NULL::VARCHAR, 'WARNING', '超过阈值时通知运维管理员'),
+    ('SYSTEM_MEMORY_USAGE', '系统内存使用率过高', 'SYSTEM_MEMORY_USAGE', 'GTE', 80::DOUBLE PRECISION, NULL::VARCHAR, 'WARNING', '超过阈值时通知运维管理员'),
+    ('JVM_HEAP_USAGE', 'JVM 堆内存使用率过高', 'JVM_HEAP_USAGE', 'GTE', 75::DOUBLE PRECISION, NULL::VARCHAR, 'WARNING', '超过阈值时通知运维管理员'),
+    ('ERROR_RATE', 'HTTP 5xx 错误率过高', 'ERROR_RATE', 'GTE', 1::DOUBLE PRECISION, NULL::VARCHAR, 'CRITICAL', '有请求指标时生效'),
+    ('P95_RESPONSE_MS', '请求响应时间过长', 'P95_RESPONSE_MS', 'GTE', 500::DOUBLE PRECISION, NULL::VARCHAR, 'WARNING', '有请求指标时生效'),
+    ('DATABASE_STATUS', 'PostgreSQL 不可用', 'DATABASE_STATUS', 'NE', NULL::DOUBLE PRECISION, 'UP', 'CRITICAL', '数据库连通性检查异常时通知运维管理员'),
+    ('REDIS_STATUS', 'Redis 不可用', 'REDIS_STATUS', 'NE', NULL::DOUBLE PRECISION, 'UP', 'CRITICAL', 'Redis 连通性检查异常时通知运维管理员')
+) AS rule(code, name, metric_code, operator_code, threshold_value, expected_value, severity, remark)
+WHERE NOT EXISTS (
+    SELECT 1 FROM spectra_core.sys_service_monitor_alert_rule existing WHERE existing.code = rule.code
+);
