@@ -14,7 +14,7 @@ updated: 2026-08-23
 
 ## 状态
 
-**规划中（跨前后端完整闭环，阶段二进行中）**
+**规划中（跨前后端完整闭环，阶段二进行中；模板后端追溯闭环已完成）**
 
 > 本计划承接已完成的 `P-统一通知模块建设计划`，不重新建设用户消息 Self API、站内信基础投递或既有业务调用迁移。
 >
@@ -79,7 +79,7 @@ flowchart LR
 | 用户消息 Self API | 已完成，强制当前用户隔离 | 已完成 `/notification`、铃铛、抽屉、详情、偏好 | 保持兼容，补充回归，不重写 |
 | Gateway / Worker | 已完成，支持幂等、重试、过期和取消 | 无需暴露内部实现 | 复用并补充受控发送入口 |
 | Request / Task / Delivery 管理 API | 已完成脱敏查询、渠道状态、重试、取消 | `/devops/notification/*` 仍为占位页 | 接入真实列表、详情、处理和轮询 |
-| 模板实体与渲染 | 已有实体、模板选择、参数校验和快照基础 | 无模板管理页 | 补齐模板生命周期和版本管理 |
+| 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照 | 已接入模板管理页，复制和版本摘要展示待补 | 补齐模板体验、版本对比和实际发送闭环 |
 | 受控发送 | 无完整预览/确认闭环 | 无发送页 | 新增 Preview/Confirm/Apply 全流程 |
 | `IN_APP` | 真实可用 | 已接入 | 保持基线 |
 | `SMS` / `EMAIL` | Placeholder，默认阻断 | 无渠道配置和发送结果页 | 接入 Provider SPI、配置、健康、回执和页面 |
@@ -172,6 +172,7 @@ flowchart LR
 | 2026-08-23 | 模板后端核心 | `spectra-admin` 已落地模板四态、草稿 CRUD、发布/停用/归档、版本历史、回滚草稿、预览校验和模板权限接口；前端页面、复制入口、版本摘要和菜单权限种子仍待收口。 |
 | 2026-08-23 | 模板权限与菜单 | 已通过 `V23__seed_notification_template_permissions_and_menu.sql` 固化模板查看、维护、发布/回滚权限，并将“模板管理”接入通知中心菜单；`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
 | 2026-08-23 | 模板 Web 页面 | `spectra-ui` 已接入 `/devops/notification/template` 真实路由和模板管理 API，完成列表筛选、草稿编辑、JSON 参数校验、预览、发布、停用、归档、版本历史和回滚交互；版本对比、复制独立 API、版本摘要和其他通知运维页面仍待完成。 |
+| 2026-08-23 | 模板版本追溯 | `spectra-admin` 已通过 V24 完成模板版本摘要、Request 渠道模板快照、Task/Delivery 版本字段和渲染快照；模板复制已提供独立 API，V22-V24 已在本机 PostgreSQL 正式执行，9 项真实 PostgreSQL 集成测试通过。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -190,8 +191,8 @@ flowchart LR
 
 | 对象 | 最终字段/状态 | 约束 |
 |---|---|---|
-| 模板 | `id`、`templateGroupCode`、`channel`、`purpose`、`versionNo`、`state`、`titleTemplate`、`contentTemplate`、`htmlTemplate`、`parameterSchema`、`providerTemplateCode`、`version` | `state` 为四态枚举；已发布版本不可编辑；变量只能使用 `{{name}}` 占位符；HTML 模板拒绝脚本、事件属性和 `javascript:`。 |
-| 模板 API | `GET/POST/PUT /notification/admin/templates`、`GET /{id}`、`POST /{id}/publish`、`POST /{id}/disable`、`POST /{id}/archive`、`GET /{id}/versions`、`POST /{id}/rollback`、`POST /preview` | 写操作按状态和乐观锁校验；所有操作写审计；预览不落库收件人和敏感参数。 |
+| 模板 | `id`、`templateGroupCode`、`channel`、`purpose`、`versionNo`、`state`、`titleTemplate`、`contentTemplate`、`htmlTemplate`、`parameterSchema`、`providerTemplateCode`、`versionDigest`、`version` | `state` 为四态枚举；已发布版本不可编辑；变量只能使用 `{{name}}` 占位符；HTML 模板拒绝脚本、事件属性和 `javascript:`；版本摘要用于不可变追溯。 |
+| 模板 API | `GET/POST/PUT /notification/admin/templates`、`GET /{id}`、`POST /{id}/copy`、`POST /{id}/publish`、`POST /{id}/disable`、`POST /{id}/archive`、`GET /{id}/versions`、`POST /{id}/rollback`、`POST /preview` | 写操作按状态和乐观锁校验；复制和回滚均创建独立草稿；所有操作写审计；预览不落库收件人和敏感参数。 |
 | Provider | `NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED` | 未配置、健康检查失败、密钥不可解密和未知结果均不得报告发送成功。 |
 | 受控发送 | `Preview -> Confirm -> Apply` | Apply 必须绑定一次性 Token、模板版本、请求摘要、受众摘要、权限快照和幂等键，并统一进入 Gateway。 |
 | 管理权限 | `notification:admin:read`、`notification:template:read/write/publish`、`notification:send:preview/apply`、`notification:provider:read/configure`、`notification:admin:retry/cancel` | `ROLE_AUDIT` 只读，不能发布、回滚、配置、重试、取消或发送。 |
@@ -206,12 +207,12 @@ flowchart LR
 
 - [x] 盘点现有 `NotificationTemplateEntity` 的用途、版本、状态、语言、渠道和变量字段；已通过 `V22__complete_notification_template_lifecycle.sql` 将模板状态收敛为四态，并移除旧的 `enabled` 字段。
 - [x] 固化模板管理权限和通知中心“模板管理”菜单；`ROLE_DEV_OPS` 拥有完整维护权限，`ROLE_AUDIT` 仅可查看。
-- [ ] 实现模板列表、详情、草稿创建、编辑、复制、停用和归档 API。
-- [ ] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
+- [x] 实现模板列表、详情、草稿创建、编辑、复制、停用和归档 API。
+- [x] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
 - [ ] 实现变量声明和模板校验：缺失变量、多余变量、非法占位符、HTML/URL 安全、用途/渠道不匹配均拒绝发布。
 - [x] 实现模板预览 API，只允许使用脱敏的示例参数，不落库真实收件人和敏感载荷。
-- [ ] 发布时生成不可变版本摘要；Request/Task/Delivery 保存版本标识和渲染快照。
-- [ ] 增加模板操作审计：创建、修改、发布、停用、回滚、预览和失败原因。
+- [x] 发布时生成不可变版本摘要；Request/Task/Delivery 保存版本标识和渲染快照。
+- [x] 增加模板操作审计：创建、修改、复制、发布、停用、归档、回滚、预览和失败原因均由管理 Controller 写入操作日志。
 
 #### 前端
 

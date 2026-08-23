@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     parameter_schema      JSONB NOT NULL DEFAULT '{}'::jsonb,
     provider_template_code VARCHAR(200),
     state                 VARCHAR(16) NOT NULL DEFAULT 'DRAFT',
+    version_digest        VARCHAR(64) NOT NULL,
     created_by            UUID,
     created_at            TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by            UUID,
@@ -23,7 +24,8 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     version               BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT "PK_NTF_TEMPLATE" PRIMARY KEY (id),
     CONSTRAINT "CK_NTF_TEMPLATE_CHANNEL" CHECK (channel IN ('IN_APP', 'SMS', 'EMAIL')),
-    CONSTRAINT "CK_NTF_TEMPLATE_STATE" CHECK (state IN ('DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED'))
+    CONSTRAINT "CK_NTF_TEMPLATE_STATE" CHECK (state IN ('DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED')),
+    CONSTRAINT "CK_NTF_TEMPLATE_VERSION_DIGEST" CHECK (version_digest ~ '^[0-9a-f]{64}$')
 );
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request (
@@ -39,6 +41,7 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request (
     initiator_user_id               UUID,
     source_department_id            UUID,
     parameters                      JSONB NOT NULL DEFAULT '{}'::jsonb,
+    template_snapshot               JSONB NOT NULL DEFAULT '{}'::jsonb,
     sensitive_parameters_ciphertext TEXT,
     encryption_key_id               VARCHAR(50),
     status                          VARCHAR(20) NOT NULL DEFAULT 'ACCEPTED',
@@ -68,6 +71,8 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
     recipient_masked                VARCHAR(200),
     recipient_ciphertext            TEXT,
     template_id                     UUID,
+    template_version_no             INTEGER,
+    template_version_digest         VARCHAR(64),
     purpose                         VARCHAR(50) NOT NULL,
     title                           TEXT NOT NULL,
     content                         TEXT NOT NULL,
@@ -95,6 +100,8 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
         REFERENCES spectra_notification.ntf_request (id),
     CONSTRAINT "FK_NTF_TASK_TEMPLATE" FOREIGN KEY (template_id)
         REFERENCES spectra_notification.ntf_template (id),
+    CONSTRAINT "CK_NTF_TASK_TEMPLATE_DIGEST"
+        CHECK (template_version_digest IS NULL OR template_version_digest ~ '^[0-9a-f]{64}$'),
     CONSTRAINT "CK_NTF_TASK_CHANNEL" CHECK (channel IN ('IN_APP', 'SMS', 'EMAIL')),
     CONSTRAINT "CK_NTF_TASK_STATUS" CHECK (status IN ('PENDING', 'PROCESSING', 'RETRYING', 'SENT', 'FAILED', 'BLOCKED', 'UNKNOWN', 'EXPIRED', 'CANCELLED')),
     CONSTRAINT "CK_NTF_TASK_ATTEMPTS" CHECK (attempt_count >= 0 AND max_attempts > 0),
@@ -105,6 +112,11 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task (
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery (
     id                      UUID NOT NULL,
     notification_task_id    UUID NOT NULL,
+    template_id             UUID,
+    template_version_no     INTEGER,
+    template_version_digest VARCHAR(64),
+    rendered_title          TEXT,
+    rendered_content        TEXT,
     attempt_no              INTEGER NOT NULL,
     provider                VARCHAR(50) NOT NULL,
     provider_message_id     VARCHAR(200),
@@ -124,6 +136,10 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery (
     CONSTRAINT "PK_NTF_DELIVERY" PRIMARY KEY (id),
     CONSTRAINT "FK_NTF_DELIVERY_TASK" FOREIGN KEY (notification_task_id)
         REFERENCES spectra_notification.ntf_task (id),
+    CONSTRAINT "FK_NTF_DELIVERY_TEMPLATE" FOREIGN KEY (template_id)
+        REFERENCES spectra_notification.ntf_template (id),
+    CONSTRAINT "CK_NTF_DELIVERY_TEMPLATE_DIGEST"
+        CHECK (template_version_digest IS NULL OR template_version_digest ~ '^[0-9a-f]{64}$'),
     CONSTRAINT "CK_NTF_DELIVERY_ATTEMPT" CHECK (attempt_no > 0),
     CONSTRAINT "CK_NTF_DELIVERY_STATUS" CHECK (result_status IN ('ACCEPTED', 'SENT', 'FAILED', 'BLOCKED', 'UNKNOWN'))
 );
@@ -234,6 +250,7 @@ COMMENT ON COLUMN spectra_notification.ntf_template.template_group_code IS '逻�
 COMMENT ON COLUMN spectra_notification.ntf_template.channel IS '投递渠道：IN_APP、SMS或EMAIL';
 COMMENT ON COLUMN spectra_notification.ntf_template.purpose IS '通知用途';
 COMMENT ON COLUMN spectra_notification.ntf_template.version_no IS '模板版本号';
+COMMENT ON COLUMN spectra_notification.ntf_template.version_digest IS '模板版本内容 SHA-256 摘要，发布后用于不可变追溯';
 COMMENT ON COLUMN spectra_notification.ntf_template.title_template IS '标题模板；无需标题时可为空';
 COMMENT ON COLUMN spectra_notification.ntf_template.content_template IS '正文模板';
 COMMENT ON COLUMN spectra_notification.ntf_template.html_template IS 'HTML正文模板；非HTML渠道可为空';
@@ -259,6 +276,7 @@ COMMENT ON COLUMN spectra_notification.ntf_request.initiator_type IS '发起方�
 COMMENT ON COLUMN spectra_notification.ntf_request.initiator_user_id IS '发起用户ID；系统发起时可为空';
 COMMENT ON COLUMN spectra_notification.ntf_request.source_department_id IS '发起请求时的来源部门ID';
 COMMENT ON COLUMN spectra_notification.ntf_request.parameters IS '可记录和持久化的非敏感模板参数';
+COMMENT ON COLUMN spectra_notification.ntf_request.template_snapshot IS '各渠道实际模板版本元数据，不包含渲染正文和敏感参数';
 COMMENT ON COLUMN spectra_notification.ntf_request.sensitive_parameters_ciphertext IS '加密后的敏感模板参数';
 COMMENT ON COLUMN spectra_notification.ntf_request.encryption_key_id IS '敏感参数使用的加密密钥标识';
 COMMENT ON COLUMN spectra_notification.ntf_request.status IS '逻辑通知请求状态';
@@ -283,6 +301,8 @@ COMMENT ON COLUMN spectra_notification.ntf_task.recipient_key_hash IS '接收人
 COMMENT ON COLUMN spectra_notification.ntf_task.recipient_masked IS '脱敏后的外部接收地址';
 COMMENT ON COLUMN spectra_notification.ntf_task.recipient_ciphertext IS '加密后的外部接收地址';
 COMMENT ON COLUMN spectra_notification.ntf_task.template_id IS '锁定的通知模板版本ID';
+COMMENT ON COLUMN spectra_notification.ntf_task.template_version_no IS '任务锁定的模板业务版本号';
+COMMENT ON COLUMN spectra_notification.ntf_task.template_version_digest IS '任务锁定的模板内容 SHA-256 摘要';
 COMMENT ON COLUMN spectra_notification.ntf_task.purpose IS '通知用途';
 COMMENT ON COLUMN spectra_notification.ntf_task.title IS '渲染后的通知标题快照';
 COMMENT ON COLUMN spectra_notification.ntf_task.content IS '渲染后的通知正文快照';
@@ -308,6 +328,11 @@ COMMENT ON COLUMN spectra_notification.ntf_task.version IS '乐观锁版本号';
 
 COMMENT ON COLUMN spectra_notification.ntf_delivery.id IS '主键ID';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.notification_task_id IS '所属通知任务ID';
+COMMENT ON COLUMN spectra_notification.ntf_delivery.template_id IS '投递时锁定的模板版本 ID';
+COMMENT ON COLUMN spectra_notification.ntf_delivery.template_version_no IS '投递时锁定的模板业务版本号';
+COMMENT ON COLUMN spectra_notification.ntf_delivery.template_version_digest IS '投递时锁定的模板内容 SHA-256 摘要';
+COMMENT ON COLUMN spectra_notification.ntf_delivery.rendered_title IS '投递时使用的渲染标题快照';
+COMMENT ON COLUMN spectra_notification.ntf_delivery.rendered_content IS '投递时使用的渲染正文快照';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.attempt_no IS '当前任务的投递尝试序号';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.provider IS '执行投递的渠道供应商编码';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.provider_message_id IS '供应商返回的消息ID';
