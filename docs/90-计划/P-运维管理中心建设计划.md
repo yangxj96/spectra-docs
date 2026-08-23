@@ -257,6 +257,8 @@ updated: 2026-08-14
 - [x] 依赖检查只返回 `UP/DOWN`、检查耗时和脱敏说明，不返回连接串、环境变量、异常原文或凭据。
 - [x] Web 页面接入真实接口，支持 5/10/30 秒刷新、失败提示、资源趋势、请求趋势和依赖状态展示；未采集到请求指标时明确显示暂无数据。
 - [x] 监控采集间隔通过 `spectra.monitor.collection-interval-ms` 配置，默认 10000 毫秒。
+- [x] 系统 CPU、内存和逻辑处理器指标使用当前 JDK 的 `com.sun.management.OperatingSystemMXBean`，不引入 OSHI/JNA；当前运行基线为 Java 25。
+- **运行风险**：`com.sun.management.OperatingSystemMXBean` 属于 JDK 扩展而非 Java SE 标准接口；如果更换为不提供 `jdk.management` 的非兼容 JDK 或精简运行时，系统 CPU、内存监控可能无法启动或不可用。后续如扩展到磁盘、网络、传感器等硬件指标，再评估 OSHI 或独立监控 Agent。
 - [ ] 后续补充通知、文件存储和应用健康 Contributor 的统一状态，并评估多实例聚合与历史持久化方案。
 - [ ] 后续增加受控诊断能力时，必须单独设计权限、审计、大小限制和脱敏策略，不在总览接口中直接开放线程/堆转储。
 
