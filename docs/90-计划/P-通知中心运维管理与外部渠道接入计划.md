@@ -176,6 +176,7 @@ flowchart LR
 | 2026-08-23 | 模板 Web 复制与摘要 | `spectra-ui` 已接入独立复制草稿 API，并在列表和版本历史中展示截断后的版本摘要；版本对比、发布影响范围和浏览器回归仍待完成。 |
 | 2026-08-23 | 模板 Web 版本对比 | `spectra-ui` 版本历史已支持选择两个版本并并列查看摘要、用途、标题模板和正文模板；发布影响范围、浏览器回归和其他通知运维页面仍待完成。 |
 | 2026-08-23 | 通知运行概览后端 | `GET /notification/admin/overview` 已接入真实 PostgreSQL 聚合，支持 1–168 小时窗口、渠道可用性、队列/失败/UNKNOWN 摘要、连续小时趋势和脱敏最近错误；Mapper 同步补齐模板快照与投递渲染快照字段映射。 |
+| 2026-08-23 | 通知运行概览 Web 页面 | `DevopsNotificationOverview` 已替换 Placeholder，接入真实概览 API，支持窗口选择、自动刷新、指标卡、渠道状态、投递趋势和脱敏错误展示；Request/Task/Delivery 页面仍待接入。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -291,7 +292,7 @@ flowchart LR
 
 #### 前端
 
-- [ ] 将 `DevopsNotificationOverview` 从 Placeholder 替换为真实运行概览页面。
+- [x] 将 `DevopsNotificationOverview` 从 Placeholder 替换为真实运行概览页面：接入 24/72/168 小时窗口、自动刷新、队列/失败/UNKNOWN 指标、渠道状态、投递趋势和脱敏最近错误。
 - [ ] 将 `DevopsNotificationRequest` 替换为 Request 列表、详情和关联 Task 页面。
 - [ ] 将 `DevopsNotificationDeliveryTask` 替换为 Task 列表、状态筛选、重试/取消和投递详情页面。
 - [ ] 将 `DevopsNotificationDeliveryRecord` 替换为 Delivery 列表、渠道、供应商回执和脱敏错误详情页面。
