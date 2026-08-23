@@ -7,14 +7,14 @@ tags:
   - operations
   - integration
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-08-24
 ---
 
 # P-通知中心运维管理与外部渠道接入计划
 
 ## 状态
 
-**规划中（跨前后端完整闭环，阶段二进行中；模板生命周期、版本追溯和发布前安全校验已完成）**
+**规划中（跨前后端完整闭环，阶段三进行中；模板生命周期、版本追溯、发布前安全校验和 Provider 回执幂等已完成）**
 
 > 本计划承接已完成的 `P-统一通知模块建设计划`，不重新建设用户消息 Self API、站内信基础投递或既有业务调用迁移。
 >
@@ -28,7 +28,7 @@ updated: 2026-08-23
 
 当前仍存在两个产品断点：
 
-1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器、健康门禁和受确认保护的测试发送，但尚未完成具体供应商、回执和未知结果处理。
+1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器、健康门禁、受确认保护的测试发送和签名回执幂等；具体供应商适配、UNKNOWN 人工确认/受控重试仍待完成。
 2. 还没有受控发送流程：运维人员不能从模板开始选择受众、预览实际接收人和渠道、确认发送，再回到 Request/Task/Delivery 观察结果。
 
 ## 二、目标
@@ -253,7 +253,7 @@ flowchart LR
 - [x] 设计 Provider 配置模型：供应商类型、启用状态、端点、超时、限流、重试、模板映射和加密 Secret 引用；SMS/EMAIL 非敏感配置写入 `spectra_core.sys_config` 的 `notification.provider.*`。
 - [x] Secret 使用现有 AES-GCM 能力保存，API 只返回是否配置、Key ID、更新时间和脱敏摘要，不返回原文；Secret 密文单独存储在对应的 `.secret` 配置键中。
 - [x] 增加 Provider 测试发送/健康检查；测试发送必须使用明确的测试地址和 `SEND_TEST` 操作确认，目标只在内存中加密使用，不从用户数据推导，也不写入业务 Request/Task/Delivery。
-- [x] Delivery 已记录供应商消息 ID、标准化结果状态、完成时间和脱敏错误码；外部回执入口及重复回执幂等仍待接入。
+- [x] Delivery 已记录供应商消息 ID、标准化结果状态、完成时间和脱敏错误码；`POST /notification/provider/callback/{channel}` 复用渠道 Secret 做 HMAC 验签，只更新既有 Delivery/Task，按回执正文摘要幂等，未知消息 ID 拒绝处理。
 - [ ] 处理成功、明确失败、限流、超时和未知结果；当前 Worker 对明确限流按任务最大尝试次数退避，对超时/UNKNOWN 写入 Delivery 后停止自动重试；UNKNOWN 的人工确认或受控重试入口仍待完成。
 - [x] 保留测试 scope 的 Placeholder/Mock Sender，并由 Provider Runtime 对未配置、未健康或未注册 Provider 做 `BLOCKED` 安全回退，默认不报告成功。
 
@@ -275,8 +275,9 @@ flowchart LR
 | 2026-08-23 | Provider SPI 与 HTTP 适配器 | 已增加 `NotificationProvider` SPI、`HTTP_JSON` 通用适配器和本地 HTTP 沙箱测试；适配器负责地址解密、标准 JSON 请求、健康检查、供应商消息 ID提取和成功/失败/未知结果脱敏映射。SMS/EMAIL Sender、健康状态缓存、测试发送和回执闭环仍待接入，当前生产 Worker 继续使用安全阻断 Sender。 |
 | 2026-08-23 | 渠道 Sender 与健康门禁 | 已接入 `SmsNotificationSender`、`EmailNotificationSender` 和 Provider Runtime；健康检查结果按配置更新时间缓存，配置变更自动失效，未通过健康检查的任务不会调用外部网络。新增 `POST /notification/admin/providers/{channel}/health`，测试发送接口已接入，回执和重试分类仍待完成。 |
 | 2026-08-23 | Provider 测试发送 | 新增 `POST /notification/admin/providers/{channel}/test`；只接受 SMS/EMAIL、明确测试地址和 `SEND_TEST` 确认词，测试任务只在内存中组装并复用健康门禁，不写业务 Request/Task/Delivery，响应不回显地址或原始供应商响应。 |
-| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除、健康检查和确认后的测试发送，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；具体供应商回执仍待完成。 |
-| 2026-08-23 | Delivery 结果与重试分类 | Worker 已为每次 Provider 结果写入 Delivery；明确 `PROVIDER_RATE_LIMITED` 按任务最大尝试次数退避，明确失败终止，Provider 异常和 `UNKNOWN` 写入 Delivery 后停止无条件重试。外部回执幂等和 UNKNOWN 人工确认/受控重试仍待完成。 |
+| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除、健康检查和确认后的测试发送，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；具体供应商适配和回执结果展示仍待完成。 |
+| 2026-08-23 | Delivery 结果与重试分类 | Worker 已为每次 Provider 结果写入 Delivery；明确 `PROVIDER_RATE_LIMITED` 按任务最大尝试次数退避，明确失败终止，Provider 异常和 `UNKNOWN` 写入 Delivery 后停止无条件重试。UNKNOWN 人工确认/受控重试仍待完成。 |
+| 2026-08-24 | Provider 回执入口与幂等 | 新增 `POST /notification/provider/callback/{channel}`；匿名入口仅接受使用当前渠道 Secret 计算的 HMAC-SHA256 签名，按 Provider+消息 ID+渠道查找既有 Delivery，状态回写 Delivery/Task/Request，回执摘要写入脱敏 `response_summary`，同一正文重复回调返回 `DUPLICATE`；新增 V26 唯一索引和验签/状态/幂等测试。 |
 
 ### 阶段四：受控发送与受众预览闭环
 
@@ -350,6 +351,7 @@ flowchart LR
 | 模板预览 | `POST /notification/admin/templates/{id}/preview` | 预览面板 |
 | Provider 状态/配置 | `GET/PUT /notification/admin/providers/{channel}` | `/devops/notification/provider` |
 | Provider 健康/测试 | `POST /notification/admin/providers/{channel}/health`、`/test` | 渠道测试 |
+| Provider 外部回执 | `POST /notification/provider/callback/{channel}` | Provider 回调（HMAC 验签、Delivery/Task 状态回写） |
 | 受控发送预览 | `POST /notification/admin/send/preview` | `/devops/notification/send` |
 | 受控发送应用 | `POST /notification/admin/send/apply` | 发送确认/结果 |
 | 运行概览 | `GET /notification/admin/overview` | `/devops/notification/overview` |
@@ -360,7 +362,7 @@ flowchart LR
 - [ ] 以现有 `ntf_template`、`ntf_request`、`ntf_task`、`ntf_delivery` 为基线，先核对当前字段再设计增量迁移。
 - [ ] 如现有模板实体不足，新增不可变模板版本表或等价版本字段；禁止覆盖在途任务使用的模板快照。
 - [ ] 如 Provider 配置需要落库，新增独立配置表或受控配置结构，Secret 只能保存密文和 Key ID，不能复用普通明文配置字段。
-- [ ] 为外部回执和供应商消息 ID 增加唯一约束/索引，确保重复回调幂等。
+- [x] 为外部回执和供应商消息 ID 增加唯一约束/索引，确保重复回调幂等；V26 新增 `UK_NTF_DELIVERY_PROVIDER_MESSAGE`，并以回执正文 SHA-256 摘要识别同一事件。
 - [ ] 受控发送 Preview 的短期数据必须具备过期时间和操作人绑定；不长期保存完整受众清单和敏感正文。
 - [ ] 所有数据库变更使用新的 Flyway 增量迁移，已执行迁移不可改写；同步 ER 图、建表 SQL、实体清单和数据字典。
 - [ ] 迁移失败时不启用 Provider、不生成半配置菜单，不影响现有 IN_APP Self API。

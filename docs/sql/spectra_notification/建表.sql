@@ -209,6 +209,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TASK_RECIPIENT_CHANNEL"
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_DELIVERY_ATTEMPT"
     ON spectra_notification.ntf_delivery (notification_task_id, attempt_no)
     WHERE deleted IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_DELIVERY_PROVIDER_MESSAGE"
+    ON spectra_notification.ntf_delivery (provider, provider_message_id)
+    WHERE provider_message_id IS NOT NULL AND deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_INBOX_TASK"
     ON spectra_notification.ntf_inbox_message (notification_task_id)
     WHERE notification_task_id IS NOT NULL AND deleted IS NULL;
@@ -349,6 +352,7 @@ COMMENT ON COLUMN spectra_notification.ntf_delivery.updated_by IS '最后更新�
 COMMENT ON COLUMN spectra_notification.ntf_delivery.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.deleted IS '删除时间；NULL表示未删除';
 COMMENT ON COLUMN spectra_notification.ntf_delivery.version IS '乐观锁版本号';
+COMMENT ON INDEX spectra_notification."UK_NTF_DELIVERY_PROVIDER_MESSAGE" IS 'Provider 与消息 ID 唯一，防止重复外部回执产生重复投递记录';
 
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.id IS '主键ID';
 COMMENT ON COLUMN spectra_notification.ntf_inbox_message.notification_task_id IS '对应的站内信通知任务ID';
