@@ -168,14 +168,32 @@ flowchart LR
 | 日期 | 步骤 | 结论 |
 |---|---|---|
 | 2026-08-23 | 基线盘点 | 后端可靠投递和基础管理 API 可复用；模板管理、Provider 接入、受控发送、运行概览及 4 个 Web 运维页面需要从契约到验收完整建设。 |
-- [ ] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
-- [ ] 固定 Provider 状态：`NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED`，明确任务状态与渠道状态的映射。
-- [ ] 固定受控发送三阶段：Preview、Confirm、Apply；Preview Token、请求摘要、模板版本和过期时间必须绑定。
-- [ ] 固定 Request/Task/Delivery 对前端的脱敏字段、分页、过滤、时间范围和轮询协议。
-- [ ] 固定权限、菜单、审计事件和 `ROLE_AUDIT` 只读边界。
-- [ ] 固定 Provider Secret 的存储、解密、轮换和响应脱敏方案；不在仓库保存任何真实凭据。
+| 2026-08-23 | 契约冻结 | 模板直接采用最终生命周期和版本 API；Provider、受控发送、管理分页与权限均以本节契约为唯一实现依据，不保留旧入口或兼容字段。 |
+- [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
+  - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
+  - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
+  - 模板接口统一使用 `/notification/admin/templates`，创建、编辑、发布、停用、归档和回滚均使用最终路由，不保留别名。
+- [x] 固定 Provider 状态：`NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED`，明确任务状态与渠道状态的映射。
+- [x] 固定受控发送三阶段：Preview、Confirm、Apply；Preview Token、请求摘要、模板版本和过期时间必须绑定。
+  - Preview 只返回脱敏受众统计、样例、跳过原因和请求摘要；Confirm 只确认当前 Preview；Apply 只调用 `NotificationGateway`。
+  - Preview Token 默认 10 分钟有效且只能 Apply 一次；模板版本、渠道、参数摘要、受众摘要、操作权限或幂等键变化时必须拒绝 Apply。
+- [x] 固定 Request/Task/Delivery 对前端的脱敏字段、分页、过滤、时间范围和轮询协议。
+  - 分页统一返回 `records/current/size/total/pages`；管理查询时间范围最多 31 天；前端每 5 秒轮询，进入终态或连续失败 3 次后停止。
+  - 管理 VO 不返回原始地址、密文、Secret、完整敏感参数、异常堆栈或未经脱敏的 Provider 响应。
+- [x] 固定权限、菜单、审计事件和 `ROLE_AUDIT` 只读边界。
+- [x] 固定 Provider Secret 的存储、解密、轮换和响应脱敏方案；不在仓库保存任何真实凭据。
 
-阶段门禁：契约评审通过、API/TypeScript 类型表完成、菜单和权限清单一致后才能进入阶段二。
+#### 阶段一最终契约
+
+| 对象 | 最终字段/状态 | 约束 |
+|---|---|---|
+| 模板 | `id`、`templateGroupCode`、`channel`、`purpose`、`versionNo`、`state`、`titleTemplate`、`contentTemplate`、`htmlTemplate`、`parameterSchema`、`providerTemplateCode`、`version` | `state` 为四态枚举；已发布版本不可编辑；变量只能使用 `{{name}}` 占位符；HTML 模板拒绝脚本、事件属性和 `javascript:`。 |
+| 模板 API | `GET/POST/PUT /notification/admin/templates`、`GET /{id}`、`POST /{id}/publish`、`POST /{id}/disable`、`POST /{id}/archive`、`GET /{id}/versions`、`POST /{id}/rollback`、`POST /preview` | 写操作按状态和乐观锁校验；所有操作写审计；预览不落库收件人和敏感参数。 |
+| Provider | `NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED` | 未配置、健康检查失败、密钥不可解密和未知结果均不得报告发送成功。 |
+| 受控发送 | `Preview -> Confirm -> Apply` | Apply 必须绑定一次性 Token、模板版本、请求摘要、受众摘要、权限快照和幂等键，并统一进入 Gateway。 |
+| 管理权限 | `notification:admin:read`、`notification:template:read/write/publish`、`notification:send:preview/apply`、`notification:provider:read/configure`、`notification:admin:retry/cancel` | `ROLE_AUDIT` 只读，不能发布、回滚、配置、重试、取消或发送。 |
+
+阶段门禁：契约评审通过、API/TypeScript 类型表完成、菜单和权限清单一致后才能进入阶段二。以上契约已冻结，阶段二直接按最终模型实现。
 
 ### 阶段二：模板管理完整闭环
 
