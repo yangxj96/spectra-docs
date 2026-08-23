@@ -160,7 +160,7 @@ flowchart LR
 - [x] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
   - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
   - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；Delivery 已具备 Provider、Provider Message ID、结果状态和脱敏响应摘要字段，但没有模板管理、Provider 配置、受控发送 Preview/Apply 和通知运行概览 API。
-  - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
+  - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；`DevopsNotificationTemplate` 已接入真实模板管理页；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
   - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel` 和 `notification:template:read/write/publish`；Provider 和受控发送的细粒度权限仍待落地。
 
 #### 阶段一实施记录
@@ -171,6 +171,7 @@ flowchart LR
 | 2026-08-23 | 契约冻结 | 模板直接采用最终生命周期和版本 API；Provider、受控发送、管理分页与权限均以本节契约为唯一实现依据，不保留旧入口或兼容字段。 |
 | 2026-08-23 | 模板后端核心 | `spectra-admin` 已落地模板四态、草稿 CRUD、发布/停用/归档、版本历史、回滚草稿、预览校验和模板权限接口；前端页面、复制入口、版本摘要和菜单权限种子仍待收口。 |
 | 2026-08-23 | 模板权限与菜单 | 已通过 `V23__seed_notification_template_permissions_and_menu.sql` 固化模板查看、维护、发布/回滚权限，并将“模板管理”接入通知中心菜单；`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
+| 2026-08-23 | 模板 Web 页面 | `spectra-ui` 已接入 `/devops/notification/template` 真实路由和模板管理 API，完成列表筛选、草稿编辑、JSON 参数校验、预览、发布、停用、归档、版本历史和回滚交互；版本对比、复制独立 API、版本摘要和其他通知运维页面仍待完成。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -214,9 +215,10 @@ flowchart LR
 
 #### 前端
 
-- [ ] 新增 `/devops/notification/template` 模板列表页面，支持用途、渠道、状态、版本和更新时间查询。
-- [ ] 新增模板编辑页面，支持基本信息、用途/渠道限制、变量声明、标题/正文和安全校验提示。
-- [ ] 新增模板预览、发布确认、版本历史、版本对比、回滚和停用交互。
+- [x] 新增 `/devops/notification/template` 模板列表页面，支持用途、渠道、状态、版本和更新时间查询。
+- [x] 新增模板编辑页面，支持基本信息、用途/渠道限制、变量声明、标题/正文和安全校验提示。
+- [x] 新增模板预览、发布确认、版本历史、回滚和停用交互。
+- [ ] 增加版本对比交互，并补齐独立复制 API 与版本摘要展示。
 - [ ] 发布前展示校验结果和影响范围；草稿、已发布版本和停用版本的操作按钮按权限显示。
 - [ ] 模板页面接入真实 API、局部 loading、错误恢复、乐观锁冲突提示和浏览器回归。
 
