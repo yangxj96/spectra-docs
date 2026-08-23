@@ -28,7 +28,7 @@ updated: 2026-08-23
 
 当前仍存在两个产品断点：
 
-1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器和健康门禁，但尚未完成具体供应商、测试发送、回执和未知结果处理。
+1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器、健康门禁和受确认保护的测试发送，但尚未完成具体供应商、回执和未知结果处理。
 2. 还没有受控发送流程：运维人员不能从模板开始选择受众、预览实际接收人和渠道、确认发送，再回到 Request/Task/Delivery 观察结果。
 
 ## 二、目标
@@ -157,9 +157,9 @@ flowchart LR
 
 - [x] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
   - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
-  - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；模板管理和通知运行概览 API 已接入，Provider 配置、受控发送 Preview/Apply 仍待落地。
+  - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；模板管理、通知运行概览和 Provider 配置/健康/测试发送 API 已接入，受控发送 Preview/Apply 仍待落地。
   - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 已接入真实页面；`DevopsNotificationTemplate` 已接入真实模板管理页；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
-  - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel` 和 `notification:template:read/write/publish`；Provider 和受控发送的细粒度权限仍待落地。
+  - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel`、`notification:template:read/write/publish` 和 `notification:provider:read/configure`；受控发送的细粒度权限仍待落地。
 
 #### 阶段一实施记录
 
@@ -241,7 +241,7 @@ flowchart LR
 - [x] 实现 SMS/EMAIL 渠道 Sender 与通用 `HTTP_JSON` Provider 适配器；具体供应商通过配置选择，HTTP/供应商细节不绑定到 Gateway 或 Worker。
 - [x] 设计 Provider 配置模型：供应商类型、启用状态、端点、超时、限流、重试、模板映射和加密 Secret 引用；SMS/EMAIL 非敏感配置写入 `spectra_core.sys_config` 的 `notification.provider.*`。
 - [x] Secret 使用现有 AES-GCM 能力保存，API 只返回是否配置、Key ID、更新时间和脱敏摘要，不返回原文；Secret 密文单独存储在对应的 `.secret` 配置键中。
-- [ ] 增加 Provider 测试发送/健康检查，测试发送必须使用明确的测试地址和操作确认，禁止误发真实用户。
+- [x] 增加 Provider 测试发送/健康检查；测试发送必须使用明确的测试地址和 `SEND_TEST` 操作确认，目标只在内存中加密使用，不从用户数据推导，也不写入业务 Request/Task/Delivery。
 - [ ] 扩展 Delivery 记录供应商消息 ID、回执状态、回执时间和脱敏错误码；重复回执必须幂等。
 - [ ] 处理成功、明确失败、限流、超时和未知结果；UNKNOWN 进入人工确认或受控重试流程。
 - [x] 保留测试 scope 的 Placeholder/Mock Sender，并由 Provider Runtime 对未配置、未健康或未注册 Provider 做 `BLOCKED` 安全回退，默认不报告成功。
@@ -249,7 +249,7 @@ flowchart LR
 #### 前端
 
 - [x] 新增 `/devops/notification/provider` 渠道配置页面，按 SMS/EMAIL/IN_APP 分组展示状态。
-- [x] 支持 Provider 类型、非敏感参数、Secret 更新、启停和健康检查；测试发送确认待测试发送闭环完成后接入。
+- [x] 支持 Provider 类型、非敏感参数、Secret 更新、启停、健康检查和测试发送确认；测试发送结果只展示标准化状态、消息 ID 和脱敏摘要。
 - [x] Secret 输入只允许覆盖更新，不回显原文；离开页面和刷新后不得保留明文。
 - [x] 展示渠道健康、最近检查时间、队列积压、成功/失败/UNKNOWN 摘要和脱敏错误原因。
 - [x] Provider 未配置或健康检查失败时，前端明确显示阻断状态，不展示“发送成功”。
@@ -262,8 +262,9 @@ flowchart LR
 |---|---|---|
 | 2026-08-23 | Provider 配置与 Secret 保护 | `spectra-admin` 已增加全局 SMS/EMAIL Provider 配置契约、脱敏管理 API、`notification:provider:read/configure` 权限和“渠道配置”菜单；非敏感配置写入 `spectra_core.sys_config`，Secret 使用通知模块 AES-GCM 密文和 Key ID 保存。配置完整但未健康检查前统一返回 `UNHEALTHY`，未配置或密钥缺失时返回 `NOT_CONFIGURED/BLOCKED`，不会报告发送成功。 |
 | 2026-08-23 | Provider SPI 与 HTTP 适配器 | 已增加 `NotificationProvider` SPI、`HTTP_JSON` 通用适配器和本地 HTTP 沙箱测试；适配器负责地址解密、标准 JSON 请求、健康检查、供应商消息 ID提取和成功/失败/未知结果脱敏映射。SMS/EMAIL Sender、健康状态缓存、测试发送和回执闭环仍待接入，当前生产 Worker 继续使用安全阻断 Sender。 |
-| 2026-08-23 | 渠道 Sender 与健康门禁 | 已接入 `SmsNotificationSender`、`EmailNotificationSender` 和 Provider Runtime；健康检查结果按配置更新时间缓存，配置变更自动失效，未通过健康检查的任务不会调用外部网络。新增 `POST /notification/admin/providers/{channel}/health`，测试发送、回执和重试分类仍待完成。 |
-| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除和健康检查，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；测试发送仍待完成。 |
+| 2026-08-23 | 渠道 Sender 与健康门禁 | 已接入 `SmsNotificationSender`、`EmailNotificationSender` 和 Provider Runtime；健康检查结果按配置更新时间缓存，配置变更自动失效，未通过健康检查的任务不会调用外部网络。新增 `POST /notification/admin/providers/{channel}/health`，测试发送接口已接入，回执和重试分类仍待完成。 |
+| 2026-08-23 | Provider 测试发送 | 新增 `POST /notification/admin/providers/{channel}/test`；只接受 SMS/EMAIL、明确测试地址和 `SEND_TEST` 确认词，测试任务只在内存中组装并复用健康门禁，不写业务 Request/Task/Delivery，响应不回显地址或原始供应商响应。 |
+| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除、健康检查和确认后的测试发送，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；具体供应商回执仍待完成。 |
 
 ### 阶段四：受控发送与受众预览闭环
 
