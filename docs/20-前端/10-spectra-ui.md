@@ -67,6 +67,8 @@ DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；�
 
 `src/api/notification/notification-api.ts` 对接 `/api/notification/list`、详情、未读数、单条/全部已读、单条/批量删除以及 `/api/notification-center/preferences`。Self API 不接受 `userId`，查询、已读和偏好均由后端绑定当前用户；前端已覆盖 API/Store 状态同步、真实登录 Bearer Token、刷新 Token、登出、用户隔离和浏览器交互验收。
 
+消息中心 V1 已完成；通知运行概览、Request/Task/Delivery 运维页面、模板管理、受控发送和 SMS/EMAIL Provider 接入由 [[90-计划/P-通知中心运维管理与外部渠道接入计划]] 统一承接，当前不能把运维菜单中的 Placeholder 页面视为完成。
+
 ## 运维管理中心
 
 运维路由集中在 `src/plugin/router/modules/devops.ts`，统一使用 `/devops` 路径、`Devops` 命名路由前缀和 `src/views/Devops/` 目录。数据库菜单只负责导航可见性，叶子路由通过 `meta.requiredMenu` 绑定；未接入真实接口的预定义能力统一指向占位页，不以模拟数据冒充正式功能。后端 `ROLE_DEV_OPS` 通过 `*` 权限和全部有效菜单契约获得运维入口，页面仍通过路由守卫和后端接口权限双重保护。
