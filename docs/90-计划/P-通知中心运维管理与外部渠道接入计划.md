@@ -239,8 +239,8 @@ flowchart LR
 
 - [ ] 定义 `NotificationProvider` SPI，隔离供应商 SDK、地址格式化、发送、查询回执和健康检查。
 - [ ] 实现 SMS Provider 适配器和 EMAIL Provider 适配器；具体供应商通过配置选择，不把 SDK 绑定到 Gateway 或 Worker。
-- [ ] 设计 Provider 配置模型：供应商类型、启用状态、端点、超时、限流、重试、模板映射和加密 Secret 引用。
-- [ ] Secret 使用现有加密能力保存，API 只返回是否配置、Key ID、更新时间和脱敏摘要，不返回原文。
+- [x] 设计 Provider 配置模型：供应商类型、启用状态、端点、超时、限流、重试、模板映射和加密 Secret 引用；SMS/EMAIL 非敏感配置写入 `spectra_core.sys_config` 的 `notification.provider.*`。
+- [x] Secret 使用现有 AES-GCM 能力保存，API 只返回是否配置、Key ID、更新时间和脱敏摘要，不返回原文；Secret 密文单独存储在对应的 `.secret` 配置键中。
 - [ ] 增加 Provider 测试发送/健康检查，测试发送必须使用明确的测试地址和操作确认，禁止误发真实用户。
 - [ ] 扩展 Delivery 记录供应商消息 ID、回执状态、回执时间和脱敏错误码；重复回执必须幂等。
 - [ ] 处理成功、明确失败、限流、超时和未知结果；UNKNOWN 进入人工确认或受控重试流程。
@@ -255,6 +255,12 @@ flowchart LR
 - [ ] Provider 未配置或健康检查失败时，前端明确显示阻断状态，不展示“发送成功”。
 
 阶段门禁：Provider 配置、健康检查、测试发送、真实/Mock 投递、回执、失败、超时、UNKNOWN 和重复回执均有后端测试和前端验收；没有真实沙箱或可重复 Mock 验收不得关闭阶段。
+
+#### 阶段三实施记录
+
+| 日期 | 步骤 | 结论 |
+|---|---|---|
+| 2026-08-23 | Provider 配置与 Secret 保护 | `spectra-admin` 已增加全局 SMS/EMAIL Provider 配置契约、脱敏管理 API、`notification:provider:read/configure` 权限和“渠道配置”菜单；非敏感配置写入 `spectra_core.sys_config`，Secret 使用通知模块 AES-GCM 密文和 Key ID 保存。配置完整但未健康检查前统一返回 `UNHEALTHY`，未配置或密钥缺失时返回 `NOT_CONFIGURED/BLOCKED`，不会报告发送成功。 |
 
 ### 阶段四：受控发送与受众预览闭环
 
