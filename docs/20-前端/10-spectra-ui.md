@@ -948,7 +948,7 @@ src/views/
 
 ### 服务监控总览
 
-`DevopsMonitorServer` 使用 `ServiceMonitorApi.getOverview()` 接入 `/api/service/monitor/overview`，页面只消费后端真实采样数据，不生成模拟指标。总览包含服务状态、CPU/系统内存/JVM 堆使用率、请求速率、错误率、响应时间 P95、线程/GC、PostgreSQL/Redis 依赖状态以及最近 30 分钟趋势。
+`DevopsMonitorServer` 使用 `ServiceMonitorApi.getOverview()` 和 `ServiceMonitorApi.getHistory()` 接入 `/api/service/monitor/overview`、`/api/service/monitor/history`，页面只消费后端真实采样数据，不生成模拟指标。总览包含服务状态、监控数据新鲜度、CPU/系统内存/JVM 堆使用率、请求速率、错误率、响应时间 P95、线程/GC、PostgreSQL/Redis 依赖状态、应用健康组件以及 30 分钟/6 小时/24 小时趋势。
 
 页面支持 5、10、30 秒自动刷新和手动刷新；首次加载失败显示错误状态，已有数据时刷新失败保留上一份数据。后端未提供 HTTP 请求指标时，QPS、错误率、P95 和请求趋势显示“暂无请求指标”，不以 0 误导使用者。
 

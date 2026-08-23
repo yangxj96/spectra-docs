@@ -61,7 +61,7 @@ tags:
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
-| `ServiceMonitorController` | spectra-core | `/service/monitor/overview` | 服务监控总览；返回 CPU、系统内存、JVM、线程、GC、HTTP 请求趋势和 PostgreSQL/Redis 脱敏健康状态 |
+| `ServiceMonitorController` | spectra-core | `/service/monitor/overview`、`/service/monitor/history` | 服务监控总览、按 30 分钟/6 小时/24 小时查询历史趋势；返回 CPU、系统内存、JVM、线程、GC、HTTP 请求趋势、健康组件和 PostgreSQL/Redis 脱敏状态 |
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | `SystemBootstrapController` | spectra-core | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
