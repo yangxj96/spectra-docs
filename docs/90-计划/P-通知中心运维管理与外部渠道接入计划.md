@@ -14,7 +14,7 @@ updated: 2026-08-23
 
 ## 状态
 
-**规划中（跨前后端完整闭环，阶段二进行中；模板后端追溯闭环已完成）**
+**规划中（跨前后端完整闭环，阶段二进行中；模板生命周期、版本追溯和发布前安全校验已完成）**
 
 > 本计划承接已完成的 `P-统一通知模块建设计划`，不重新建设用户消息 Self API、站内信基础投递或既有业务调用迁移。
 >
@@ -196,7 +196,7 @@ flowchart LR
 
 | 对象 | 最终字段/状态 | 约束 |
 |---|---|---|
-| 模板 | `id`、`templateGroupCode`、`channel`、`purpose`、`versionNo`、`state`、`titleTemplate`、`contentTemplate`、`htmlTemplate`、`parameterSchema`、`providerTemplateCode`、`versionDigest`、`version` | `state` 为四态枚举；已发布版本不可编辑；变量只能使用 `{{name}}` 占位符；HTML 模板拒绝脚本、事件属性和 `javascript:`；版本摘要用于不可变追溯。 |
+| 模板 | `id`、`templateGroupCode`、`channel`、`purpose`、`versionNo`、`state`、`titleTemplate`、`contentTemplate`、`htmlTemplate`、`parameterSchema`、`providerTemplateCode`、`versionDigest`、`version` | `state` 为四态枚举；已发布版本不可编辑；变量只能使用安全变量名占位符；HTML 模板拒绝脚本、事件属性和危险 URL scheme；版本摘要用于不可变追溯。 |
 | 模板 API | `GET/POST/PUT /notification/admin/templates`、`GET /{id}`、`POST /{id}/copy`、`POST /{id}/publish`、`POST /{id}/disable`、`POST /{id}/archive`、`GET /{id}/versions`、`POST /{id}/rollback`、`POST /preview` | 写操作按状态和乐观锁校验；复制和回滚均创建独立草稿；所有操作写审计；预览不落库收件人和敏感参数。 |
 | Provider | `NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED` | 未配置、健康检查失败、密钥不可解密和未知结果均不得报告发送成功。 |
 | 受控发送 | `Preview -> Confirm -> Apply` | Apply 必须绑定一次性 Token、模板版本、请求摘要、受众摘要、权限快照和幂等键，并统一进入 Gateway。 |
@@ -214,7 +214,8 @@ flowchart LR
 - [x] 固化模板管理权限和通知中心“模板管理”菜单；`ROLE_DEV_OPS` 拥有完整维护权限，`ROLE_AUDIT` 仅可查看。
 - [x] 实现模板列表、详情、草稿创建、编辑、复制、停用和归档 API。
 - [x] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
-- [ ] 实现变量声明和模板校验：缺失变量、多余变量、非法占位符、HTML/URL 安全、用途/渠道不匹配均拒绝发布。
+- [x] 实现变量声明和模板校验：缺失变量、多余变量、非法占位符、HTML/URL 安全均由后端渲染器在保存、预览和发布前拒绝，Web 页面同步提供即时预校验。
+- [ ] 建立用途/渠道兼容矩阵，并在保存、预览、发布和受控发送时拒绝不匹配组合。
 - [x] 实现模板预览 API，只允许使用脱敏的示例参数，不落库真实收件人和敏感载荷。
 - [x] 发布时生成不可变版本摘要；Request/Task/Delivery 保存版本标识和渲染快照。
 - [x] 增加模板操作审计：创建、修改、复制、发布、停用、归档、回滚、预览和失败原因均由管理 Controller 写入操作日志。
@@ -226,10 +227,18 @@ flowchart LR
 - [x] 新增模板预览、发布确认、版本历史、回滚和停用交互。
 - [x] 增加版本对比交互。
 - [x] 接入独立复制 API 与版本摘要展示。
-- [ ] 发布前展示校验结果和影响范围；草稿、已发布版本和停用版本的操作按钮按权限显示。
-- [ ] 模板页面接入真实 API、局部 loading、错误恢复、乐观锁冲突提示和浏览器回归。
+- [x] 发布前展示校验结果和影响范围；发布确认展示渠道、版本和变量影响摘要，草稿、已发布版本和停用版本的操作按钮按状态与权限显示。
+- [x] 模板页面接入真实 API、局部 loading、错误恢复和乐观锁冲突提示。
+- [ ] 完成模板页面真实浏览器回归。
 
 阶段门禁：一个真实模板能够创建、校验、发布、预览、用于发送、查看版本快照并回滚；没有模板 CRUD 页面和版本验收不得关闭阶段。
+
+#### 阶段二实施记录
+
+| 日期 | 步骤 | 结论 |
+|---|---|---|
+| 2026-08-23 | 模板前后端安全校验 | 后端模板渲染器和 Web 页面均校验声明变量、引用变量、非法双大括号以及 HTML/URL 安全；通知模块测试、Spotless 和 Web 类型/测试/构建均通过。用途/渠道兼容矩阵和真实浏览器回归仍待完成。 |
+| 2026-08-23 | 发布影响摘要 | 模板发布确认展示渠道、版本和变量影响摘要；保存、预览、发布均先执行前端预校验，并由后端执行最终校验。 |
 
 ### 阶段三：Provider 与外部渠道闭环
 
@@ -315,7 +324,7 @@ flowchart LR
 
 ### 阶段六：全链路安全、测试、文档与发布
 
-- [ ] 增加模板生命周期、版本快照、变量校验和 HTML/URL 安全测试。
+- [x] 增加模板生命周期、版本快照、变量校验和 HTML/URL 安全测试；通知模块测试已覆盖模板渲染器边界并通过。
 - [ ] 增加 Provider Mock 测试：成功、失败、限流、超时、UNKNOWN、重复回执、重复发送和密钥不可用。
 - [ ] 增加受控发送 Preview/Apply 幂等、Token 过期、权限变化、数据范围、规模上限和审计测试。
 - [ ] 增加 `ROLE_USER`、`ROLE_AUDIT`、`ROLE_ADMIN_SYSTEM`、`ROLE_DEV_OPS` 的 API/页面矩阵回归。
