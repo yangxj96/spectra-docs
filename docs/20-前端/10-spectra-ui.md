@@ -67,7 +67,7 @@ DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；�
 
 `src/api/notification/notification-api.ts` 对接 `/api/notification/list`、详情、未读数、单条/全部已读、单条/批量删除以及 `/api/notification-center/preferences`。Self API 不接受 `userId`，查询、已读和偏好均由后端绑定当前用户；前端已覆盖 API/Store 状态同步、真实登录 Bearer Token、刷新 Token、登出、用户隔离和浏览器交互验收。
 
-消息中心 V1 已完成；模板管理已通过 `/devops/notification/template` 和 `src/views/Devops/Notification/Template/` 接入真实模板 API，支持草稿编辑、预览、发布、停用、归档、复制草稿、版本历史和版本摘要展示；版本对比仍未完成。通知运行概览、Request/Task/Delivery 运维页面、受控发送和 SMS/EMAIL Provider 接入由 [[90-计划/P-通知中心运维管理与外部渠道接入计划]] 继续承接，其他运维菜单中的 Placeholder 页面仍不能视为完成。
+消息中心 V1 已完成；模板管理已通过 `/devops/notification/template` 和 `src/views/Devops/Notification/Template/` 接入真实模板 API，支持草稿编辑、预览、发布、停用、归档、复制草稿、版本历史、版本摘要展示和两个版本并列对比。通知运行概览、Request/Task/Delivery 运维页面、受控发送和 SMS/EMAIL Provider 接入由 [[90-计划/P-通知中心运维管理与外部渠道接入计划]] 继续承接，其他运维菜单中的 Placeholder 页面仍不能视为完成。
 
 ## 运维管理中心
 
