@@ -26,12 +26,11 @@ updated: 2026-08-23
 
 统一通知模块 V1 已完成并作为稳定基线：独立 Maven 模块、`NotificationGateway`、Request/Task/Delivery、PostgreSQL Worker、站内信、消息 Self API、用户偏好、数据隔离、验证码安全契约、管理端脱敏 API、真实 HTTP/浏览器回归均已收口。
 
-当前仍存在四个产品断点：
+当前仍存在三个产品断点：
 
-1. 后端已经有 Request/Task/Delivery 查询、渠道状态、重试和取消接口，但 Web 运维路由仍指向 `Placeholder`，运维人员无法在页面完成观察和处理。
+1. 后端已经有 Request/Task/Delivery 查询、渠道状态、重试和取消接口，Web 已接入概览、Request、Task，Delivery 运维页仍指向 `Placeholder`。
 2. 后端已有模板实体、模板渲染和模板版本快照基础，但没有模板创建、编辑、校验、发布、停用、预览和版本回滚的完整管理闭环。
-3. `SMS`、`EMAIL` 只有明确阻断的 Placeholder Sender，尚未接入真实供应商、供应商配置、回执和未知结果处理。
-4. 没有受控发送流程：运维人员不能从模板开始选择受众、预览实际接收人和渠道、确认发送，再回到 Request/Task/Delivery 观察结果。
+3. `SMS`、`EMAIL` 只有明确阻断的 Placeholder Sender，尚未接入真实供应商、供应商配置、回执和未知结果处理；同时没有受控发送流程，运维人员不能从模板开始选择受众、预览实际接收人和渠道、确认发送，再回到 Request/Task/Delivery 观察结果。
 
 ## 二、目标
 
@@ -78,8 +77,8 @@ flowchart LR
 |---|---|---|---|
 | 用户消息 Self API | 已完成，强制当前用户隔离 | 已完成 `/notification`、铃铛、抽屉、详情、偏好 | 保持兼容，补充回归，不重写 |
 | Gateway / Worker | 已完成，支持幂等、重试、过期和取消 | 无需暴露内部实现 | 复用并补充受控发送入口 |
-| Request / Task / Delivery 管理 API | 已完成脱敏查询、渠道状态、重试、取消 | `/devops/notification/*` 仍为占位页 | 接入真实列表、详情、处理和轮询 |
-| 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照 | 已接入模板管理页，复制和版本摘要展示待补 | 补齐模板体验、版本对比和实际发送闭环 |
+| Request / Task / Delivery 管理 API | 已完成脱敏查询、渠道状态、重试、取消 | 概览、Request、Task 已接入；Delivery 仍为占位页 | 接入 Delivery 列表、详情、处理和轮询 |
+| 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照 | 已接入模板管理页、复制、版本摘要和版本对比 | 补齐实际发送闭环 |
 | 受控发送 | 无完整预览/确认闭环 | 无发送页 | 新增 Preview/Confirm/Apply 全流程 |
 | `IN_APP` | 真实可用 | 已接入 | 保持基线 |
 | `SMS` / `EMAIL` | Placeholder，默认阻断 | 无渠道配置和发送结果页 | 接入 Provider SPI、配置、健康、回执和页面 |
@@ -160,7 +159,7 @@ flowchart LR
 - [x] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
   - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
   - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；模板管理和通知运行概览 API 已接入，Provider 配置、受控发送 Preview/Apply 仍待落地。
-  - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；`DevopsNotificationTemplate` 已接入真实模板管理页；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
+  - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask` 已接入真实页面，`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；`DevopsNotificationTemplate` 已接入真实模板管理页；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
   - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel` 和 `notification:template:read/write/publish`；Provider 和受控发送的细粒度权限仍待落地。
 
 #### 阶段一实施记录
@@ -176,8 +175,9 @@ flowchart LR
 | 2026-08-23 | 模板 Web 复制与摘要 | `spectra-ui` 已接入独立复制草稿 API，并在列表和版本历史中展示截断后的版本摘要；版本对比、发布影响范围和浏览器回归仍待完成。 |
 | 2026-08-23 | 模板 Web 版本对比 | `spectra-ui` 版本历史已支持选择两个版本并并列查看摘要、用途、标题模板和正文模板；发布影响范围、浏览器回归和其他通知运维页面仍待完成。 |
 | 2026-08-23 | 通知运行概览后端 | `GET /notification/admin/overview` 已接入真实 PostgreSQL 聚合，支持 1–168 小时窗口、渠道可用性、队列/失败/UNKNOWN 摘要、连续小时趋势和脱敏最近错误；Mapper 同步补齐模板快照与投递渲染快照字段映射。 |
-| 2026-08-23 | 通知运行概览 Web 页面 | `DevopsNotificationOverview` 已替换 Placeholder，接入真实概览 API，支持窗口选择、自动刷新、指标卡、渠道状态、投递趋势和脱敏错误展示；Request/Task/Delivery 页面仍待接入。 |
+| 2026-08-23 | 通知运行概览 Web 页面 | `DevopsNotificationOverview` 已替换 Placeholder，接入真实概览 API，支持窗口选择、自动刷新、指标卡、渠道状态、投递趋势和脱敏错误展示；Request/Task 页面已接入，Delivery 页面仍待接入。 |
 | 2026-08-23 | Request 运维链路 | Request/Task/Delivery 管理查询统一默认最近 31 天，显式范围不得超过 31 天；Request 精确详情和关联 Task 查询不受默认窗口影响；`DevopsNotificationRequest` 已接入真实列表、详情摘要和关联 Task 展示。 |
+| 2026-08-23 | Task 运维链路 | 新增 Task 脱敏详情接口，`DevopsNotificationDeliveryTask` 已接入真实分页、状态/渠道/用途/Request/收件用户/时间筛选、任务详情、供应商投递记录、权限保护的重试与取消；Task 精确关联查询不受默认时间窗口影响，Delivery 页面仍待完成。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -286,7 +286,7 @@ flowchart LR
 #### 后端
 
 - [x] 补充通知运行概览 API：`GET /notification/admin/overview` 支持 1–168 小时窗口，返回渠道可用性、待处理/处理中数量、最早待处理时间、失败率、UNKNOWN 数量、脱敏最近错误和连续小时趋势。
-- [x] 完善 Request/Task/Delivery 查询的时间范围上限和 Request 详情摘要契约：普通管理查询默认最近 31 天且最大 31 天，按 Request/Task 精确 ID 关联查询不受默认窗口影响；Request 详情返回脱敏摘要和任务/接收人数。
+- [x] 完善 Request/Task/Delivery 查询的时间范围上限、Request/Task 详情摘要契约：普通管理查询默认最近 31 天且最大 31 天，按 Request/Task 精确 ID 关联查询不受默认窗口影响；Request 详情返回脱敏摘要和任务/接收人数，Task 详情返回脱敏任务和模板版本摘要。
 - [ ] 为重试、取消、Provider 测试、模板发布和受控发送补齐权限、幂等和审计。
 - [ ] 确认管理端 VO 永不返回原始地址、Secret、验证码、敏感载荷、完整模板敏感参数或异常堆栈。
 - [ ] 所有运维查询和写操作增加服务层权限边界测试，不能只依赖 Controller 注解。
@@ -295,7 +295,7 @@ flowchart LR
 
 - [x] 将 `DevopsNotificationOverview` 从 Placeholder 替换为真实运行概览页面：接入 24/72/168 小时窗口、自动刷新、队列/失败/UNKNOWN 指标、渠道状态、投递趋势和脱敏最近错误。
 - [x] 将 `DevopsNotificationRequest` 替换为 Request 列表、详情和关联 Task 页面：支持状态、用途、来源模块、业务对象、时间范围筛选，展示脱敏详情和关联任务。
-- [ ] 将 `DevopsNotificationDeliveryTask` 替换为 Task 列表、状态筛选、重试/取消和投递详情页面。
+- [x] 将 `DevopsNotificationDeliveryTask` 替换为 Task 列表、状态/渠道/用途/关联 Request/收件用户筛选、权限保护的重试/取消和供应商投递详情页面。
 - [ ] 将 `DevopsNotificationDeliveryRecord` 替换为 Delivery 列表、渠道、供应商回执和脱敏错误详情页面。
 - [ ] 统一使用真实 API、分页、时间范围、局部 loading、错误保留上一份数据和轮询退出条件。
 - [ ] 菜单、面包屑、路由、按钮权限和后端权限保持一致；正式菜单不再指向 Placeholder。
