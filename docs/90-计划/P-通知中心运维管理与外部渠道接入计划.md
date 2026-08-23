@@ -159,7 +159,7 @@ flowchart LR
 
 - [x] 对照 `NotificationAdminController`、`NotificationAdminService`、实体和当前 `devops.ts` 路由建立差距清单。
   - 后端当前已提供渠道状态、Request 分页、Task 分页、Delivery 分页、Task 重试和 Task 取消 6 类管理能力；对应入口为 `NotificationAdminController` 与 `NotificationAdminService`。
-  - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；Delivery 已具备 Provider、Provider Message ID、结果状态和脱敏响应摘要字段，但没有模板管理、Provider 配置、受控发送 Preview/Apply 和通知运行概览 API。
+  - `NotificationTemplateEntity`、模板渲染、`NotificationRequestEntity`、`NotificationTaskEntity` 和 `NotificationDeliveryEntity` 已存在；模板管理和通知运行概览 API 已接入，Provider 配置、受控发送 Preview/Apply 仍待落地。
   - Web `devops.ts` 中 `DevopsNotificationOverview`、`DevopsNotificationRequest`、`DevopsNotificationDeliveryTask`、`DevopsNotificationDeliveryRecord` 仍指向 `src/views/Devops/Placeholder/index.vue`；`DevopsNotificationTemplate` 已接入真实模板管理页；用户消息 Self API 和 `NotificationBell` 不属于本次缺口。
   - 当前管理权限覆盖 `notification:admin:read`、`notification:admin:retry`、`notification:admin:cancel` 和 `notification:template:read/write/publish`；Provider 和受控发送的细粒度权限仍待落地。
 
@@ -175,6 +175,7 @@ flowchart LR
 | 2026-08-23 | 模板版本追溯 | `spectra-admin` 已通过 V24 完成模板版本摘要、Request 渠道模板快照、Task/Delivery 版本字段和渲染快照；模板复制已提供独立 API，V22-V24 已在本机 PostgreSQL 正式执行，9 项真实 PostgreSQL 集成测试通过。 |
 | 2026-08-23 | 模板 Web 复制与摘要 | `spectra-ui` 已接入独立复制草稿 API，并在列表和版本历史中展示截断后的版本摘要；版本对比、发布影响范围和浏览器回归仍待完成。 |
 | 2026-08-23 | 模板 Web 版本对比 | `spectra-ui` 版本历史已支持选择两个版本并并列查看摘要、用途、标题模板和正文模板；发布影响范围、浏览器回归和其他通知运维页面仍待完成。 |
+| 2026-08-23 | 通知运行概览后端 | `GET /notification/admin/overview` 已接入真实 PostgreSQL 聚合，支持 1–168 小时窗口、渠道可用性、队列/失败/UNKNOWN 摘要、连续小时趋势和脱敏最近错误；Mapper 同步补齐模板快照与投递渲染快照字段映射。 |
 - [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
   - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
@@ -282,7 +283,7 @@ flowchart LR
 
 #### 后端
 
-- [ ] 补充通知运行概览 API：渠道可用性、待处理数量、最老任务、失败率、UNKNOWN 数量、最近错误和时间范围趋势。
+- [x] 补充通知运行概览 API：`GET /notification/admin/overview` 支持 1–168 小时窗口，返回渠道可用性、待处理/处理中数量、最早待处理时间、失败率、UNKNOWN 数量、脱敏最近错误和连续小时趋势。
 - [ ] 完善 Request/Task/Delivery 查询的过滤、排序、时间范围上限、详情摘要和分页契约。
 - [ ] 为重试、取消、Provider 测试、模板发布和受控发送补齐权限、幂等和审计。
 - [ ] 确认管理端 VO 永不返回原始地址、Secret、验证码、敏感载荷、完整模板敏感参数或异常堆栈。
