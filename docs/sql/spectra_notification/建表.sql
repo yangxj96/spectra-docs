@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     html_template         TEXT,
     parameter_schema      JSONB NOT NULL DEFAULT '{}'::jsonb,
     provider_template_code VARCHAR(200),
-    enabled               BOOLEAN NOT NULL DEFAULT TRUE,
+    state                 VARCHAR(16) NOT NULL DEFAULT 'DRAFT',
     created_by            UUID,
     created_at            TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by            UUID,
@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_template (
     deleted               TIMESTAMP(6) WITH TIME ZONE,
     version               BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT "PK_NTF_TEMPLATE" PRIMARY KEY (id),
-    CONSTRAINT "CK_NTF_TEMPLATE_CHANNEL" CHECK (channel IN ('IN_APP', 'SMS', 'EMAIL'))
+    CONSTRAINT "CK_NTF_TEMPLATE_CHANNEL" CHECK (channel IN ('IN_APP', 'SMS', 'EMAIL')),
+    CONSTRAINT "CK_NTF_TEMPLATE_STATE" CHECK (state IN ('DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED'))
 );
 
 CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request (
@@ -177,9 +178,9 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_user_preference (
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_VERSION"
     ON spectra_notification.ntf_template (template_group_code, channel, version_no)
     WHERE deleted IS NULL;
-CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_ENABLED"
+CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_PUBLISHED"
     ON spectra_notification.ntf_template (template_group_code, channel)
-    WHERE enabled = TRUE AND deleted IS NULL;
+    WHERE state = 'PUBLISHED' AND deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_REQUEST_EXTERNAL_ID"
     ON spectra_notification.ntf_request (external_request_id)
     WHERE deleted IS NULL;
@@ -238,7 +239,7 @@ COMMENT ON COLUMN spectra_notification.ntf_template.content_template IS '正文�
 COMMENT ON COLUMN spectra_notification.ntf_template.html_template IS 'HTML正文模板；非HTML渠道可为空';
 COMMENT ON COLUMN spectra_notification.ntf_template.parameter_schema IS '模板参数JSON Schema';
 COMMENT ON COLUMN spectra_notification.ntf_template.provider_template_code IS '渠道供应商模板编码';
-COMMENT ON COLUMN spectra_notification.ntf_template.enabled IS '是否启用';
+COMMENT ON COLUMN spectra_notification.ntf_template.state IS '模板生命周期状态：DRAFT、PUBLISHED、DISABLED或ARCHIVED';
 COMMENT ON COLUMN spectra_notification.ntf_template.created_by IS '创建人ID';
 COMMENT ON COLUMN spectra_notification.ntf_template.created_at IS '创建时间';
 COMMENT ON COLUMN spectra_notification.ntf_template.updated_by IS '最后更新人ID';

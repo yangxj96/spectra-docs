@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 51 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 52 个 `*Controller.java`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。项目处于开发阶段，已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -73,6 +73,7 @@ tags:
 | `NotificationController` | spectra-notification | `/notification/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
 | `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的脱敏查询、渠道状态、重试和取消 |
+| `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板草稿、发布、停用、归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。
 

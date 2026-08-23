@@ -7,7 +7,7 @@ tags:
 
 # API 端点
 
-> 源码当前 51 个 `*Controller.java` 端点速查表。
+> 源码当前 52 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。开发阶段不保留旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -86,6 +86,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | NotificationController | `/notification/**` | 当前用户消息列表/详情/未读数/已读/删除/批量删除 |
 | NotificationPreferenceController | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好查询与保存 |
 | NotificationAdminController | `/notification/admin/**` | 运维/审计脱敏查询、渠道状态、任务重试和取消 |
+| NotificationTemplateAdminController | `/notification/admin/templates/**` | 模板分页/详情、草稿创建/编辑、发布/停用/归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
 
 `POST /notification/batch-delete` 使用 `NotificationBatchDeleteFrom` 请求体：`{"ids":["消息ID"]}`。
 
