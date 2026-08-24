@@ -97,7 +97,7 @@ com.devops00.spectra.{module}
 ```
 
 - `service` 只放应用服务接口及其实现，不把所有 Spring Bean 都归入 Service。
-- 按职责增加同级包：Provider SPI 使用 `provider/impl`，渠道发送器使用 `sender/impl`，Worker/调度/状态推进使用 `dispatch`，外部边界使用 `client`/`adapter`，规则使用 `strategy`/`policy`/`validator`。
+- 按职责增加同级包：Provider SPI 使用 `provider/impl`，渠道发送器使用 `sender/impl`，Worker/调度/状态推进使用 `dispatch`，外部边界使用 `client`/`adapter`，规则使用 `strategy`/`policy`/`validator`，跨子域复用组件使用明确领域名的 `support`。
 - `utils` 只放无状态、无领域端口依赖的纯函数工具；依赖 Mapper、配置、事务或领域规则的复用逻辑应提取为命名清晰的 `@Component`/领域服务。
 
 **复杂模块（子域拆分）：**
