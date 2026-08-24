@@ -79,13 +79,23 @@ Spectra 是一个后端服务、两个前端客户端和一个流程建模插件
 - Maven 3.9.12 使用 `spectra-admin/mvnw.cmd`，不要依赖全局 Maven。
 - Windows 命令统一使用 PowerShell 7.6 或更高版本的 `pwsh`；实际安装路径由 `Get-Command pwsh` 确认，不假设固定磁盘位置。不要使用 Windows PowerShell 5.1 的 `powershell.exe`。根目录脚本通过 `#requires -Version 7.6` 强制执行此约束。
 - mise 信任是人工安全决策；若提示未信任，只提醒用户在对应目录执行一次 `mise trust`，Agent 不自动修改信任状态。只读检查和验证可点源 `scripts/agent-runtime.ps1`，直接使用项目固定运行时。
+- 后端开发遵循“先实现、后整理”：功能或模块开发过程中不要求每次执行耗时的完整 `mvn verify`，按需运行目标模块的 `compile` 或 `test`；模块完成或提交代码前再执行 `spotless:apply` 和质量校验。提交前执行全项目 `mvn verify`，仅文档等不涉及 Java/Maven 的修改可跳过。
 
 ```powershell
-# 后端（spectra-admin/）
-.\mvnw.cmd spotless:check
+# 后端（spectra-admin/）开发中按需快速反馈
+.\mvnw.cmd -pl spectra-core -am compile
+.\mvnw.cmd -pl spectra-core -am test
+
+# 模块完成时（以下以 spectra-core 为例，替换为实际开发模块）
+.\mvnw.cmd -pl spectra-core -am spotless:apply
+.\mvnw.cmd verify -pl spectra-core -am
+
+# 提交代码前：全项目整理和质量门禁
 .\mvnw.cmd spotless:apply
+.\mvnw.cmd verify
+
+# 全量格式检查（按需）；PowerShell 中系统属性必须作为单个参数
 .\mvnw.cmd spotless:check "-Dspotless.ratchetFrom=NONE"
-.\mvnw.cmd test
 .\mvnw.cmd clean package -DskipTests
 
 # Web（spectra-ui/）
