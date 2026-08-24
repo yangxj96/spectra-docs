@@ -31,6 +31,7 @@ import java.util.UUID;
  * <li>使用 @Data 注解</li>
  * <li>分页查询返回 IPage<XxxVO></li>
  * <li>与 Entity 分开定义，职责单一</li>
+ * <li>响应时间使用 LocalDateTime/LocalDate/LocalTime，禁止暴露 Instant</li>
  * </ol>
  *
  * @author yangxj96

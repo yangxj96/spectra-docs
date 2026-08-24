@@ -1,6 +1,6 @@
 ---
 name: spectra-admin-spec
-description: 修改、创建、重构或审查 spectra-admin 后端 Java 代码时使用，包括 Controller、Service、Mapper、Entity、From、VO、Converter、异常、日志、事务、权限和 PostgreSQL JSONB 处理。执行后端任务时按项目分层、命名、注解和验证规则实施。
+description: 修改、创建、重构或审查 spectra-admin 后端 Java 代码时使用，包括 Controller、Service、Mapper、Entity、From、VO、Converter、职责分包、枚举状态、时间边界、异常、日志、事务、权限和 PostgreSQL JSONB 处理。执行后端任务时按项目分层、命名、注解和验证规则实施。
 ---
 
 # spectra-admin 后端开发规范
@@ -51,7 +51,7 @@ spectra-admin 采用标准 Spring Boot 分层架构，所有后端代码必须�
 | `@ULog` | 必须 | 所有接口方法必须加 |
 | `@PreAuthorize` | 必须 | 公开接口用 `permitAll()` |
 | `@Validated` | 写操作必须 | 使用 `Verify.Insert.class` 或 `Verify.Update.class` |
-| `version` | 必须 | Mapping 注解中统一 `version = "1.0.0+"` |
+| `version` | 必须 | Mapping 注解中统一 `version = "1.0.0"` |
 
 ### TypeHandler 速查
 
@@ -95,6 +95,10 @@ com.devops00.spectra.{module}
 └── service/                          # 业务逻辑接口
     └── impl/                         # Service 实现
 ```
+
+- `service` 只放应用服务接口及其实现，不把所有 Spring Bean 都归入 Service。
+- 按职责增加同级包：Provider SPI 使用 `provider/impl`，渠道发送器使用 `sender/impl`，Worker/调度/状态推进使用 `dispatch`，外部边界使用 `client`/`adapter`，规则使用 `strategy`/`policy`/`validator`。
+- `utils` 只放无状态、无领域端口依赖的纯函数工具；依赖 Mapper、配置、事务或领域规则的复用逻辑应提取为命名清晰的 `@Component`/领域服务。
 
 **复杂模块（子域拆分）：**
 ```
@@ -146,6 +150,8 @@ com.devops00.spectra.{module}
 - 必填字段必须加 `@NotBlank`/`@NotNull` 等校验注解
 - 使用 `@Data` 注解
 - 提供清晰的中文 `message` 参数
+- Controller 请求 From 必须使用普通 `class`，禁止使用 `record`；`record` 仅用于响应或内部不可变值对象
+- 日期、时间和日期时间入参使用 ISO 8601 `String`，禁止在 From 中声明 `Instant`、`LocalDateTime`、`OffsetDateTime` 等 Java 时间类型
 
 ### 8. VO 对象规范
 
@@ -154,6 +160,7 @@ com.devops00.spectra.{module}
 - 使用 `@Data` 注解
 - 分页查询返回 `IPage<XxxVO>`
 - 时间字段使用 `LocalDateTime`、`LocalDate`、`LocalTime`（MapStruct 会自动转换）
+- VO 禁止暴露 `Instant`；简单不可变响应可以使用 `record`
 
 ### 9. Converter 规范（MapStruct）
 
@@ -170,7 +177,14 @@ public interface FormConverter {
 }
 ```
 
-### 10. 日志规范
+### 10. Java 类型、状态与复用规范
+
+- 项目使用 JDK 25。类型声明、方法签名、泛型、构造调用和方法引用使用简单类名并通过 `import` 引入；只有同名类型发生真实导入冲突时才使用全限定名。
+- 本系统控制的封闭状态、类型、渠道和动作必须定义为枚举，使用枚举值或 `name()` 持久化/传输；禁止散落魔法字符串。第三方开放状态码只在 Provider/Adapter 边界保留 `String`，并集中映射为内部枚举。
+- Entity 持久化时间统一使用 `Instant`；From 时间统一使用 ISO 8601 `String`；VO 时间统一使用 `LocalDate`、`LocalTime` 或 `LocalDateTime`。MapStruct 声明 `uses = TimeMapper.class`，手工组装时注入 `TimeMapper`，禁止依赖系统默认时区自行转换。
+- 两处及以上出现语义和实现都相同的方法时评估提取，三处及以上默认提取。纯逻辑放 `utils`，有依赖或领域状态的逻辑提取为组件；优先复用 `TimeMapper`、`SHA256Utils` 等现有能力，禁止一行转发包装和 `CommonUtils` 巨型工具类。
+
+### 11. 日志规范
 
 | 级别 | Controller 层 | Service 层 |
 |---|---|---|
@@ -179,7 +193,7 @@ public interface FormConverter {
 | `log.warn()` | — | 业务校验失败、降级处理 |
 | `log.error()` | — | 异常捕获、系统错误 |
 
-### 11. TypeHandler 规范（PostgreSQL jsonb）
+### 12. TypeHandler 规范（PostgreSQL jsonb）
 
 - PostgreSQL 的 `jsonb` 列必须使用项目自定义的 `PgJsonbTypeHandler`
 - **禁止**使用 MyBatis-Plus 内置的 `Jackson3TypeHandler`（会将 Map 序列化为 varchar 字符串，PostgreSQL 不会自动转换为 jsonb）
@@ -286,7 +300,7 @@ public IPage<FormDefinitionVO> page(PageFrom page, FormPageFrom params) {
 
 // ✅ 正确：完整注解
 @ULog("'查询表单列表'")
-@GetMapping(value = "/page", version = "1.0.0+")
+@GetMapping(value = "/page", version = "1.0.0")
 @PreAuthorize("isAuthenticated()")
 public IPage<FormDefinitionVO> page(PageFrom page, FormPageFrom params) {
     return formDefinitionService.page(page, params);

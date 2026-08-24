@@ -32,6 +32,8 @@ import lombok.Data;
  * <li>必填字段必须加 @NotBlank/@NotNull 等校验注解</li>
  * <li>使用 @Data 注解</li>
  * <li>提供清晰的中文 message 参数</li>
+ * <li>Controller 请求 From 使用普通 class，禁止使用 record</li>
+ * <li>日期时间入参使用 ISO 8601 String，不直接使用 Java 时间类型</li>
  * </ol>
  *
  * @author yangxj96

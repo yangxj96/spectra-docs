@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.example.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -42,7 +43,7 @@ import java.util.UUID;
  * <li>统一方法命名：created/modify/deleteById/page</li>
  * <li>所有接口必须加 @ULog、@PreAuthorize</li>
  * <li>写操作必须加 @Validated</li>
- * <li>Mapping 注解中统一 version = "1.0.0+"</li>
+ * <li>Mapping 注解中统一 version = "1.0.0"</li>
  * </ol>
  *
  * @author yangxj96
@@ -61,9 +62,9 @@ public class ExampleFullController {
      * 分页查询示例列表
      */
     @ULog("'查询示例列表'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
-    public Object page(PageFrom page, ExamplePageFrom params) {
+    public IPage<ExampleVO> page(PageFrom page, ExamplePageFrom params) {
         return exampleService.page(page, params);
     }
 
@@ -71,7 +72,7 @@ public class ExampleFullController {
      * 查询示例详情
      */
     @ULog("'查询示例详情'")
-    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public ExampleVO getDetail(@PathVariable UUID id) {
         return exampleService.getDetail(id);
@@ -81,7 +82,7 @@ public class ExampleFullController {
      * 创建示例
      */
     @ULog("'创建示例'")
-    @PostMapping(value = "", version = "1.0.0+")
+    @PostMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody ExampleSaveFrom from) {
         exampleService.created(from);
@@ -91,7 +92,7 @@ public class ExampleFullController {
      * 更新示例
      */
     @ULog("'更新示例'")
-    @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:UPDATE')")
     public void modify(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody ExampleSaveFrom from) {
         exampleService.modify(id, from);
@@ -101,7 +102,7 @@ public class ExampleFullController {
      * 删除示例
      */
     @ULog("'删除示例'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:DELETE')")
     public void deleteById(@PathVariable UUID id) {
         exampleService.deleteById(id);

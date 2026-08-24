@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * 注意：
  * <ol>
- * <li>Mapping 注解中统一 version = "1.0.0+"</li>
+ * <li>当前开发阶段 Mapping 注解统一 version = "1.0.0"</li>
  * <li>版本号格式：主版本.次版本.修订号</li>
- * <li>"+" 表示兼容该版本及更高版本</li>
+ * <li>不使用 "+" 兼容范围；契约变化时同步更新调用方、测试和文档</li>
  * <li>使用 @Slf4j 注解</li>
  * </ol>
  *
@@ -47,26 +47,10 @@ public class VersionFullExampleController {
      * 版本控制接口示例
      */
     @ULog("'获取版本数据'")
-    @GetMapping(value = "/data", version = "1.0.0+")
+    @GetMapping(value = "/data", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public String versionedEndpoint() {
         return "版本数据";
     }
 
-    /**
-     * 不同版本的接口示例
-     */
-    @ULog("'获取V1版本数据'")
-    @GetMapping(value = "/data", version = "1.0.0")
-    @PreAuthorize("isAuthenticated()")
-    public String v1Endpoint() {
-        return "V1版本数据";
-    }
-
-    @ULog("'获取V2版本数据'")
-    @GetMapping(value = "/data", version = "2.0.0")
-    @PreAuthorize("isAuthenticated()")
-    public String v2Endpoint() {
-        return "V2版本数据";
-    }
 }

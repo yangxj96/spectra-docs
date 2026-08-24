@@ -48,7 +48,7 @@ public class SecurityFullExampleController {
      * 公开接口示例
      */
     @ULog("'获取公开数据'")
-    @GetMapping(value = "/public", version = "1.0.0+")
+    @GetMapping(value = "/public", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public String publicEndpoint() {
         return "公开数据";
@@ -58,7 +58,7 @@ public class SecurityFullExampleController {
      * 已认证用户接口示例
      */
     @ULog("'获取用户数据'")
-    @GetMapping(value = "/authenticated", version = "1.0.0+")
+    @GetMapping(value = "/authenticated", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public String authenticatedEndpoint() {
         return "用户数据";
@@ -68,7 +68,7 @@ public class SecurityFullExampleController {
      * 权限控制接口示例
      */
     @ULog("'获取管理数据'")
-    @GetMapping(value = "/admin", version = "1.0.0+")
+    @GetMapping(value = "/admin", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'SYSTEM:ADMIN')")
     public String adminEndpoint() {
         return "管理数据";
@@ -78,7 +78,7 @@ public class SecurityFullExampleController {
      * 角色控制接口示例
      */
     @ULog("'获取开发数据'")
-    @GetMapping(value = "/dev", version = "1.0.0+")
+    @GetMapping(value = "/dev", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public String devEndpoint() {
         return "开发数据";

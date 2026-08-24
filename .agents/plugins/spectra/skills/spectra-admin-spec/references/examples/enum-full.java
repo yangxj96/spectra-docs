@@ -27,8 +27,9 @@ import lombok.Getter;
  * <li>枚举使用 @Getter 注解</li>
  * <li>使用 @AllArgsConstructor 注解</li>
  * <li>常量使用大写下划线命名</li>
- * <li>命名：XxxEnum</li>
+ * <li>命名优先使用明确的领域名；仅在语义需要时使用 XxxEnum 后缀</li>
  * <li>使用 @Getter 和 @AllArgsConstructor 注解</li>
+ * <li>本系统控制的封闭状态、类型、渠道和动作不得使用魔法字符串</li>
  * </ol>
  *
  * @author yangxj96
