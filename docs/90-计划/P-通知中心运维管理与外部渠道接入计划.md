@@ -28,7 +28,7 @@ updated: 2026-08-24
 
 当前仍存在两个产品断点：
 
-1. `SMS`、`EMAIL` 已接入 Provider 配置、通用 HTTP JSON 适配器、健康门禁、受确认保护的测试发送和签名回执幂等；具体供应商适配、UNKNOWN 人工确认/受控重试仍待完成。
+1. `SMS`、`EMAIL` 已接入 Provider 配置、阿里云/腾讯云短信、SMTP、通用 HTTP JSON、内置 MOCK、健康门禁、受确认保护的测试发送和签名回执幂等；UNKNOWN 人工确认/受控重试仍待完成。
 2. 受控发送后端 Preview/Apply 与 Web 页面已经接入：运维人员可以从已发布模板选择受众、预览当前渠道结果、确认发送并回到 Request 观察结果；真实 Worker/Provider 和浏览器全链路验收仍待完成。
 
 ## 二、目标
@@ -81,7 +81,7 @@ flowchart LR
 | 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照 | 已接入模板管理页、复制、版本摘要和版本对比 | 与受控发送和外部渠道串联 |
 | 受控发送 | 无完整预览/确认闭环 | 无发送页 | 新增 Preview/Confirm/Apply 全流程 |
 | `IN_APP` | 真实可用 | 已接入 | 保持基线 |
-| `SMS` / `EMAIL` | 已接入 Provider SPI、配置、通用 HTTP JSON 适配器和健康门禁；具体供应商投递仍默认阻断 | 已接入渠道配置和健康检查页，发送结果仍在 Delivery 运维页观察 | 接入具体供应商、测试发送、回执、失败/UNKNOWN 处理和受控发送 |
+| `SMS` / `EMAIL` | 已接入 Provider SPI、阿里云/腾讯云短信、SMTP、通用 HTTP JSON、MOCK 和健康门禁 | 已接入渠道配置和健康检查页，发送结果仍在 Delivery 运维页观察 | 完成真实供应商沙箱、回执、UNKNOWN 人工处理和受控发送验收 |
 | 指标/健康检查/清理 | 已有低基数指标、健康检查、敏感密文清理 | 已接入通知运行概览、渠道状态、趋势和脱敏错误 | 与实际发送和 Provider 结果串联 |
 | 权限/审计 | Self、Audit、DevOps 边界已存在 | 运维路由和菜单已有骨架 | 收敛细粒度权限和操作审计 |
 
@@ -250,13 +250,13 @@ flowchart LR
 #### 后端
 
 - [x] 定义 `NotificationProvider` SPI，隔离供应商 SDK、地址格式化、发送、查询回执和健康检查；通知 Worker 不直接依赖 HTTP 或供应商实现。
-- [x] 实现 SMS/EMAIL 渠道 Sender 与通用 `HTTP_JSON` Provider 适配器；具体供应商通过配置选择，HTTP/供应商细节不绑定到 Gateway 或 Worker。
-- [x] 设计 Provider 配置模型：供应商类型、启用状态、端点、超时、限流、重试、模板映射和加密 Secret 引用；SMS/EMAIL 非敏感配置写入 `spectra_core.sys_config` 的 `notification.provider.*`。
+- [x] 实现 SMS/EMAIL 渠道 Sender、阿里云短信、腾讯云短信、SMTP、通用 `HTTP_JSON` 和内置 `MOCK` Provider；HTTP/供应商细节不绑定到 Gateway 或 Worker。
+- [x] 设计 Provider 配置模型：供应商类型、启用状态、端点/SMTP 主机、端口、地域、凭据标识、短信签名/模板、邮件发件信息、超时、限流、重试、模板参数顺序和加密 Secret 引用；SMS/EMAIL 非敏感配置写入 `spectra_core.sys_config` 的 `notification.provider.*`。
 - [x] Secret 使用现有 AES-GCM 能力保存，API 只返回是否配置、Key ID、更新时间和脱敏摘要，不返回原文；Secret 密文单独存储在对应的 `.secret` 配置键中。
 - [x] 增加 Provider 测试发送/健康检查；测试发送必须使用明确的测试地址和 `SEND_TEST` 操作确认，目标只在内存中加密使用，不从用户数据推导，也不写入业务 Request/Task/Delivery。
 - [x] Delivery 已记录供应商消息 ID、标准化结果状态、完成时间和脱敏错误码；`POST /notification/provider/callback/{channel}` 复用渠道 Secret 做 HMAC 验签，只更新既有 Delivery/Task，按回执正文摘要幂等，未知消息 ID 拒绝处理。
 - [ ] 处理成功、明确失败、限流、超时和未知结果；当前 Worker 对明确限流按任务最大尝试次数退避，对超时/UNKNOWN 写入 Delivery 后停止自动重试；UNKNOWN 的人工确认或受控重试入口仍待完成。
-- [x] 保留测试 scope 的 Placeholder/Mock Sender，并由 Provider Runtime 对未配置、未健康或未注册 Provider 做 `BLOCKED` 安全回退，默认不报告成功。
+- [x] 内置生产态 `MOCK` Provider，并由 Provider Runtime 对未配置、未健康或未注册 Provider 做 `BLOCKED` 安全回退，默认不报告成功；MOCK 仅在最终发送点打印脱敏信息。
 
 #### 前端
 
@@ -276,7 +276,8 @@ flowchart LR
 | 2026-08-23 | Provider SPI 与 HTTP 适配器 | 已增加 `NotificationProvider` SPI、`HTTP_JSON` 通用适配器和本地 HTTP 沙箱测试；适配器负责地址解密、标准 JSON 请求、健康检查、供应商消息 ID提取和成功/失败/未知结果脱敏映射。SMS/EMAIL Sender、健康状态缓存、测试发送和回执闭环仍待接入，当前生产 Worker 继续使用安全阻断 Sender。 |
 | 2026-08-23 | 渠道 Sender 与健康门禁 | 已接入 `SmsNotificationSender`、`EmailNotificationSender` 和 Provider Runtime；健康检查结果按配置更新时间缓存，配置变更自动失效，未通过健康检查的任务不会调用外部网络。新增 `POST /notification/admin/providers/{channel}/health`，测试发送接口已接入，回执和重试分类仍待完成。 |
 | 2026-08-23 | Provider 测试发送 | 新增 `POST /notification/admin/providers/{channel}/test`；只接受 SMS/EMAIL、明确测试地址和 `SEND_TEST` 确认词，测试任务只在内存中组装并复用健康门禁，不写业务 Request/Task/Delivery，响应不回显地址或原始供应商响应。 |
-| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除、健康检查和确认后的测试发送，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警；具体供应商适配和回执结果展示仍待完成。 |
+| 2026-08-23 | Provider Web 页面 | `spectra-ui` 已接入 `/devops/notification/provider`，按 `IN_APP`、`SMS`、`EMAIL` 展示真实配置和渠道状态；外部渠道支持 Provider 类型、非敏感参数、启停、Secret 覆盖/清除、健康检查和确认后的测试发送，Secret 不回显。页面同时展示最近健康检查、队列积压、成功/失败/UNKNOWN 摘要，并对未配置、未健康和阻断状态明确告警。 |
+| 2026-08-24 | 真实 Provider 与 Mock | `spectra-admin` 已接入阿里云短信 RPC 签名、腾讯云短信 TC3-HMAC-SHA256、SMTP 465/587 和生产态 `MOCK` Provider；短信敏感参数在调用前从任务密文短暂恢复，模拟发送只打印脱敏信息，其他流程继续写入 Delivery。 |
 | 2026-08-23 | Delivery 结果与重试分类 | Worker 已为每次 Provider 结果写入 Delivery；明确 `PROVIDER_RATE_LIMITED` 按任务最大尝试次数退避，明确失败终止，Provider 异常和 `UNKNOWN` 写入 Delivery 后停止无条件重试。UNKNOWN 人工确认/受控重试仍待完成。 |
 | 2026-08-24 | Provider 回执入口与幂等 | 新增 `POST /notification/provider/callback/{channel}`；匿名入口仅接受使用当前渠道 Secret 计算的 HMAC-SHA256 签名，按 Provider+消息 ID+渠道查找既有 Delivery，状态回写 Delivery/Task/Request，回执摘要写入脱敏 `response_summary`，同一正文重复回调返回 `DUPLICATE`；新增 V26 唯一索引和验签/状态/幂等测试。 |
 
