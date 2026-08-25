@@ -37,7 +37,7 @@ Pop-Location
 
 ## 本机容器验证
 
-后端仍需要完整的数据库、Redis、S3、AI 和 RAG 环境变量。推荐使用 [[30-DockerCompose]] 集中配置，不要把真实值写进 Dockerfile 或 `docker run` 命令历史。
+后端仍需要完整的数据库、Redis 和 S3 环境变量。推荐使用 [[30-DockerCompose]] 集中配置，不要把真实值写进 Dockerfile 或 `docker run` 命令历史。
 
 ```powershell
 docker image inspect spectra-admin:local

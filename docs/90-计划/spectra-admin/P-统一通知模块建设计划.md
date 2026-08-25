@@ -12,6 +12,8 @@ updated: 2026-08-23
 
 # P-统一通知模块建设计划
 
+> **AI 内容归档标记**：本文中涉及 `AI`、`spectra-ai` 或 AI 调用迁移的段落属于历史计划上下文，仅适用于 `spectra-admin` 的 `archive/ai` 分支；`master` 已移除 AI 模块。其他通知模块内容仍需以当前源码和活动计划为准。
+
 ## 状态
 
 **完成（独立模块、消息中心 Self API、可靠 Worker、收件人目录、Security/Workflow/AI 调用迁移、验证码安全契约、数据范围/受众边界、链接白名单、Mock Provider 示例、管理端脱敏运维 API、免打扰跨午夜/用户时区规则、Self API 用户 A/B 认证上下文与管理端角色矩阵回归、低基数指标/健康检查/敏感密文清理、10 项真实 PostgreSQL 事务/并发/迁移回归、Web 前端 API/Store 回归与构建、真实 HTTP 登录/Token 刷新/登出/通知隔离回归和真实浏览器交互验收均已完成；真实短信/邮件 Provider 按范围继续保持占位且默认关闭）**

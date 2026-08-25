@@ -2,6 +2,7 @@
 -- spectra_ai schema 建表语句
 -- RAG 向量存储（需要 pgvector 扩展）
 -- ============================================
+-- ARCHIVED: 仅适用于 spectra-admin/archive/ai；master 已移除 spectra_ai。
 
 CREATE SCHEMA IF NOT EXISTS spectra_ai;
 

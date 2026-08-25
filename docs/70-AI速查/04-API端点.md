@@ -7,7 +7,9 @@ tags:
 
 # API 端点
 
-> 源码当前 55 个 `*Controller.java` 端点速查表。
+> **AI 归档说明**：本文当前只收录 `master` 的活动 API；已移除的 AI 端点不属于主分支。AI 端点和相关契约仅可到 `spectra-admin` 的 `archive/ai` 分支及其归档文档中查阅。
+
+> 源码当前 53 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。开发阶段不保留旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -71,7 +73,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 |---|---|---|
 | MenuController | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树（`GET /menu/current`） |
 | DepartmentController | `/department/**` | 部门树查询；旧创建/修改写入口已冻结，新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
-| RegionController | `/region/**` | 区域查询（省/市/区县） |
+| RegionController | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |
 | ConfiguredController | `/configured/**` | 配置表管理 |
 | ServiceMonitorController | `/service/monitor/**` | 服务监控总览/历史趋势、告警摘要/规则/事件、运行时诊断和受控诊断任务；分别使用 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 权限 |
@@ -134,13 +136,6 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | TaskController | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；任务动作校验当前办理人 |
 | RuntimeController | `/workflow/runtime/**` | 运行时状态查询（待实现） |
 | HistoryController | `/workflow/history/**` | 历史记录查询（待实现） |
-
-## AI
-
-| Controller | 路径 | 说明 |
-|---|---|---|
-| AiAskController | `/ai/ask/**` | AI 问答接口 |
-| AiConversationController | `/ai/conversation/**` | 当前用户 AI 会话列表、消息历史与删除 |
 
 ## 全局异常处理
 

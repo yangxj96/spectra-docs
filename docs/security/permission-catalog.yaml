@@ -341,25 +341,6 @@ permissions:
     scopeMode: SELF
     legacy: [NOTIFICATION_SETTING:UPDATE]
 
-  # AI
-  - code: ai:create
-    name: AI 会话创建
-    scopeMode: SELF
-    legacy: [AI:INSERT]
-  - code: ai:read
-    name: AI 会话查看
-    scopeMode: SELF
-    legacy: [AI:QUERY]
-  - code: ai:update
-    name: AI 会话维护
-    scopeMode: SELF
-    legacy: [AI:UPDATE]
-  - code: ai:delete
-    name: AI 会话删除
-    scopeMode: SELF
-    highRisk: true
-    legacy: [AI:DELETE]
-
   # OA resources: all RULES by default; payment/execute are high-risk and non-delegatable by default.
   - code: oa:application-type:create
     name: OA 申请类型创建

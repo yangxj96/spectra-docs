@@ -16,14 +16,12 @@ tags:
 | 服务名、容器内端口 8888、数据库/Redis 内部地址 | 可复用 | 同一 Compose 网络内按服务名访问 |
 | Named Volume | 可直接使用 | Docker 管理真实宿主机路径，避免写死 `/data/...` |
 | `POSTGRES_PASSWORD`、`REDIS_PASSWORD` | 必须配置 | 只写入部署机 `.env` 或 Secret 管理系统 |
-| S3/AI/RAG 地址和凭据 | 必须按功能配置 | 示例不提供真实 Provider |
+| S3 地址和凭据 | 必须按功能配置 | 示例不提供真实 Provider |
 | 宿主机映射端口、域名、镜像 Tag、资源限制 | 每套环境配置 | 不同服务器可能冲突或有不同规范 |
 
 ## Compose 模板
 
 下面示例以 Nginx 在容器外或同网络反向代理后端为前提。后端容器内使用 HTTP 8888；开发机的 4004 约定不适用于容器内部。
-
-示例中的 `postgres:18-alpine` 只覆盖基础启动，不自带项目 RAG 所需的 pgvector。启用 RAG 时应换成组织批准的 PostgreSQL 18 + pgvector 镜像或在数据库服务器安装扩展，再执行 `docs/sql/spectra_ai/建表.sql`。
 
 ```yaml
 services:
@@ -72,12 +70,6 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY:?set S3_SECRET_KEY}
       S3_BUCKET: ${S3_BUCKET:?set S3_BUCKET}
       S3_REGION: ${S3_REGION:?set S3_REGION}
-      AI_KEY: ${AI_KEY:?set AI_KEY}
-      AI_BASE_URL: ${AI_BASE_URL:?set AI_BASE_URL}
-      AI_MODEL: ${AI_MODEL:?set AI_MODEL}
-      RAG_KEY: ${RAG_KEY:?set RAG_KEY}
-      RAG_BASE_URL: ${RAG_BASE_URL:?set RAG_BASE_URL}
-      RAG_MODEL: ${RAG_MODEL:?set RAG_MODEL}
     volumes:
       - spectra-files:/app/files
     depends_on:
@@ -110,12 +102,6 @@ S3_SECRET_KEY=<真实值>
 S3_BUCKET=<真实值>
 S3_REGION=<真实值>
 
-AI_KEY=<真实值>
-AI_BASE_URL=<真实值>
-AI_MODEL=<真实值>
-RAG_KEY=<真实值>
-RAG_BASE_URL=<真实值>
-RAG_MODEL=<真实值>
 ```
 
 尖括号内容是占位符，不能原样运行。`.env` 必须限制文件权限并排除版本控制。

@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 55 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 53 个 `*Controller.java`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。项目处于开发阶段，已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -58,7 +58,7 @@ tags:
 |---|---|---|---|
 | `MenuController` | spectra-core | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树 |
 | `DepartmentController` | spectra-core | `/department/**` | 部门树查询；旧创建/修改写入口已冻结，新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
-| `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县） |
+| `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/service/monitor/**` | 服务监控总览、30 分钟/6 小时/24 小时历史趋势、告警规则/事件/摘要、JVM 运行时只读诊断和受控线程/堆转储任务；读取、告警配置、诊断分别受 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 保护 |
@@ -140,13 +140,6 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 | `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时控制入口（当前为空壳） |
 | `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史查询入口（当前为空壳） |
 
-## AI
-
-| Controller | 模块 | 基础路径 | 说明 |
-|---|---|---|---|
-| `AiAskController` | spectra-ai | `/ai/ask/**` | AI 问答接口 |
-| `AiConversationController` | spectra-ai | `/ai/conversation/**` | 当前用户 AI 会话列表、消息历史与删除 |
-
 ## 全局异常处理
 
 | Advice | 说明 |
@@ -178,4 +171,3 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 - [[40-OA模块]] — OA API
 - [[50-文件上传]] — 文件上传 API
 - [[60-工作流]] — 工作流 API
-- [[70-AI模块]] — AI API

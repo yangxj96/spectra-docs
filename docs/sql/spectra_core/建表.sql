@@ -220,7 +220,7 @@ COMMENT ON COLUMN spectra_core.sys_region.name IS '区域名称';
 COMMENT ON COLUMN spectra_core.sys_region.full_name IS '区域全称，如 北京市/北京市/东城区';
 COMMENT ON COLUMN spectra_core.sys_region.short_name IS '简称';
 COMMENT ON COLUMN spectra_core.sys_region.code IS '区域编码';
-COMMENT ON COLUMN spectra_core.sys_region.path IS '区域路径，如 /110000/110100/110101';
+COMMENT ON COLUMN spectra_core.sys_region.path IS '区域路径，如 11/1101/110101，不带前导斜杠';
 COMMENT ON COLUMN spectra_core.sys_region.level IS '行政区划层级:1省 2地级市 3县级 4乡级 5村级';
 COMMENT ON COLUMN spectra_core.sys_region.status IS '状态：true-启用 false-停用';
 COMMENT ON COLUMN spectra_core.sys_region.sort IS '排序';
@@ -544,8 +544,6 @@ COMMENT ON COLUMN spectra_core.file_upload_chunk.updated_by IS '最后更新人'
 COMMENT ON COLUMN spectra_core.file_upload_chunk.updated_at IS '最后更新时间';
 COMMENT ON COLUMN spectra_core.file_upload_chunk.deleted IS '是否删除';
 COMMENT ON COLUMN spectra_core.file_upload_chunk.version IS '乐观锁';
-
--- AI 会话和消息记忆统一由 spectra_ai schema 管理，core 不再创建会话表。
 
 -- 消息中心已迁移到 spectra_notification.ntf_*。
 -- 旧 sys_notification* 仅在不可变历史迁移和离线数据迁移脚本中出现，
