@@ -169,9 +169,9 @@ flowchart LR
 | 2026-08-23 | 基线盘点 | 后端可靠投递和基础管理 API 可复用；模板管理、Provider 接入、受控发送、运行概览及 4 个 Web 运维页面需要从契约到验收完整建设。 |
 | 2026-08-23 | 契约冻结 | 模板直接采用最终生命周期和版本 API；Provider、受控发送、管理分页与权限均以本节契约为唯一实现依据，不保留旧入口或兼容字段。 |
 | 2026-08-23 | 模板后端核心 | `spectra-admin` 已落地模板四态、草稿 CRUD、发布/停用/归档、版本历史、回滚草稿、预览校验和模板权限接口；模板管理 API 与菜单权限种子已收口。 |
-| 2026-08-23 | 模板权限与菜单 | 已通过 `V23__seed_notification_template_permissions_and_menu.sql` 固化模板查看、维护、发布/回滚权限，并将“模板管理”接入通知中心菜单；`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
+| 2026-08-23 | 模板权限与菜单 | 历史增量 `V23__seed_notification_template_permissions_and_menu.sql` 固化了模板查看、维护、发布/回滚权限，并将“模板管理”接入通知中心菜单；相关最终种子现已合并到 `V1__init_db.sql`，`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
 | 2026-08-23 | 模板 Web 页面 | `spectra-ui` 已接入 `/devops/notification/template` 真实路由和模板管理 API，完成列表筛选、草稿编辑、JSON 参数校验、预览、发布、停用、归档、版本历史、复制、版本摘要和版本对比交互。 |
-| 2026-08-23 | 模板版本追溯 | `spectra-admin` 已通过 V24 完成模板版本摘要、Request 渠道模板快照、Task/Delivery 版本字段和渲染快照；模板复制已提供独立 API，V22-V24 已在本机 PostgreSQL 正式执行，9 项真实 PostgreSQL 集成测试通过。 |
+| 2026-08-23 | 模板版本追溯 | `spectra-admin` 已通过历史 V22-V24 完成模板版本摘要、Request 渠道模板快照、Task/Delivery 版本字段和渲染快照；最终结构现已合并到 `V1__init_db.sql`，模板复制已提供独立 API，9 项真实 PostgreSQL 集成测试通过。 |
 | 2026-08-23 | 模板 Web 复制与摘要 | `spectra-ui` 已接入独立复制草稿 API，并在列表和版本历史中展示截断后的版本摘要。 |
 | 2026-08-23 | 模板 Web 版本对比 | `spectra-ui` 版本历史已支持选择两个版本并并列查看摘要、用途、标题模板和正文模板。 |
 | 2026-08-23 | 通知运行概览后端 | `GET /notification/admin/overview` 已接入真实 PostgreSQL 聚合，支持 1–168 小时窗口、渠道可用性、队列/失败/UNKNOWN 摘要、连续小时趋势和脱敏最近错误；Mapper 同步补齐模板快照与投递渲染快照字段映射。 |
@@ -211,7 +211,7 @@ flowchart LR
 
 #### 后端
 
-- [x] 盘点现有 `NotificationTemplateEntity` 的用途、版本、状态、语言、渠道和变量字段；已通过 `V22__complete_notification_template_lifecycle.sql` 将模板状态收敛为四态，并移除旧的 `enabled` 字段。
+- [x] 盘点现有 `NotificationTemplateEntity` 的用途、版本、状态、语言、渠道和变量字段；历史 V22 已将模板状态收敛为四态并移除旧的 `enabled` 字段，最终结构已合并到 `V1__init_db.sql`。
 - [x] 固化模板管理权限和通知中心“模板管理”菜单；`ROLE_DEV_OPS` 拥有完整维护权限，`ROLE_AUDIT` 仅可查看。
 - [x] 实现模板列表、详情、草稿创建、编辑、复制、停用和归档 API。
 - [x] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
