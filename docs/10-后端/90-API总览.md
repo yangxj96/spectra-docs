@@ -15,13 +15,13 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `AuthenticationController` | spectra-core.security.authentication | `/security/authentication/**` | 登录/登出/刷新 Token/验证码获取；DEV_OPS 密码登录支持二阶段 MFA challenge |
+| `AuthenticationController` | spectra-core.security.authentication | `/security/authentication/**` | 登录/登出/刷新 Token/验证码获取；DEV_OPS 首次 MFA 登记或用户自启用 TOTP 时支持二阶段 MFA challenge |
 | `AuthenticationIdentityController` | spectra-core | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；所有高风险写入绑定短时 token |
 | `AuthorizationProfileController` | spectra-core | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除；方案保存使用稳定业务编码和版本校验 |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
-| `MfaController` | spectra-core | `/security/mfa/**` | TOTP 登记/确认、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
+| `MfaController` | spectra-core | `/security/mfa/**` | MFA 状态查询、已登录用户 TOTP 登记/停用、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次保存系统基础配置、创建 DEV_OPS 账号、确认 TOTP 和完成初始化；完成后不自动登录，由客户端返回登录页 |
 
@@ -31,11 +31,17 @@ tags:
 
 | 方法 | 路径 | 认证 | 说明 |
 |---|---|---|---|
-| `POST` | `/security/authentication/login` | `permitAll` | DEV_OPS 密码正确但需要 MFA 时返回 `mfa_required=true` 和短期 `mfa_challenge_id`，不返回普通 Token |
+| `POST` | `/security/authentication/login` | `permitAll` | DEV_OPS 尚未登记 MFA 或用户已启用 TOTP 且主认证成功时返回 `mfa_required=true` 和短期 `mfa_challenge_id`，不返回普通 Token |
 | `POST` | `/security/authentication/mfa/verify` | `permitAll` | 使用 challenge + TOTP 或 Recovery Code 完成第二阶段并签发正式会话 |
 | `POST` | `/security/authentication/mfa/complete` | `permitAll` | 首次 TOTP 登记成功后消费 challenge 并签发正式会话 |
 | `POST` | `/security/mfa/setup/totp/enroll` | `permitAll` | 仅接受首次登录 challenge，生成 TOTP secret 和 provisioning URI |
 | `POST` | `/security/mfa/setup/totp/confirm` | `permitAll` | 使用首次登录 challenge + enrollmentId + TOTP 验证码确认登记并返回 Recovery Code |
+| `GET` | `/security/mfa/status` | 已认证 | 查询当前用户是否已启用 TOTP MFA |
+| `POST` | `/security/mfa/totp/enroll` | 已认证 | 为当前用户生成 TOTP 登记信息；已启用时拒绝重复登记 |
+| `POST` | `/security/mfa/totp/confirm` | 已认证 | 使用 enrollmentId + TOTP 验证码确认登记并返回一次性 Recovery Code |
+| `POST` | `/security/mfa/totp/disable` | 已认证 | 使用当前 TOTP 或未使用 Recovery Code 验证后停用 MFA |
+| `POST` | `/security/mfa/recovery/verify` | 已认证 | 消费当前用户的一次性 Recovery Code |
+| `POST` | `/security/mfa/recovery/rotate` | 已认证 | 失效旧 Recovery Code 并生成新 Recovery Code |
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
