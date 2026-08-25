@@ -1,70 +1,98 @@
 #requires -Version 7.6
 
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet('auto', 'all', 'backend', 'web', 'app', 'plugin')]
+    [string]$Area = 'auto',
+    [switch]$Facts
+)
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$currentPath = (Get-Location).Path
 
-if (-not (Get-Command rg -ErrorAction SilentlyContinue)) {
-    throw '未找到 rg（ripgrep），无法快速读取项目事实。'
+$routes = @{
+    backend = [pscustomobject]@{
+        Name = 'backend'
+        Agent = 'spectra-admin/AGENTS.md'
+        Skill = '$spectra-admin-spec'
+        Docs = @('docs/10-后端/目标领域笔记', 'docs/30-数据模型/目标实体笔记')
+        Validate = 'spectra-admin/mvnw.cmd -pl <module> -am test'
+    }
+    web = [pscustomobject]@{
+        Name = 'web'
+        Agent = 'spectra-ui/AGENTS.md'
+        Skill = '$spectra-ui-spec'
+        Docs = @('docs/20-前端/10-spectra-ui.md（仅目标规则未覆盖时）')
+        Validate = 'pnpm run type-check; pnpm run test'
+    }
+    app = [pscustomobject]@{
+        Name = 'app'
+        Agent = 'spectra-app/AGENTS.md'
+        Skill = '$spectra-app-spec'
+        Docs = @('docs/20-前端/20-spectra-app.md（仅目标规则未覆盖时）')
+        Validate = 'pnpm run type-check; pnpm run build:h5 或 build:mp-weixin'
+    }
+    plugin = [pscustomobject]@{
+        Name = 'plugin'
+        Agent = 'logicflow-plugin-flowable/AGENTS.md'
+        Skill = '无专用 Skill；使用插件 AGENTS.md'
+        Docs = @('docs/20-前端/30-流程建模插件.md（仅节点行为未覆盖时）')
+        Validate = 'pnpm run format:check; pnpm run build'
+    }
 }
 
-$wrapperProperties = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'spectra-admin/.mvn/wrapper/maven-wrapper.properties')
-$mavenVersion = [regex]::Match($wrapperProperties, 'apache-maven-([^/]+)-bin').Groups[1].Value
-$pom = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'spectra-admin/pom.xml')
-$backendVersion = [regex]::Match($pom, '<revision>([^<]+)</revision>').Groups[1].Value
-$springBootVersion = [regex]::Match($pom, '<artifactId>spring-boot-starter-parent</artifactId>\s*<version>([^<]+)</version>').Groups[1].Value
-
-$controllerCount = (& rg -l '^\s*@RestController\s*$' (Join-Path $projectRoot 'spectra-admin') -g '*.java' | Measure-Object).Count
-$entityCount = (& rg -l '@TableName' (Join-Path $projectRoot 'spectra-admin') -g '*.java' | Measure-Object).Count
-$codeGraphCommand = Get-Command codegraph -ErrorAction SilentlyContinue
-$codeGraphLocation = if ($codeGraphCommand) { $codeGraphCommand.Source } else { '未在 PATH 中（可选工具）' }
-
-$projects = @(
-    [pscustomobject]@{ Project = 'spectra-admin'; Runtime = 'Java 25.0.2'; PackageManager = "Maven $mavenVersion (wrapper)"; Check = '.\mvnw.cmd spotless:check'; Build = '.\mvnw.cmd clean package -DskipTests' }
-    [pscustomobject]@{ Project = 'spectra-ui'; Runtime = 'Node 24.14.0'; PackageManager = 'pnpm 11.0.9'; Check = 'pnpm run format:check; pnpm run lint; pnpm run type-check; pnpm run test'; Build = 'pnpm run build' }
-    [pscustomobject]@{ Project = 'spectra-app'; Runtime = 'Node 24.14.0'; PackageManager = 'pnpm 11.0.9'; Check = 'pnpm run format:check; pnpm run lint; pnpm run type-check'; Build = 'pnpm run build:h5' }
-    [pscustomobject]@{ Project = 'logicflow-plugin-flowable'; Runtime = 'Node 24.14.0'; PackageManager = 'pnpm 11.0.9'; Check = 'pnpm run format:check'; Build = 'pnpm run build' }
-)
-
-$planRows = foreach ($file in Get-ChildItem -Recurse -File (Join-Path $projectRoot 'docs/90-计划') -Filter 'P-*.md') {
-    $lines = Get-Content -LiteralPath $file.FullName
-    $statusIndex = [Array]::IndexOf($lines, '## 状态')
-    $status = if ($statusIndex -ge 0) {
-        $lines[($statusIndex + 1)..([Math]::Min($statusIndex + 6, $lines.Count - 1))] |
-            Where-Object { $_.Trim() -ne '' } |
-            Select-Object -First 1
-    } else {
-        '未声明'
+if ($Area -eq 'auto') {
+    $relativePath = $currentPath.Substring($projectRoot.Length).TrimStart('\')
+    $Area = switch -Regex ($relativePath) {
+        '^spectra-admin(?:\\|$)' { 'backend'; break }
+        '^spectra-ui(?:\\|$)' { 'web'; break }
+        '^spectra-app(?:\\|$)' { 'app'; break }
+        '^logicflow-plugin-flowable(?:\\|$)' { 'plugin'; break }
+        default { 'all' }
     }
+}
+
+Write-Output '=== Agent Context Route ==='
+Write-Output "Workspace: $projectRoot"
+Write-Output "Area: $Area"
+
+if ($Area -eq 'all') {
+    $routes.Values |
+        Select-Object Name, Agent, Skill, Validate |
+        Format-Table -AutoSize -Wrap
+    Write-Output 'Docs: 仅按任务读取 docs/00-项目总览.md、架构笔记或一个目标领域笔记。'
+} else {
+    $route = $routes[$Area]
+    $route | Select-Object Name, Agent, Skill, Validate | Format-List
+    Write-Output 'Suggested docs:'
+    $route.Docs | ForEach-Object { Write-Output "- $_" }
+}
+
+Write-Output 'Context policy: 不预加载无关领域文档；结构分析优先使用 CodeGraph。'
+
+if ($Facts) {
+    if (-not (Get-Command rg -ErrorAction SilentlyContinue)) {
+        throw '未找到 rg（ripgrep），无法读取项目事实。'
+    }
+
+    $wrapperProperties = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'spectra-admin/.mvn/wrapper/maven-wrapper.properties')
+    $mavenVersion = [regex]::Match($wrapperProperties, 'apache-maven-([^/]+)-bin').Groups[1].Value
+    $pom = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'spectra-admin/pom.xml')
+    $backendVersion = [regex]::Match($pom, '<revision>([^<]+)</revision>').Groups[1].Value
+    $springBootVersion = [regex]::Match($pom, '<artifactId>spring-boot-starter-parent</artifactId>\s*<version>([^<]+)</version>').Groups[1].Value
+    $controllerCount = (& rg -l '^\s*@RestController\s*$' (Join-Path $projectRoot 'spectra-admin') -g '*.java' | Measure-Object).Count
+    $entityCount = (& rg -l '@TableName' (Join-Path $projectRoot 'spectra-admin') -g '*.java' | Measure-Object).Count
+    $codeGraph = if (Get-Command codegraph -ErrorAction SilentlyContinue) { '可用' } else { '未在 PATH 中（可选）' }
+
+    Write-Output '=== Project Facts ==='
     [pscustomobject]@{
-        Plan = $file.BaseName
-        Area = Split-Path $file.DirectoryName -Leaf
-        Status = $status
-    }
+        BackendVersion = $backendVersion
+        SpringBoot = $springBootVersion
+        Maven = $mavenVersion
+        Controllers = $controllerCount
+        Entities = $entityCount
+        CodeGraph = $codeGraph
+        PowerShell = $PSVersionTable.PSVersion.ToString()
+    } | Format-List
 }
-
-Write-Output '=== Spectra 快速上下文 ==='
-[pscustomobject]@{
-    Root = $projectRoot
-    BackendVersion = $backendVersion
-    SpringBoot = $springBootVersion
-    Entities = $entityCount
-    Controllers = $controllerCount
-    CodeGraph = $codeGraphLocation
-    PowerShell = $PSVersionTable.PSVersion.ToString()
-} | Format-List
-
-Write-Output '=== 子项目与验证命令 ==='
-$projects | Format-Table -AutoSize -Wrap
-
-Write-Output '=== Agent 环境回退 ==='
-Write-Output 'mise 未信任或沙箱运行时不可写时：. .\scripts\agent-runtime.ps1'
-Write-Output 'Node 项目会直接使用项目固定的 Node 24.14.0 与 pnpm 11.0.9。'
-Write-Output '后端 Maven 仓库由 agent-runtime.ps1 自动注入 MAVEN_OPTS，无需逐条追加参数。'
-
-Write-Output '=== 保留的执行计划 ==='
-$planRows | Sort-Object Area, Plan | Format-Table -AutoSize -Wrap
-
-Write-Output '完整命令说明：docs/50-开发指南/20-常见命令.md'

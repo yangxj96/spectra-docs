@@ -1,306 +1,39 @@
 ---
 name: git-execution-spec
-description: 在 Spectra 根仓库或其子模块中执行 Git 状态检查、差异审查、暂存、提交、分支、标签、恢复、推送或冲突处理时使用。强制执行敏感信息检查、具体文件暂存、Conventional Commits 中文提交信息以及推送确认规则。
+description: 仅在用户要求 Spectra 的 Git 状态、差异、暂存、提交、分支、标签、恢复、推送或冲突处理时使用；普通代码修改不要触发。
 ---
 
-# Git 执行规范
+# Spectra Git Skill
 
-## 概述
+## 读取预算
 
-本规范定义了在 Spectra 项目中执行 git 操作时必须遵循的安全规则和提交规范。
+- 只为明确的 Git 操作加载本 Skill；普通代码、测试或文档任务不要触发。
+- 状态/分支/远程只读对应命令；未要求差异时不要加载完整 diff、历史或所有子仓库。
+- 审查/暂存/提交先看状态，再审查目标文件的未暂存或暂存 diff。
+- 推送确认分支、上游、待推送提交和工作区状态；已有审查结论时不重复加载全部 diff。
+- 冲突只读冲突文件清单和相关 diff；配置诊断可用脱敏的 `git config --show-origin --name-only --list`。
 
-**核心原则：** 安全第一、确认机制、禁止自动推送。
+## 安全边界
 
-## 何时使用
+- 只读的 `status`、`diff`、`diff --cached`、`log`、`show`、`branch`、`tag`、`remote -v`、`submodule status` 和脱敏的 `config` 查询可以执行。
+- `add`、`commit`、`amend`、分支/标签写操作、恢复、重置、清理和推送必须在用户明确授权后执行。
+- 禁止 `git add -A`、`git add .` 和未审查的批量暂存；暂存必须使用具体文件或明确目录。
+- 推送必须等待用户明确说“推送”或“push”，即使用户已要求提交也不能自动推送。
+- 变更审查必须检查 `git diff`、暂存文件清单和敏感信息。
+- 不得提交 `.env*`、`.mise.local.toml`、证书私钥、Token、密码、API Key 或其他本机凭据。
 
-当执行以下操作时自动加载：
-- 执行任何 git 命令（commit、push、add 等）
-- 审查代码变更
-- 处理敏感信息
-- 解决 git 冲突
+## 提交格式
 
-## 操作分类
+使用：`<type>(<scope>): <中文描述>`。
 
-### 只读命令（允许随时执行）
+常用 type：`feat`、`fix`、`docs`、`style`、`refactor`、`perf`、`test`、`build`、`ci`、`chore`、`revert`。
 
-以下命令**不需要用户确认**，可以随时执行：
+Spectra 常用 scope：`admin`、`ui`、`app`、`core`、`security`、`framework`、`project`；跨模块变更可以省略 scope。
 
-```bash
-# 查看状态
-git status
-git diff
-git diff --stat
-git diff --cached
-git diff --cached --name-only
+## 操作流程
 
-# 查看历史
-git log
-git log --oneline
-git log -n 5
-git show
-
-# 查看分支/标签
-git branch          # 列出本地分支
-git branch -a       # 列出所有分支
-git tag             # 列出标签
-git remote -v       # 查看远程
-
-# 其他只读操作
-git blame
-git shortlog
-```
-
-### 写操作（必须等待用户确认）
-
-以下命令**必须暂停并等待用户明确确认**后才能执行：
-
-#### 提交相关
-
-```bash
-# 暂存文件（必须使用具体文件，禁止 git add -A）
-git add <具体文件1> <具体文件2>
-git add src/          # 添加整个目录
-git add -p            # 交互式暂存
-
-# 提交
-git commit -m "type(scope): 描述"
-git commit --amend    # 修改最近一次提交
-```
-
-#### 推送相关（绝对禁止自动执行）
-
-```bash
-git push              # 推送到远程
-git push origin main  # 推送到指定分支
-git push --force      # 强制推送（危险！）
-```
-
-#### 撤回/重置相关（危险操作）
-
-```bash
-git revert            # 撤回提交
-git reset             # 重置
-git checkout          # 切换分支/恢复文件
-git restore           # 恢复文件
-git clean             # 清理未跟踪文件
-git stash             # 暂存工作区
-```
-
-#### 分支/标签管理
-
-```bash
-git branch <name>     # 创建分支
-git branch -d <name>  # 删除分支
-git tag <name>        # 创建标签
-git tag -d <name>     # 删除标签
-```
-
-## 提交规范
-
-### Commit 格式
-
-```
-<type>(<scope>): <中文描述>
-
-<正文（可选）>
-
-<脚注（可选）>
-```
-
-### Type 类型
-
-| 类型 | 说明 | 示例 |
-|---|---|---|
-| `feat` | 新功能 | `feat(ui): 新增用户管理页面` |
-| `fix` | 修复 bug | `fix(admin): 修复登录接口返回格式问题` |
-| `docs` | 文档变更 | `docs: 更新 README 安装说明` |
-| `style` | 代码格式（不影响功能） | `style(ui): 格式化代码` |
-| `refactor` | 重构 | `refactor(ui): 重构 HTTP 客户端` |
-| `perf` | 性能优化 | `perf(admin): 优化查询性能` |
-| `test` | 测试相关 | `test: 添加单元测试` |
-| `build` | 构建系统 | `build: 升级 Vite 到 v8` |
-| `ci` | CI 配置 | `ci: 添加 GitHub Actions` |
-| `chore` | 其他杂项 | `chore: 更新依赖` |
-| `revert` | 回滚 | `revert: 回滚 feat #123` |
-
-### Scope 范围
-
-| Scope | 说明 |
-|---|---|
-| `ui` | spectra-ui（Web 管理后台） |
-| `app` | spectra-app（移动端） |
-| `admin` | spectra-admin（后端 API） |
-| `ai` | AI 相关模块 |
-| `security` | 安全/认证模块 |
-| `core` | 核心框架 |
-| `framework` | 基础设施 |
-| `log` | 日志模块 |
-| `project` | 项目管理 |
-| 无 scope | 跨模块变更（如 `docs`、`chore`） |
-
-### 提交信息示例
-
-```bash
-# 好的提交信息
-git commit -m "feat(ui): 新增用户管理页面"
-git commit -m "fix(admin): 修复登录接口返回格式问题"
-git commit -m "docs: 更新 README 安装说明"
-git commit -m "chore: 更新 spectra-admin 子模块引用"
-
-# 不好的提交信息（禁止）
-git commit -m "update"
-git commit -m "fix bug"
-git commit -m "修改了一些东西"
-```
-
-## 安全规则
-
-### 提交前检查清单
-
-**每次提交前必须执行以下检查：**
-
-#### 1. 审查变更内容
-
-```bash
-# 查看变更统计
-git diff --stat
-
-# 查看具体变更
-git diff
-
-# 查看暂存区变更
-git diff --cached
-```
-
-#### 2. 确认不包含敏感内容
-
-**绝对禁止提交以下内容：**
-
-| 类型 | 示例 |
-|---|---|
-| 环境配置文件 | `.env`、`.env.local`、`.env.production` |
-| 本地配置文件 | `.mise.local.toml`（含数据库密码） |
-| 证书私钥 | `*.p12`、`*.jks`、`*.pem`、`*.key` |
-| 凭据脚本 | 包含 `$env:... = "真实值"` 的 `.ps1` |
-| API 密钥 | 任何包含 Token/Secret/Key 的文件 |
-
-#### 3. 禁止 git add -A
-
-```bash
-# ❌ 错误：禁止使用
-git add -A
-git add .
-git add --all
-
-# ✅ 正确：使用具体文件
-git add src/components/MyComponent.vue
-git add src/api/user-api.ts src/types/user.d.ts
-```
-
-#### 4. 确认暂存文件清单
-
-```bash
-# 查看将要提交的文件
-git diff --cached --name-only
-```
-
-### 推送限制
-
-- **绝对禁止**在未经用户明确允许的情况下执行 `git push`
-- 即使用户说了"提交"，也只执行 `git commit`，**不执行 `git push`**
-- 推送需要用户明确说出"推送"或"push"指令后才可执行
-
-```bash
-# ❌ 错误：自动推送
-git add . && git commit -m "..." && git push
-
-# ✅ 正确：只提交，等待用户确认推送
-git add src/file.ts
-git commit -m "feat: 新增功能"
-# 等待用户说"推送"
-```
-
-### 泄露后应急流程
-
-如已误提交并推送敏感信息：
-
-1. **立即轮换所有暴露的密钥/密码/Token**
-   - 数据库密码
-   - API 密钥
-   - SSH 密钥
-   - 任何凭据
-
-2. **清理 git 历史**
-   ```bash
-   # 交互式 rebase 删除敏感提交
-   git rebase -i HEAD~n
-
-   # 或使用 filter-branch（更彻底）
-   git filter-branch --force --index-filter \
-     'git rm --cached --ignore-unmatch <敏感文件>' \
-     --prune-empty --tag-name-filter cat -- --all
-   ```
-
-3. **强制推送（需用户确认）**
-   ```bash
-   git push --force origin main
-   ```
-
-## 快速参考
-
-### 常用命令模板
-
-#### 提交一个功能
-
-```bash
-# 1. 检查变更
-git status
-git diff --stat
-
-# 2. 暂存具体文件
-git add src/components/MyComponent/index.vue
-git add src/api/user-api.ts
-
-# 3. 确认暂存内容
-git diff --cached --name-only
-
-# 4. 提交
-git commit -m "feat(ui): 新增用户管理组件"
-
-# 5. 等待用户确认后推送
-# 用户说"推送"后执行：git push
-```
-
-#### 修复一个 bug
-
-```bash
-# 1. 检查变更
-git status
-
-# 2. 暂存修复文件
-git add src/plugin/request/http.ts
-
-# 3. 提交
-git commit -m "fix(ui): 修复登录 token 刷新逻辑"
-
-# 4. 等待用户确认推送
-```
-
-#### 更新文档
-
-```bash
-# 1. 暂存文档文件
-git add docs/20-前端/10-spectra-ui.md
-
-# 2. 提交
-git commit -m "docs: 更新前端开发规范"
-
-# 3. 等待用户确认推送
-```
-
-## 相关规范
-
-- [[10-项目总览]] — 项目架构概述
-- [[20-前端/10-spectra-ui]] — 前端开发规范
-- `$spectra-admin-spec` — 后端开发规范
-- `$spectra-ui-spec` — Web 前端规范
+1. 按读取预算确认现有改动和目标差异。
+2. 审查目标文件和敏感信息。
+3. 获得写操作确认后，使用具体文件暂存。
+4. 检查暂存区文件和差异。
+5. 获得提交确认后使用 Conventional Commit；提交后停止，等待推送指令。

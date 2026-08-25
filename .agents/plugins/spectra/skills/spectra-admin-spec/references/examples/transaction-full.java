@@ -69,17 +69,4 @@ public class TransactionFullExample extends BaseServiceImpl<ExampleFullMapper, E
         log.info("更新示例成功: id={}", id);
     }
 
-    /**
-     * 事务传播示例
-     */
-    @Transactional
-    public void propagationExample() {
-        // 事务传播：内部方法会加入外部事务
-        this.innerMethod();
-    }
-
-    @Transactional
-    public void innerMethod() {
-        // 内部方法
-    }
 }

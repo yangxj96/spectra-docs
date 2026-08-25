@@ -1,43 +1,32 @@
 import { createTestingPinia } from "@pinia/testing";
 import { mount } from "@vue/test-utils";
 import { ElOption, ElSelect } from "element-plus";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import DictSelect from "../src/components/DictSelect/index.vue";
+import { useDictStore } from "../src/plugin/store/modules/use-dict-store";
 
-// 在文件顶部（vitest 会自动 hoist vi.mock）
-vi.mock("../src/plugin/store/modules/use-dict-store", () => ({
-    default: () => ({
-        dicts: {
-            sys_common_state: [
-                { label: "正常", value: "0" },
-                { label: "冻结", value: "1" },
-                { label: "封禁", value: "2" }
-            ]
-        }
-    })
-}));
+const dictItems = [
+    { id: "1", gid: "state", label: "正常", value: "0", sort: 1, state: 0, default_flag: true },
+    { id: "2", gid: "state", label: "冻结", value: "1", sort: 2, state: 0, default_flag: false },
+    { id: "3", gid: "state", label: "封禁", value: "2", sort: 3, state: 0, default_flag: false }
+];
+
+function mountDictSelect(modelValue: string | undefined = "0") {
+    const pinia = createTestingPinia({ stubActions: true });
+    const store = useDictStore(pinia);
+    vi.mocked(store.getDictData).mockResolvedValue(dictItems);
+    return mount(DictSelect, {
+        props: { modelValue, dict_code: "sys_common_state" },
+        global: { plugins: [pinia], components: { ElSelect, ElOption } }
+    });
+}
+
+beforeEach(() => vi.clearAllMocks());
 
 describe("DictSelect 组件", () => {
     it("应该正确接收并传递dict_code和model值", async () => {
-        const wrapper = mount(DictSelect, {
-            props: {
-                modelValue: "0",
-                dict_code: "sys_common_state",
-                "append-to": undefined
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false
-                    })
-                ],
-                components: {
-                    ElSelect,
-                    ElOption
-                }
-            }
-        });
+        const wrapper = mountDictSelect();
 
         // 检查props是否正确接收
         expect(wrapper.props("modelValue")).toBe("0");
@@ -45,24 +34,7 @@ describe("DictSelect 组件", () => {
     });
 
     it("应该正确渲染选项", async () => {
-        const wrapper = mount(DictSelect, {
-            props: {
-                modelValue: "0",
-                dict_code: "sys_common_state",
-                "append-to": undefined
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false
-                    })
-                ],
-                components: {
-                    ElSelect,
-                    ElOption
-                }
-            }
-        });
+        const wrapper = mountDictSelect();
 
         await wrapper.vm.$nextTick();
 
@@ -72,24 +44,7 @@ describe("DictSelect 组件", () => {
     });
 
     it("应该触发 update:modelValue 事件", async () => {
-        const wrapper = mount(DictSelect, {
-            props: {
-                modelValue: "0",
-                dict_code: "sys_common_state",
-                "append-to": undefined
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false
-                    })
-                ],
-                components: {
-                    ElSelect,
-                    ElOption
-                }
-            }
-        });
+        const wrapper = mountDictSelect();
 
         // 模拟选择新值
         await wrapper.find(".el-select").trigger("click");
@@ -100,27 +55,12 @@ describe("DictSelect 组件", () => {
     });
 
     it("应该处理空字典数据", async () => {
-        vi.mocked(useDictStore).mockReturnValue({
-            dicts: {}
-        } as ReturnType<typeof useDictStore>);
-
+        const pinia = createTestingPinia({ stubActions: true });
+        const store = useDictStore(pinia);
+        vi.mocked(store.getDictData).mockResolvedValue([]);
         const wrapper = mount(DictSelect, {
-            props: {
-                modelValue: "",
-                dict_code: "empty_dict",
-                "append-to": undefined
-            },
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        stubActions: false
-                    })
-                ],
-                components: {
-                    ElSelect,
-                    ElOption
-                }
-            }
+            props: { modelValue: undefined, dict_code: "empty_dict" },
+            global: { plugins: [pinia], components: { ElSelect, ElOption } }
         });
 
         await wrapper.vm.$nextTick();

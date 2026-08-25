@@ -8,7 +8,7 @@
       "name": "spectra",
       "source": {
         "source": "local",
-        "path": "./plugins/spectra"
+        "path": "./.agents/plugins/spectra"
       },
       "policy": {
         "installation": "AVAILABLE",

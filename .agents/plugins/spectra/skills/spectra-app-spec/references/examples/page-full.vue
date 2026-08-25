@@ -2,7 +2,10 @@
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { get } from "@/services/request";
 import useAppStore from "@/stores/app";
+import type { UserInfo } from "@/types";
 
 defineOptions({
     name: "UserProfile"
@@ -18,7 +21,7 @@ const userInfo = ref<UserInfo | null>(null);
 
 // 计算属性
 const isLoggedIn = computed(() => appStore.isLoggedIn);
-const displayName = computed(() => userInfo.value?.nickname || t("user.anonymous"));
+const displayName = computed(() => userInfo.value?.username || t("user.anonymous"));
 
 // 页面生命周期
 onLoad((options) => {
@@ -39,11 +42,8 @@ onShow(() => {
 async function loadUserInfo(id: string) {
     loading.value = true;
     try {
-        // 使用 uni.request 封装的 API
-        const { get } = await import("@/services/request");
-        userInfo.value = await get<UserInfo>(`/api/users/${id}`);
-    } catch (error) {
-        console.error("加载用户信息失败:", error);
+        userInfo.value = await get<UserInfo>(`/api/user/${id}`);
+    } catch {
         uni.showToast({
             title: t("error.loadFailed"),
             icon: "none"

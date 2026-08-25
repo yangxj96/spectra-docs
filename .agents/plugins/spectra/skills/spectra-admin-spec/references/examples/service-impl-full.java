@@ -23,13 +23,13 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.example.javabean.converter.ExampleConverter;
-import com.devops00.spectra.example.javabean.entity.Example;
-import com.devops00.spectra.example.javabean.from.ExampleSaveFrom;
-import com.devops00.spectra.example.javabean.from.ExamplePageFrom;
-import com.devops00.spectra.example.javabean.vo.ExampleVO;
-import com.devops00.spectra.example.mapper.ExampleMapper;
-import com.devops00.spectra.example.service.ExampleServiceInterface;
+import com.devops00.spectra.example.javabean.converter.ExampleFullConverter;
+import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
+import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
+import com.devops00.spectra.example.javabean.query.ExampleFullQuery;
+import com.devops00.spectra.example.javabean.vo.ExampleFullVO;
+import com.devops00.spectra.example.mapper.ExampleFullMapper;
+import com.devops00.spectra.example.service.ExampleFullService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,29 +58,29 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExampleServiceFullImpl extends BaseServiceImpl<ExampleMapper, Example>
-        implements ExampleServiceInterface {
+public class ExampleFullServiceImpl extends BaseServiceImpl<ExampleFullMapper, ExampleFullEntity>
+        implements ExampleFullService {
 
-    private final ExampleConverter exampleConverter;
+    private final ExampleFullConverter exampleConverter;
 
     @Override
-    public IPage<ExampleVO> page(PageFrom page, ExamplePageFrom params) {
-        var wrapper = new LambdaQueryWrapper<Example>();
+    public IPage<ExampleFullVO> page(PageFrom page, ExampleFullQuery params) {
+        var wrapper = new LambdaQueryWrapper<ExampleFullEntity>();
         if (StringUtils.hasText(params.getName())) {
-            wrapper.like(Example::getName, params.getName());
+            wrapper.like(ExampleFullEntity::getName, params.getName());
         }
         if (params.getActive() != null) {
-            wrapper.eq(Example::getActive, params.getActive());
+            wrapper.eq(ExampleFullEntity::getActive, params.getActive());
         }
-        wrapper.orderByDesc(Example::getCreatedAt);
+        wrapper.orderByDesc(ExampleFullEntity::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
-        var voPage = new Page<ExampleVO>(result.getCurrent(), result.getSize(), result.getTotal());
+        var voPage = new Page<ExampleFullVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(exampleConverter::toVO).toList());
         return voPage;
     }
 
     @Override
-    public ExampleVO getDetail(UUID id) {
+    public ExampleFullVO getDetail(UUID id) {
         var entity = this.getById(id);
         if (entity == null) {
             throw new DataNotExistException("示例不存在");
@@ -90,7 +90,7 @@ public class ExampleServiceFullImpl extends BaseServiceImpl<ExampleMapper, Examp
 
     @Override
     @Transactional
-    public void created(ExampleSaveFrom from) {
+    public void created(ExampleFullFrom from) {
         var entity = exampleConverter.toEntity(from);
         if (!this.save(entity)) {
             throw new DataSaveException("创建示例失败");
@@ -100,7 +100,7 @@ public class ExampleServiceFullImpl extends BaseServiceImpl<ExampleMapper, Examp
 
     @Override
     @Transactional
-    public void modify(UUID id, ExampleSaveFrom from) {
+    public void modify(UUID id, ExampleFullFrom from) {
         var entity = this.getById(id);
         if (entity == null) {
             throw new DataNotExistException("示例不存在");

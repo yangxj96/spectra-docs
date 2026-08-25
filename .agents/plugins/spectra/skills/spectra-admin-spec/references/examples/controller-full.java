@@ -20,10 +20,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.example.javabean.from.ExampleSaveFrom;
-import com.devops00.spectra.example.javabean.from.ExamplePageFrom;
-import com.devops00.spectra.example.javabean.vo.ExampleVO;
-import com.devops00.spectra.example.service.ExampleServiceInterface;
+import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
+import com.devops00.spectra.example.javabean.query.ExampleFullQuery;
+import com.devops00.spectra.example.javabean.vo.ExampleFullVO;
+import com.devops00.spectra.example.service.ExampleFullService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,7 +56,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ExampleFullController {
 
-    private final ExampleServiceInterface exampleService;
+    private final ExampleFullService exampleService;
 
     /**
      * 分页查询示例列表
@@ -64,7 +64,7 @@ public class ExampleFullController {
     @ULog("'查询示例列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
-    public IPage<ExampleVO> page(PageFrom page, ExamplePageFrom params) {
+    public IPage<ExampleFullVO> page(PageFrom page, ExampleFullQuery params) {
         return exampleService.page(page, params);
     }
 
@@ -74,7 +74,7 @@ public class ExampleFullController {
     @ULog("'查询示例详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
-    public ExampleVO getDetail(@PathVariable UUID id) {
+    public ExampleFullVO getDetail(@PathVariable UUID id) {
         return exampleService.getDetail(id);
     }
 
@@ -84,7 +84,7 @@ public class ExampleFullController {
     @ULog("'创建示例'")
     @PostMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:INSERT')")
-    public void created(@Validated(Verify.Insert.class) @RequestBody ExampleSaveFrom from) {
+    public void created(@Validated(Verify.Insert.class) @RequestBody ExampleFullFrom from) {
         exampleService.created(from);
     }
 
@@ -94,7 +94,7 @@ public class ExampleFullController {
     @ULog("'更新示例'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:UPDATE')")
-    public void modify(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody ExampleSaveFrom from) {
+    public void modify(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody ExampleFullFrom from) {
         exampleService.modify(id, from);
     }
 

@@ -9,7 +9,7 @@
  * 5. setup*() 函数用于全局初始化（在 App.vue onLaunch 中调用）
  */
 
-import { ref, onUnmounted } from "vue";
+import { ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 
 // ==================== 类型定义 ====================
@@ -60,12 +60,6 @@ export function setupNetworkListener() {
         isOnline.value = res.isConnected;
         networkType.value = res.networkType as NetworkType;
 
-        // 网络恢复时可触发刷新
-        if (res.isConnected) {
-            console.log("[Network] 网络已恢复:", res.networkType);
-        } else {
-            console.log("[Network] 网络已断开");
-        }
     });
 
     listenerSetup = true;
@@ -97,11 +91,6 @@ export function useNetwork(): NetworkState & {
     // 页面显示时刷新网络状态
     onShow(() => {
         refreshNetwork();
-    });
-
-    // 组件卸载时清理（可选）
-    onUnmounted(() => {
-        // 不移除全局监听器，因为是单例模式
     });
 
     /**

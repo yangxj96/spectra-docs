@@ -29,7 +29,7 @@ export const UserApi = {
      * @param params 用户信息
      */
     created(params: UserSaveFrom): Promise<void> {
-        return post<void>("/api/user", params);
+        return post<void>("/api/user/onboarding", params);
     },
 
     /**
@@ -37,7 +37,7 @@ export const UserApi = {
      * @param params 用户信息
      */
     modify(params: UserSaveFrom): Promise<void> {
-        return put<void>("/api/user", params);
+        return put<void>("/api/user/onboarding", params);
     },
 
     /**
@@ -53,6 +53,6 @@ export const UserApi = {
      * @param id 用户ID
      */
     resetPassword(id: string): Promise<void> {
-        return post<void>(`/api/user/${id}/reset-password`);
+        return put<void>(`/api/user/password/reset/${id}`);
     }
 };

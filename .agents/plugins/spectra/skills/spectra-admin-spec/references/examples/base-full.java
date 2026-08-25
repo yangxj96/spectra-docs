@@ -16,7 +16,11 @@
 
 package com.devops00.spectra.common.base;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
 
 import java.time.Instant;
@@ -53,14 +57,14 @@ public class BaseEntityFullExample {
     /**
      * UUID 主键
      */
-    @TableId(type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private UUID id;
 
     /**
      * 创建人
      */
-    @TableField(fill = FieldFill.INSERT)
-    private String createdBy;
+    @TableField(value = "created_by", fill = FieldFill.INSERT)
+    private UUID createdBy;
 
     /**
      * 创建时间
@@ -71,8 +75,8 @@ public class BaseEntityFullExample {
     /**
      * 更新人
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updatedBy;
+    @TableField(value = "updated_by", fill = FieldFill.INSERT_UPDATE)
+    private UUID updatedBy;
 
     /**
      * 更新时间
@@ -83,12 +87,13 @@ public class BaseEntityFullExample {
     /**
      * 软删除标记（null = 未删除）
      */
-    @TableLogic
+    @TableField(value = "deleted")
     private Instant deleted;
 
     /**
      * 乐观锁版本号
      */
     @Version
+    @TableField(value = "version")
     private Long version;
 }

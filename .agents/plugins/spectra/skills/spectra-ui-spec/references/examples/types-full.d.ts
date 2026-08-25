@@ -17,10 +17,8 @@ declare global {
         status: number;
         /** 部门ID */
         department_id?: string;
-        /** 角色列表 */
-        roles: Role[];
         /** 权限列表 */
-        authorities: string[];
+        permissions: string[];
     };
 
     /**
@@ -77,32 +75,17 @@ declare global {
         password: string;
     };
 
-    /**
-     * Token
-     */
+    /** 与当前 Web Store 对齐的 Token */
     type Token = {
+        id: string;
+        username: string;
         /** 访问令牌 */
         access_token: string;
-        /** 刷新令牌 */
-        refresh_token: string;
-        /** 过期时间 */
-        expires_in: number;
         /** 权限列表 */
-        authorities: string[];
-        /** 角色列表 */
-        roles: Role[];
-    };
-
-    /**
-     * 角色
-     */
-    type Role = {
-        /** 角色ID */
-        id: string;
-        /** 角色编码 */
-        code: string;
-        /** 角色名称 */
-        name: string;
+        permissions: string[];
+        /** MFA 状态字段按接口需要选用 */
+        mfa_required?: boolean;
+        mfa_challenge_id?: string;
     };
 
     /**

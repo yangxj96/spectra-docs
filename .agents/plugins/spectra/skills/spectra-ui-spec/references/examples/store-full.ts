@@ -11,42 +11,22 @@ export const useUserStore = defineStore("user", {
         isLoggedIn: false
     }),
     getters: {
-        /**
-         * 获取权限列表
-         */
-        getAuthorities(): string[] {
-            return this.token.authorities || [];
-        },
-        /**
-         * 获取角色列表
-         */
-        getRoles(): string[] {
-            return this.token.roles.map(item => item.code) || [];
+        /** 获取 Permission Catalog 权限编码 */
+        getPermissions(): string[] {
+            return this.token.permissions || [];
         },
         /**
          * 统一权限检查方法
-         * 支持格式：
-         * - 'USER:INSERT'
-         * - 'ROLE:ADMIN'
-         * - 'DICT:*'
-         * - '*'
+         * 支持精确编码、同级通配符和全局通配符。
          */
         hasPermission(): (perm: string) => boolean {
             return (perm: string): boolean => {
-                const { getAuthorities, getRoles } = this;
-                const allPerms: string[] = [
-                    ...getAuthorities,
-                    ...getRoles.map(role => `ROLE:${role}`)
-                ];
-                if (allPerms.includes("*")) return true;
-                if (perm === "*") return true;
-                return allPerms.some(userPerm => {
-                    if (userPerm === perm) return true;
-                    if (userPerm.endsWith(":*")) {
-                        const module = userPerm.slice(0, -2);
-                        return perm.startsWith(`${module}:`);
-                    }
-                    return false;
+                if (!perm) return false;
+                const required = perm.split(":");
+                return this.getPermissions.some(granted => {
+                    if (granted === "*") return true;
+                    const parts = granted.split(":");
+                    return parts.length === required.length && parts.every((part, index) => part === "*" || part === required[index]);
                 });
             };
         },
@@ -60,20 +40,11 @@ export const useUserStore = defineStore("user", {
         }
     },
     actions: {
-        /**
-         * 登录
-         * @param credentials 登录凭证
-         */
-        async login(credentials: LoginCredentials): Promise<void> {
-            // 登录逻辑
-        },
-        /**
-         * 登出
-         */
-        async logout(): Promise<void> {
+        /** 清除当前内存中的认证状态；Refresh Token 由 HttpOnly Cookie 管理。 */
+        clearAuth(): void {
             this.token = {} as Token;
             this.isLoggedIn = false;
         }
     },
-    persist: true
+    persist: false
 });

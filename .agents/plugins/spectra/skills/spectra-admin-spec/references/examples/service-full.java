@@ -21,7 +21,7 @@ import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
 import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
-import com.devops00.spectra.example.javabean.from.ExamplePageFrom;
+import com.devops00.spectra.example.javabean.query.ExampleFullQuery;
 import com.devops00.spectra.example.javabean.vo.ExampleFullVO;
 
 import java.util.UUID;
@@ -35,19 +35,18 @@ import java.util.UUID;
  * <li>禁止直接继承 MyBatis-Plus 的 IService</li>
  * <li>方法命名规范：created/modify/deleteById/page</li>
  * <li>返回类型使用具体 VO 类型</li>
- * <li>使用 @Service 注解</li>
  * </ol>
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/7/18
  */
-public interface ExampleFullServiceInterface extends BaseService<ExampleFullEntity> {
+public interface ExampleFullService extends BaseService<ExampleFullEntity> {
 
     /**
      * 分页查询示例列表
      */
-    IPage<ExampleFullVO> page(PageFrom page, ExamplePageFrom params);
+    IPage<ExampleFullVO> page(PageFrom page, ExampleFullQuery params);
 
     /**
      * 查询示例详情
