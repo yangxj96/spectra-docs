@@ -73,7 +73,7 @@ tags:
 | `NotificationController` | spectra-notification | `/notification/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
 | `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的运行概览、Request/Task/Delivery 脱敏查询与详情、渠道状态、重试和取消；运行概览支持 `hours=1..168` |
-| `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板分页/详情、草稿创建/编辑/复制、发布、停用、归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
+| `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板行级分页/详情、按模板组聚合分页、草稿创建/编辑、发布、禁用/启用、归档、版本历史和安全预览；按 `notification:template:*` 权限保护 |
 | `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、健康检查和明确测试地址的测试发送；按 `notification:provider:read/configure` 权限保护，Secret 和测试地址不回显 |
 | `NotificationProviderCallbackController` | spectra-notification | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执入口；匿名但必须使用当前渠道 Secret 的 HMAC 签名，重复回执幂等更新既有 Delivery/Task，不创建孤立投递记录 |
 | `NotificationControlledSendController` | spectra-notification | `/notification/admin/send/**` | 受控发送 Preview/Apply；Preview 按当前受众、模板版本、用户偏好和渠道状态返回脱敏结果，Apply 绑定短时令牌并通过统一 Gateway 创建通知请求；分别受 `notification:send:preview/apply` 保护 |
@@ -84,7 +84,7 @@ tags:
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；独立授权编辑仍使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。用户新增/编辑页面使用“基本信息 → 授权方案 → 角色授权”三步流程，最后改用 UserController 的 `/user/onboarding` 提交接口，一次接收多个保留/新增/修改的角色授权和被移除的授权实例，由后端在同一事务中逐条复用授权 Preview/Apply 并处理撤销。
 
-用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收结构化行（`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`，工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期以 `LocalDateTime` 响应，不接受 Role/Permission/Scope UUID；Web 下载的 Excel 模板只包含用户基本信息，部门、语言、时区和授权方案由页面在数据预览上方统一选择后合并到每一行请求。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。CSV/Excel 解析由前端完成。
+用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收结构化行（`real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`，工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期以 `LocalDateTime` 响应，不接受 Role/Permission/Scope UUID；Web 下载的 Excel 模板只包含用户基本信息，部门、语言、时区和授权方案由页面在数据预览上方统一选择后合并到每一行请求。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。XLSX 文件解析由前端完成。
 
 用户分页资料与当前用户资料中的角色展示已切换为读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
 

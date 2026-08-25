@@ -61,7 +61,7 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 用户 RoleAssignment 不再通过用户资料的 `role_ids` 或 `/user/{uid}/roles` 覆盖写入；独立授权编辑使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。用户新增/编辑页面按“基本信息 → 授权方案 → 角色授权”流转，最后一步调用 `POST/PUT /user/onboarding`，一次提交多个角色授权和移除列表，由后端在同一事务中保存用户资料、逐条复用 Assignment Preview/Apply 并撤销被移除角色。
 
-用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要和 `completed_rows`，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 校验通过后返回 `APPLYING` 任务并异步应用通过校验的行。请求字段为 `real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`，另带 `file_hash` 和 `idempotency_key`；工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期字段以 `LocalDateTime` 响应，Web 页面统一格式化为 `yyyy-MM-dd HH:mm:ss`；Web Excel 模板只包含用户基本信息，部门、语言、时区和授权方案由页面统一选择后合并到每一行 Preview 请求；后端不接收内部授权 UUID，Excel/CSV 文件解析由前端负责。
+用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要和 `completed_rows`，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 校验通过后返回 `APPLYING` 任务并异步应用通过校验的行。请求字段为 `real_name`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`，另带 `file_hash` 和 `idempotency_key`；工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期字段以 `LocalDateTime` 响应，Web 页面统一格式化为 `yyyy-MM-dd HH:mm:ss`；Web Excel 模板只包含用户基本信息，部门、语言、时区和授权方案由页面统一选择后合并到每一行 Preview 请求；后端不接收内部授权 UUID，XLSX 文件解析由前端负责。
 
 用户分页资料与当前用户资料的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
 
@@ -88,7 +88,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | NotificationController | `/notification/**` | 当前用户消息列表/详情/未读数/已读/删除/批量删除 |
 | NotificationPreferenceController | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好查询与保存 |
 | NotificationAdminController | `/notification/admin/**` | 运行概览（`GET /overview?hours=1..168`）、Request/Task/Delivery 脱敏分页与详情、渠道状态、任务重试和取消 |
-| NotificationTemplateAdminController | `/notification/admin/templates/**` | 模板分页/详情、草稿创建/编辑/复制、发布/停用/归档、版本历史、回滚和安全预览；按 `notification:template:*` 权限保护 |
+| NotificationTemplateAdminController | `/notification/admin/templates/**` | 模板行级分页/详情、按模板组聚合分页、草稿创建/编辑、发布/禁用/启用/归档、版本历史和安全预览；按 `notification:template:*` 权限保护 |
 | NotificationProviderAdminController | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、`POST /{channel}/health` 健康检查和 `POST /{channel}/test` 受确认保护的测试发送；Secret/测试地址只在服务端短暂使用，不回显原文 |
 | NotificationProviderCallbackController | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执；必须带 `X-Notification-Signature: sha256=<HMAC-SHA256(raw body)>`，重复正文返回 `DUPLICATE`，不创建新 Delivery |
 | NotificationControlledSendController | `/notification/admin/send/**` | `POST /preview` 和 `POST /apply`；绑定当前受众、已发布模板、渠道状态、请求摘要和短时令牌，Apply 只通过统一 Gateway 创建通知请求；权限为 `notification:send:preview/apply` |

@@ -221,9 +221,12 @@ CREATE TABLE IF NOT EXISTS spectra_notification.ntf_send_preview (
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_VERSION"
     ON spectra_notification.ntf_template (template_group_code, channel, version_no)
     WHERE deleted IS NULL;
-CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_PUBLISHED"
+CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_RELEASED"
     ON spectra_notification.ntf_template (template_group_code, channel)
-    WHERE state = 'PUBLISHED' AND deleted IS NULL;
+    WHERE state IN ('PUBLISHED', 'DISABLED') AND deleted IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_TEMPLATE_DRAFT"
+    ON spectra_notification.ntf_template (template_group_code, channel)
+    WHERE state = 'DRAFT' AND deleted IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UK_NTF_REQUEST_EXTERNAL_ID"
     ON spectra_notification.ntf_request (external_request_id)
     WHERE deleted IS NULL;

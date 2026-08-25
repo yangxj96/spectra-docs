@@ -16,7 +16,7 @@ tags:
 
 ## OA P1 页面
 
-请假、费用报销和采购申请页统一使用 `OAApproverSelect` 选择审批人，支持草稿/驳回态编辑、提交、撤回和取消。费用报销页面为 `src/views/oa/Reimbursement/index.vue`，路由为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销明细、附件、审批和付款接口；凭证上传复用 `FileUpload`，上传响应中的 `file_id` 写入申请附件关联，收款账号回显使用脱敏值。
+请假、费用报销和采购申请页统一使用 `OAApproverSelect` 选择审批人，支持草稿/驳回态编辑、提交、撤回和取消。费用报销页面为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销明细、审批和付款接口；凭证上传前端能力暂时下线，后续重做上传模块时再恢复。
 
 采购申请页面为 `src/views/oa/Purchase/index.vue`，路由为 `/oa/purchase`，通过 `src/api/oa/purchase-api.ts` 对接采购草稿、明细、审批、执行登记和分批收货接口，审批完成后可继续执行至 `RECEIVED`。
 
@@ -67,7 +67,7 @@ DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；�
 
 `src/api/notification/notification-api.ts` 对接 `/api/notification/list`、详情、未读数、单条/全部已读、单条/批量删除以及 `/api/notification-center/preferences`。Self API 不接受 `userId`，查询、已读和偏好均由后端绑定当前用户；前端已覆盖 API/Store 状态同步、真实登录 Bearer Token、刷新 Token、登出、用户隔离和浏览器交互验收。
 
-消息中心 V1 已完成；模板管理已通过 `/devops/notification/template` 和 `src/views/Devops/Notification/Template/` 接入真实模板 API，支持草稿编辑、预览、发布、停用、归档、复制草稿、版本历史、版本摘要展示和两个版本并列对比。保存、预览和发布前会校验声明变量、引用变量、非法占位符、用途/渠道兼容以及 HTML/URL 安全；验证码用途在编辑器中只显示短信/邮件渠道，发布确认会展示渠道、版本和变量影响摘要，后端规则仍是最终门禁。通知运行概览已通过 `/devops/notification/overview` 接入真实概览 API，支持窗口选择、自动刷新、渠道状态、队列/失败/UNKNOWN 指标、投递趋势和脱敏错误；Request 运维页已通过 `/devops/notification/request` 接入真实列表、详情和关联 Task 查询；Task 运维页已通过 `/devops/notification/delivery-task` 接入真实分页、任务详情、供应商投递记录和权限保护的重试/取消；Delivery 运维页已通过 `/devops/notification/delivery-record` 接入真实分页、渠道/状态/关联 ID 筛选、供应商回执和脱敏错误详情。渠道配置已通过 `/devops/notification/provider` 和 `src/views/Devops/Notification/Provider/` 接入真实 Provider 配置、健康检查和测试发送 API，支持 `IN_APP`、`SMS`、`EMAIL` 状态展示、非敏感参数配置、Secret 覆盖/清除、启停、健康门禁和 `SEND_TEST` 确认后的明确测试地址发送；Secret 和测试地址不回显，未配置或未健康时明确阻断。受控发送已通过 `/devops/notification/send` 和 `src/views/Devops/Notification/Send/` 接入 Preview/Apply API，支持已发布模板选择、用户/部门下级/角色受众、非敏感参数、渠道状态、跳过原因、脱敏样例和 Apply 后跳转 Request。普通管理查询限制最近 31 天，精确 Request/Task 关联查询不受该窗口影响；具体供应商回执、SMS/EMAIL 失败/UNKNOWN 人工处置和真实浏览器验收由 [[90-计划/P-通知中心运维管理与外部渠道接入计划]] 继续承接，其他运维菜单中的 Placeholder 页面仍不能视为完成。
+消息中心 V1 已完成；模板管理已通过 `/devops/notification/template` 和 `src/views/Devops/Notification/Template/` 接入真实模板 API，按逻辑模板组聚合展示多个渠道，支持按渠道草稿编辑、预览、保存草稿、保存且发布、发布版本禁用/启用、归档、版本历史和两个版本并列对比。保存、预览和发布前会校验声明变量、引用变量、非法占位符、用途/渠道兼容以及 HTML/URL 安全；验证码用途在编辑器中只显示短信/邮件渠道，后端规则仍是最终门禁。通知运行概览已通过 `/devops/notification/overview` 接入真实概览 API，支持窗口选择、自动刷新、渠道状态、队列/失败/UNKNOWN 指标、投递趋势和脱敏错误；Request 运维页已通过 `/devops/notification/request` 接入真实列表、详情和关联 Task 查询；Task 运维页已通过 `/devops/notification/delivery-task` 接入真实分页、任务详情、供应商投递记录和权限保护的重试/取消；Delivery 运维页已通过 `/devops/notification/delivery-record` 接入真实分页、渠道/状态/关联 ID 筛选、供应商回执和脱敏错误详情。渠道配置已通过 `/devops/notification/provider` 和 `src/views/Devops/Notification/Provider/` 接入真实 Provider 配置、健康检查和测试发送 API，支持 `IN_APP`、`SMS`、`EMAIL` 状态展示、非敏感参数配置、Secret 覆盖/清除、启停、健康门禁和 `SEND_TEST` 确认后的明确测试地址发送；Secret 和测试地址不回显，未配置或未健康时明确阻断。受控发送已通过 `/devops/notification/send` 和 `src/views/Devops/Notification/Send/` 接入 Preview/Apply API，继续使用按渠道拆开的已发布模板版本，支持用户/部门下级/角色受众、非敏感参数、渠道状态、跳过原因、脱敏样例和 Apply 后跳转 Request。普通管理查询限制最近 31 天，精确 Request/Task 关联查询不受该窗口影响；具体供应商回执、SMS/EMAIL 失败/UNKNOWN 人工处置和真实浏览器验收由 [[90-计划/P-通知中心运维管理与外部渠道接入计划]] 继续承接，其他运维菜单中的 Placeholder 页面仍不能视为完成。
 
 ## 运维管理中心
 
@@ -93,15 +93,12 @@ spectra-ui/
 │   │   ├── DictSelect/   # 组件目录（PascalCase）
 │   │   │   └── index.vue # 组件主文件
 │   │   ├── DictTag/
-│   │   ├── FileUpload/
 │   │   ├── IconPicker/
 │   │   ├── JsonEditor/
 │   │   ├── NotificationBell/
-│   │   ├── PDFViewer/
 │   │   └── StepNavigation/
 │   ├── hooks/            # 组合式函数（kebab-case）
-│   │   ├── use-table.ts
-│   │   └── use-file-upload.ts
+│   │   └── use-table.ts
 │   ├── layouts/          # 布局组件
 │   ├── plugin/           # 核心插件（kebab-case）
 │   │   ├── request/      # HTTP 客户端
@@ -250,7 +247,7 @@ spectra-ui/
 | 工具函数 | kebab-case | `message-utils.ts`、`route-utils.ts` |
 | 类型声明 | kebab-case | `http.d.ts`、`paging.d.ts` |
 | Store 模块 | kebab-case | `use-user-store.ts`、`use-app-store.ts` |
-| Hook | kebab-case | `use-table.ts`、`use-file-upload.ts` |
+| Hook | kebab-case | `use-table.ts` |
 
 ### 目录结构规范
 
@@ -319,77 +316,9 @@ await del("/api/users/{id}", { pathParams: { id } });
 
 ### 文件上传与下载
 
-**上传和下载需要使用 XHR（XMLHttpRequest）实现**，因为 `fetch` API 不支持上传/下载进度监听。
+前端文件上传能力暂时下线，后续重做时必须接入 `src/plugin/request/` 自定义请求客户端，不在业务组件中直接使用 `XMLHttpRequest`、Axios 或 `fetch`。
 
-```typescript
-// 上传文件（带进度监听）
-export function uploadWithProgress(
-    url: string,
-    file: File,
-    onProgress?: (percent: number) => void
-): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", url);
-
-        xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable && onProgress) {
-                onProgress(Math.round((e.loaded / e.total) * 100));
-            }
-        };
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                resolve(JSON.parse(xhr.responseText));
-            } else {
-                reject(new Error(`上传失败: ${xhr.status}`));
-            }
-        };
-
-        xhr.onerror = () => reject(new Error("网络错误"));
-
-        const formData = new FormData();
-        formData.append("file", file);
-        xhr.send(formData);
-    });
-}
-
-// 下载文件（带进度监听）
-export function downloadWithProgress(
-    url: string,
-    filename: string,
-    onProgress?: (percent: number) => void
-): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
-        xhr.responseType = "blob";
-
-        xhr.onprogress = (e) => {
-            if (e.lengthComputable && onProgress) {
-                onProgress(Math.round((e.loaded / e.total) * 100));
-            }
-        };
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const blob = xhr.response;
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = filename;
-                a.click();
-                URL.revokeObjectURL(a.href);
-                resolve();
-            } else {
-                reject(new Error(`下载失败: ${xhr.status}`));
-            }
-        };
-
-        xhr.onerror = () => reject(new Error("网络错误"));
-        xhr.send();
-    });
-}
-```
+文件下载继续通过 `src/plugin/request/api.ts` 的 `download` 封装完成。
 
 ### RequestOptions 类型
 
@@ -904,7 +833,7 @@ export default [
 - 可见页面通过 `meta.requiredMenu` 绑定数据库 `routeName`；详情和编辑页用 `activeMenu` 继承所属菜单权限和高亮。
 - 用户管理的新增和编辑使用完整页面路由 `/system/user/create`、`/system/user/:id/edit`，不使用抽屉；编辑页通过用户详情接口独立加载数据，刷新或直接访问地址仍可正常回显。页面按“基本信息 → 授权方案 → 角色授权”步骤展示：第 02 步加载已有角色并负责角色的移除、新增和快速套用多角色授权方案，重复角色会提示并跳过；第 03 步在左侧按 `3.1`、`3.2` 等子节点切换角色，并在内容区分别配置访问范围，不能在第 03 步增删角色，至少保留一个角色；每一步只在页面内暂存，最后通过 `POST/PUT /api/user/onboarding` 一次性提交用户资料、多角色授权和撤销列表；后端事务失败时不会留下半成品用户。
 - 用户管理的“重置密码”使用一次性临时密码弹窗展示接口响应，支持复制并显示 24 小时有效期；关闭弹窗后不再保留明文，遗失时重新执行重置。使用临时密码登录的用户会被引导到修改密码页。
-- 用户批量导入使用完整页面路由 `/system/user/import`，挂在用户管理菜单下；页面采用与用户编辑一致的左侧编号步骤、中间滚动内容、右侧提示和底部固定操作栏，支持下载只包含真实姓名、手机号码和邮箱的中文 Excel 模板、CSV/TXT/Excel 上传、选择文件后自动解析、行编辑、在数据预览上方统一选择部门/语言/时区/授权方案、后端 Preview、Apply、错误分类筛选、带中文表头的错误明细下载和结果查看。工号由后端在 Preview 阶段自动生成，任务有效期按 `yyyy-MM-dd HH:mm:ss` 展示，固定配置会在 Preview 提交时合并到每一行，不再要求管理员在 Excel 中重复填写。Apply 返回后台任务后，页面轮询任务详情展示已处理行数和进度，完成后加载错误明细；API 封装位于 `src/api/user/user-import-api.ts`，文件解析与摘要工具位于 `src/utils/user-import.ts`。
+- 用户批量导入使用完整页面路由 `/system/user/import`，挂在用户管理菜单下；页面采用与用户编辑一致的左侧编号步骤、中间滚动内容、右侧提示和底部固定操作栏，统一使用 XLSX 处理 Excel 文件，支持下载只包含真实姓名、手机号码和邮箱的中文 Excel 模板、选择 Excel 文件后自动解析、行编辑、在数据预览上方统一选择部门/语言/时区/授权方案、后端 Preview、Apply、错误分类筛选、带中文表头的 Excel 错误明细下载和结果查看。工号由后端在 Preview 阶段自动生成，任务有效期按 `yyyy-MM-dd HH:mm:ss` 展示，固定配置会在 Preview 提交时合并到每一行，不再要求管理员在 Excel 中重复填写。Apply 返回后台任务后，页面轮询任务详情展示已处理行数和进度，完成后加载错误明细；API 封装位于 `src/api/user/user-import-api.ts`，文件解析与摘要工具位于 `src/utils/user-import.ts`。
 - 授权方案列表使用 `/system/authorization-profiles` 页面，采用系统管理页的查询区/数据区布局；新建和编辑分别使用 `/system/authorization-profiles/create`、`/system/authorization-profiles/:id/edit` 独立页面，不再使用弹窗。方案编辑采用“基本信息 → 选择角色 → 权限范围设置”三步流程，角色支持多选并为每个角色生成独立 Assignment，权限选择支持多选后一次性加入，已加入的权限支持勾选后批量应用访问组织、子部门和授权范围，最后一步统一提交；批量设置遵循所选 Permission 的共同 `allowed_scope_modes`，右侧提供“全选权限”“清空选择”“选中按组织规则”“选中按仅当前主体数据”快捷操作，避免把 `RULES` 与 `SELF` 权限混在一起配置；仅支持 `NONE` 的权限不会显示组织选择。用户授权步骤可以套用单角色方案作为初始值，最终仍走当前用户对应的 Preview/Apply；授权方案支持启用、停用和删除，停用或删除不会撤销已经生效的运行时授权实例。
 - 一级授权节点显示在顶部导航，后代由递归 `MenuItem` 显示在侧栏，支持任意层级。
 - 未授权的已定义路由进入 `/401`，未定义地址由 catch-all 路由进入 `/404`。

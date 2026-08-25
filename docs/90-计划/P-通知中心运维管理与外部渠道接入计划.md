@@ -53,7 +53,7 @@ flowchart LR
 
 目标分为五层：
 
-1. **模板闭环**：模板草稿、校验、预览、发布版本、停用、回滚和在途任务版本快照完整可用。
+1. **模板闭环**：模板草稿、校验、预览、发布版本、启用/禁用、归档和在途任务版本快照完整可用。
 2. **运维闭环**：通知运行概览、Request、Task、Delivery、渠道状态、失败重试和取消均有真实 Web 页面。
 3. **受控发送闭环**：运维人员只能在权限和数据范围允许的受众内预览、确认和发送，所有发送均进入统一 Gateway 和可靠任务流。
 4. **外部渠道闭环**：短信/邮件 Provider 可配置、可健康检查、可投递、可记录回执；失败、超时和未知结果不能伪装成功或无条件重试。
@@ -78,7 +78,7 @@ flowchart LR
 | 用户消息 Self API | 已完成，强制当前用户隔离 | 已完成 `/notification`、铃铛、抽屉、详情、偏好 | 保持兼容，补充回归，不重写 |
 | Gateway / Worker | 已完成，支持幂等、重试、过期和取消 | 无需暴露内部实现 | 复用并补充受控发送入口 |
 | Request / Task / Delivery 管理 API | 已完成脱敏查询、详情、渠道状态、重试、取消 | 概览、Request、Task、Delivery 均已接入真实页面 | 补齐跨页面钻取、轮询和实际发送闭环 |
-| 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照 | 已接入模板管理页、复制、版本摘要和版本对比 | 与受控发送和外部渠道串联 |
+| 模板实体与渲染 | 已完成四态生命周期、版本摘要、模板选择、参数校验和 Request/Task/Delivery 追溯快照；同一模板按渠道独立维护版本 | 已接入按模板聚合的多渠道管理页、版本摘要和版本对比 | 与受控发送和外部渠道串联 |
 | 受控发送 | 无完整预览/确认闭环 | 无发送页 | 新增 Preview/Confirm/Apply 全流程 |
 | `IN_APP` | 真实可用 | 已接入 | 保持基线 |
 | `SMS` / `EMAIL` | 已接入 Provider SPI、阿里云/腾讯云短信、SMTP、通用 HTTP JSON、MOCK 和健康门禁 | 已接入渠道配置和健康检查页，发送结果仍在 Delivery 运维页观察 | 完成真实供应商沙箱、回执、UNKNOWN 人工处理和受控发送验收 |
@@ -125,7 +125,7 @@ flowchart LR
 | `notification:admin:read` | 概览、渠道状态、Request/Task/Delivery 查询 | `ROLE_DEV_OPS`、`ROLE_AUDIT`（脱敏只读） |
 | `notification:template:read` | 查询模板和版本 | `ROLE_DEV_OPS`、`ROLE_AUDIT`（只读） |
 | `notification:template:write` | 创建、编辑、停用草稿 | `ROLE_DEV_OPS` |
-| `notification:template:publish` | 发布、回滚模板版本 | `ROLE_DEV_OPS` |
+| `notification:template:publish` | 发布模板版本、启用或禁用已发布渠道 | `ROLE_DEV_OPS` |
 | `notification:send:preview` | 受控发送预览 | `ROLE_DEV_OPS` |
 | `notification:send:apply` | 确认并发起受控发送 | `ROLE_DEV_OPS` |
 | `notification:provider:read` | 查看渠道状态和脱敏配置摘要 | `ROLE_DEV_OPS`、`ROLE_AUDIT`（只读） |
@@ -168,21 +168,21 @@ flowchart LR
 |---|---|---|
 | 2026-08-23 | 基线盘点 | 后端可靠投递和基础管理 API 可复用；模板管理、Provider 接入、受控发送、运行概览及 4 个 Web 运维页面需要从契约到验收完整建设。 |
 | 2026-08-23 | 契约冻结 | 模板直接采用最终生命周期和版本 API；Provider、受控发送、管理分页与权限均以本节契约为唯一实现依据，不保留旧入口或兼容字段。 |
-| 2026-08-23 | 模板后端核心 | `spectra-admin` 已落地模板四态、草稿 CRUD、发布/停用/归档、版本历史、回滚草稿、预览校验和模板权限接口；模板管理 API 与菜单权限种子已收口。 |
-| 2026-08-23 | 模板权限与菜单 | 历史增量 `V23__seed_notification_template_permissions_and_menu.sql` 固化了模板查看、维护、发布/回滚权限，并将“模板管理”接入通知中心菜单；相关最终种子现已合并到 `V1__init_db.sql`，`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
-| 2026-08-23 | 模板 Web 页面 | `spectra-ui` 已接入 `/devops/notification/template` 真实路由和模板管理 API，完成列表筛选、草稿编辑、JSON 参数校验、预览、发布、停用、归档、版本历史、复制、版本摘要和版本对比交互。 |
-| 2026-08-23 | 模板版本追溯 | `spectra-admin` 已通过历史 V22-V24 完成模板版本摘要、Request 渠道模板快照、Task/Delivery 版本字段和渲染快照；最终结构现已合并到 `V1__init_db.sql`，模板复制已提供独立 API，9 项真实 PostgreSQL 集成测试通过。 |
-| 2026-08-23 | 模板 Web 复制与摘要 | `spectra-ui` 已接入独立复制草稿 API，并在列表和版本历史中展示截断后的版本摘要。 |
+| 2026-08-23 | 模板后端核心 | `spectra-admin` 已落地模板四态、草稿 CRUD、发布/停用/归档、版本历史、预览校验和模板权限接口；模板管理 API 与菜单权限种子已收口。 |
+| 2026-08-23 | 模板权限与菜单 | 历史增量 `V23__seed_notification_template_permissions_and_menu.sql` 固化了模板查看、维护和发布权限，并将“模板管理”接入通知中心菜单；相关最终种子现已合并到 `V1__init_db.sql`，`ROLE_DEV_OPS` 拥有完整权限，`ROLE_AUDIT` 仅拥有查看权限。 |
+| 2026-08-23 | 模板 Web 页面 | `spectra-ui` 已接入 `/devops/notification/template` 真实路由和模板管理 API，完成列表筛选、草稿编辑、JSON 参数校验、预览、发布、停用、归档、版本历史、版本摘要和版本对比交互。 |
+| 2026-08-23 | 模板版本追溯 | `spectra-admin` 已通过历史 V22-V24 完成模板版本摘要、Request 渠道模板快照、Task/Delivery 版本字段和渲染快照；最终结构现已合并到 `V1__init_db.sql`，9 项真实 PostgreSQL 集成测试通过。 |
 | 2026-08-23 | 模板 Web 版本对比 | `spectra-ui` 版本历史已支持选择两个版本并并列查看摘要、用途、标题模板和正文模板。 |
 | 2026-08-23 | 通知运行概览后端 | `GET /notification/admin/overview` 已接入真实 PostgreSQL 聚合，支持 1–168 小时窗口、渠道可用性、队列/失败/UNKNOWN 摘要、连续小时趋势和脱敏最近错误；Mapper 同步补齐模板快照与投递渲染快照字段映射。 |
 | 2026-08-23 | 通知运行概览 Web 页面 | `DevopsNotificationOverview` 已替换 Placeholder，接入真实概览 API，支持窗口选择、自动刷新、指标卡、渠道状态、投递趋势和脱敏错误展示；Request/Task/Delivery 页面均已接入。 |
 | 2026-08-23 | Request 运维链路 | Request/Task/Delivery 管理查询统一默认最近 31 天，显式范围不得超过 31 天；Request 精确详情和关联 Task 查询不受默认窗口影响；`DevopsNotificationRequest` 已接入真实列表、详情摘要和关联 Task 展示。 |
 | 2026-08-23 | Task 运维链路 | 新增 Task 脱敏详情接口，`DevopsNotificationDeliveryTask` 已接入真实分页、状态/渠道/用途/Request/收件用户/时间筛选、任务详情、供应商投递记录、权限保护的重试与取消；Task 精确关联查询不受默认时间窗口影响。 |
 | 2026-08-23 | Delivery 运维链路 | 投递分页改为任务联表查询，支持渠道、Request、Task、收件用户、状态和 31 天时间范围筛选；新增脱敏 Delivery 详情，`DevopsNotificationDeliveryRecord` 已接入真实列表、供应商回执、脱敏错误详情和权限保护的详情查询。 |
-- [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确发布和回滚规则。
+- [x] 固定模板生命周期：`DRAFT`、`PUBLISHED`、`DISABLED`、`ARCHIVED`，明确按渠道独立维护的发布、启用、禁用和归档规则。
   - `DRAFT` 只能编辑和预览；`PUBLISHED` 只能被发送和查看；`DISABLED` 不参与发送但保留历史；`ARCHIVED` 只读保存。
-  - 发布只能从草稿生成不可变版本；停用作用于已发布版本；回滚通过指定历史版本创建新的草稿，不修改历史版本。
-  - 模板接口统一使用 `/notification/admin/templates`，创建、编辑、发布、停用、归档和回滚均使用最终路由，不保留别名。
+  - 每个模板组可以关联多个渠道，版本号在渠道内独立维护；每个模板渠道最多一个草稿和一个已发布/已禁用版本，可以有多个归档版本。
+  - 发布只能从草稿生成不可变版本，并自动归档该渠道原已发布/已禁用版本；已禁用版本允许重新启用；历史版本只读，不提供回滚或复制操作。
+  - 模板接口统一使用 `/notification/admin/templates`，创建、编辑、发布、停用、启用和归档均使用最终路由，不保留别名。
 - [x] 固定 Provider 状态：`NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED`，明确任务状态与渠道状态的映射。
 - [x] 固定受控发送三阶段：Preview、Confirm、Apply；Preview Token、请求摘要、模板版本和过期时间必须绑定。
   - Preview 只返回脱敏受众统计、样例、跳过原因和请求摘要；Confirm 只确认当前 Preview；Apply 只调用 `NotificationGateway`。
@@ -198,42 +198,42 @@ flowchart LR
 | 对象 | 最终字段/状态 | 约束 |
 |---|---|---|
 | 模板 | `id`、`templateGroupCode`、`channel`、`purpose`、`versionNo`、`state`、`titleTemplate`、`contentTemplate`、`htmlTemplate`、`parameterSchema`、`providerTemplateCode`、`versionDigest`、`version` | `state` 为四态枚举；已发布版本不可编辑；变量只能使用安全变量名占位符；HTML 模板拒绝脚本、事件属性和危险 URL scheme；版本摘要用于不可变追溯。 |
-| 模板 API | `GET/POST/PUT /notification/admin/templates`、`GET /{id}`、`POST /{id}/copy`、`POST /{id}/publish`、`POST /{id}/disable`、`POST /{id}/archive`、`GET /{id}/versions`、`POST /{id}/rollback`、`POST /preview` | 写操作按状态和乐观锁校验；复制和回滚均创建独立草稿；所有操作写审计；预览不落库收件人和敏感参数。 |
+| 模板 API | `GET /notification/admin/templates/groups`、`GET/POST/PUT /notification/admin/templates`、`GET /{id}`、`POST /{id}/publish`、`POST /{id}/disable`、`POST /{id}/enable`、`POST /{id}/archive`、`GET /{id}/versions`、`POST /preview` | 管理列表按模板聚合展示各渠道最新状态；写操作按状态和乐观锁校验；每个渠道最多一个草稿和一个已发布/已禁用版本；历史版本只读；所有操作写审计；预览不落库收件人和敏感参数。 |
 | Provider | `NOT_CONFIGURED`、`DISABLED`、`HEALTHY`、`UNHEALTHY`、`BLOCKED` | 未配置、健康检查失败、密钥不可解密和未知结果均不得报告发送成功。 |
 | 受控发送 | `Preview -> Confirm -> Apply` | Apply 必须绑定一次性 Token、模板版本、请求摘要、受众摘要、权限快照和幂等键，并统一进入 Gateway。 |
-| 管理权限 | `notification:admin:read`、`notification:template:read/write/publish`、`notification:send:preview/apply`、`notification:provider:read/configure`、`notification:admin:retry/cancel` | `ROLE_AUDIT` 只读，不能发布、回滚、配置、重试、取消或发送。 |
+| 管理权限 | `notification:admin:read`、`notification:template:read/write/publish`、`notification:send:preview/apply`、`notification:provider:read/configure`、`notification:admin:retry/cancel` | `ROLE_AUDIT` 只读，不能发布、启停、配置、重试、取消或发送。 |
 
 阶段门禁：契约评审通过、API/TypeScript 类型表完成、菜单和权限清单一致后才能进入阶段二。以上契约已冻结，阶段二直接按最终模型实现。
 
 ### 阶段二：模板管理完整闭环
 
-目标：让模板从创建到发布、发送、追溯和回滚完整可用。
+目标：让模板从创建到发布、发送、追溯和渠道启停完整可用。
 
 #### 后端
 
 - [x] 盘点现有 `NotificationTemplateEntity` 的用途、版本、状态、语言、渠道和变量字段；历史 V22 已将模板状态收敛为四态并移除旧的 `enabled` 字段，最终结构已合并到 `V1__init_db.sql`。
 - [x] 固化模板管理权限和通知中心“模板管理”菜单；`ROLE_DEV_OPS` 拥有完整维护权限，`ROLE_AUDIT` 仅可查看。
-- [x] 实现模板列表、详情、草稿创建、编辑、复制、停用和归档 API。
-- [x] 实现模板版本发布、版本列表、版本详情、回滚和乐观锁校验。
+- [x] 实现按模板聚合的列表、详情、草稿创建、编辑、停用、启用和归档 API；模板组内按渠道维护版本。
+- [x] 实现模板版本发布、版本列表、版本详情和乐观锁校验；每个渠道限制一个草稿和一个已发布/已禁用版本。
 - [x] 实现变量声明和模板校验：缺失变量、多余变量、非法占位符、HTML/URL 安全均由后端渲染器在保存、预览和发布前拒绝，Web 页面同步提供即时预校验。
 - [x] 建立用途/渠道兼容矩阵；`NotificationPolicy` 固化验证码仅允许 SMS/EMAIL、普通用途允许三种渠道，模板保存、预览、发布和 Gateway 按矩阵拒绝不匹配组合。
    - [x] 受控发送 Preview/Apply 复用同一用途/渠道矩阵，并在最终确认时再次拒绝不匹配组合。
 - [x] 实现模板预览 API，只允许使用脱敏的示例参数，不落库真实收件人和敏感载荷。
 - [x] 发布时生成不可变版本摘要；Request/Task/Delivery 保存版本标识和渲染快照。
-- [x] 增加模板操作审计：创建、修改、复制、发布、停用、归档、回滚、预览和失败原因均由管理 Controller 写入操作日志。
+- [x] 增加模板操作审计：创建、修改、发布、停用、启用、归档、预览和失败原因均由管理 Controller 写入操作日志。
 
 #### 前端
 
 - [x] 新增 `/devops/notification/template` 模板列表页面，支持用途、渠道、状态、版本和更新时间查询。
 - [x] 新增模板编辑页面，支持基本信息、用途/渠道限制、变量声明、标题/正文和安全校验提示。
-- [x] 新增模板预览、发布确认、版本历史、回滚和停用交互。
+- [x] 新增模板预览、发布确认、版本历史、停用和启用交互。
 - [x] 增加版本对比交互。
-- [x] 接入独立复制 API 与版本摘要展示。
+- [x] 按模板聚合展示多渠道状态、草稿和版本摘要；历史列表只读。
 - [x] 发布前展示校验结果和影响范围；发布确认展示渠道、版本和变量影响摘要，草稿、已发布版本和停用版本的操作按钮按状态与权限显示。
 - [x] 模板页面接入真实 API、局部 loading、错误恢复和乐观锁冲突提示。
 - [ ] 完成模板页面真实浏览器回归。
 
-阶段门禁：一个真实模板能够创建、校验、发布、预览、用于发送、查看版本快照并回滚；没有模板 CRUD 页面和版本验收不得关闭阶段。
+阶段门禁：一个真实模板能够按多个渠道创建草稿、校验、发布、启用/禁用、预览、用于发送并查看版本快照；没有模板 CRUD 页面和版本验收不得关闭阶段。
 
 #### 阶段二实施记录
 
@@ -356,7 +356,7 @@ flowchart LR
 | 模板列表/详情 | `GET /notification/admin/templates`、`GET /notification/admin/templates/{id}` | `/devops/notification/template` |
 | 模板草稿 | `POST/PUT /notification/admin/templates` | 模板编辑页 |
 | 模板版本 | `GET /notification/admin/templates/{id}/versions` | 版本历史/对比 |
-| 发布/停用/回滚 | `POST /notification/admin/templates/{id}/publish` 等 | 发布确认/版本操作 |
+| 发布/停用/启用 | `POST /notification/admin/templates/{id}/publish`、`/{id}/disable`、`/{id}/enable` 等 | 发布确认/渠道状态操作 |
 | 模板预览 | `POST /notification/admin/templates/{id}/preview` | 预览面板 |
 | Provider 状态/配置 | `GET/PUT /notification/admin/providers/{channel}` | `/devops/notification/provider` |
 | Provider 健康/测试 | `POST /notification/admin/providers/{channel}/health`、`/test` | 渠道测试 |
@@ -380,7 +380,7 @@ flowchart LR
 
 本计划只有同时满足以下条件，才允许标记为完成：
 
-- [ ] 模板能够创建、编辑、校验、预览、发布、停用、回滚，且版本快照可追溯。
+- [ ] 模板能够创建、编辑、校验、预览、发布、停用、启用，且版本快照可追溯。
 - [ ] 受控发送能够完成 Preview、Confirm、Apply，并通过统一 Gateway 生成 Request/Task/Delivery。
 - [ ] 受众预览、数据范围、角色边界、规模上限和幂等校验全部由后端执行。
 - [ ] `IN_APP`、已接入的 SMS/EMAIL Provider 均有真实或可重复 Mock 的成功、失败、超时、UNKNOWN 和重复回执验收。
