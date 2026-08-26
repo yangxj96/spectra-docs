@@ -80,6 +80,9 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | CryptoController | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | SystemBootstrapController | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | SystemGuideController | `/system/guide/**` | DEV_OPS 系统设置引导状态查询与完成 |
+| SchedulerAdminController | `/scheduler/admin/**` | 调度处理器目录、OPS 定义、离散执行、LOOP 会话、统一操作记录、控制命令和错误聚合；版本 `1.0.0` |
+
+调度管理公共 URL 为 `/api/scheduler/admin`。`ROLE_ADMIN_SYSTEM` 管理 OPS 和普通 LOOP 控制，`ROLE_DEV_OPS` 处理 SYSTEM 受控触发、UNKNOWN 解决和 LOOP 高风险控制，`ROLE_AUDIT` 只读；数据库不可用返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。完整路径见 [[../10-后端/35-单体调度内核]]。
 
 ## 消息中心
 

@@ -7,7 +7,7 @@ tags:
 
 # spectra-core 模块
 
-> 核心能力模块：用户/角色/权限/部门/菜单/字典/区域/日志/配置。
+> 核心能力模块：用户/角色/权限/部门/菜单/字典/区域/日志/配置和单体调度。
 
 ## 模块职责
 
@@ -22,6 +22,7 @@ spectra-admin/spectra-modules/spectra-core/
     ├── user/           ← 用户资料与生命周期
     ├── authorization/  ← Role/Permission/Assignment/Boundary
     ├── system/         ← 部门/菜单/字典/区域/配置/日志
+    ├── scheduler/      ← 统一调度内核、LOOP 会话和运维管理
     ├── controller/     ← REST 端点
     ├── service/        ← 业务逻辑
     │   └── impl/
@@ -62,7 +63,9 @@ spectra-admin/spectra-modules/spectra-core/
 
 ### 任务系统
 
-- 系统任务调度
+- OPS、SYSTEM、LOOP 三类统一调度
+- PostgreSQL 唯一事实源、租约 CAS、UNKNOWN 结果和 LOOP 错误聚合
+- 调度管理 API 与 Web 运维页面
 - 审批任务
 
 ### 文件与附件
@@ -106,6 +109,12 @@ spectra-core ← 被以下模块依赖
 | Configured | sys_configured | 系统配置 |
 | SysConfig | sys_config | 系统参数 |
 | OperationLog | sys_operation_log | 操作日志 |
+| SchedulerJobEntity | spectra_core.scheduler_job | 任务定义和调度策略 |
+| SchedulerExecutionEntity | spectra_core.scheduler_execution | 离散执行、租约和结果 |
+| SchedulerLoopRuntimeEntity | spectra_core.scheduler_loop_runtime | LOOP 运行会话和心跳 |
+| SchedulerControlCommandEntity | spectra_core.scheduler_control_command | LOOP 控制命令 |
+| SchedulerLoopErrorEntity | spectra_core.scheduler_loop_error | LOOP 错误聚合 |
+| SchedulerOperationAuditEntity | spectra_core.scheduler_operation_audit | OPS/SYSTEM 调度操作审计 |
 
 ## API 端点
 
@@ -118,6 +127,7 @@ spectra-core ← 被以下模块依赖
 | AuthorizationController | `/security/authorization/**` | Role capability 与 Assignment Preview/Apply |
 | AuthorityController | `/authority/tree` | Permission Catalog 只读树 |
 | MenuController | `/menu/**` | 菜单 CRUD |
+| SchedulerAdminController | `/scheduler/admin/**` | 调度目录、任务、执行、统一操作记录、LOOP 会话和控制命令 |
 | DepartmentController | `/department/**` | 部门 CRUD |
 | RegionController | `/region/**` | 区域查询 |
 | DictController | `/dict/**` | 字典管理 |

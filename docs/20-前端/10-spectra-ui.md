@@ -73,6 +73,8 @@ DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；�
 
 运维路由集中在 `src/plugin/router/modules/devops.ts`，统一使用 `/devops` 路径、`Devops` 命名路由前缀和 `src/views/Devops/` 目录。数据库菜单只负责导航可见性，叶子路由通过 `meta.requiredMenu` 绑定；未接入真实接口的预定义能力统一指向占位页，不以模拟数据冒充正式功能。后端 `ROLE_DEV_OPS` 通过 `*` 权限和全部有效菜单契约获得运维入口，页面仍通过路由守卫和后端接口权限双重保护。
 
+调度页面位于 `src/views/Devops/Scheduler/`：`/devops/scheduler/task` 展示代码处理器目录、OPS 任务定义、三类任务统一的操作记录、离散手工触发和 LOOP 会话入口；`/devops/scheduler/execution` 展示执行详情、取消、允许的重试和 UNKNOWN 解决。LOOP 运行面板展示实时会话与控制入口，控制命令历史从任务页的独立“操作记录”弹窗查看。页面只根据后端注册目录显示参数与动作，不提供 Bean、方法、SQL 或脚本输入。
+
 ## 目录结构
 
 ```
@@ -861,7 +863,7 @@ src/views/
 ├── Devops/                 # 运维管理（/devops，Devops* 命名路由）
 │   ├── Monitor/             # 服务监控、缓存监控
 │   ├── Notification/        # 通知运行概览、Request/Task/Delivery、模板管理、受控发送、渠道配置
-│   ├── Placeholder/         # 应用健康、调度、安全等预定义占位页
+│   ├── Placeholder/         # 应用健康、安全等预定义占位页
 │   ├── Scheduler/           # 定时任务
 │   ├── Security/            # 安全上下文、安全审计、在线用户
 │   └── SystemMaintenance/   # 系统配置、文件管理

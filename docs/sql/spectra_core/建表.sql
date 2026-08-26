@@ -912,3 +912,9 @@ FROM (VALUES
 WHERE NOT EXISTS (
     SELECT 1 FROM spectra_core.sys_service_monitor_alert_rule existing WHERE existing.code = rule.code
 );
+
+-- 统一调度表由 spectra-config/src/main/resources/db/migration/V4__create_scheduler_tables.sql 一次性创建。
+-- 当前 schema 的调度对象：scheduler_job、scheduler_execution、scheduler_loop_runtime、
+-- scheduler_control_command、scheduler_loop_error、scheduler_operation_audit。
+-- V4 是调度表结构、约束、内置任务和 system:scheduler:* 权限的唯一运行迁移契约；
+-- V6 增加 OPS/SYSTEM 操作审计表；六张表保留 deleted 以兼容 BaseEntity，但调度逻辑不使用该字段。

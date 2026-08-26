@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 53 个 `*Controller.java`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 54 个 `@RestController`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -71,6 +71,9 @@ tags:
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | `SystemBootstrapController` | spectra-core | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
+| `SchedulerAdminController` | spectra-core | `/scheduler/admin/**` | 代码处理器目录、OPS 任务定义、离散执行、LOOP 会话、统一操作记录、控制命令及错误聚合；所有接口版本为 `1.0.0` |
+
+调度管理 API 的完整端点、请求约束和权限边界见 [[35-单体调度内核]]。公共 URL 前缀为 `/api/scheduler/admin`，PostgreSQL 不可用时管理写操作和结果确认返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。
 
 ## 消息中心
 
@@ -173,6 +176,7 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 - [[10-架构分层]] — 各 Controller 所在模块
 - [[20-用户与权限]] — 认证与权限 API
 - [[30-系统管理]] — 系统管理 API
+- [[35-单体调度内核]] — 单体调度管理 API
 - [[85-接口加解密方案]] — 加解密密钥管理 API
 - [[40-OA模块]] — OA API
 - [[50-文件上传]] — 文件上传 API
