@@ -50,7 +50,7 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 | `sec:rt:*` / `sec:rt:claim:*` / `sec:replay:*` | Refresh 映射、一次性消费声明和重放撤销围栏 |
 | `sec:mfa:challenge:*` / `sec:fail:*` | MFA Challenge 和登录失败锁定 |
 
-旧 `auth:*`、`sec:v2:*` 和兼容 Key 不再由运行时读取或写入；开发阶段不维护双命名空间迁移逻辑。
+旧 `auth:*`、`sec:v2:*` 和兼容 Key 不再由运行时读取或写入；运行时不维护双命名空间迁移逻辑。
 
 ## Key 设计
 

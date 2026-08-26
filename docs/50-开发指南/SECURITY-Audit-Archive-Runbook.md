@@ -1,6 +1,6 @@
 # Security Audit 归档与恢复 Runbook
 
-> 当前开发阶段不要求真实 S3 Object Lock bucket 或归档恢复演练；确定 `1.0.0` 发布版本后，必须完成本文的独立 bucket、Compliance retention、完整性校验和隔离恢复门禁。
+> 生效条件：`1.0.0` 发布前完成独立 S3 Object Lock bucket、Compliance retention、完整性校验和隔离恢复门禁。
 
 ## 已选后端
 
