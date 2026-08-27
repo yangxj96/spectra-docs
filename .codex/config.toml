@@ -1,1 +1,8 @@
 model_verbosity = "medium"
+
+[marketplaces.spectra-project]
+source_type = "local"
+source = '\\?\D:\Develop\Projects\spectra'
+
+[plugins."spectra@spectra-project"]
+enabled = true
