@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "source": {
+    "docsRoot": "docs",
+    "excludeGlobs": [
+      "90-计划/**",
+      "99-模板/**",
+      "superpowers/**"
+    ]
+  },
+  "targets": {
+    "spectra": "docs/pages/spectra-admin",
+    "designer": "docs/pages/logicflow-flowable",
+    "assets": "docs/public/spectra-admin",
+    "generatedSidebar": "docs/.vitepress/generated/project-sidebar.mts",
+    "generatedManifest": "docs/.vitepress/generated/spectra-docs-sync.json"
+  },
+  "designerSources": [
+    "20-前端/40-流程设计器.md"
+  ],
+  "attachments": [
+    {
+      "source": "10-后端/permission-catalog.yaml",
+      "target": "permission-catalog.yaml"
+    }
+  ],
+  "routeOverrides": {
+    "00-项目总览.md": "index.md",
+    "10-后端/10-架构分层.md": "be-architecture.md",
+    "10-后端/15-spectra-core模块.md": "be-core-module.md",
+    "10-后端/20-用户与权限.md": "be-user-auth.md",
+    "10-后端/25-数据权限设计.md": "be-data-scope.md",
+    "10-后端/30-系统管理.md": "be-system-management.md",
+    "10-后端/35-单体调度内核.md": "be-scheduler.md",
+    "10-后端/40-OA模块.md": "be-oa-module.md",
+    "10-后端/50-文件上传.md": "be-file-upload.md",
+    "10-后端/60-工作流.md": "be-workflow.md",
+    "10-后端/75-统一通知模块.md": "be-notification.md",
+    "10-后端/80-基础设施.md": "be-infrastructure.md",
+    "10-后端/82-数据库连接池.md": "be-database-pool.md",
+    "10-后端/85-接口加解密方案.md": "be-crypto.md",
+    "10-后端/90-API总览.md": "be-api-reference.md",
+    "20-前端/00-前端总览.md": "fe-overview.md",
+    "20-前端/10-spectra-ui.md": "fe-spectra-ui.md",
+    "20-前端/30-流程建模插件.md": "fe-flowable-integration.md",
+    "30-数据模型/10-ER图.md": "db-er-diagram.md",
+    "30-数据模型/20-实体清单.md": "db-entity-list.md",
+    "30-数据模型/30-数据库随笔.md": "database-explain.md",
+    "30-数据模型/40-字段顺序清单.md": "db-field-order.md",
+    "40-规范/10-Git提交规范.md": "commit-convention.md",
+    "40-规范/15-后端开发规范.md": "be-development-guide.md",
+    "40-规范/20-前端命名规范.md": "fe-naming.md",
+    "40-规范/30-MapStruct命名规范.md": "be-mapstruct-guide.md",
+    "40-规范/40-数据库命名规范.md": "database-guide.md",
+    "40-规范/50-Redis使用规范.md": "be-redis-guide.md",
+    "40-规范/60-行政区域编码.md": "misc-code.md",
+    "50-开发指南/10-环境搭建.md": "guide-setup.md",
+    "50-开发指南/20-常见命令.md": "guide-commands.md",
+    "50-开发指南/20-脚本工具.md": "guide-scripts.md",
+    "50-开发指南/SECURITY-Migration-Inventory.md": "security-migration-inventory.md",
+    "50-开发指南/SECURITY-Backup-Recovery-Runbook.md": "security-backup-recovery.md",
+    "50-开发指南/SECURITY-Audit-Archive-Runbook.md": "security-audit-archive.md",
+    "50-开发指南/DEV_OPS-Break-Glass-Runbook.md": "devops-break-glass.md",
+    "60-部署运维/10-Docker部署.md": "guide-docker.md",
+    "60-部署运维/20-Nginx配置.md": "guide-nginx.md",
+    "60-部署运维/30-DockerCompose.md": "guide-docker-compose.md",
+    "60-部署运维/40-SSL证书配置.md": "be-ssl-scripts.md",
+    "60-部署运维/50-生产部署说明.md": "guide-production.md",
+    "70-AI速查/00-MOC-知识图谱.md": "ai-reference.md",
+    "70-AI速查/01-架构概览.md": "ai-architecture.md",
+    "70-AI速查/02-模块清单.md": "ai-modules.md",
+    "70-AI速查/03-实体字典.md": "ai-entities.md",
+    "70-AI速查/04-API端点.md": "ai-api.md",
+    "70-AI速查/05-配置清单.md": "ai-config.md",
+    "70-AI速查/06-依赖版本.md": "ai-dependencies.md"
+  }
+}
