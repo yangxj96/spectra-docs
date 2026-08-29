@@ -34,7 +34,7 @@
 2. 通过 `SecuritySessionRevocationPort` 按用户、Client 或全量撤销；禁止直接删除任意业务 Redis key。
 3. 验证 `sec:session:*`、Token family 和 replay revoke 结果，并保留数量证据；不记录 token 原文。
 4. 追加 `SECURITY_GLOBAL_LOGOUT_SUCCEEDED` 或 `SECURITY_GLOBAL_LOGOUT_FAILED`。
-5. 让 Web/App 重新登录并验证 Refresh rotation；旧 Refresh Token 必须被拒绝。
+5. 让 Web 重新登录并验证 Refresh rotation；旧 Refresh Token 必须被拒绝。
 
 ## 回滚规则
 

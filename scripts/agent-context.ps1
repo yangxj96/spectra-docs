@@ -2,7 +2,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet('auto', 'all', 'backend', 'web', 'app', 'plugin')]
+    [ValidateSet('auto', 'all', 'backend', 'web', 'plugin')]
     [string]$Area = 'auto',
     [switch]$Facts
 )
@@ -26,13 +26,6 @@ $routes = @{
         Docs = @('docs/20-前端/10-spectra-ui.md（仅目标规则未覆盖时）')
         Validate = 'pnpm run type-check; pnpm run test'
     }
-    app = [pscustomobject]@{
-        Name = 'app'
-        Agent = 'spectra-app/AGENTS.md'
-        Skill = '$spectra-app-spec'
-        Docs = @('docs/20-前端/20-spectra-app.md（仅目标规则未覆盖时）')
-        Validate = 'pnpm run type-check; pnpm run build:h5 或 build:mp-weixin'
-    }
     plugin = [pscustomobject]@{
         Name = 'plugin'
         Agent = 'logicflow-plugin-flowable/AGENTS.md'
@@ -47,7 +40,6 @@ if ($Area -eq 'auto') {
     $Area = switch -Regex ($relativePath) {
         '^spectra-admin(?:\\|$)' { 'backend'; break }
         '^spectra-ui(?:\\|$)' { 'web'; break }
-        '^spectra-app(?:\\|$)' { 'app'; break }
         '^logicflow-plugin-flowable(?:\\|$)' { 'plugin'; break }
         default { 'all' }
     }

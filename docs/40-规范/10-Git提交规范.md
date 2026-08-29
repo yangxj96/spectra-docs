@@ -9,7 +9,7 @@ source: https://www.devops00.com/spectra-admin/commit-convention
 
 > 来源：[[00-项目总览|项目 VitePress 文档]]
 >
-> 适用于 spectra-admin、spectra-ui、spectra-app 所有子项目。
+> 适用于 spectra-admin、spectra-ui 和 logicflow-plugin-flowable 子项目。
 
 ## 格式
 
@@ -42,7 +42,7 @@ type(scope): subject
 
 ## Scope 模块
 
-### 前端（spectra-ui / spectra-app）
+### 前端（spectra-ui / logicflow-plugin-flowable）
 
 | scope | 说明 |
 |---|---|
@@ -54,6 +54,7 @@ type(scope): subject
 | `layout` | 布局 |
 | `vite` | 构建工具 |
 | `build` | 打包构建 |
+| `plugin` | 流程建模插件 |
 
 ### 后端（spectra-admin）
 

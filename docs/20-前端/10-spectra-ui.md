@@ -903,7 +903,7 @@ src/views/
 
 ## Commit 规范
 
-项目提交信息遵循 Conventional Commits 约定。为兼容 Windows 开发环境，`spectra-ui` 和 `spectra-app` 不再配置 Husky、lint-staged 或 commitlint 提交钩子，提交时按以下格式人工遵循。
+项目提交信息遵循 Conventional Commits 约定。为兼容 Windows 开发环境，`spectra-ui` 不配置 Husky、lint-staged 或 commitlint 提交钩子，提交时按以下格式人工遵循。
 
 ### 提交格式
 
@@ -934,8 +934,8 @@ src/views/
 | Scope | 说明 |
 |---|---|
 | `ui` | spectra-ui 项目 |
-| `app` | spectra-app 项目 |
 | `admin` | spectra-admin 后端 |
+| `plugin` | logicflow-plugin-flowable 项目 |
 
 ### 提交信息建议
 
@@ -1004,11 +1004,11 @@ const result = Flowable.fromBpmnXml(xmlString, lf);
 
 ### 首次系统初始化
 
-Web 管理端提供 `/initialization` 首次初始化页面，用于设置系统名称、简称、Logo 标识、默认语言、默认时区和安全策略，创建 DEV_OPS 用户、绑定 TOTP MFA、保存 Recovery Code 并完成初始化。系统名称会作为新 MFA 登记的 TOTP issuer。应用启动阶段先调用 `/api/system/bootstrap`，一次获取系统公开信息、加解密配置和初始化状态，并写入应用 store；只有启动聚合接口失败时，登录页或初始化页才回退调用 `/api/system/initialization/status`。初始化完成后页面返回登录页，由用户通过正常登录流程建立会话；登录页会在后端返回 `UNINITIALIZED` 时自动跳转到初始化页面。初始化流程不属于 `spectra-app` 移动端范围。应用首次启动时会把初始化令牌输出到受控的后端控制台，启动请求使用用户手工输入的 `X-Spectra-Initialization-Token`，令牌只保存在当前页面内存中。
+Web 管理端提供 `/initialization` 首次初始化页面，用于设置系统名称、简称、Logo 标识、默认语言、默认时区和安全策略，创建 DEV_OPS 用户、绑定 TOTP MFA、保存 Recovery Code 并完成初始化。系统名称会作为新 MFA 登记的 TOTP issuer。应用启动阶段先调用 `/api/system/bootstrap`，一次获取系统公开信息、加解密配置和初始化状态，并写入应用 store；只有启动聚合接口失败时，登录页或初始化页才回退调用 `/api/system/initialization/status`。初始化完成后页面返回登录页，由用户通过正常登录流程建立会话；登录页会在后端返回 `UNINITIALIZED` 时自动跳转到初始化页面。应用首次启动时会把初始化令牌输出到受控的后端控制台，启动请求使用用户手工输入的 `X-Spectra-Initialization-Token`，令牌只保存在当前页面内存中。
 
 仓库只提交 `.env.example`。新克隆先复制为 `.env.development`；开发环境的 `VITE_API_URL=https://127.0.0.1:4004/` 直接连接后端 4004。Vite 通过 `SSL_PASSWORD` 加载后端同一份 `files/ssl/keystore.p12`，因此 Web 使用 `https://localhost:5173` 访问，浏览器才能正常携带 Secure Cookie 和读取 CSRF Cookie。修改后端端口或连接远程后端时，只修改本机环境文件。
 
-> **环境变量命名约定**：spectra-ui 使用 `VITE_API_URL`（带尾部 `/`），spectra-app 使用 `VITE_API_BASE_URL`（无尾部 `/`）。这是两个项目的既定约定，不强制统一（Vite SPA 和 uni-app 的 base URL 处理逻辑不同）。
+> **环境变量命名约定**：spectra-ui 使用 `VITE_API_URL`，值保留尾部 `/`。
 
 ## 关键文件路径
 
@@ -1049,12 +1049,9 @@ Web 管理端提供 `/initialization` 首次初始化页面，用于设置系统
 - 登录成功：`fetchClientPrivateKey()` → `GET /api/system/crypto/keypair/client-private` → 获取 `clientPrivateKey`
 - 系统信息和初始化状态存储在 `use-app-store`；加解密状态存储在 `use-crypto-store`，`enabled` + `serverPublicKey` 持久化，`clientPrivateKey` 仅内存
 
-> ⚠️ **技术债务**：`utils/crypto/` 下的 `aes-utils.ts`、`rsa-utils.ts`、`crypto-utils.ts` 与 spectra-app 中完全重复。未来应抽取为共享包 `@spectra/crypto`。
-
 ## 相关笔记
 
 - [[00-项目总览]]
-- [[20-spectra-app]]
 - [[30-流程建模插件]]
 - [[10-环境搭建]]
 - [[20-常见命令]]

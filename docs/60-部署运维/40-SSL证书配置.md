@@ -70,9 +70,6 @@ SSL_ALIAS = "tomcat"
 ```dotenv
 # spectra-ui/.env.development
 VITE_API_URL=https://127.0.0.1:4004/
-
-# spectra-app/.env.development
-VITE_API_BASE_URL=https://127.0.0.1:4004
 ```
 
 浏览器默认不信任自签名证书。个人机器可以按操作系统策略信任 `localhost.crt`，团队或企业环境应使用组织 CA；不要共享或提交开发 CA 私钥。未建立信任时，健康检查和前端请求可能因证书校验失败。
@@ -83,7 +80,7 @@ VITE_API_BASE_URL=https://127.0.0.1:4004
 SERVER_SSL_ENABLED = "false"
 ```
 
-同时把两个前端 API URL 改回 `http://`。协议不一致是新环境最常见的“页面能打开但接口全部失败”原因之一。
+同时把 Web 前端 API URL 改回 `http://`。协议不一致是新环境最常见的“页面能打开但接口全部失败”原因之一。
 
 ## 相关
 

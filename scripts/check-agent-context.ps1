@@ -12,7 +12,6 @@ $targets = @(
     [pscustomobject]@{ Scope = 'root'; Path = (Join-Path $projectRoot 'AGENTS.md'); Limit = 6144 }
     [pscustomobject]@{ Scope = 'backend'; Path = (Join-Path $projectRoot 'spectra-admin/AGENTS.md'); Limit = 4096 }
     [pscustomobject]@{ Scope = 'web'; Path = (Join-Path $projectRoot 'spectra-ui/AGENTS.md'); Limit = 4096 }
-    [pscustomobject]@{ Scope = 'app'; Path = (Join-Path $projectRoot 'spectra-app/AGENTS.md'); Limit = 4096 }
     [pscustomobject]@{ Scope = 'plugin'; Path = (Join-Path $projectRoot 'logicflow-plugin-flowable/AGENTS.md'); Limit = 3072 }
 )
 

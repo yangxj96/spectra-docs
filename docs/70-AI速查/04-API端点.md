@@ -1,13 +1,10 @@
 ---
 tags:
-  - ai
   - api
   - reference
 ---
 
 # API 端点
-
-> **AI 归档说明**：本文当前只收录 `master` 的活动 API；已移除的 AI 端点不属于主分支。AI 端点和相关契约仅可到 `spectra-admin` 的 `archive/ai` 分支及其归档文档中查阅。
 
 > 源码当前 53 个 `*Controller.java` 端点速查表。
 
