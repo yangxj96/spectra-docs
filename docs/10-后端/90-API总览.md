@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 54 个 `@RestController`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 58 个 `@RestController`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -134,8 +134,12 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `FileController` | spectra-upload | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `file:read`，不再匿名开放 |
-| `FileInfoController` | spectra-upload | `/file/info/**` | 文件信息/类型管理 |
+| `FileUploadController` | spectra-upload | `/file/uploads/**` | 上传会话、分片目标、Local 原始 PUT、分片确认、完成和取消 |
+| `FileUploadAdminController` | spectra-upload | `/file/uploads/page`、`/{uploadId}/admin-detail`、`/{uploadId}/admin-cancel` | 上传任务管理查询、分片详情和管理员取消 |
+| `FileAssetController` | spectra-upload | `/file/assets/page`、`/file/assets/{fileAssetId}` | READY 文件资产分页和管理员删除 |
+| `FileAssetStreamController` | spectra-upload | `/file/assets/{fileAssetId}/preview`、`download` | 按业务引用或管理员权限流式预览/下载，支持 Range |
+| `FileReferenceController` | spectra-upload | `/file/references/**` | 业务文件引用登记、删除和管理员只读分页 |
+| `FileTypeController` | spectra-upload | `/file/types/**` | 文件类型策略查询、创建、修改、启用和停用 |
 
 ## 工作流
 

@@ -6,7 +6,7 @@ tags:
 
 # API 端点
 
-> 源码当前 53 个 `*Controller.java` 端点速查表。
+> 源码当前 58 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -122,8 +122,12 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| FileController | `/file/upload/**`、`/file/preview/{id}` | 文件上传/下载/分片上传；预览接口要求 `FILE:QUERY`，不再匿名开放 |
-| FileInfoController | `/file/info/**` | 文件信息/类型管理 |
+| FileUploadController | `/file/uploads/**` | 统一上传会话、分片目标、Local 原始 PUT、确认、完成和取消 |
+| FileUploadAdminController | `/file/uploads/page`、`/{uploadId}/admin-detail`、`/{uploadId}/admin-cancel` | 上传任务管理查询、分片详情和管理员取消 |
+| FileAssetController | `/file/assets/page`、`/file/assets/{fileAssetId}` | READY 资产分页和管理员删除 |
+| FileAssetStreamController | `/file/assets/{fileAssetId}/preview`、`download` | 按业务引用或管理员权限流式读取，支持 Range |
+| FileReferenceController | `/file/references/**` | 业务引用登记、删除和管理员只读分页 |
+| FileTypeController | `/file/types/**` | 文件类型策略查询、创建、修改、启用和停用 |
 
 ## 工作流
 

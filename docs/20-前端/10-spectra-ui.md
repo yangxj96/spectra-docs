@@ -16,7 +16,7 @@ tags:
 
 ## OA P1 页面
 
-请假、费用报销和采购申请页统一使用 `OAApproverSelect` 选择审批人，支持草稿/驳回态编辑、提交、撤回和取消。费用报销页面为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销明细、审批和付款接口；凭证上传前端能力暂时下线，后续重做上传模块时再恢复。
+请假、费用报销和采购申请页统一使用 `OAApproverSelect` 选择审批人，支持草稿/驳回态编辑、提交、撤回和取消。费用报销页面为 `/oa/reimbursement`，通过 `src/api/oa/reimbursement-api.ts` 对接报销明细、审批和付款接口；附件上传统一使用 `useFileUpload` 和 `FileApi`，业务只提交 `file_asset_id`。
 
 采购申请页面为 `src/views/oa/Purchase/index.vue`，路由为 `/oa/purchase`，通过 `src/api/oa/purchase-api.ts` 对接采购草稿、明细、审批、执行登记和分批收货接口，审批完成后可继续执行至 `RECEIVED`。
 
@@ -318,9 +318,11 @@ await del("/api/users/{id}", { pathParams: { id } });
 
 ### 文件上传与下载
 
-前端文件上传能力暂时下线，后续重做时必须接入 `src/plugin/request/` 自定义请求客户端，不在业务组件中直接使用 `XMLHttpRequest`、Axios 或 `fetch`。
+文件上传统一由 `src/services/file-upload-client.ts` 驱动：Worker 增量计算 SHA-256 并报告分析进度，IndexedDB 保存可恢复任务元数据，客户端按服务端已确认分片执行并发上传、暂停/继续、重试和最终复核轮询。控制面由 `src/api/system/file-api.ts` 统一封装，Local 原始 PUT 和 S3 预签名 PUT 都通过 `src/plugin/request/upload.ts`，业务组件不得直接调用 `XMLHttpRequest`、Axios 或 `fetch`。
 
-文件下载继续通过 `src/plugin/request/api.ts` 的 `download` 封装完成。
+文件预览和下载继续通过 `src/plugin/request/api.ts` 的 `download` 封装，返回原始 Blob；业务访问必须传入业务引用上下文或走管理员资产接口，旧上传路由不再存在。
+
+文件管理作为运维管理下与系统维护同级的独立目录，入口为 `/#/devops/file/upload`、`/#/devops/file/assets`、`/#/devops/file/upload-tasks`、`/#/devops/file/references` 和 `/#/devops/file/types`，分别对应文件上传、文件资产、上传任务、文件引用和文件类型策略页面。所有控制面请求统一由 `src/api/system/file-api.ts` 封装，管理页面不直接调用二进制上传接口。
 
 ### RequestOptions 类型
 
@@ -866,7 +868,13 @@ src/views/
 │   ├── Placeholder/         # 应用健康、安全等预定义占位页
 │   ├── Scheduler/           # 定时任务
 │   ├── Security/            # 安全上下文、安全审计、在线用户
-│   └── SystemMaintenance/   # 系统配置、文件管理
+│   ├── File/                # 文件管理：上传、资产、上传任务、引用和类型策略
+│   │   ├── Upload/
+│   │   ├── Assets/
+│   │   ├── UploadTask/
+│   │   ├── Reference/
+│   │   └── Type/
+│   └── SystemMaintenance/   # 系统配置及其他系统维护入口
 ├── System/                 # 系统管理
 │   ├── Dept/
 │   ├── Dict/

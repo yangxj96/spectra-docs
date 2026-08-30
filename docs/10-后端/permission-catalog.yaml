@@ -300,6 +300,13 @@ permissions:
     devOpsOnly: true
     delegatable: false
     source: phase-7-controller-migration
+  - code: file:admin:manage
+    name: 文件管理操作
+    scopeMode: NONE
+    highRisk: true
+    devOpsOnly: true
+    delegatable: false
+    source: phase-11-file-management
   - code: notification:read
     name: 通知查看
     scopeMode: SELF
