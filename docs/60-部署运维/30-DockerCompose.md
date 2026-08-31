@@ -7,7 +7,11 @@ tags:
 
 # Docker Compose
 
-> 本页是部署模板，不是仓库内现成的 Compose 文件。复制示例后，必须为目标机器创建自己的 `.env`，并在真实部署中固定镜像版本。
+> 本页是生产部署模板；仓库内另有 `spectra-admin/compose.dev.yml`，仅用于可选的本地 PostgreSQL/Redis 依赖编排，不启动后端，也不替代本页的生产部署配置。复制生产示例后，必须为目标机器创建自己的 `.env`，并在真实部署中固定镜像版本。
+
+## 服务边界
+
+Compose 模板只需要 PostgreSQL、Redis 和 `spectra-admin` 三类服务；后端是单体多模块应用，不需要 Nacos、服务注册发现、远程配置中心或服务间 discovery 服务。模块装配由镜像内的 `spectra-launch` 固定完成，环境差异通过 Compose 环境变量或部署 Secret 注入。
 
 ## 可复用与必须配置
 
@@ -41,7 +45,7 @@ services:
       retries: 10
 
   spectra-redis:
-    image: redis:7
+    image: redis:7.4.7
     restart: unless-stopped
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD}"]
     healthcheck:

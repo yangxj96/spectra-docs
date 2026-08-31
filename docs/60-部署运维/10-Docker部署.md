@@ -9,6 +9,12 @@ tags:
 
 > Docker 构建命令可以复用；镜像仓库、Tag、端口、Secret、数据卷和证书属于部署环境配置。
 
+## 单体部署边界
+
+当前镜像只运行 `spectra-admin` 单体多模块应用。容器通过环境变量连接 PostgreSQL、Redis 和可选的 S3，不依赖 Nacos、服务注册中心、远程配置中心或其他微服务运行时组件；部署时不需要额外启动注册中心或配置中心容器。
+
+模块是否启用由 `spectra-launch` 的显式 Maven 依赖和启动配置 `spectra.modules.<name>.enabled` 共同决定，不通过服务发现或远程配置动态改变。开关只在启动时读取；修改模块依赖或模块装配配置必须重新构建并验证镜像，不能依赖运行时注册回调。
+
 ## 构建前提
 
 - 使用 `spectra-admin/mvnw.cmd` 生成 Spring Boot 可执行 JAR。

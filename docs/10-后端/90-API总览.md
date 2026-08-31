@@ -11,6 +11,8 @@ tags:
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
+后端 API 运行在单体多模块组合根 `spectra-launch` 中：Core API 始终可用，OA、Workflow、Notification、Upload API 仅在对应模块已由 launch 引入且 `spectra.modules.<name>.enabled=true` 时注册。模块关闭不会产生空 Controller 或兼容回退入口；本系统不提供租户参数、租户切换或 SaaS 隔离 API。
+
 ## 认证与安全
 
 | Controller | 模块 | 基础路径 | 说明 |
@@ -20,7 +22,7 @@ tags:
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；所有高风险写入绑定短时 token |
 | `AuthorizationProfileController` | spectra-core | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除；方案保存使用稳定业务编码和版本校验 |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
-| `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略 |
+| `SecurityAuditController` | spectra-core | `/security/audit/**` | 按可见性策略查询/详情/CSV 导出安全审计，并只读展示热存与归档保留策略；`ROLE_DEV_OPS` 可计划归档、查看 manifest、失败重试、申请恢复和执行校验，普通 API 不提供删除/覆盖入口 |
 | `MfaController` | spectra-core | `/security/mfa/**` | MFA 状态查询、已登录用户 TOTP 登记/停用、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次保存系统基础配置、创建 DEV_OPS 账号、确认 TOTP 和完成初始化；完成后不自动登录，由客户端返回登录页 |
@@ -83,7 +85,7 @@ tags:
 | `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
 | `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的运行概览、Request/Task/Delivery 脱敏查询与详情、渠道状态、重试和取消；运行概览支持 `hours=1..168` |
 | `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板行级分页/详情、按模板组聚合分页、草稿创建/编辑、发布、禁用/启用、归档、版本历史和安全预览；按 `notification:template:*` 权限保护 |
-| `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、健康检查和明确测试地址的测试发送；按 `notification:provider:read/configure` 权限保护，Secret 和测试地址不回显 |
+| `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、单渠道配置校验和明确测试地址的测试发送；单渠道校验用于发送前置门禁，不替代系统级统一健康聚合；按 `notification:provider:read/configure` 权限保护，Secret 和测试地址不回显 |
 | `NotificationProviderCallbackController` | spectra-notification | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执入口；匿名但必须使用当前渠道 Secret 的 HMAC 签名，重复回执幂等更新既有 Delivery/Task，不创建孤立投递记录 |
 | `NotificationControlledSendController` | spectra-notification | `/notification/admin/send/**` | 受控发送 Preview/Apply；Preview 按当前受众、模板版本、用户偏好和渠道状态返回脱敏结果，Apply 绑定短时令牌并通过统一 Gateway 创建通知请求；分别受 `notification:send:preview/apply` 保护 |
 

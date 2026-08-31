@@ -19,7 +19,7 @@ tags:
 | AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；高风险写入绑定短时 token |
 | AuthorizationProfileController | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除 |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
-| SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据 |
+| SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据；ROLE_DEV_OPS 可计划/查询/重试/申请恢复/校验归档 manifest，不提供删除接口 |
 | MfaController | `/security/mfa/**` | MFA 状态查询、已登录用户 TOTP 登记/停用、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | SystemInitializationController | `/system/initialization/**` | 首次保存六项系统基础配置、创建 DEV_OPS 用户、密码凭证、TOTP MFA、Recovery Code 和 RoleAssignment；启动需要初始化令牌，MFA 挑战依赖 Redis |
@@ -89,7 +89,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | NotificationPreferenceController | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好查询与保存 |
 | NotificationAdminController | `/notification/admin/**` | 运行概览（`GET /overview?hours=1..168`）、Request/Task/Delivery 脱敏分页与详情、渠道状态、任务重试和取消 |
 | NotificationTemplateAdminController | `/notification/admin/templates/**` | 模板行级分页/详情、按模板组聚合分页、草稿创建/编辑、发布/禁用/启用/归档、版本历史和安全预览；按 `notification:template:*` 权限保护 |
-| NotificationProviderAdminController | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、`POST /{channel}/health` 健康检查和 `POST /{channel}/test` 受确认保护的测试发送；Secret/测试地址只在服务端短暂使用，不回显原文 |
+| NotificationProviderAdminController | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、`POST /{channel}/health` 单渠道配置校验/发送前置门禁和 `POST /{channel}/test` 受确认保护的测试发送；该校验不替代系统级统一健康聚合；Secret/测试地址只在服务端短暂使用，不回显原文 |
 | NotificationProviderCallbackController | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执；必须带 `X-Notification-Signature: sha256=<HMAC-SHA256(raw body)>`，重复正文返回 `DUPLICATE`，不创建新 Delivery |
 | NotificationControlledSendController | `/notification/admin/send/**` | `POST /preview` 和 `POST /apply`；绑定当前受众、已发布模板、渠道状态、请求摘要和短时令牌，Apply 只通过统一 Gateway 创建通知请求；权限为 `notification:send:preview/apply` |
 
