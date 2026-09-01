@@ -111,7 +111,7 @@ update code                     # 缺少 type
 | 类型 | 示例 |
 |---|---|
 | 配置文件（含真实凭据） | `.env`、`.mise.local.toml` |
-| 启动脚本（含环境变量） | `start-*.ps1`、包含 `$env:` 的 `.ps1` |
+| 启动脚本（含环境变量） | `start-*.sh`、包含 `export` 的 Bash 脚本 |
 | 证书/私钥 | `*.p12`、`*.jks`、`*.pem`、`*.key` |
 | 临时/日志文件 | `*.tmp`、`*.log` |
 

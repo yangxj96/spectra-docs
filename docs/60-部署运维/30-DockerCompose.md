@@ -114,7 +114,7 @@ S3_REGION=<真实值>
 
 Compose 创建空数据库后，仍需按 [[10-环境搭建#4. 准备 PostgreSQL 与 Redis]] 初始化项目 schema。随后在 Compose 文件所在目录执行：
 
-```powershell
+```bash
 docker compose config
 docker compose up -d
 docker compose ps

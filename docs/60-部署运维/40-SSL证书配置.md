@@ -18,34 +18,28 @@ tags:
 | P12 密码、CA、私钥、证书有效期 | 每台机器/每套环境自行生成 |
 | 系统证书库位置和企业 CA 流程 | 取决于操作系统和组织策略 |
 
-仓库当前没有提交 `install-ca.ps1`、`generate-cert.ps1` 或 `uninstall-ca.ps1`。不要按旧文档尝试运行不存在的脚本。
+仓库不提交 CA 安装、证书生成或卸载脚本；不要依赖不存在的脚本。可以使用组织 CA，或在本机用 OpenSSL 生成开发证书。
 
 ## 本机自签名证书示例
 
 要求 OpenSSL 已加入 PATH。以下命令从仓库根目录执行，生成仅用于本机开发的证书：
 
-```powershell
-$certDir = Join-Path (Resolve-Path .\spectra-admin) 'files\ssl'
-New-Item -ItemType Directory -Path $certDir -Force | Out-Null
-Push-Location $certDir
+```bash
+mkdir -p spectra-admin/files/ssl
+cd spectra-admin/files/ssl
+read -r -s -p '输入本机 P12 密码: ' SPECTRA_SSL_PASSWORD
+printf '\n'
+export SPECTRA_SSL_PASSWORD
 
-$securePassword = Read-Host '输入本机 P12 密码' -AsSecureString
-$passwordPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
-try {
-    $env:SPECTRA_SSL_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($passwordPtr)
+openssl req -x509 -newkey rsa:2048 -sha256 -days 825 -nodes \
+  -keyout localhost.key -out localhost.crt \
+  -subj '/CN=localhost' \
+  -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'
 
-    openssl req -x509 -newkey rsa:2048 -sha256 -days 825 -nodes `
-        -keyout localhost.key -out localhost.crt `
-        -subj '/CN=localhost' `
-        -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'
-
-    openssl pkcs12 -export -in localhost.crt -inkey localhost.key `
-        -out keystore.p12 -name tomcat -passout env:SPECTRA_SSL_PASSWORD
-} finally {
-    $env:SPECTRA_SSL_PASSWORD = $null
-    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($passwordPtr)
-    Pop-Location
-}
+openssl pkcs12 -export -in localhost.crt -inkey localhost.key \
+  -out keystore.p12 -name tomcat -passout env:SPECTRA_SSL_PASSWORD
+unset SPECTRA_SSL_PASSWORD
+chmod 600 keystore.p12 localhost.key
 ```
 
 生成的 `localhost.key`、`localhost.crt` 和 `keystore.p12` 都是本机材料，不得提交。确认 P12 可用后，可按本机安全策略处理不再需要的明文私钥文件。

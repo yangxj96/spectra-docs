@@ -70,7 +70,7 @@ server {
 
 ## 验证
 
-```powershell
+```bash
 nginx -t
 ```
 

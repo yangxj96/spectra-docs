@@ -17,7 +17,7 @@ tags:
 
 ## 构建前提
 
-- 使用 `spectra-admin/mvnw.cmd` 生成 Spring Boot 可执行 JAR。
+- 使用 `spectra-admin/mvnw` 生成 Spring Boot 可执行 JAR；在 WSL 中通过 mise 提供 Java。
 - Dockerfile 位于 `spectra-admin/spectra-launch/Dockerfile`。
 - Dockerfile 的构建上下文必须是 `spectra-launch/`，`JAR_FILE` 只传 JAR 文件名。
 - 运行镜像时显式配置 `SERVER_PORT`；[[30-DockerCompose]] 使用容器内 HTTP 8888，由 Nginx 终止 TLS。
@@ -26,17 +26,14 @@ tags:
 
 从仓库根目录执行：
 
-```powershell
-Push-Location .\spectra-admin
-.\mvnw.cmd clean package -DskipTests
-$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File |
-    Where-Object { $_.Name -notlike '*.jar.original' } |
-    Select-Object -First 1
+```bash
+cd spectra-admin
+./mvnw clean package -DskipTests
+jar=$(find spectra-launch/target -maxdepth 1 -type f \
+    -name 'spectra-launch-*.jar' ! -name '*.jar.original' -printf '%f\n' | head -n 1)
 
-Push-Location .\spectra-launch
-docker build --build-arg "JAR_FILE=$($jar.Name)" -t spectra-admin:local .
-Pop-Location
-Pop-Location
+cd spectra-launch
+docker build --build-arg "JAR_FILE=$jar" -t spectra-admin:local .
 ```
 
 `spectra-admin:local` 是本机标签，可直接用于本机验证。推送到镜像仓库时，仓库地址和版本 Tag 必须按发布流程确定；生产部署不要长期跟随 `latest`。
@@ -45,7 +42,7 @@ Pop-Location
 
 后端仍需要完整的数据库、Redis 和 S3 环境变量。推荐使用 [[30-DockerCompose]] 集中配置，不要把真实值写进 Dockerfile 或 `docker run` 命令历史。
 
-```powershell
+```bash
 docker image inspect spectra-admin:local
 ```
 

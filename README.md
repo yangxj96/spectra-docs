@@ -6,20 +6,20 @@
 
 首次拉取请使用包含子模块的命令：
 
-```powershell
+```bash
 git clone --recurse-submodules https://github.com/yangxj96/spectra-docs.git spectra
-Set-Location .\spectra
+cd spectra
 ```
 
 已经普通克隆过仓库时，补齐子模块：
 
-```powershell
+```bash
 git submodule update --init --recursive
 ```
 
 然后按 [环境搭建](docs/50-开发指南/10-环境搭建.md) 完成以下事项：
 
-1. 安装 PowerShell 7.6+、mise、PostgreSQL 18 和 Redis。
+1. 安装 Bash、mise、PostgreSQL 18 和 Redis。
 2. 从示例文件创建本机配置；真实密码和密钥只写入 Git 已忽略的本地文件。
 3. 初始化数据库，安装三个子项目的依赖。
 4. 分别启动后端、Web 管理后台和流程建模插件。
@@ -78,16 +78,16 @@ spectra/
 
 - 用普通 Markdown 阅读器即可查看 `docs/`；Obsidian 只是可选的图谱和 wikilink 阅读体验。
 - `docs/00-项目总览.md` 是架构入口，`docs/50-开发指南/10-环境搭建.md` 是新机器入口。
-- 修改文档后在 PowerShell 7.6+ 中运行 `.\scripts\check-docs.ps1`。
+- 修改文档后在仓库根目录运行 `./scripts/check-docs.sh`。
 
 ### CodeGraph（可选）
 
 CodeGraph 不参与项目构建。只有已经安装 `codegraph` CLI 且希望使用源码知识图谱时，才需要在各子项目和根目录初始化索引：
 
-```powershell
-Push-Location .\spectra-admin; codegraph init; Pop-Location
-Push-Location .\spectra-ui; codegraph init; Pop-Location
-Push-Location .\logicflow-plugin-flowable; codegraph init; Pop-Location
+```bash
+(cd spectra-admin && codegraph init)
+(cd spectra-ui && codegraph init)
+(cd logicflow-plugin-flowable && codegraph init)
 codegraph init
 ```
 

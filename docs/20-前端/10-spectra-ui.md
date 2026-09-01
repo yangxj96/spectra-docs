@@ -51,8 +51,8 @@ tags:
 
 ## 运行命令
 
-```powershell
-Copy-Item .env.example .env.development
+```bash
+cp .env.example .env.development
 pnpm install    # 安装依赖
 pnpm start      # 启动开发服务器（:5173），自动执行 format+lint+type-check
 ```
@@ -911,7 +911,7 @@ src/views/
 
 ## Commit 规范
 
-项目提交信息遵循 Conventional Commits 约定。为兼容 Windows 开发环境，`spectra-ui` 不配置 Husky、lint-staged 或 commitlint 提交钩子，提交时按以下格式人工遵循。
+项目提交信息遵循 Conventional Commits 约定。当前 Linux/WSL 开发环境不配置 Husky、lint-staged 或 commitlint 提交钩子，提交时按以下格式人工遵循。
 
 ### 提交格式
 
