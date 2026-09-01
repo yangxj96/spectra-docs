@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf 'SPECTRA_REGION_IMPORT=%s\n' "${SPECTRA_REGION_IMPORT-}" >"$SPECTRA_IMPORT_TEST_CAPTURE"
+printf '%s\n' "$*" >>"$SPECTRA_IMPORT_TEST_CAPTURE"
