@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 58 个 `@RestController`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 55 个 `@RestController`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -148,12 +148,11 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `FormDefinitionController` | spectra-workflow | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
-| `ModelController` | spectra-workflow | `/workflow/model/**` | 流程模型草稿入口（当前为空壳） |
 | `ProcessDefinitionController` | spectra-workflow | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | `ProcessInstanceController` | spectra-workflow | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
 | `TaskController` | spectra-workflow | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；写操作校验当前办理人 |
-| `RuntimeController` | spectra-workflow | `/workflow/runtime/**` | 运行时控制入口（当前为空壳） |
-| `HistoryController` | spectra-workflow | `/workflow/history/**` | 历史查询入口（当前为空壳） |
+
+1.0.0 当前不开放独立的流程模型草稿、运行时控制和历史查询入口；BPMN XML 部署使用 `/workflow/process-definitions/deploy`，实例与任务查询使用上表中的已发布接口。
 
 ## 全局异常处理
 

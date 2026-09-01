@@ -6,7 +6,7 @@ tags:
 
 # API 端点
 
-> 源码当前 58 个 `*Controller.java` 端点速查表。
+> 源码当前 55 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -134,12 +134,11 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | Controller | 路径 | 说明 |
 |---|---|---|
 | FormDefinitionController | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
-| ModelController | `/workflow/model/**` | 流程模型草稿入口（当前为空壳） |
 | ProcessDefinitionController | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | ProcessInstanceController | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
 | TaskController | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；任务动作校验当前办理人 |
-| RuntimeController | `/workflow/runtime/**` | 运行时状态查询（待实现） |
-| HistoryController | `/workflow/history/**` | 历史记录查询（待实现） |
+
+1.0.0 当前不开放独立的流程模型、运行时控制和历史查询入口；流程设计器使用流程定义部署接口，实例和任务使用上表接口。
 
 ## 全局异常处理
 
