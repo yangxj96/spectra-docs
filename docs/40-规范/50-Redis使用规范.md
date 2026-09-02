@@ -10,7 +10,7 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 
 > 来源：[[00-项目总览|项目 VitePress 文档]]
 >
-> 适用于 spectra-admin 中作为缓存层使用 Redis。不含消息队列、分布式锁等特殊用法。安全模块的 Token、Session、MFA、验证码、防重放和请求 nonce Redis 不属于本规范中的普通缓存，见下文“安全 Redis 强依赖”。
+> 适用于 spectra-admin 中作为缓存层使用 Redis。不含消息队列、分布式锁等特殊用法。安全模块的 Token、Session、验证码、防重放和请求 nonce Redis 不属于本规范中的普通缓存，见下文“安全 Redis 强依赖”。
 
 ## 核心原则
 
@@ -26,7 +26,6 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 
 - Access Token / Refresh Token / Session 及 Token Family
 - Refresh Token 一次性轮换声明和重放围栏
-- MFA 登录 Challenge、失败次数和消费状态
 - 登录、绑定流程验证码摘要
 - 加密请求 nonce 防重放状态
 - 登录失败次数和锁定状态
@@ -48,7 +47,7 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 | `sec:uc:*` / `sec:ut:*` / `sec:online` | 用户-客户端索引、用户 Token 集合和在线用户集合 |
 | `sec:family:*` / `sec:rt:family:*` | Access/Refresh Token Family |
 | `sec:rt:*` / `sec:rt:claim:*` / `sec:replay:*` | Refresh 映射、一次性消费声明和重放撤销围栏 |
-| `sec:mfa:challenge:*` / `sec:fail:*` | MFA Challenge 和登录失败锁定 |
+| `sec:fail:*` | 登录失败锁定 |
 
 旧 `auth:*`、`sec:v2:*` 和兼容 Key 不再由运行时读取或写入；运行时不维护双命名空间迁移逻辑。
 

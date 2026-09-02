@@ -6,14 +6,14 @@
 
 ## 适用范围
 
-适用于 Security 重构 cutover、Flyway 升级、权限大批量变更、MFA/Session 故障和安全事件。应用账号不能更新/删除 Security Audit；备份与恢复使用独立数据库运维权限。
+适用于 Security 重构 cutover、Flyway 升级、权限大批量变更、Session 故障和安全事件。应用账号不能更新/删除 Security Audit；备份与恢复使用独立数据库运维权限。
 
 ## 变更前门禁
 
 1. 记录变更单、事件编号、目标 Flyway 版本、回滚负责人和独立复核人。
 2. 对 `spectra_core`、`spectra_security`、`spectra_notification`、`spectra_oa` 和 `spectra_workflow` 做一致性快照或可恢复备份。
 3. 备份完成后执行独立校验，并在隔离数据库恢复至少一次；只验证“备份文件存在”不算通过。
-4. 记录当前 `root_policy`、有效 DEV_OPS 数量、活动 Assignment、Session policy、MFA enrollment 数量和 Redis key namespace 统计。
+4. 记录当前 `root_policy`、有效 DEV_OPS 数量、活动 Assignment、Session policy 和 Redis key namespace 统计。
 5. 明确全局 logout 的执行窗口。Security Redis 不可用时不得宣称已完成全局 logout，也不得用本地缓存替代撤销。
 
 ## 恢复验收
@@ -23,7 +23,7 @@
 - Flyway history 连续且校验通过；
 - `security_audit_event` 仍可追加，更新/删除 trigger 仍拒绝；
 - `root_policy` 和有效 DEV_OPS 数量满足最小 Root 约束；
-- RoleAssignment、Permission Boundary、AuthenticationIdentity、PasswordCredential、MFA 和 Recovery Code 数量与备份报告一致；
+- RoleAssignment、Permission Boundary、AuthenticationIdentity 和 PasswordCredential 数量与备份报告一致；
 - `security_audit_archive_manifest` 的摘要、对象 URI 和状态可查询；
 - Redis 使用 `sec:*` namespace，抽样 Token Digest 不会在日志或响应中出现；
 - 使用测试账户完成登录、刷新、logout、全局 revoke 后，旧 Access/Refresh Token 均被拒绝。
@@ -46,4 +46,4 @@
 
 ## 证据清单
 
-变更单、备份摘要、恢复日志、Flyway history、Root/Assignment 计数、Audit append-only 结果、Redis revoke 计数、登录/刷新/logout 测试结果、告警编号和复盘结论必须关联事件编号保存。证据中不得包含密码、Token、TOTP Secret、Recovery Code 或私钥。
+变更单、备份摘要、恢复日志、Flyway history、Root/Assignment 计数、Audit append-only 结果、Redis revoke 计数、登录/刷新/logout 测试结果、告警编号和复盘结论必须关联事件编号保存。证据中不得包含密码、Token 或私钥。

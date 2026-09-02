@@ -6,7 +6,7 @@ tags:
 
 # API 端点
 
-> 源码当前 55 个 `*Controller.java` 端点速查表。
+> 源码当前 54 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -14,15 +14,14 @@ tags:
 
 | Controller | 路径 | 说明 |
 |---|---|---|
-| AuthenticationController（spectra-core.security.authentication） | `/security/authentication/**` | 登录/登出/刷新 Token/登录验证码获取；DEV_OPS 首次 MFA 登记或用户自启用 TOTP 时支持二阶段 MFA challenge |
+| AuthenticationController（spectra-core.security.authentication） | `/security/authentication/**` | 登录/登出/刷新 Token、登录验证码获取和认证身份绑定验证码 |
 | AuthenticationIdentityController | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
 | AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；高风险写入绑定短时 token |
 | AuthorizationProfileController | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除 |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据；ROLE_DEV_OPS 可计划/查询/重试/申请恢复/校验归档 manifest，不提供删除接口 |
-| MfaController | `/security/mfa/**` | MFA 状态查询、已登录用户 TOTP 登记/停用、Recovery Code 单次消费/轮换；首次登录通过受限 setup challenge 登记 TOTP |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
-| SystemInitializationController | `/system/initialization/**` | 首次保存六项系统基础配置、创建 DEV_OPS 用户、密码凭证、TOTP MFA、Recovery Code 和 RoleAssignment；启动需要初始化令牌，MFA 挑战依赖 Redis |
+| SystemInitializationController | `/system/initialization/**` | 首次保存六项系统基础配置、创建 DEV_OPS 用户、密码凭证和 RoleAssignment；启动需要初始化令牌 |
 | SystemGuideController | `/system/guide/**` | DEV_OPS 首次登录后查询并完成系统设置；提交根部门名称、区域、类型并保存接口加解密、通知模块和底部版权策略 |
 
 ## 核心 — 公共
@@ -31,9 +30,9 @@ tags:
 |---|---|---|
 | CommonController | `/common/**` | 验证码生成、公共接口 |
 
-二阶段 MFA 登录接口：`POST /security/authentication/login` 在 DEV_OPS 被强制或任意用户已启用 TOTP 且主认证成功时返回 `mfa_required=true` 和短期 `mfa_challenge_id`；已有 TOTP 账号调用 `POST /security/authentication/mfa/verify`，首次账号依次调用 `POST /security/mfa/setup/totp/enroll`、`POST /security/mfa/setup/totp/confirm`、`POST /security/authentication/mfa/complete`。已登录用户可调用 `GET /security/mfa/status`、`POST /security/mfa/totp/enroll`、`POST /security/mfa/totp/confirm` 和 `POST /security/mfa/totp/disable` 管理自己的 TOTP；Recovery Code 可通过 `/security/mfa/recovery/verify` 消费、通过 `/security/mfa/recovery/rotate` 轮换。challenge 成功消费、过期或达到失败次数上限后失效。
+登录接口在主认证成功后直接签发正式 Token；密码、短信验证码和邮箱验证码登录共用同一会话创建路径，不提供二阶段挑战或额外认证因子。
 
- Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息、加解密配置和初始化状态；该接口面向未登录页面开放，只返回系统名称、简称、Logo、默认语言、默认时区、版权开关、版权名称、版权跳转地址、加解密开关、服务端公钥和初始化状态，不返回安全策略或任何私钥。首次系统初始化接口：未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，请求同时提交 `system_name`、`system_short_name`、`system_logo`、`default_locale`、`default_timezone` 和 `security_profile`，后端将六项非敏感配置写入 `spectra_core.sys_config`，只创建 DEV_OPS 用户及其认证材料，不创建部门。再调用 `POST /system/initialization/mfa/confirm` 完成 TOTP 登记并离线保存 Recovery Code，最后调用 `POST /system/initialization/complete` 激活用户并创建 `ROLE_DEV_OPS` Assignment。完成接口不签发登录 Token，客户端应返回登录页并通过正常登录流程建立会话。初始化状态和引导状态分别使用 `sys_system_state` 的 `SYSTEM` 与 `SYSTEM_GUIDE` 种子行；Redis 不可用时挑战和最终初始化均 fail-closed。DEV_OPS 首次登录后调用 `GET /system/guide/status`，必须通过 `POST /system/guide/complete` 提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`crypto_enabled`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url`，其中根部门名称、区域和类型均必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。后端在当前用户上下文中创建根部门、建立 DEV_OPS 主部门关系并自动生成所需密钥，版权设置同时写入 `sys_config`。
+Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息、加解密配置和初始化状态；该接口面向未登录页面开放，只返回系统名称、简称、Logo、默认语言、默认时区、版权开关、版权名称、版权跳转地址、加解密开关、服务端公钥和初始化状态，不返回安全策略或任何私钥。首次系统初始化接口：未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，请求同时提交 `system_name`、`system_short_name`、`system_logo`、`default_locale`、`default_timezone` 和 `security_profile`，后端将六项非敏感配置写入 `spectra_core.sys_config`，只创建 DEV_OPS 用户及其认证材料，不创建部门。随后调用 `POST /system/initialization/complete` 激活用户并创建 `ROLE_DEV_OPS` Assignment。完成接口不签发登录 Token，客户端应返回登录页并通过正常登录流程建立会话。初始化状态和引导状态分别使用 `sys_system_state` 的 `SYSTEM` 与 `SYSTEM_GUIDE` 种子行；Redis 不可用时初始化令牌读取和最终完成操作均 fail-closed。DEV_OPS 首次登录后调用 `GET /system/guide/status`，必须通过 `POST /system/guide/complete` 提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`crypto_enabled`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url`，其中根部门名称、区域和类型均必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。后端在当前用户上下文中创建根部门、建立 DEV_OPS 主部门关系并自动生成所需密钥，版权设置同时写入 `sys_config`。
 
 ## 核心 — 用户权限
 

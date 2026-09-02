@@ -11,7 +11,7 @@
 迁移前必须确认：
 
 - 当前有效管理员、`DEV_OPS`、`SYSTEM_ADMIN` 和 Root 数量满足 `root_policy`；
-- 用户生命周期、认证身份、密码凭据、活动 RoleAssignment 和 MFA 状态可追溯；
+- 用户生命周期、认证身份、密码凭据和活动 RoleAssignment 可追溯；
 - 历史 user-level/role-level Scope 的每一条记录都由业务负责人映射到具体 `(RoleAssignment, Permission)` Boundary；
 - 没有任何旧 Scope 被自动转换为 `GrantablePermission` 或 Grant Boundary。
 
@@ -48,12 +48,11 @@ LEFT JOIN spectra_security.sec_role_assignment ra
        ON ra.role_id = r.id AND ra.state = 'ACTIVE'
 GROUP BY rp.min_effective_dev_ops_users, rp.max_dev_ops_users;
 
--- 4. 认证身份、密码和 MFA 覆盖率（只返回数量）
+-- 4. 认证身份和密码覆盖率（只返回数量）
 SELECT
     (SELECT COUNT(*) FROM spectra_core.sys_user WHERE deleted IS NULL) AS users,
     (SELECT COUNT(DISTINCT user_id) FROM spectra_security.sec_authentication_identity WHERE state = 'ACTIVE') AS users_with_identity,
-    (SELECT COUNT(*) FROM spectra_security.sec_password_credential) AS password_credentials,
-    (SELECT COUNT(DISTINCT user_id) FROM spectra_security.sec_mfa_enrollment WHERE state = 'ACTIVE') AS users_with_mfa;
+    (SELECT COUNT(*) FROM spectra_security.sec_password_credential) AS password_credentials;
 
 -- 5. Permission-specific Boundary 覆盖情况
 SELECT COUNT(*) AS access_boundary_count
@@ -88,7 +87,7 @@ FROM spectra_security.sec_assignment_grant_boundary;
 Flyway 版本：
 有效 DEV_OPS / min / max：
 ACTIVE 用户 / LOCKED / DISABLED / DEPARTED：
-有认证身份用户数 / 有密码凭据用户数 / 已完成 MFA 用户数：
+有认证身份用户数 / 有密码凭据用户数：
 待人工 Scope 映射数：
 未决高风险项：
 业务负责人：

@@ -50,7 +50,7 @@ description: 仅在修改或审查 spectra-admin 的 Java、后端接口、持�
 
 - PostgreSQL `jsonb` 必须使用项目自定义 `PgJsonbTypeHandler`，不要使用 `Jackson3TypeHandler`；需要细节时读取 `references/jsonb.md`。
 - 安全 Redis 操作必须通过 `SecurityRedisExecutor`；连接失败、命令失败、超时或无法确认状态时立即 fail-closed，不得以内存、本地快照或“数据不存在”降级。
-- 修改认证、MFA、验证码、Token、Session、防重放或安全 Redis 时读取 `references/security.md`。
+- 修改认证、验证码、Token、Session、防重放或安全 Redis 时读取 `references/security.md`。
 
 ## Reference 路由
 

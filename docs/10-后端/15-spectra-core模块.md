@@ -79,7 +79,7 @@ spectra-admin/spectra-modules/spectra-core/
 - 业务代码统一使用 common 的 `@Audit` 或 `AuditService`，不直接依赖日志表或 Mapper。
 - `CoreAuditService` 负责脱敏后的事件路由：普通操作事件在当前事务进入 PostgreSQL outbox，安全事件进入安全审计 sink。
 - `AuditAspect` 和 `AuditConfiguration` 位于 core，`@Audit`/`AuditService` 是唯一业务入口；普通日志由 outbox worker 租约消费并幂等写入 `sys_log`，安全审计仍保持同步写入和失败阻断。
-- 安全事实写入与安全变更 outbox 是两条明确链路：`SecurityAuditWriter` 同步写入不可变事实表，成功的用户、角色、权限、组织、MFA 和策略变更再在同一事务中进入 `sec_security_change_outbox`，由可选处理器异步消费；outbox 失败不能替代或掩盖安全事实写入失败。
+- 安全事实写入与安全变更 outbox 是两条明确链路：`SecurityAuditWriter` 同步写入不可变事实表，成功的用户、角色、权限、组织和策略变更再在同一事务中进入 `sec_security_change_outbox`，由可选处理器异步消费；outbox 失败不能替代或掩盖安全事实写入失败。
 - 安全审计归档状态由 `sec_security_audit_archive_manifest` 管理，Core 负责计划、归档 worker、对象完整性校验、恢复申请和指标；对象存储实现通过 `common.port.audit.SecurityAuditArchiveBackend` 由可选 Upload 模块提供。开发环境后端策略为 `PENDING` 时不执行归档，生产必须显式配置匹配的 Object Lock 后端。
 
 文件资产、分片上传和业务附件引用属于可选的 `spectra-upload` 模块；Core 只通过公共能力契约参与需要的跨模块调用，不持有文件存储实现。
@@ -144,7 +144,6 @@ spectra-core ← 被以下模块依赖
 | AuthorizationProfileController | `/security/authorization/profiles` | 授权方案管理 |
 | SecurityContextController | `/security/context` | 当前用户权限目录和可授予权限 |
 | SecurityAuditController | `/security/audit/**` | 安全审计查询、详情、导出、保留策略，以及归档计划/状态/重试/恢复申请/校验；归档运维接口要求 `ROLE_DEV_OPS` |
-| MfaController | `/security/mfa/**` | TOTP MFA、Recovery Code 和状态 |
 | SecurityPolicyController | `/security/policy/**` | Session 和密码策略 |
 | AuthorityController | `/authority/tree` | Permission Catalog 只读树 |
 | MenuController | `/menu/**` | 菜单 CRUD |
