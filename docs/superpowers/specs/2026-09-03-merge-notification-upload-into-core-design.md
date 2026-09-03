@@ -72,7 +72,7 @@ spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notificatio
 spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/notification
 ```
 
-所有包声明和内部引用同步替换 `com.devops00.spectra.notification` 为 `com.devops00.spectra.core.notification`。通知 Mapper XML 迁移到 Core 的 `src/main/resources/mapper`，保持原文件名和 namespace。
+所有包声明和内部引用同步替换 `com.devops00.spectra.notification` 为 `com.devops00.spectra.core.notification`。通知 Mapper XML 迁移到 Core 的 `src/main/resources/mapper`，保持原文件名，并将 MyBatis `namespace` 同步为新的 Mapper 接口全限定名；数据库表和 SQL 语义不变。
 
 删除 `NotificationModule` 及其 `AutoConfiguration.imports`。通知配置属性由 `CoreModule` 注册，通知组件由 Core 包扫描发现。
 

@@ -11,7 +11,7 @@ tags:
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
-后端 API 运行在单体多模块组合根 `spectra-launch` 中：Core API 始终可用，OA、Workflow、Notification、Upload API 仅在对应模块已由 launch 引入且 `spectra.modules.<name>.enabled=true` 时注册。模块关闭不会产生空 Controller 或兼容回退入口；本系统不提供租户参数、租户切换或 SaaS 隔离 API。
+后端 API 运行在单体多模块组合根 `spectra-launch` 中：Core API（包含通知和文件上传 API）始终可用，OA、Workflow API 仅在对应模块已由 launch 引入且 `spectra.modules.<name>.enabled=true` 时注册。可选模块关闭不会产生空 Controller 或兼容回退入口；本系统不提供租户参数、租户切换或 SaaS 隔离 API。
 
 ## 认证与安全
 
@@ -72,13 +72,13 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `NotificationController` | spectra-notification | `/notification/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
-| `NotificationPreferenceController` | spectra-notification | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
-| `NotificationAdminController` | spectra-notification | `/notification/admin/**` | `notification:admin:*` 权限保护的运行概览、Request/Task/Delivery 脱敏查询与详情、渠道状态、重试和取消；运行概览支持 `hours=1..168` |
-| `NotificationTemplateAdminController` | spectra-notification | `/notification/admin/templates/**` | 模板行级分页/详情、按模板组聚合分页、草稿创建/编辑、发布、禁用/启用、归档、版本历史和安全预览；按 `notification:template:*` 权限保护 |
-| `NotificationProviderAdminController` | spectra-notification | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、单渠道配置校验和明确测试地址的测试发送；单渠道校验用于发送前置门禁，不替代系统级统一健康聚合；按 `notification:provider:read/configure` 权限保护，Secret 和测试地址不回显 |
-| `NotificationProviderCallbackController` | spectra-notification | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执入口；匿名但必须使用当前渠道 Secret 的 HMAC 签名，重复回执幂等更新既有 Delivery/Task，不创建孤立投递记录 |
-| `NotificationControlledSendController` | spectra-notification | `/notification/admin/send/**` | 受控发送 Preview/Apply；Preview 按当前受众、模板版本、用户偏好和渠道状态返回脱敏结果，Apply 绑定短时令牌并通过统一 Gateway 创建通知请求；分别受 `notification:send:preview/apply` 保护 |
+| `NotificationController` | spectra-core（core.notification） | `/notification/**` | 当前用户消息分页、详情、未读数、已读、删除与批量删除；不接收 `userId` |
+| `NotificationPreferenceController` | spectra-core（core.notification） | `/notification-center/preferences/**` | 当前用户用途 × 渠道偏好矩阵 |
+| `NotificationAdminController` | spectra-core（core.notification） | `/notification/admin/**` | `notification:admin:*` 权限保护的运行概览、Request/Task/Delivery 脱敏查询与详情、渠道状态、重试和取消；运行概览支持 `hours=1..168` |
+| `NotificationTemplateAdminController` | spectra-core（core.notification） | `/notification/admin/templates/**` | 模板行级分页/详情、按模板组聚合分页、草稿创建/编辑、发布、禁用/启用、归档、版本历史和安全预览；按 `notification:template:*` 权限保护 |
+| `NotificationProviderAdminController` | spectra-core（core.notification） | `/notification/admin/providers/**` | SMS/EMAIL/IN_APP Provider 脱敏配置查询、SMS/EMAIL 配置保存、单渠道配置校验和明确测试地址的测试发送；单渠道校验用于发送前置门禁，不替代系统级统一健康聚合；按 `notification:provider:read/configure` 权限保护，Secret 和测试地址不回显 |
+| `NotificationProviderCallbackController` | spectra-core（core.notification） | `/notification/provider/callback/{channel}` | 外部 SMS/EMAIL Provider 回执入口；匿名但必须使用当前渠道 Secret 的 HMAC 签名，重复回执幂等更新既有 Delivery/Task，不创建孤立投递记录 |
+| `NotificationControlledSendController` | spectra-core（core.notification） | `/notification/admin/send/**` | 受控发送 Preview/Apply；Preview 按当前受众、模板版本、用户偏好和渠道状态返回脱敏结果，Apply 绑定短时令牌并通过统一 Gateway 创建通知请求；分别受 `notification:send:preview/apply` 保护 |
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。
 
@@ -127,12 +127,12 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `FileUploadController` | spectra-upload | `/file/uploads/**` | 上传会话、分片目标、Local 原始 PUT、分片确认、完成和取消 |
-| `FileUploadAdminController` | spectra-upload | `/file/uploads/page`、`/{uploadId}/admin-detail`、`/{uploadId}/admin-cancel` | 上传任务管理查询、分片详情和管理员取消 |
-| `FileAssetController` | spectra-upload | `/file/assets/page`、`/file/assets/{fileAssetId}` | READY 文件资产分页和管理员删除 |
-| `FileAssetStreamController` | spectra-upload | `/file/assets/{fileAssetId}/preview`、`download` | 按业务引用或管理员权限流式预览/下载，支持 Range |
-| `FileReferenceController` | spectra-upload | `/file/references/**` | 业务文件引用登记、删除和管理员只读分页 |
-| `FileTypeController` | spectra-upload | `/file/types/**` | 文件类型策略查询、创建、修改、启用和停用 |
+| `FileUploadController` | spectra-core（core.upload） | `/file/uploads/**` | 上传会话、分片目标、Local 原始 PUT、分片确认、完成和取消 |
+| `FileUploadAdminController` | spectra-core（core.upload） | `/file/uploads/page`、`/{uploadId}/admin-detail`、`/{uploadId}/admin-cancel` | 上传任务管理查询、分片详情和管理员取消 |
+| `FileAssetController` | spectra-core（core.upload） | `/file/assets/page`、`/file/assets/{fileAssetId}` | READY 文件资产分页和管理员删除 |
+| `FileAssetStreamController` | spectra-core（core.upload） | `/file/assets/{fileAssetId}/preview`、`download` | 按业务引用或管理员权限流式预览/下载，支持 Range |
+| `FileReferenceController` | spectra-core（core.upload） | `/file/references/**` | 业务文件引用登记、删除和管理员只读分页 |
+| `FileTypeController` | spectra-core（core.upload） | `/file/types/**` | 文件类型策略查询、创建、修改、启用和停用 |
 
 ## 工作流
 

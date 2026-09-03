@@ -22,7 +22,7 @@ tags:
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据；ROLE_DEV_OPS 可计划/查询/重试/申请恢复/校验归档 manifest，不提供删除接口 |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | SystemInitializationController | `/system/initialization/**` | 首次保存六项系统基础配置、创建 DEV_OPS 用户、密码凭证和 RoleAssignment；启动需要初始化令牌 |
-| SystemGuideController | `/system/guide/**` | DEV_OPS 首次登录后查询并完成系统设置；提交根部门名称、区域、类型并保存接口加解密、通知模块和底部版权策略 |
+| SystemGuideController | `/system/guide/**` | DEV_OPS 首次登录后查询并完成系统设置；提交根部门名称、区域、类型并保存接口加解密、Core 通知业务和底部版权策略 |
 
 ## 核心 — 公共
 

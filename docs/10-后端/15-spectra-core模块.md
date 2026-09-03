@@ -7,11 +7,11 @@ tags:
 
 # spectra-core 模块
 
-> 必选系统核心模块：用户/认证/角色/权限/组织/系统配置/统一审计/健康聚合/单体调度。
+> 必选系统核心模块：用户/认证/角色/权限/组织/系统配置/统一审计/健康聚合/单体调度/统一通知/文件上传。
 
 ## 模块职责
 
-`spectra-core` 是 Spectra 后端平台的必选业务核心，提供系统运行所需的基础能力与核心编排。Core 不承载 Web、Redis、MyBatis 等纯技术实现，也不依赖 OA、Workflow、Notification、Upload 或未来 ERP 的业务实现；可选能力通过 common/framework 的稳定端口接入。
+`spectra-core` 是 Spectra 后端平台的必选业务核心，提供系统运行所需的基础能力与核心编排。Core 不承载 Web、Redis、MyBatis 等纯技术实现，也不依赖 OA、Workflow 或未来 ERP 的业务实现；统一通知和文件上传作为 Core 子域随核心能力提供，跨域调用继续通过 common/framework 的稳定端口接入。
 
 ## 目录结构
 
@@ -27,6 +27,8 @@ spectra-admin/spectra-modules/spectra-core/
     ├── system/         ← 系统管理、服务监控、统一健康聚合
     ├── scheduler/      ← 统一调度内核、LOOP 会话和运维管理
     ├── security/       ← 认证、授权、安全审计和安全策略
+    ├── notification/   ← 统一通知请求、模板、投递和消息中心
+    ├── upload/         ← 文件资产、分片上传、本地/S3 存储
     └── user/           ← 用户、角色和批量导入
 ```
 
@@ -80,9 +82,15 @@ spectra-admin/spectra-modules/spectra-core/
 - `CoreAuditService` 负责脱敏后的事件路由：普通操作事件在当前事务进入 PostgreSQL outbox，安全事件进入安全审计 sink。
 - `AuditAspect` 和 `AuditConfiguration` 位于 core，`@Audit`/`AuditService` 是唯一业务入口；普通日志由 outbox worker 租约消费并幂等写入 `sys_log`，安全审计仍保持同步写入和失败阻断。
 - 安全事实写入与安全变更 outbox 是两条明确链路：`SecurityAuditWriter` 同步写入不可变事实表，成功的用户、角色、权限、组织和策略变更再在同一事务中进入 `sec_security_change_outbox`，由可选处理器异步消费；outbox 失败不能替代或掩盖安全事实写入失败。
-- 安全审计归档状态由 `sec_security_audit_archive_manifest` 管理，Core 负责计划、归档 worker、对象完整性校验、恢复申请和指标；对象存储实现通过 `common.port.audit.SecurityAuditArchiveBackend` 由可选 Upload 模块提供。开发环境后端策略为 `PENDING` 时不执行归档，生产必须显式配置匹配的 Object Lock 后端。
+- 安全审计归档状态由 `sec_security_audit_archive_manifest` 管理，Core 负责计划、归档 worker、对象完整性校验、恢复申请和指标；对象存储实现通过 `common.port.audit.SecurityAuditArchiveBackend` 由 Core 的 upload 子域提供。开发环境后端策略为 `PENDING` 时不执行归档，生产必须显式配置匹配的 Object Lock 后端。
 
-文件资产、分片上传和业务附件引用属于可选的 `spectra-upload` 模块；Core 只通过公共能力契约参与需要的跨模块调用，不持有文件存储实现。
+文件资产、分片上传和业务附件引用属于 Core 的 `upload` 子域；OA 等业务通过 `common.port.file` 使用能力，Core 持有文件存储实现。
+
+### 统一通知与文件上传
+
+- `core.notification` 提供通知请求、模板、Provider、投递 Worker、消息中心、偏好、健康检查和敏感数据清理；`NotificationService` 仍是跨域发送的公共端口，`spectra.notification.enabled` 只控制通知业务功能。
+- `core.upload` 提供文件资产、分片上传、Local/S3 Provider、文件引用、清理任务和文件管理 API；`FileAssetPort`、`FileReferenceService` 等跨域契约继续位于 `spectra-common`。
+- 两个子域不再有独立 Maven artifact、自动配置入口或模块装配开关，均由 `CoreModule` 统一扫描；API 路径、数据库 schema/table 和配置前缀不变。
 
 ## 模块关系
 
@@ -91,7 +99,7 @@ spectra-core ← 被以下模块依赖
 ├── spectra-oa
 └── spectra-launch
 
-`spectra-upload`、`spectra-workflow` 和 `spectra-notification` 均为独立可选模块；它们不通过生产依赖反向依赖 Core。需要组合时由 `spectra-launch` 显式装配。
+`spectra-workflow` 和 `spectra-oa` 是独立可选模块；通知和文件上传已并入 Core，不再由 `spectra-launch` 单独装配。
 ```
 
 ## 实体清单
@@ -165,4 +173,4 @@ spectra-core ← 被以下模块依赖
 - [[30-系统管理]] — 系统管理详细设计
 - [[03-实体字典]] — 实体字段速查
 - [[04-API端点]] — API 端点速查
-- [[75-统一通知模块]] — 通知模块已从 Core 独立
+- [[75-统一通知模块]] — Core 内置通知子域

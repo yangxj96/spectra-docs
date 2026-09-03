@@ -22,9 +22,7 @@ MODULES = OrderedDict(
         ("spectra-launch", ("spectra-launch", "com.devops00.spectra.launch")),
         ("spectra-security-base", ("spectra-starter/spectra-security-base", "com.devops00.spectra.security.base")),
         ("spectra-security-spring-boot-starter", ("spectra-starter/spectra-security-spring-boot-starter", "com.devops00.spectra.security")),
-        ("spectra-notification", ("spectra-modules/spectra-notification", "com.devops00.spectra.notification")),
         ("spectra-core", ("spectra-modules/spectra-core", "com.devops00.spectra.core")),
-        ("spectra-upload", ("spectra-modules/spectra-upload", "com.devops00.spectra.upload")),
         ("spectra-workflow", ("spectra-modules/spectra-workflow", "com.devops00.spectra.workflow")),
         ("spectra-oa", ("spectra-modules/spectra-oa", "com.devops00.spectra.oa")),
     )
@@ -34,8 +32,6 @@ BUSINESS_PREFIXES = (
     "com.devops00.spectra.core.",
     "com.devops00.spectra.oa.",
     "com.devops00.spectra.workflow.",
-    "com.devops00.spectra.notification.",
-    "com.devops00.spectra.upload.",
     "com.devops00.spectra.erp.",
 )
 OPTIONAL_BUSINESS_PREFIXES = BUSINESS_PREFIXES[1:]
@@ -129,8 +125,6 @@ def main() -> int:
         "spectra-modules/spectra-core",
         "spectra-modules/spectra-oa",
         "spectra-modules/spectra-workflow",
-        "spectra-modules/spectra-notification",
-        "spectra-modules/spectra-upload",
     ):
         for path in main_java_files(relative_root):
             if any("com.devops00.spectra.launch." in line for line in imports(path)):
@@ -157,8 +151,8 @@ def main() -> int:
         "spectra-framework/src/main/java/com/devops00/spectra/framework/health/DataSourceHealthContributor.java",
         "spectra-framework/src/main/java/com/devops00/spectra/framework/health/RedisHealthContributor.java",
         "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/scheduler/health/SchedulerHealthIndicator.java",
-        "spectra-modules/spectra-notification/src/main/java/com/devops00/spectra/notification/health/NotificationHealthIndicator.java",
-        "spectra-modules/spectra-upload/src/main/java/com/devops00/spectra/upload/health/FileStorageHealthIndicator.java",
+        "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/health/NotificationHealthIndicator.java",
+        "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/health/FileStorageHealthIndicator.java",
         "spectra-modules/spectra-workflow/src/main/java/com/devops00/spectra/workflow/health/FlowableHealthContributor.java",
     )
     for relative in health_contributors:
@@ -175,9 +169,9 @@ def main() -> int:
             add(violations, "统一健康 contributor", None, f"缺少统一健康入口: {relative}")
 
     policies = {
-        "spectra-common": ("spectra-core", "spectra-oa", "spectra-workflow", "spectra-notification", "spectra-upload", "spectra-erp", "spectra-framework", "spectra-starter"),
-        "spectra-framework": ("spectra-core", "spectra-oa", "spectra-workflow", "spectra-notification", "spectra-upload", "spectra-erp"),
-        "spectra-core": ("spectra-modules", "spectra-starter", "spectra-oa", "spectra-workflow", "spectra-notification", "spectra-upload", "spectra-erp"),
+        "spectra-common": ("spectra-core", "spectra-oa", "spectra-workflow", "spectra-erp", "spectra-framework", "spectra-starter"),
+        "spectra-framework": ("spectra-core", "spectra-oa", "spectra-workflow", "spectra-erp"),
+        "spectra-core": ("spectra-modules", "spectra-starter", "spectra-oa", "spectra-workflow", "spectra-erp"),
         "spectra-launch": ("spectra-modules", "spectra-starter"),
     }
     for path in pom_files:

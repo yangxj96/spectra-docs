@@ -12,7 +12,7 @@
 - 对象写入携带 SHA-256 metadata、归档保留截止时间和不可变 key；
 - 应用只拥有归档对象写入/读取校验能力，不拥有删除、覆盖、缩短保留期限或修改 manifest 的权限。
 
-代码端口为 `com.devops00.spectra.common.port.audit.SecurityAuditArchiveBackend`，S3 实现仅在 `spectra.security.audit-archive-backend=S3_OBJECT_LOCK` 时由 `spectra-upload` 装配。`sec_security_audit_archive_manifest` 是归档状态事实，Core worker 负责租约、重试、完整性校验和恢复状态，归档自身通过 `SecurityAuditArchiveAuditTrail` 写入 planned/started/completed/failed/verified/restored 事件。开发环境默认策略 `archive_backend=PENDING`，没有对象存储时保持待处理状态，不将本地文件或普通上传 bucket 伪装成安全归档。
+代码端口为 `com.devops00.spectra.common.port.audit.SecurityAuditArchiveBackend`，S3 实现仅在 `spectra.security.audit-archive-backend=S3_OBJECT_LOCK` 时由 Core 的 upload 子域装配。`sec_security_audit_archive_manifest` 是归档状态事实，Core worker 负责租约、重试、完整性校验和恢复状态，归档自身通过 `SecurityAuditArchiveAuditTrail` 写入 planned/started/completed/failed/verified/restored 事件。开发环境默认策略 `archive_backend=PENDING`，没有对象存储时保持待处理状态，不将本地文件或普通上传 bucket 伪装成安全归档。
 
 ## 归档流程
 
