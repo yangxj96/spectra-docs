@@ -36,7 +36,8 @@
 
 ## 源码理解与验证
 
-- 根目录存在 `.codegraph/` 且工具可用时，源码定义、实现、调用链、依赖和影响范围优先使用 CodeGraph；精确文本、配置和文档使用 `rg`。
+- 根仓库 `spectra-docs/` 不包含 `.codegraph/`；以下三个子项目各自包含 CodeGraph 索引：`spectra-admin/.codegraph/`、`spectra-ui/.codegraph/`、`logicflow-plugin-flowable/.codegraph/`。
+- 需要理解或定位上述子项目的源码定义、实现、调用链、依赖关系或影响范围时，必须先进入对应子项目目录使用 `codegraph explore "..."`；跨项目任务按目标子项目分别调用 CodeGraph。不要在根目录假定存在或调用根级 CodeGraph。精确文本、配置和文档使用 `rg`。
 - 开发阶段优先目标模块或目标项目的快速检查；模块完成、交付或提交前再执行完整质量门禁。
 - 后端使用 `spectra-admin/mvnw`；前端和插件使用 mise 管理的 Node/pnpm 与项目脚本。完整命令维护在 `docs/50-开发指南/20-常见命令.md`，不要复制到本文件。
 
