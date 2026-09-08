@@ -1106,37 +1106,38 @@
   public Optional<NotificationSender> find(NotificationChannel channel);
   ```
 
-- [ ] **Step 1: Write registry contract tests**
+- [x] **Step 1: Write registry contract tests**
 
   覆盖空渠道、未注册渠道、已注册渠道、重复渠道实现和发送器 `available()` 为 false 的情况；重复渠道必须在 Bean 创建阶段失败，未注册渠道不得被静默降级或触发额外 Provider/数据库查询。
 
-- [ ] **Step 2: Run the focused test to verify it is red**
+- [x] **Step 2: Run the focused test to verify it is red**
 
   ```bash
   cd spectra-admin
-  mise exec -- ./mvnw -pl spectra-core -am \
+  mise exec -- ./mvnw -pl spectra-modules/spectra-core -am \
       -Dtest=NotificationSenderRegistryTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected: Registry 尚未存在时测试失败，且现有通知发送测试仍能独立暴露迁移前的列表扫描路径。
 
-- [ ] **Step 3: Build an immutable channel registry**
+- [x] **Step 3: Build an immutable channel registry**
 
   构造器注入 `List<NotificationSender>`，启动时复制为不可变 `EnumMap`/Map；对 null、重复渠道和非法声明直接失败。`require` 对 null/未知渠道抛出现有通知不可用异常，`find` 返回 `Optional.empty()`；不得使用静态注册表或运行期可变全局状态。
 
-- [ ] **Step 4: Migrate Gateway, Worker and Health**
+- [x] **Step 4: Migrate Gateway, Worker and Health**
 
   三个调用方只依赖 Registry：Gateway 的 `availability` 和发送选择、Worker 的任务投递选择、Health 的渠道探测均调用同一解析入口。保持通知幂等、重试、投递记录、Provider 健康检查和不可用原因的现有语义；不要把 Registry 的职责扩展为 Provider 配置或健康缓存。
 
-- [ ] **Step 5: Run notification regression tests and compare lookup paths**
+- [x] **Step 5: Run notification regression tests and compare lookup paths**
 
   ```bash
-  mise exec -- ./mvnw -pl spectra-core -am \
+  cd spectra-admin
+  mise exec -- ./mvnw -pl spectra-modules/spectra-core -am \
       -Dtest=NotificationSenderRegistryTest,NotificationGatewayImplTest,NotificationTaskWorkerTest,NotificationHealthIndicatorTest,NotificationProviderRuntimeTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   rg -n 'senders\.stream\(\)|List<NotificationSender>' \
-      spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification
+      spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification
   ```
 
   Expected: 生产代码只在 Registry 内接收并索引发送器列表；Gateway、Worker、Health 不再重复查找，通知 Provider Runtime 的状态逻辑没有被复制。
