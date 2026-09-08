@@ -1049,33 +1049,33 @@
           String correlationId);
   ```
 
-- [ ] **Step 1: Write the failing Bean and policy-boundary tests**
+- [x] **Step 1: Write the failing Bean and policy-boundary tests**
 
   测试默认 Bean 只有一个 `AuditSanitizer`，实现对输入 Map、嵌套 Map、集合、数组、URL 凭据、Bearer Token 和空值的行为保持不变；测试 Factory 使用注入的 mock sanitizer；测试 Core 查询路径使用注入的 `AuditSanitizer`，而不是静态默认实例。增加源码扫描断言：除 `SecurityAuditEvent` 的构造安全兜底外，Core 生产代码不得出现 `DefaultAuditSanitizer.INSTANCE`。
 
-- [ ] **Step 2: Run the focused tests to verify the boundary is red**
+- [x] **Step 2: Run the focused tests to verify the boundary is red**
 
   ```bash
   cd spectra-admin
-  mise exec -- ./mvnw -pl spectra-common,spectra-core -am \
-      -Dtest=DefaultAuditSanitizerTest,AuditSanitizerBeanContractTest,SecurityAuditEventSanitizationTest \
+  mise exec -- ./mvnw -pl spectra-common,spectra-modules/spectra-core -am \
+      -Dtest=DefaultAuditSanitizerTest,AuditSanitizerBeanContractTest,SecurityAuditEventFactoryTest,SecurityAuditEventSanitizationTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected: 在 Factory、Bean 注入和静态调用清理完成前，新增的注入边界测试失败；既有脱敏行为测试仍能区分实现回归和装配边界失败。
 
-- [ ] **Step 3: Make the sanitizer a single stateless default Bean**
+- [x] **Step 3: Make the sanitizer a single stateless default Bean**
 
   保留 `AuditSanitizer` 在 common 作为纯契约，`DefaultAuditSanitizer` 只保留一个无状态实现；由 `AuditConfiguration` 显式构造并注册唯一 Bean。移除业务代码对公开静态共享实例的依赖；若 `SecurityAuditEvent` 仍需在 Jackson 反序列化或脱离 Spring 的值对象构造阶段保留最后一道脱敏兜底，必须将其限定在值对象边界、写清原因，并不得让服务层或查询层绕过注入策略。
 
-- [ ] **Step 4: Migrate event creation and query sanitization**
+- [x] **Step 4: Migrate event creation and query sanitization**
 
   由 `SecurityAuditEventFactory` 注入 `AuditSanitizer`，先对原始 before/after 快照脱敏，再创建不可变事件；迁移 Core 生产代码中的所有直接事件构造调用。`SecurityAuditEvent.started()`/`withResult()` 只复用已脱敏快照，不重复读取 Bean；`SecurityAuditQueryService.parseSnapshot` 改用构造器注入的 `AuditSanitizer`。保留无效 JSON → `_redacted=invalid_snapshot`、不可变副本和不泄漏原始快照的语义。
 
-- [ ] **Step 5: Run audit security regression and static scans**
+- [x] **Step 5: Run audit security regression and static scans**
 
   ```bash
-  mise exec -- ./mvnw -pl spectra-common,spectra-core -am \
+  mise exec -- ./mvnw -pl spectra-common,spectra-modules/spectra-core -am \
       -Dtest=DefaultAuditSanitizerTest,AuditSanitizerBeanContractTest,SecurityAuditEventFactoryTest,SecurityAuditEventSanitizationTest,SecurityAuditQueryServiceTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   rg -n 'DefaultAuditSanitizer\.INSTANCE|SENSITIVE_KEYS|REDACTED_VALUE' \
