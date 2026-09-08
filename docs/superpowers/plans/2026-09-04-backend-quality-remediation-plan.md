@@ -970,11 +970,11 @@
   }
   ```
 
-- [ ] **Step 1: Write the failing resolver contract tests**
+- [x] **Step 1: Write the failing resolver contract tests**
 
   使用测试用 Checker 覆盖空 `referenceType`、空 `referenceId`、空 `userId`、没有支持者、所有支持者拒绝和至少一个支持者允许的情况；覆盖 Checker 抛出运行时异常时不能转为允许，并断言 `requireReadable` 使用 `FILE_UPLOAD_PERMISSION_DENIED`。验证允许路径只调用支持当前类型的 Checker，不新增 Mapper/数据库调用。
 
-- [ ] **Step 2: Run the focused test to verify the new contract is red**
+- [x] **Step 2: Run the focused test to verify the new contract is red**
 
   ```bash
   cd spectra-admin
@@ -985,15 +985,15 @@
 
   Expected: 新接口和实现尚不存在时测试无法通过；失败原因应指向 Resolver 契约缺失，而不是测试配置没有发现。
 
-- [ ] **Step 3: Implement the domain-owned Resolver**
+- [x] **Step 3: Implement the domain-owned Resolver**
 
   由 `DefaultFileReferencePermissionResolver` 构造器注入 `List<FileReferencePermissionChecker>`，集中完成支持者选择、拒绝默认和现有异常映射；未知类型、空主体、无匹配 Checker、全部拒绝和 Checker 异常均不得产生允许结果。保持 Checker 的 `supports`/`canRead` 调用顺序，不在 Resolver 中增加并行调用、缓存或额外数据库访问。
 
-- [ ] **Step 4: Migrate both upload application services**
+- [x] **Step 4: Migrate both upload application services**
 
   删除两个应用服务对 `List<FileReferencePermissionChecker>` 的注入和重复循环，改为调用 Resolver；保留 `FileReferenceApplicationService` 的当前登录用户取得逻辑、`FileAssetApplicationService` 的引用存在性检查、管理员分支、创建者临时访问规则和上下文用户一致性校验。不得把管理员权限错误地交给业务引用 Checker。
 
-- [ ] **Step 5: Run resolver and upload regression tests**
+- [x] **Step 5: Run resolver and upload regression tests**
 
   ```bash
   mise exec -- ./mvnw -pl spectra-core -am \
