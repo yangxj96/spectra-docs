@@ -870,23 +870,23 @@
 - Consumes: Task 11–16 形成的职责边界、重复条件分支、调用次数、扩展轴和测试结果。
 - Produces: 有证据的模式采纳/拒绝决策；采纳项减少分支或中间调用并保持 Spring Bean 生命周期、错误语义和 API 契约稳定。
 
-- [ ] **Step 1: Build the pattern candidate matrix**
+- [x] **Step 1: Build the pattern candidate matrix**
 
   对每个候选记录现有变体数量、重复条件分支、变化频率、调用方数量、测试隔离难度、引入成本、回滚方式和可测收益。至少评估：Session backend 的 Strategy/Factory、Cookie/CSRF 与限流主体的 Policy/Strategy、请求/响应安全 pipeline、验证码类型 Factory/Strategy、数据权限 SQL Specification/Policy、Session 用例的 command object，以及 Java 25 `ScopedValue` 对自维护请求/数据权限上下文的替代价值；`NameLookup`/`NameFillExecutor` 保持 Adapter 语义，不把它们泛化为 common 工具，但针对当前 VO 绑定完整 Service 和 `ApplicationContext.getBean()` 查找问题，由 Task 22 落地最小的 Lookup Registry 与 feature Adapter。
 
-- [ ] **Step 2: Set adoption criteria and write equivalence tests**
+- [x] **Step 2: Set adoption criteria and write equivalence tests**
 
   只有至少两个真实变体、存在明确扩展轴并能通过调用次数、圈复杂度、依赖数或测试隔离性证明收益时才采纳。先为现有行为写参数化/契约测试，覆盖权限、排序、异常、事务和 fail-closed 语义；不因为类名“看起来适合模式”就拆分。
 
-- [ ] **Step 3: Implement the smallest beneficial pattern**
+- [x] **Step 3: Implement the smallest beneficial pattern**
 
   优先评估 Task 13 已拆分的 Session operation strategy 和 Task 14 的安全匹配策略；Session backend、验证码和数据权限只有在矩阵达到“至少两个真实变体、明确扩展轴、可测收益”的门槛时才实施。模式对象使用构造器注入，避免静态注册表、隐式全局状态和额外 Service 自调用；旧入口迁移完成后删除重复分支和临时适配层。
 
-- [ ] **Step 4: Measure and review the result**
+- [x] **Step 4: Measure and review the result**
 
   对采纳项比较迁移前后调用次数、圈复杂度、类依赖数、Bean 数量和关键路径耗时；对拒绝项记录保持现状的原因。确认没有为了模式引入额外数据库/Redis 往返、循环依赖或安全策略绕过。
 
-- [ ] **Step 5: Run pattern contract tests and record the decision**
+- [x] **Step 5: Run pattern contract tests and record the decision**
 
   ```bash
   cd spectra-admin
