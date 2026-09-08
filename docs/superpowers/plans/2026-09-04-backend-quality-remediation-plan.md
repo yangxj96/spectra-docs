@@ -1212,11 +1212,15 @@
 **Files:**
 - Move: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/configure/FileStorageProviderRegistry.java` → `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/storage/FileStorageProviderRegistry.java`
 - Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/FileAssetApplicationService.java:27,47`
-- Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadApplicationService.java`
+- Review: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadApplicationService.java`（当前仅编排上传用例，不直接持有 Provider，无需新增 Registry 依赖）
 - Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/FileUploadCleanupService.java`
+- Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadPartService.java`
+- Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadSessionService.java`
+- Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadVerificationWorker.java`
 - Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/health/FileStorageHealthIndicator.java:23,44,70`
+- Modify: `spectra-admin/config/spotbugs/exclude.xml`
 - Test: `spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/upload/storage/FileStorageProviderRegistryTest.java`
-- Modify: existing upload service and health tests importing `core.upload.configure.FileStorageProviderRegistry`
+- Modify: existing upload service, verification worker and health tests importing `core.upload.configure.FileStorageProviderRegistry`
 
 **Interfaces:**
 - Consumes: `FileStorageProvider`、`StorageProviderType`、上传默认 Provider 配置、对象存储健康检查和现有 `FILE_STORAGE_UNAVAILABLE` 异常。
@@ -1230,37 +1234,38 @@
   public Optional<FileStorageProvider> find(StorageProviderType type);
   ```
 
-- [ ] **Step 1: Write the failing Registry and health reuse tests**
+- [x] **Step 1: Write the failing Registry and health reuse tests**
 
   覆盖 Provider 列表为空、默认 Provider 缺失、重复 `StorageProviderType`、已注册 Provider、`require(null)` 和 Provider 健康检查异常；测试 `FileStorageHealthIndicator` 只能通过 Registry 查询默认 Provider，不能再注入 `List<FileStorageProvider>`。
 
-- [ ] **Step 2: Run the focused tests to verify the old configuration path is red**
+- [x] **Step 2: Run the focused tests to verify the old configuration path is red**
 
   ```bash
   cd spectra-admin
-  mise exec -- ./mvnw -pl spectra-core -am \
+  mise exec -- ./mvnw -pl spectra-modules/spectra-core -am \
       -Dtest=FileStorageProviderRegistryTest,FileStorageHealthIndicatorTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected: Registry 新包和 `find` 契约尚未完成时测试失败；失败不能通过放宽缺失 Provider 的断言来规避。
 
-- [ ] **Step 3: Move and harden the existing Registry**
+- [x] **Step 3: Move and harden the existing Registry**
 
   将 Registry 归位到 `upload.storage`，构造器注入 Provider 列表并复制为不可变索引；重复类型在启动阶段抛出明确异常，null 类型和未注册类型统一走现有存储不可用错误。保持 `require` 不返回 null，不引入动态替换、静态全局状态或缓存失效问题。
 
-- [ ] **Step 4: Make all upload consumers use the Registry**
+- [x] **Step 4: Make all upload consumers use the Registry**
 
-  迁移 `FileAssetApplicationService`、`UploadApplicationService`、`FileUploadCleanupService` 和 `FileStorageHealthIndicator` 的导入及依赖；健康检查使用 `find(defaultStorage)`，Provider 自身的 `health()` 失败继续转换为 DOWN 结果，业务存储不可用继续 fail-closed。
+  迁移实际持有 Provider Registry 的 `FileAssetApplicationService`、`UploadPartService`、`UploadSessionService`、`UploadVerificationWorker`、`FileUploadCleanupService` 和 `FileStorageHealthIndicator`；`UploadApplicationService` 仅编排这些服务，不新增重复的 Registry 依赖。健康检查使用 `find(defaultStorage)`，Provider 自身的 `health()` 失败继续转换为 DOWN 结果，业务存储不可用继续 fail-closed。
 
-- [ ] **Step 5: Run storage regression tests and residual scans**
+- [x] **Step 5: Run storage regression tests and residual scans**
 
   ```bash
-  mise exec -- ./mvnw -pl spectra-core -am \
+  cd spectra-admin
+  mise exec -- ./mvnw -pl spectra-modules/spectra-core -am \
       -Dtest=FileStorageProviderRegistryTest,FileStorageHealthIndicatorTest,FileAssetApplicationServiceTest,FileUploadCleanupServiceTest,UploadApplicationServiceWiringTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   rg -n 'core\.upload\.configure\.FileStorageProviderRegistry|List<FileStorageProvider>' \
-      spectra-admin/spectra-modules/spectra-core/src/main/java --glob '*.java'
+      spectra-modules/spectra-core/src/main/java --glob '*.java'
   ```
 
   Expected: 生产代码只有 Registry 接收 Provider 列表；旧 `configure` 包入口、重复选择逻辑和直接列表遍历均清除，文件上传、清理和健康检查行为保持不变。
