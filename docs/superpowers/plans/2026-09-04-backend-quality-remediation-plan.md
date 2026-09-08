@@ -915,23 +915,23 @@
 - Consumes: 全部 backend `utils`/`util`/`helper`/`support`/`tools` 包、`*Utils`/`*Helper`/`*Support`、静态方法集合、framework assembler/converter 和各模块 MapStruct converter 的调用图。
 - Produces: 一个按能力归属的工具类矩阵和唯一权威实现；纯基础能力、Web 适配、安全算法、需要注入 Bean 的 framework assembler、业务辅助和 feature converter 不再互相越层或重复实现。
 
-- [ ] **Step 1: Write the failing whole-backend utility architecture test**
+- [x] **Step 1: Write the failing whole-backend utility architecture test**
 
   新建 `BackendUtilityArchitectureTest`，扫描 `spectra-admin` 全部 `src/main/java`，收集 `utils`/`util`/`helper`/`support`/`tools` 包、工具类后缀、public static 方法和 converter/assembler。测试先固定当前盘点结果并断言：通用工具只能位于 canonical foundation 包；Servlet/Spring/数据库类型不能进入 `spectra-common` foundation；安全算法不能被业务模块直接依赖；领域 helper 不得被迁移为全局 common 工具；需要注入 Bean、配置或生命周期的能力不能被标记为 static utility；同一 canonical 能力只能有一个生产实现。
 
-- [ ] **Step 2: Build the project-wide convergence matrix before moving classes**
+- [x] **Step 2: Build the project-wide convergence matrix before moving classes**
 
   将每个候选写入 `2026-09-04-backend-utility-convergence-matrix.md`，至少记录原路径、目标路径、所有调用方、重复实现、输入/输出和异常语义、线程安全、敏感数据风险、是否保留、合并方案、迁移顺序和删除旧入口的影响。重点核对 `common/utils` 的字符串/集合/对象/树/加解密/IP 类，framework assembler/converter，core 的认证上下文/标识摘要/通知脱敏、上传权限/存储/通知发送注册表，OA 的文件引用和流程辅助，以及各 feature 的 MapStruct converter；没有跨模块复用的业务 helper 保持在对应 feature，而不是继续泛化。对 `NameFill`、`NameLookup`、`NameFillExecutor` 单独记录“注解契约 / Bean 扩展点 / 注入式执行器”三层职责，不能因为执行器提供通用方法就将其并入 common 工具；同时把 `DepartmentServiceImpl`、`RegionServiceImpl` 这类当前 Lookup 实现评估为独立 feature Lookup 适配 Bean，避免 VO 注解绑定完整 Service 实现。P1/P2 的横向能力由 Task 19–23 分别记录真实调用方、拒绝语义和启动期校验，不得只在矩阵中登记而不迁移调用方。
 
-- [ ] **Step 3: Consolidate pure foundation utilities and remove duplicate wrappers**
+- [x] **Step 3: Consolidate pure foundation utilities and remove duplicate wrappers**
 
   将 `StrUtils`、`CollUtils`、`ObjUtils` 收敛到明确的 `spectra-common` foundation/lang/collection 能力包；将 `TreeBuilder`、`TreeUtils` 收敛到 foundation/tree，明确它们不需要 Bean 注入，但 `TreeBuilder` 构树时可能回填节点 children，必须记录输入复制深度、重复调用、缺失父节点和排序比较器契约。统一 null/blank、Unicode 字节截断、集合大小、树排序/根节点/选中节点压缩和异常语义；删除只有单一调用方的泛化包装，能用 JDK 的地方不再依赖 Guava。先用行为等价测试锁定旧结果，再迁移所有调用方并删除 `common.utils` 旧类。
 
-- [ ] **Step 4: Move security, Web and domain-specific helpers to their owning layers**
+- [x] **Step 4: Move security, Web and domain-specific helpers to their owning layers**
 
   将 AES/RSA/SHA-256/HMAC/nonce 按调用图收敛到 `framework.security.crypto` 或明确的 `common.security.crypto` Port/Adapter：保持现有 AES-GCM、RSA-OAEP/签名、编码和 Token/密钥不透明性，统一随机数、密钥长度、常量时间校验和异常 fail-closed；业务模块不得直接复制算法。将 `IpUtils` 迁入 `framework.web`，对代理头解析和非法输入建立边界策略；将认证上下文、标识摘要、通知脱敏、OA 文件引用和流程辅助分别移入其 feature 的 application/domain/policy 包；各 feature 的 MapStruct converter 保持领域隔离，只共享 mapper 配置和时间转换。`NameFill`、`NameLookup` 和 `NameFillExecutor` 保持在 `framework.assembler`：前两者是注解/SPI 契约，后者是构造器注入的 Spring 组件；其当前状态主要是每次调用的局部集合，不得引入未定义的 singleton 可变状态。Task 22 只增加按 Lookup 类型解析的显式 Registry 和 feature Adapter，不引入缓存；如果以后增加反射元数据缓存或其他长期状态，必须补充并发、生命周期和失效测试。将 `DepartmentServiceImpl`、`RegionServiceImpl` 中的名称查询能力拆成独立 feature Lookup 适配 Bean，再让注解绑定适配 Bean 类型；所有旧包、别名和回退读取在调用方迁移完成后删除。P1/P2 的文件权限、审计脱敏、通知发送和文件存储注册表按 Task 19–23 的领域归属落地，不能上移为 framework/common 的横向万能组件。
 
-- [ ] **Step 5: Run whole-backend utility checks and record the migration**
+- [x] **Step 5: Run whole-backend utility checks and record the migration**
 
   ```bash
   cd spectra-admin
