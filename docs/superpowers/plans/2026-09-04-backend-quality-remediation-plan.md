@@ -1153,6 +1153,7 @@
 - Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/javabean/vo/DepartmentTreeVo.java:79`
 - Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/DepartmentServiceImpl.java`
 - Modify: `spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/RegionServiceImpl.java`
+- Modify: `spectra-admin/config/spotbugs/exclude.xml`
 - Test: `spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/assembler/NameLookupRegistryTest.java`
 - Modify: `spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/assembler/NameFillExecutorTest.java`
 - Test: `spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/system/lookup/DepartmentNameLookupTest.java`
@@ -1170,37 +1171,38 @@
 
   `DepartmentNameLookup` 和 `RegionNameLookup` 保持现有 `NameLookup<UUID>` 批量查询契约，直接复用对应 Mapper/读模型，不调用完整 `DepartmentServiceImpl` 或 `RegionServiceImpl`，避免增加 Service 自调用。
 
-- [ ] **Step 1: Write the failing registry and assembler tests**
+- [x] **Step 1: Write the failing registry and assembler tests**
 
   测试 Registry 能解析已注册 Lookup、未知类型失败、同一 Lookup 类型重复注册失败；测试 Executor 通过 Registry 批量收集 ID、一次调用每个 Lookup、正确处理 String/UUID key 和空输入，并验证不再依赖 `ApplicationContext`。
 
-- [ ] **Step 2: Run the focused tests to verify the old lookup path is exposed**
+- [x] **Step 2: Run the focused tests to verify the old lookup path is exposed**
 
   ```bash
   cd spectra-admin
-  mise exec -- ./mvnw -pl spectra-framework,spectra-core -am \
+  mise exec -- ./mvnw -pl spectra-framework,spectra-modules/spectra-core -am \
       -Dtest=NameLookupRegistryTest,NameFillExecutorTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected: Registry 构造器和 Executor 新依赖尚未接入时测试失败；失败信息必须能区分 Bean 解析失败、批量查询次数错误和字段回填错误。
 
-- [ ] **Step 3: Implement the explicit Registry without adding mutable singleton state**
+- [x] **Step 3: Implement the explicit Registry without adding mutable singleton state**
 
   Registry 构造器注入所有 `NameLookup<?>` Bean，使用不可变类型索引并在启动时校验重复类型；Executor 构造器只注入 Registry，保留现有注解字段扫描、源字段读取、批量 ID 去重、ID 类型转换、目标字段写入和空集合快速返回。不得加入未经需求验证的缓存、静态注册表或请求级状态。
 
-- [ ] **Step 4: Extract feature-owned Lookup Adapters and migrate annotations**
+- [x] **Step 4: Extract feature-owned Lookup Adapters and migrate annotations**
 
   从 `DepartmentServiceImpl`、`RegionServiceImpl` 移除 `NameLookup` 扩展职责，将查询逻辑迁移到对应 feature Adapter；把 `UserPageVO` 和 `DepartmentTreeVo` 的 `@NameFill.lookup` 分别改为 `DepartmentNameLookup.class` 和 `RegionNameLookup.class`。调用方迁移完成后删除 Service 作为 Lookup 的旧入口，不保留别名或回退查找。
 
-- [ ] **Step 5: Run assembler, feature and package-boundary tests**
+- [x] **Step 5: Run assembler, feature and package-boundary tests**
 
   ```bash
-  mise exec -- ./mvnw -pl spectra-framework,spectra-core -am \
+  cd spectra-admin
+  mise exec -- ./mvnw -pl spectra-framework,spectra-modules/spectra-core -am \
       -Dtest=NameLookupRegistryTest,NameFillExecutorTest,DepartmentNameLookupTest,RegionNameLookupTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
   rg -n 'ApplicationContext\.getBean|@NameFill\(lookup = (DepartmentServiceImpl|RegionServiceImpl)\.class|implements NameLookup' \
-      spectra-admin/spectra-framework spectra-admin/spectra-modules/spectra-core --glob '*.java'
+      spectra-framework spectra-modules/spectra-core --glob '*.java'
   ```
 
   Expected: Executor 只通过显式 Registry 解析 Lookup；VO 不再绑定完整 Service 实现；部门/区域名称回填结果、批量调用次数和空值语义保持不变。
