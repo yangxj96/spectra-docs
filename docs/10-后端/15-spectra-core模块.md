@@ -63,6 +63,10 @@ spectra-admin/spectra-modules/spectra-core/
 - 操作日志（用户操作审计）
 - 统一健康聚合、服务监控、告警和受控诊断
 
+系统配置值类型 `ConfiguredValueType`、行政区划层级 `RegionLevel` 和系统配置写入端口
+`SystemConfigValueWriter` 位于 `core.system`；它们描述系统领域语义或由 Core 提供业务写入实现，
+不再放在公共契约层。
+
 ### 任务系统
 
 - OPS、SYSTEM、LOOP 三类统一调度

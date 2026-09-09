@@ -1377,11 +1377,11 @@
 - Consumes: 当前 common 的 Spring、MyBatis-Plus、PostgreSQL、Servlet 和 Spring Event 依赖。
 - Produces: common 契约包不再新增技术实现依赖；已有技术桥接被放到明确的 framework/config/persistence 模块，所有调用方迁移完成后删除旧入口。
 
-- [ ] **Step 1: Write the dependency boundary test**
+- [x] **Step 1: Write the dependency boundary test**
 
   扫描 `spectra-common/src/main/java` 的 import，允许 JDK、Jakarta 基础注解和项目纯契约包；禁止新增 `org.springframework`、`com.baomidou`、`org.postgresql`、`jakarta.servlet` 生产 import。现有白名单在测试中逐个记录迁移前的 12 个文件，迁移完成后白名单必须为空。
 
-- [ ] **Step 2: Move one technical group at a time**
+- [x] **Step 2: Move one technical group at a time**
 
   - 将 `SystemProperties` 和 `R` 的 Spring Boot/Web 类型移动到 config/framework-web，并保留同一 API 字段和序列化结果。
   - 将 `BaseEntity`、`BaseService`、`BaseServiceImpl`、`PageFrom` 和 PgJsonb Handler 移到明确的 persistence 基础模块；所有 core/OA Mapper 和 Service 依赖新包。
@@ -1389,7 +1389,7 @@
   - 将 `FileUploadFinishEvent` 变为 common Port 中的纯事件数据，事件发布适配器放入 framework/core。
   - `ConfiguredValueType`、`RegionLevel` 等 MyBatis 枚举在迁移对应 Entity 后一并迁移，禁止只移动一半导致 common 反向依赖业务模块。
 
-- [ ] **Step 3: Run dependency and module tests**
+- [x] **Step 3: Run dependency and module tests**
 
   ```bash
   mise exec -- ./mvnw -pl spectra-launch -am \
@@ -1398,7 +1398,7 @@
 
   Expected: common 生产源码没有被禁止的技术 import，所有模块仍能编译和通过架构测试。
 
-- [ ] **Step 4: Run documentation synchronization only if architecture docs changed**
+- [x] **Step 4: Run documentation synchronization only if architecture docs changed**
 
   如果模块边界、能力归属或 common 分层发生变化，更新：
 
@@ -1414,7 +1414,7 @@
   bash scripts/check-docs.sh
   ```
 
-- [ ] **Step 5: Commit the common layer migration**
+- [x] **Step 5: Commit the common layer migration**
 
   ```bash
   git add spectra-admin/spectra-common spectra-admin/spectra-config spectra-admin/spectra-framework \
