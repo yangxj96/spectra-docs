@@ -1312,11 +1312,11 @@
   public static void withBypass(Runnable action);
   ```
 
-- [ ] **Step 1: Write failing ScopedValue contract tests**
+- [x] **Step 1: Write failing ScopedValue contract tests**
 
   覆盖 Request correlation 的空上下文、嵌套作用域恢复、异常后恢复、MDC 恢复、任务上下文 requestId 为空和并发任务互不泄漏；覆盖 DataScope 的请求作用域、嵌套 bypass 深度、异常后清理和虚拟线程并发隔离。增加源码约束断言：两个自维护 Context Holder 不得继续声明 `ThreadLocal`，不得保留 `open`/`beginRequest`/`endRequest` 作为兼容别名。
 
-- [ ] **Step 2: Run the focused tests to verify the new context contract is red**
+- [x] **Step 2: Run the focused tests to verify the new context contract is red**
 
   ```bash
   cd spectra-admin
@@ -1327,29 +1327,29 @@
 
   Expected: `ScopedValue` 新入口和无泄漏契约尚未实现时测试失败；失败必须能区分 API 缺失、作用域恢复错误和并发串值。
 
-- [ ] **Step 3: Replace RequestCorrelationContext storage with `ScopedValue`**
+- [x] **Step 3: Replace RequestCorrelationContext storage with `ScopedValue`**
 
   使用 `java.lang.ScopedValue<RequestCorrelationContext.Context>` 存储不可变 `Context`；`current()` 使用未绑定时的空上下文，`callWithMdc`/`runWithMdc` 在 `ScopedValue.where(...).call/run` 内设置 MDC，并在 finally 中恢复之前的 MDC。删除跨调用方持有的 `Scope`、`open`、`openWithMdc` 和 `openTask`，不把 ScopedValue 暴露到 common Port 签名中。
 
-- [ ] **Step 4: Replace DataScopeContextHolder storage with lexical immutable depth**
+- [x] **Step 4: Replace DataScopeContextHolder storage with lexical immutable depth**
 
   使用 `ScopedValue<Integer>` 表示当前 bypass 深度；`withBypass` 通过嵌套绑定深度实现递归调用，`callWithRequest` 在请求期间绑定深度 0，回调结束后自动解除绑定。删除 `beginRequest`/`endRequest` 和可变 `Context`；`DataScopeInnerInterceptor` 仍只读取 `isBypassed()`，数据权限绕过仍只能从 `DataScopeExecutor` 进入。
 
-- [ ] **Step 5: Migrate servlet, aspect and worker boundaries**
+- [x] **Step 5: Migrate servlet, aspect and worker boundaries**
 
   将 `RequestCorrelationFilter`、`AuditAspect`、`NotificationTaskWorker`、`OperationLogOutboxWorker` 和 `SecurityChangeOutboxWorker` 的 try-with-resources Scope 改为 callback 作用域，并正确转译 Filter 的 checked exception；将 `DataScopeContextFilter` 改为 `callWithRequest`，保留 finally 等价的作用域自动清理。保留异步任务中的显式 task correlationId，不假设任意 Executor 会自动传播上下文；需要跨线程时由任务边界显式建立上下文。
 
-- [ ] **Step 6: Apply stable Java 25 features only where they have a concrete benefit**
+- [x] **Step 6: Apply stable Java 25 features only where they have a concrete benefit**
 
   在 `java-language-usage-matrix.md` 中完成 Java 25 稳定特性盘点：`ScopedValue` 已由本任务落地；record、pattern matching、switch expression、Sequenced Collection API 和 `var` 只补齐明确提高可读性的遗漏。当前 `SHA256Utils` 只有 SHA-256、HMAC-SHA256 和 nonce，不把普通摘要/HMAC 误改为 `javax.crypto.KDF`；只有发现明确的“主密钥派生子密钥”路径时才使用 JDK 25 KDF API，并为 HKDF 参数、输出长度和旧结果等价性增加测试。`module import`、compact source/instance main 不用于 Spring Boot 生产类，预览/实验特性不启用；JFR 方法计时作为诊断配置评估，不把业务计时逻辑隐式改掉。
 
-- [ ] **Step 7: Run Java 25 context, concurrency and regression tests**
+- [x] **Step 7: Run Java 25 context, concurrency and regression tests**
 
   ```bash
   mise exec -- ./mvnw -pl spectra-launch -am \
       -Dtest=ScopedValueContextContractTest,JavaLanguageUsageContractTest,RequestCorrelationFilterTest,DataScopeIsolationTest,AuditAspectContractTest,NotificationTaskWorkerTest,OperationLogOutboxWorkerTest,SecurityChangeOutboxWorkerTest \
       -Dsurefire.failIfNoSpecifiedTests=false test
-  rg -n 'ThreadLocal|RequestCorrelationContext\.(open|openWithMdc|openTask)|DataScopeContextHolder\.(beginRequest|endRequest)' \
+  rg -n 'ThreadLocal<|RequestCorrelationContext\.(open|openWithMdc|openTask)|DataScopeContextHolder\.(beginRequest|endRequest)' \
       spectra-admin/spectra-common/src/main/java spectra-admin/spectra-framework/src/main/java \
       spectra-admin/spectra-modules/spectra-core/src/main/java --glob '*.java'
   ```

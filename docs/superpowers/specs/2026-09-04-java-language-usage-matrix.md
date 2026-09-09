@@ -2,7 +2,7 @@
 
 ## 审计范围
 
-本矩阵记录 2026-09-08 对 `spectra-admin` 生产源码的审计结果。扫描范围为：
+本矩阵记录 2026-09-09 对 `spectra-admin` 生产源码的审计结果。扫描范围为：
 
 - `spectra-common/src/main/java`
 - `spectra-framework/src/main/java`
@@ -21,14 +21,14 @@
 |---|---:|---:|---:|
 | 根 POM | 25 | — | — |
 | `spectra-config` | 25 | 无 Java 源码 | 0 |
-| `spectra-common` | 25 | 有 | 29 |
+| `spectra-common` | 25 | 有 | 28 |
 | `spectra-framework` | 25 | 有 | 82 |
 | `spectra-modules` | 25 | 聚合 POM | 0 |
-| `spectra-modules/spectra-core` | 25 | 有 | 1451 |
+| `spectra-modules/spectra-core` | 25 | 有 | 1448 |
 | `spectra-modules/spectra-oa` | 25 | 有 | 412 |
 | `spectra-modules/spectra-workflow` | 25 | 有 | 56 |
 | `spectra-launch` | 25 | 有 | 3 |
-| **合计** | **25** | — | **2033** |
+| **合计** | **25** | — | **2029** |
 
 ## 语言特性现状
 
@@ -36,7 +36,8 @@
 
 | 特性 | 当前现状 | 审计结果与迁移判断 |
 |---|---|---|
-| `var` | 2033 个局部声明 | 仅用于有明确初始化器或增强 `for` 迭代变量的局部推断；不得用于成员字段、方法返回值、方法参数或 `null` 初始化。它是 Java 10 引入的局部变量语法，不是 Java 25 新特性。 |
+| `ScopedValue` | 已用于请求链路和数据权限作用域 | Java 25 中已稳定，适合承载只在请求、任务或受控 callback 内有效的不可变上下文。`RequestCorrelationContext` 通过 `ScopedValue<Context>` 绑定请求/任务关联信息，`DataScopeContextHolder` 通过 `ScopedValue<Integer>` 绑定绕过深度；作用域退出后由运行时自动恢复，不再维护 `ThreadLocal` 或可关闭 Scope。跨线程传播仍由任务边界显式建立，不假设普通 Executor 自动复制上下文。 |
+| `var` | 2029 个局部声明 | 仅用于有明确初始化器或增强 `for` 迭代变量的局部推断；不得用于成员字段、方法返回值、方法参数或 `null` 初始化。它是 Java 10 引入的局部变量语法，不是 Java 25 新特性。 |
 | `record` | 138 个声明行命中 | 已用于快照、请求、响应、策略和领域值对象等数据载体；这些类型依赖紧凑不可变语义，继续使用显式字段类会增加样板代码，暂无统一迁移收益。 |
 | `instanceof` 模式匹配 | 49 个模式匹配行命中 | 已用于异常、权限和输入分支中的类型判断；绑定变量只在判断成功后的分支内使用，避免重复强制转换。 |
 | switch expression / arrow case | 118 个 `case ->` 或 `yield` 行命中 | 已用于状态、渠道、调度和安全策略映射；表达式结果直接对应业务值，保留现状，不为“全部改写”制造行为风险。 |
@@ -69,5 +70,6 @@
 - 根 POM 和每个 Maven 模块声明 Java 25；
 - 生产源码存在已编译的 `var` 局部变量，并输出按模块的清单；
 - 源码中出现的 `var` 只能是带初始化器或增强 `for` 迭代变量的局部声明，不得出现在字段或方法签名位置。
+- `ScopedValueContextContractTest` 验证请求/任务和数据权限作用域的嵌套恢复、异常清理、MDC 恢复以及虚拟线程并发隔离；两个上下文 Holder 不得重新引入 `ThreadLocal` 或旧 Scope API。
 
 该测试不限制 record、模式匹配、switch expression 或 Sequenced Collection API 的数量；这些构造是否使用，取决于类型安全、空值/异常行为、集合语义和业务可读性。
