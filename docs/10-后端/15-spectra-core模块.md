@@ -22,14 +22,10 @@ spectra-admin/spectra-modules/spectra-core/
     ├── user/           ← 用户资料与生命周期
     ├── authorization/  ← Role/Permission/Assignment/Boundary
     ├── system/         ← 部门/菜单/字典/区域/配置/日志
-    ├── scheduler/      ← 统一调度内核、LOOP 会话和运维管理
+    ├── scheduler/      ← Quartz 调度基础设施、执行历史和运维管理
     ├── common/         ← Core 公共接口和 Core-only 辅助能力
-    ├── system/         ← 系统管理、服务监控、统一健康聚合
-    ├── scheduler/      ← 统一调度内核、LOOP 会话和运维管理
-    ├── security/       ← 认证、授权、安全审计和安全策略
     ├── notification/   ← 统一通知请求、模板、投递和消息中心
-    ├── upload/         ← 文件资产、分片上传、本地/S3 存储
-    └── user/           ← 用户、角色和批量导入
+    └── upload/         ← 文件资产、分片上传、本地/S3 存储
 ```
 
 领域包内按 `controller`、`service`、`mapper`、`javabean` 等职责继续分层；目录树中的领域归属优先于历史顶层技术包名。模块入口由 `CoreModule` 注册到 `spectra-launch`，Mapper 资源随 Core 发布。
@@ -67,11 +63,12 @@ spectra-admin/spectra-modules/spectra-core/
 `SystemConfigValueWriter` 位于 `core.system`；它们描述系统领域语义或由 Core 提供业务写入实现，
 不再放在公共契约层。
 
-### 任务系统
+### Quartz 任务系统
 
-- OPS、SYSTEM、LOOP 三类统一调度
-- PostgreSQL 唯一事实源、租约 CAS、UNKNOWN 结果和 LOOP 错误聚合
-- 调度管理 API 与 Web 运维页面
+- Quartz JDBC JobStore Cluster 使用独立 `spectra_quartz` schema
+- 代码白名单 Job、Cron/Simple Trigger 和一对一 Job/Trigger 管理
+- `spectra_core.quartz_job_execution_history` 记录脱敏执行历史
+- 调度管理 API 与 Web 运维页面；数据库不可用时保持 `NOT_READY` 并返回 503
 - 审批任务
 
 ### 服务运行基础设施
@@ -136,12 +133,7 @@ spectra-core ← 被以下模块依赖
 | OperationLogOutbox（支撑表） | spectra_core.sys_operation_log_outbox | 普通操作日志事务 outbox、租约、重试和死信状态 |
 | SecurityChangeOutbox（支撑表） | spectra_security.sec_security_change_outbox | 安全变更外部动作 outbox、幂等、租约、重试和死信状态；不替代安全事实表 |
 | SecurityAuditArchiveManifest（支撑表） | spectra_security.sec_security_audit_archive_manifest | 安全审计分区归档、完整性校验和恢复状态；不代表可删除审计事实 |
-| SchedulerJobEntity | spectra_core.scheduler_job | 任务定义和调度策略 |
-| SchedulerExecutionEntity | spectra_core.scheduler_execution | 离散执行、租约和结果 |
-| SchedulerLoopRuntimeEntity | spectra_core.scheduler_loop_runtime | LOOP 运行会话和心跳 |
-| SchedulerControlCommandEntity | spectra_core.scheduler_control_command | LOOP 控制命令 |
-| SchedulerLoopErrorEntity | spectra_core.scheduler_loop_error | LOOP 错误聚合 |
-| SchedulerOperationAuditEntity | spectra_core.scheduler_operation_audit | OPS/SYSTEM 调度操作审计 |
+| QuartzJobExecutionHistoryEntity | spectra_core.quartz_job_execution_history | Quartz 执行历史、状态、脱敏结果和审计字段 |
 
 ## API 端点
 
@@ -159,7 +151,7 @@ spectra-core ← 被以下模块依赖
 | SecurityPolicyController | `/security/policy/**` | Session 和密码策略 |
 | AuthorityController | `/authority/tree` | Permission Catalog 只读树 |
 | MenuController | `/menu/**` | 菜单 CRUD |
-| SchedulerAdminController | `/scheduler/admin/**` | 调度目录、任务、执行、统一操作记录、LOOP 会话和控制命令 |
+| QuartzAdminController | `/scheduler/quartz/**` | Quartz Job 类型、Job/Trigger、执行历史和受控操作 |
 | DepartmentController | `/department/**` | 部门 CRUD |
 | RegionController | `/region/**` | 区域查询 |
 | DictController | `/dict/**` | 字典管理 |

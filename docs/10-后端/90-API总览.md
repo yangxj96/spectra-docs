@@ -64,9 +64,9 @@ tags:
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | `SystemBootstrapController` | spectra-core | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
-| `SchedulerAdminController` | spectra-core | `/scheduler/admin/**` | 代码处理器目录、OPS 任务定义、离散执行、LOOP 会话、统一操作记录、控制命令及错误聚合；所有接口版本为 `1.0.0` |
+| `QuartzAdminController` | spectra-core | `/scheduler/quartz/**` | Quartz Job 类型、Job/Trigger、暂停/恢复、立即触发和执行历史；所有接口版本为 `1.0.0` |
 
-调度管理 API 的完整端点、请求约束和权限边界见 [[35-单体调度内核]]。公共 URL 前缀为 `/api/scheduler/admin`，PostgreSQL 不可用时管理写操作和结果确认返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。
+调度管理 API 的完整端点、请求约束和权限边界见 [[35-单体调度内核]]。公共 URL 前缀为 `/api/scheduler/quartz`；`ROLE_ADMIN_SYSTEM` 管理普通 Job，`ROLE_DEV_OPS` 处理立即触发和内置 Job 高风险操作，`ROLE_AUDIT` 只读。PostgreSQL/Quartz 不可用时返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。
 
 ## 消息中心
 
