@@ -59,7 +59,7 @@ pnpm start      # 启动开发服务器（:5173），自动执行 format+lint+ty
 
 ## 系统设置引导
 
-DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；当后端返回 `required=true` 时强制进入 `/system-guide`，在完成前不加载业务菜单。引导页提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`crypto_enabled`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url` 到 `POST /api/system/guide/complete`，其中根部门名称、区域和类型均为必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。后端在当前 DEV_OPS 用户上下文中创建根部门并建立主部门关系；接口加解密密钥以及通知模块所需的 AES 密钥由后端自动生成并保存到 `sys_config`，底部版权配置也保存到 `sys_config`。完成后刷新加解密配置并返回登录后的目标页面。
+DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；当后端返回 `required=true` 时强制进入 `/system-guide`，在完成前不加载业务菜单。系统初始化完成时后端已自动生成并发布接口加解密、通知保护和安全签名所需的内部密钥，接口加解密开关默认关闭。引导页仅提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url` 到 `POST /api/system/guide/complete`，其中根部门名称、区域和类型均为必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。完成引导后，DEV_OPS 可在“密钥管理”页面查看密钥运行态、管理版本并调整接口加解密开关；页面请求 `GET/POST /api/security/secrets/settings*` 的开关响应保持明文，以支持协议切换。
 
 ## 消息中心
 

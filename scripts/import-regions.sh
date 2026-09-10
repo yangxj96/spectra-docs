@@ -11,7 +11,9 @@ env SPECTRA_REGION_IMPORT=true mise exec -- ./mvnw \
   -Pmanual-integration \
   -pl spectra-modules/spectra-core -am \
   -Dgroups=manual-integration \
+  -Dspectra.test.groups.exclude= \
   -Dtest=RegionServiceTest \
   -Dsurefire.failIfNoSpecifiedTests=false \
+  -Dlogging.level.com.devops00.spectra=INFO \
   -Dstyle.color=never \
   test

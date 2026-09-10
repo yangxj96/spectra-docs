@@ -14,5 +14,7 @@ export PATH=$script_dir/fixtures:$PATH
 rg -F 'SPECTRA_REGION_IMPORT=true' "$capture" >/dev/null
 rg -F -- '-Pmanual-integration' "$capture" >/dev/null
 rg -F -- '-Dgroups=manual-integration' "$capture" >/dev/null
+rg -F -- '-Dspectra.test.groups.exclude=' "$capture" >/dev/null
 rg -F -- '-Dsurefire.failIfNoSpecifiedTests=false' "$capture" >/dev/null
+rg -F -- '-Dlogging.level.com.devops00.spectra=INFO' "$capture" >/dev/null
 printf '%s\n' 'PASS: import-regions enables the manual integration profile'

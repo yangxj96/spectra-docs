@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 55 个 `@RestController`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 56 个 `@RestController`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -62,7 +62,8 @@ tags:
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/service/monitor/**` | 服务监控总览、30 分钟/6 小时/24 小时历史趋势、告警规则/事件/摘要、JVM 运行时只读诊断和受控线程/堆转储任务；读取、告警配置、诊断分别受 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 保护 |
 | `CacheManagementController` | spectra-core | `/cache/**` | 普通缓存监控/清理，以及通过安全端口编排的 Session、验证码、登录失败计数和 Web 加密 nonce 维护；nonce 两个写入口额外要求 `ROLE_DEV_OPS` |
-| `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
+| `CryptoController` | spectra-core | `/system/crypto/**` | Web 加密初始化配置查询和客户端私钥获取；管理操作统一迁移到密钥管理 |
+| `SecretManagementController` | spectra-core | `/security/secrets/**` | `ROLE_DEV_OPS` 专属的注册密钥定义、接口加解密开关、版本创建/发布/退役、加密导入导出和运行态刷新；其他角色无菜单和接口访问权 |
 | `SystemBootstrapController` | spectra-core | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
 | `QuartzAdminController` | spectra-core | `/scheduler/quartz/**` | Quartz Job 类型、Job/Trigger、暂停/恢复、立即触发和执行历史；所有接口版本为 `1.0.0` |

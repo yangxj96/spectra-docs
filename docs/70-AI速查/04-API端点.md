@@ -6,7 +6,7 @@ tags:
 
 # API 端点
 
-> 源码当前 55 个 `*Controller.java` 端点速查表。
+> 源码当前 56 个 `*Controller.java` 端点速查表。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供旧接口兼容别名；部门、Role 和 RoleAssignment 等高风险写入必须走 Preview/Apply API。
 
@@ -22,7 +22,8 @@ tags:
 | SecurityAuditController | `/security/audit/**` | 按 Root/SYSTEM_ADMIN/普通用户可见性策略查询、详情、CSV 导出安全审计，并查看保留策略元数据；ROLE_DEV_OPS 可计划/查询/重试/申请恢复/校验归档 manifest，响应使用 `SecurityAuditArchiveManifestVO`，时间字段按当前用户时区返回 `LocalDateTime`，不暴露 worker 租约字段，不提供删除接口 |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | SystemInitializationController | `/system/initialization/**` | 首次保存六项系统基础配置、创建 DEV_OPS 用户、密码凭证和 RoleAssignment；启动需要初始化令牌 |
-| SystemGuideController | `/system/guide/**` | DEV_OPS 首次登录后查询并完成系统设置；提交根部门名称、区域、类型并保存接口加解密、Core 通知业务和底部版权策略 |
+| SystemGuideController | `/system/guide/**` | DEV_OPS 首次登录后查询并完成系统设置；提交根部门名称、区域、类型并保存 Core 通知业务和底部版权策略，内部密钥不在此处生成或配置 |
+| SecretManagementController | `/security/secrets/**` | 仅 `ROLE_DEV_OPS` 可访问的密钥定义、接口加解密开关、版本创建/发布/退役、一次性口令导入导出和运行态刷新；响应不包含明文或密文，开关端点响应保持明文 |
 
 ## 核心 — 公共
 
@@ -32,7 +33,7 @@ tags:
 
 登录接口在主认证成功后直接签发正式 Token；密码、短信验证码和邮箱验证码登录共用同一会话创建路径，不提供二阶段挑战或额外认证因子。
 
-Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息、加解密配置和初始化状态；该接口面向未登录页面开放，只返回系统名称、简称、Logo、默认语言、默认时区、版权开关、版权名称、版权跳转地址、加解密开关、服务端公钥和初始化状态，不返回安全策略或任何私钥。首次系统初始化接口：未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，请求同时提交 `system_name`、`system_short_name`、`system_logo`、`default_locale`、`default_timezone` 和 `security_profile`，后端将六项非敏感配置写入 `spectra_core.sys_config`，只创建 DEV_OPS 用户及其认证材料，不创建部门。随后调用 `POST /system/initialization/complete` 激活用户并创建 `ROLE_DEV_OPS` Assignment。完成接口不签发登录 Token，客户端应返回登录页并通过正常登录流程建立会话。初始化状态和引导状态分别使用 `sys_system_state` 的 `SYSTEM` 与 `SYSTEM_GUIDE` 种子行；Redis 不可用时初始化令牌读取和最终完成操作均 fail-closed。DEV_OPS 首次登录后调用 `GET /system/guide/status`，必须通过 `POST /system/guide/complete` 提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`crypto_enabled`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url`，其中根部门名称、区域和类型均必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。后端在当前用户上下文中创建根部门、建立 DEV_OPS 主部门关系并自动生成所需密钥，版权设置同时写入 `sys_config`。
+Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息、加解密配置和初始化状态；该接口面向未登录页面开放，只返回系统名称、简称、Logo、默认语言、默认时区、版权开关、版权名称、版权跳转地址、加解密开关、服务端公钥和初始化状态，不返回安全策略或任何私钥。首次系统初始化接口：未初始化时使用 `X-Spectra-Initialization-Token` 调用 `POST /system/initialization/start`，请求同时提交 `system_name`、`system_short_name`、`system_logo`、`default_locale`、`default_timezone` 和 `security_profile`，后端将六项非敏感配置写入 `spectra_core.sys_config`，只创建 DEV_OPS 用户及其认证材料，不创建部门。随后调用 `POST /system/initialization/complete` 激活用户、创建 `ROLE_DEV_OPS` Assignment，并在同一初始化事务中生成发布 10 个内部密钥、将 `crypto.enabled` 初始化为 `false`。完成接口不签发登录 Token，客户端应返回登录页并通过正常登录流程建立会话。初始化状态和引导状态分别使用 `sys_system_state` 的 `SYSTEM` 与 `SYSTEM_GUIDE` 种子行；Redis 不可用时初始化令牌读取和最终完成操作均 fail-closed。DEV_OPS 首次登录后调用 `GET /system/guide/status`，必须通过 `POST /system/guide/complete` 提交 `root_department_name`、`root_department_region_id`、`root_department_type`、`notification_enabled`、`copyright_enabled`、`copyright_name` 和 `copyright_url`，其中根部门名称、区域和类型均必填；启用版权时版权名称和 HTTP/HTTPS 跳转地址必填。系统设置引导只保存组织、通知和版权策略，不负责密钥生成；密钥轮换、业务凭据、安全签名密钥和接口加解密开关由 `SecretManagementController` 管理。
 
 ## 核心 — 用户权限
 
@@ -74,7 +75,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | ConfiguredController | `/configured/**` | 配置表管理 |
 | ServiceMonitorController | `/service/monitor/**` | 服务监控总览/历史趋势、告警摘要/规则/事件、运行时诊断和受控诊断任务；分别使用 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 权限 |
 | CacheManagementController | `/cache/**` | `/monitor/*` 提供缓存和安全运行态只读查询，`/admin/business/*` 提供显式普通缓存预览/清理，`/admin/security/*` 提供 Session、验证码、登录失败和 nonce 维护；三个目标候选查询按对应清理权限隔离并最多返回 20 项，验证码联系方式展示脱敏，`KAPTCHA` 与 nonce 不提供枚举；nonce 写入口额外要求 `ROLE_DEV_OPS` |
-| CryptoController | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
+| CryptoController | `/system/crypto/**` | Web 加密配置查询 / 客户端私钥获取；密钥生成、发布、导入导出和刷新统一由 `SecretManagementController` 提供 |
 | SystemBootstrapController | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | SystemGuideController | `/system/guide/**` | DEV_OPS 系统设置引导状态查询与完成 |
 | QuartzAdminController | `/scheduler/quartz/**` | Quartz Job 类型、Job/Trigger、暂停/恢复、立即触发和执行历史；版本 `1.0.0` |
