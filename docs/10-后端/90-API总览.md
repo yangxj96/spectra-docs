@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 54 个 `@RestController`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 55 个 `@RestController`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -61,12 +61,33 @@ tags:
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
 | `ServiceMonitorController` | spectra-core | `/service/monitor/**` | 服务监控总览、30 分钟/6 小时/24 小时历史趋势、告警规则/事件/摘要、JVM 运行时只读诊断和受控线程/堆转储任务；读取、告警配置、诊断分别受 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 保护 |
+| `CacheManagementController` | spectra-core | `/cache/**` | 普通缓存监控/清理，以及通过安全端口编排的 Session、验证码、登录失败计数和 Web 加密 nonce 维护；nonce 两个写入口额外要求 `ROLE_DEV_OPS` |
 | `CryptoController` | spectra-core | `/system/crypto/**` | 加密配置查询 / 客户端私钥获取 / 密钥对生成 / 密钥刷新 |
 | `SystemBootstrapController` | spectra-core | `/system/bootstrap` | Web 启动阶段一次性获取系统公开信息、加解密配置和初始化状态 |
 | `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
 | `QuartzAdminController` | spectra-core | `/scheduler/quartz/**` | Quartz Job 类型、Job/Trigger、暂停/恢复、立即触发和执行历史；所有接口版本为 `1.0.0` |
 
 调度管理 API 的完整端点、请求约束和权限边界见 [[35-单体调度内核]]。公共 URL 前缀为 `/api/scheduler/quartz`；`ROLE_ADMIN_SYSTEM` 管理普通 Job，`ROLE_DEV_OPS` 处理立即触发和内置 Job 高风险操作，`ROLE_AUDIT` 只读。PostgreSQL/Quartz 不可用时返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。
+
+### 缓存监控与系统维护
+
+| 方法 | 路径 | 权限/角色 | 说明 |
+|---|---|---|---|
+| `GET` | `/cache/monitor/overview` | `system:cache:read` | 普通缓存区域数、在线 Session 数、安全 Redis 状态和生成时间 |
+| `GET` | `/cache/monitor/regions` | `system:cache:read` | 只返回显式注册的普通缓存区域及支持的统计字段；不返回 Redis Key |
+| `GET` | `/cache/monitor/security` | `system:cache:read` | Session/Token、验证码、登录失败、nonce 和 Refresh 防重放的脱敏运行态 |
+| `GET` | `/cache/admin/operations/{operationId}` | `system:cache:read` | 查询当前实例已知的普通缓存清理回执；未知操作返回 `UNKNOWN` |
+| `POST` | `/cache/admin/business/clear/preview` | `system:cache:clear` | 预览已注册普通缓存区域和实例范围 |
+| `POST` | `/cache/admin/business/clear` | `system:cache:clear` | 使用固定确认语句清理本实例，并按请求发布普通 Redis 多实例失效消息 |
+| `POST` | `/cache/admin/security/session/revoke`、`revoke-all` | `session:revoke` | 按用户/客户端或用户全部撤销安全 Session；不接收明文 Token |
+| `GET` | `/cache/admin/security/session/candidates?keyword=...` | `session:revoke` | 按用户编号、用户名、姓名或工号查询最多 20 个用户候选；只返回定位所需的最小用户资料 |
+| `POST` | `/cache/admin/security/verification/clear` | `security:verification:manage` | 按受控验证码类型和目标清理验证码，登录验证码可选清理尝试计数 |
+| `GET` | `/cache/admin/security/verification/candidates?type=...&keyword=...` | `security:verification:manage` | 按短信/邮箱验证码类型查询最多 20 个有效联系方式候选；展示值脱敏，`KAPTCHA` 不枚举会话句柄 |
+| `POST` | `/cache/admin/security/login-failure/clear` | `security:login-failure:manage` | 清理登录失败计数，不改变用户生命周期锁定/禁用状态 |
+| `GET` | `/cache/admin/security/login-failure/candidates?keyword=...` | `security:login-failure:manage` | 按用户编号、用户名、姓名或工号查询最多 20 个账号候选；仍允许直接输入未知账号 |
+| `POST` | `/cache/admin/security/nonce/invalidate`、`invalidate-all` | `ROLE_DEV_OPS` | 定向失效 nonce 或推进当前窗口 cutoff；不提供 Refresh 防重放数据的通用清空 |
+
+所有写操作使用 `@Audit`。普通缓存只接受注册表区域编码，禁止任意 Key、通配符、`FLUSHDB` 和 `FLUSHALL`；普通缓存多实例广播被 Redis 接受不等于其他实例已经完成，未确认时返回部分/未知语义。安全 Redis 故障统一 fail-closed。
 
 ## 消息中心
 

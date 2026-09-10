@@ -73,6 +73,10 @@ DEV_OPS 首次登录后，路由守卫调用 `GET /api/system/guide/status`；�
 
 运维路由集中在 `src/plugin/router/modules/devops.ts`，统一使用 `/devops` 路径、`Devops` 命名路由前缀和 `src/views/Devops/` 目录。数据库菜单只负责导航可见性，叶子路由通过 `meta.requiredMenu` 绑定；未接入真实接口的预定义能力统一指向占位页，不以模拟数据冒充正式功能。后端 `ROLE_DEV_OPS` 通过 `*` 权限和全部有效菜单契约获得运维入口，页面仍通过路由守卫和后端接口权限双重保护。
 
+缓存监控页面位于 `/devops/monitor/cache`，使用 `src/api/system/cache-management-api.ts` 读取 `/api/cache/monitor/overview`、`/api/cache/monitor/regions` 和 `/api/cache/monitor/security`，每 15 秒刷新一次；普通区域的未提供统计显示“暂不支持”，安全 Redis 不可用显示 `UNAVAILABLE`，不展示 Key、Token、验证码或 nonce 原文。缓存清理页面位于 `/devops/system-maintenance/cache-clear`，先预览再按固定确认语句清理已登记普通缓存，并支持当前实例/多实例范围和操作状态轮询。
+
+同一清理页面通过安全管理 API 按用户/客户端撤销 Session、维护受控验证码和登录失败计数；不提供明文 Token 或任意 Key 输入。Web 加密 nonce 的定向失效和全局当前窗口失效按钮仅对具有 `security:replay:manage` 的用户展示，后端仍以 `ROLE_DEV_OPS` 作为最终授权门禁；全局操作需要固定确认短语。
+
 调度页面位于 `src/views/Devops/Scheduler/`：`/devops/scheduler/task` 展示 Quartz Job 类型、JobKey、唯一 Cron/Simple Trigger、暂停/恢复、编辑、删除和立即触发；`/devops/scheduler/execution` 展示 `RUNNING`、`SUCCEEDED`、`FAILED`、`VETOED`、`ABANDONED` 执行历史及脱敏详情。页面只根据后端白名单和参数 schema 显示参数与动作，不提供 Bean、方法、SQL、脚本或旧 LOOP/UNKNOWN 操作输入。
 
 ## 目录结构
