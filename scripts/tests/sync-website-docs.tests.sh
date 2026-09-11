@@ -24,10 +24,13 @@ assert_not_contains() {
 mkdir -p "$source_root/docs/后端/10-后端模块" "$source_root/docs/后端/40-配置说明"
 mkdir -p "$source_root/docs/前端" "$source_root/docs/流程设计器"
 mkdir -p "$source_root/docs/开发指南" "$source_root/docs/部署运维" "$source_root/docs/AI速查"
+mkdir -p "$source_root/docs/使用指南" "$source_root/docs/参考文档" "$source_root/docs/参与贡献"
 mkdir -p "$website_root/docs/pages/blogs" "$website_root/docs/pages/spectra" \
   "$website_root/docs/pages/spectra-ui" "$website_root/docs/pages/spectra-admin" \
   "$website_root/docs/pages/spectra-guide" "$website_root/docs/pages/spectra-ops" \
-  "$website_root/docs/pages/logicflow-flowable"
+  "$website_root/docs/pages/logicflow-flowable" "$website_root/docs/pages/spectra-quickstart" \
+  "$website_root/docs/pages/spectra-user-guide" "$website_root/docs/pages/spectra-reference" \
+  "$website_root/docs/pages/spectra-contributing"
 mkdir -p "$source_root/scripts"
 cp -- "$sync_script" "$source_root/scripts/sync-website-docs.sh"
 cp -- "${sync_script%.sh}.py" "$source_root/scripts/sync-website-docs.py"
@@ -38,21 +41,29 @@ cat >"$source_root/scripts/website-docs-manifest.json" <<'JSON'
   "source": {"docsRoot": "docs", "excludeGlobs": ["superpowers/**"]},
   "sections": [
     {"id": "overview", "sourceFiles": ["00-项目总览.md"], "target": "docs/pages/spectra", "routePrefix": "spectra", "sidebar": "overviewSidebar", "routeOverrides": {"00-项目总览.md": "index.md"}},
+    {"id": "quickstart", "sourceFiles": ["01-快速开始.md"], "target": "docs/pages/spectra-quickstart", "routePrefix": "spectra-quickstart", "sidebar": "quickstartSidebar", "routeOverrides": {"01-快速开始.md": "index.md"}},
+    {"id": "user-guide", "sourceRoot": "使用指南", "target": "docs/pages/spectra-user-guide", "routePrefix": "spectra-user-guide", "sidebar": "userGuideSidebar", "routeOverrides": {"00-使用指南.md": "index.md"}},
     {"id": "frontend", "sourceRoot": "前端", "target": "docs/pages/spectra-ui", "routePrefix": "spectra-ui", "sidebar": "frontendSidebar", "routeOverrides": {"00-前端总览.md": "index.md"}},
     {"id": "backend", "sourceRoot": "后端", "target": "docs/pages/spectra-admin", "routePrefix": "spectra-admin", "sidebar": "backendSidebar", "routeOverrides": {"10-后端模块/00-后端总览.md": "index.md", "40-配置说明/00-后端配置说明.md": "spectra-config.md"}},
     {"id": "guide", "sourceRoot": "开发指南", "target": "docs/pages/spectra-guide", "routePrefix": "spectra-guide", "sidebar": "guideSidebar"},
     {"id": "operations", "sourceRoot": "部署运维", "target": "docs/pages/spectra-ops", "routePrefix": "spectra-ops", "sidebar": "operationsSidebar", "sidebarTitleOverrides": {"05-运维应急解锁手册.md": "运维应急解锁手册"}},
-    {"id": "designer", "sourceRoot": "流程设计器", "target": "docs/pages/logicflow-flowable", "routePrefix": "logicflow-flowable", "sidebar": "designerSidebar", "routeOverrides": {"00-流程设计器.md": "index.md"}}
+    {"id": "designer", "sourceRoot": "流程设计器", "target": "docs/pages/logicflow-flowable", "routePrefix": "logicflow-flowable", "sidebar": "designerSidebar", "routeOverrides": {"00-流程设计器.md": "index.md"}},
+    {"id": "reference", "sourceRoot": "参考文档", "target": "docs/pages/spectra-reference", "routePrefix": "spectra-reference", "sidebar": "referenceSidebar", "routeOverrides": {"00-版本与支持范围.md": "index.md"}},
+    {"id": "contributing", "sourceRoot": "参与贡献", "target": "docs/pages/spectra-contributing", "routePrefix": "spectra-contributing", "sidebar": "contributingSidebar", "routeOverrides": {"00-贡献指南.md": "index.md"}}
   ],
   "attachments": [{"source": "后端/10-后端模块/permission-catalog.yaml", "target": "permission-catalog.yaml", "section": "backend"}]
 }
 JSON
 printf '%s\n' '# 项目总览' '' '参见 [[00-前端总览]]、[[00-后端总览]]、[[00-开发指南]] 和 [[00-流程设计器]]。\n' >"$source_root/docs/00-项目总览.md"
+printf '%s\n' '# 快速开始' >"$source_root/docs/01-快速开始.md"
+printf '%s\n' '# 使用指南' >"$source_root/docs/使用指南/00-使用指南.md"
 printf '%s\n' '# 后端总览' '' '参见 [[00-前端总览]] 和 [[00-开发指南]]。\n' >"$source_root/docs/后端/10-后端模块/00-后端总览.md"
 printf '%s\n' '# 前端总览' '' '参见 [[00-后端总览]]。\n' >"$source_root/docs/前端/00-前端总览.md"
 printf '%s\n' '# 流程设计器' '' '参见 [[00-后端总览]]。\n' >"$source_root/docs/流程设计器/00-流程设计器.md"
 printf '%s\n' '# 开发指南' >"$source_root/docs/开发指南/00-开发指南.md"
 printf '%s\n' '# 部署运维' >"$source_root/docs/部署运维/00-部署运维.md"
+printf '%s\n' '# 版本与支持范围' >"$source_root/docs/参考文档/00-版本与支持范围.md"
+printf '%s\n' '# 贡献指南' >"$source_root/docs/参与贡献/00-贡献指南.md"
 printf '%s\n' '# DEV_OPS Break-glass Runbook' >"$source_root/docs/部署运维/05-运维应急解锁手册.md"
 printf '%s\n' '# 后端配置说明' >"$source_root/docs/后端/40-配置说明/00-后端配置说明.md"
 printf '%s\n' '# 旧页面' >"$source_root/docs/后端/10-后端模块/old.md"
@@ -80,11 +91,15 @@ assert_absent "$website_root/.vitepress/generated/project-sidebar.mts"
 "$sync_script" --source-root "$source_root" --website-root "$website_root" --mode Apply --prune-legacy >/tmp/spectra-sync-apply.$$ \
   || { cat /tmp/spectra-sync-apply.$$ >&2; exit 1; }
 assert_file "$website_root/docs/pages/spectra/index.md"
+assert_file "$website_root/docs/pages/spectra-quickstart/index.md"
+assert_file "$website_root/docs/pages/spectra-user-guide/index.md"
 assert_file "$website_root/docs/pages/spectra-ui/index.md"
 assert_file "$website_root/docs/pages/spectra-admin/index.md"
 assert_file "$website_root/docs/pages/spectra-guide/00-开发指南.md"
 assert_file "$website_root/docs/pages/spectra-ops/00-部署运维.md"
 assert_file "$website_root/docs/pages/logicflow-flowable/index.md"
+assert_file "$website_root/docs/pages/spectra-reference/index.md"
+assert_file "$website_root/docs/pages/spectra-contributing/index.md"
 assert_file "$website_root/docs/pages/spectra-admin/spectra-config.md"
 assert_file "$website_root/docs/public/spectra-admin/permission-catalog.yaml"
 assert_file "$website_root/.vitepress/generated/project-sidebar.mts"
@@ -95,8 +110,12 @@ assert_absent "$website_root/docs/pages/logicflow-flowable/legacy.md"
 assert_contains "$website_root/docs/pages/blogs/keep.md" '# Keep my blog'
 assert_contains "$website_root/.vitepress/generated/spectra-docs-sync.json" 'permission-catalog.yaml'
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const frontendSidebar'
+assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const quickstartSidebar'
+assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const userGuideSidebar'
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const guideSidebar'
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const operationsSidebar'
+assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const referenceSidebar'
+assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const contributingSidebar'
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" '运维应急解锁手册'
 assert_not_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'DEV_OPS Break-glass Runbook'
 if rg -i '\.env|token|password|secret|AI速查' "$website_root/.vitepress/generated/spectra-docs-sync.json" >/dev/null; then

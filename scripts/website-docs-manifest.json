@@ -24,6 +24,33 @@
       }
     },
     {
+      "id": "quickstart",
+      "title": "快速开始",
+      "sourceFiles": ["01-快速开始.md"],
+      "target": "docs/pages/spectra-quickstart",
+      "routePrefix": "spectra-quickstart",
+      "sidebar": "quickstartSidebar",
+      "routeOverrides": {
+        "01-快速开始.md": "index.md"
+      }
+    },
+    {
+      "id": "user-guide",
+      "title": "使用指南",
+      "sourceRoot": "使用指南",
+      "target": "docs/pages/spectra-user-guide",
+      "routePrefix": "spectra-user-guide",
+      "sidebar": "userGuideSidebar",
+      "routeOverrides": {
+        "00-使用指南.md": "index.md",
+        "01-登录与工作台.md": "login-workbench.md",
+        "02-组织与权限.md": "organization-permissions.md",
+        "03-办公与通知.md": "office-notification.md",
+        "04-文件与流程.md": "files-workflow.md",
+        "05-问题排查.md": "troubleshooting.md"
+      }
+    },
+    {
       "id": "frontend",
       "title": "前端",
       "sourceRoot": "前端",
@@ -161,6 +188,33 @@
         "04-属性Schema与编辑面板.md": "属性结构与编辑面板",
         "06-BPMN导入导出.md": "流程导入导出",
         "07-Spectra宿主集成.md": "宿主平台集成"
+      }
+    },
+    {
+      "id": "reference",
+      "title": "参考文档",
+      "sourceRoot": "参考文档",
+      "target": "docs/pages/spectra-reference",
+      "routePrefix": "spectra-reference",
+      "sidebar": "referenceSidebar",
+      "routeOverrides": {
+        "00-版本与支持范围.md": "index.md",
+        "01-接口与配置索引.md": "api-configuration-index.md",
+        "02-常见问题.md": "faq.md"
+      }
+    },
+    {
+      "id": "contributing",
+      "title": "参与贡献",
+      "sourceRoot": "参与贡献",
+      "target": "docs/pages/spectra-contributing",
+      "routePrefix": "spectra-contributing",
+      "sidebar": "contributingSidebar",
+      "routeOverrides": {
+        "00-贡献指南.md": "index.md",
+        "01-提交与分支规范.md": "commit-branch-convention.md",
+        "02-问题反馈与合并请求.md": "issue-pull-request.md",
+        "03-安全问题报告.md": "security-report.md"
       }
     }
   ],

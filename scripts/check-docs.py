@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import sys
@@ -39,6 +40,50 @@ def main() -> int:
     if shutil.which("rg") is None:
         return fail(["未找到 rg（ripgrep），无法执行文档事实校验。"])
     errors: list[str] = []
+    required_paths = (
+        "README.md",
+        "LICENSE",
+        "CONTRIBUTING.md",
+        "CODE_OF_CONDUCT.md",
+        "SECURITY.md",
+        "CHANGELOG.md",
+        ".github/ISSUE_TEMPLATE/bug_report.md",
+        ".github/ISSUE_TEMPLATE/feature_request.md",
+        ".github/pull_request_template.md",
+        "docs/00-项目总览.md",
+        "docs/01-快速开始.md",
+        "docs/使用指南/00-使用指南.md",
+        "docs/参考文档/00-版本与支持范围.md",
+        "docs/参与贡献/00-贡献指南.md",
+    )
+    for relative in required_paths:
+        if not (ROOT / relative).is_file():
+            errors.append(f"缺少开源项目入口文件：{relative}。")
+
+    manifest_path = ROOT / "scripts/website-docs-manifest.json"
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            configured_sources = {
+                str(section.get("sourceRoot", "")) for section in manifest.get("sections", [])
+            }
+            if "AI速查" in configured_sources:
+                errors.append("网站同步清单不得发布 docs/AI速查/。")
+            required_sections = {"quickstart", "user-guide", "reference", "contributing"}
+            configured_sections = {str(section.get("id", "")) for section in manifest.get("sections", [])}
+            missing_sections = sorted(required_sections - configured_sections)
+            if missing_sections:
+                errors.append(f"网站同步清单缺少公共分区：{', '.join(missing_sections)}。")
+        except (ValueError, OSError) as exc:
+            errors.append(f"无法读取网站同步清单：{exc}。")
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8") if (ROOT / "README.md").is_file() else ""
+    old_directory_refs = re.compile(
+        r"docs/(?:02-使用指南|10-后端|20-前端|30-数据模型|40-规范|50-开发指南|60-部署运维|60-参考文档|70-AI速查|70-参与贡献)(?:/|[`\)])"
+    )
+    if old_directory_refs.search(readme):
+        errors.append("根 README 仍然包含旧的编号目录链接。")
+
     markdown_files = sorted(DOCS.rglob("*.md"))
     wiki_pattern = re.compile(r"\[\[([^\]]+)\]\]")
     for path in markdown_files:
