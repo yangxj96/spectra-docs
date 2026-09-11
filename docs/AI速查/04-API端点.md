@@ -41,12 +41,12 @@ Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息�
 |---|---|---|
 | UserController | `/user/**` | 用户资料查询、`POST /user/onboarding` 新增用户及多角色 RoleAssignment、`PUT /user/onboarding` 编辑用户并增改/移除多个 RoleAssignment、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；提交接口在同一事务内完成资料和授权 |
 | UserImportController | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
-| RoleController | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、`PUT /role/{id}/enable`、`PUT /role/{id}/disable`、逻辑删除和菜单查询；旧角色创建、修改和菜单独立写入路由已移除 |
+| RoleController | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、`PUT /role/{id}/enable`、`PUT /role/{id}/disable`、逻辑删除和菜单查询 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`（临时密码、`expires_at`、`must_change`）。临时密码 24 小时有效，只在本次响应返回明文，服务端只保存哈希；临时会话必须先修改密码。
 
-Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`，且仅允许对 ACTIVE 业务角色执行。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`，且仅允许对 ACTIVE 业务角色执行。菜单 UX 配置由 RoleController 管理。
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要和版本，并在事务内维护闭包表、递增 organizationVersion、撤销受影响会话。
 
@@ -60,7 +60,7 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 用户批量导入端点：`POST /user/imports/preview` 创建或幂等重放 Preview 任务，`GET /user/imports/{id}` 查询任务摘要和 `completed_rows`，`GET /user/imports/{id}/errors` 查询错误行，`POST /user/imports/{id}/apply` 校验通过后返回 `APPLYING` 任务并异步应用通过校验的行。请求字段为 `real_name`、`username`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`；`username` 是登录用户名，`phone/email` 是联系方式和认证身份字段，不再写入 `sys_user`。另带 `file_hash` 和 `idempotency_key`；工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期字段以 `LocalDateTime` 响应，Web 页面统一格式化为 `yyyy-MM-dd HH:mm:ss`；Web 页面前端解析 XLSX，部门、语言、时区和授权方案由页面统一选择后合并到每一行 Preview 请求。
 
-用户分页资料与当前用户资料的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为展示来源。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
+用户分页资料与当前用户资料的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记及分离的 Access/Grant Boundary。`GET /authority/tree` 的 Permission 叶子同时返回 `allowed_scope_modes`，用于 Boundary 编辑器限制可选模式。
 
 Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改和移除：第 02 步加载已有活动角色，也可以套用多 Role 授权方案；方案中的重复角色会跳过并提示。第 03 步按角色分别调整 Access Boundary 与 Grant Boundary，至少保留一个角色，最后调用 `/user/onboarding` 一次性提交；独立授权页面仍可调用 `/security/authorization/users/{userId}/assignments/preview` 和 `/apply`。Access Boundary 与 Grant Boundary 独立提交，不从一个边界推导另一个边界。
 
@@ -69,7 +69,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | Controller | 路径 | 说明 |
 |---|---|---|
 | MenuController | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树（`GET /menu/current`） |
-| DepartmentController | `/department/**` | 部门树查询；旧创建/修改写入口已冻结，新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
+| DepartmentController | `/department/**` | 部门树查询；新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
 | RegionController | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |
 | ConfiguredController | `/configured/**` | 配置表管理 |

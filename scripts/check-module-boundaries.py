@@ -20,8 +20,6 @@ MODULES = OrderedDict(
         ("spectra-config", ("spectra-config", "com.devops00.spectra.config")),
         ("spectra-framework", ("spectra-framework", "com.devops00.spectra.framework")),
         ("spectra-launch", ("spectra-launch", "com.devops00.spectra.launch")),
-        ("spectra-security-base", ("spectra-starter/spectra-security-base", "com.devops00.spectra.security.base")),
-        ("spectra-security-spring-boot-starter", ("spectra-starter/spectra-security-spring-boot-starter", "com.devops00.spectra.security")),
         ("spectra-core", ("spectra-modules/spectra-core", "com.devops00.spectra.core")),
         ("spectra-workflow", ("spectra-modules/spectra-workflow", "com.devops00.spectra.workflow")),
         ("spectra-oa", ("spectra-modules/spectra-oa", "com.devops00.spectra.oa")),
@@ -150,7 +148,7 @@ def main() -> int:
     health_contributors = (
         "spectra-framework/src/main/java/com/devops00/spectra/framework/health/DataSourceHealthContributor.java",
         "spectra-framework/src/main/java/com/devops00/spectra/framework/health/RedisHealthContributor.java",
-        "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/scheduler/health/SchedulerHealthIndicator.java",
+        "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/quartz/health/QuartzSchedulerHealthIndicator.java",
         "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/health/NotificationHealthIndicator.java",
         "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/health/FileStorageHealthIndicator.java",
         "spectra-modules/spectra-workflow/src/main/java/com/devops00/spectra/workflow/health/FlowableHealthContributor.java",
@@ -217,7 +215,7 @@ def main() -> int:
             continue
         if artifact and dependencies:
             dependency_inventory.append((artifact, dependencies))
-    print("当前 Maven 直接依赖盘点（仅记录现状，后续任务再按归属矩阵收敛）：")
+    print("当前 Maven 直接依赖盘点：")
     for artifact, dependencies in sorted(dependency_inventory):
         print(f"- {artifact}: {', '.join(dependencies)}")
     declared_modules: list[str] = []

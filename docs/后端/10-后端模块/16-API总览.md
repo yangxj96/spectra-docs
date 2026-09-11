@@ -9,7 +9,7 @@ tags:
 
 > spectra-admin 全部 REST API 控制器速查表。源码当前共 56 个 `@RestController`。
 
-当前所有 REST Mapping 统一使用 API 版本 `1.0.0`。已移除的旧路径、旧字段和旧授权写入口不提供兼容别名；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
+当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供兼容别名或第二套授权写入入口；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
 后端 API 运行在单体多模块组合根 `spectra-launch` 中：Core API（包含通知和文件上传 API）始终可用，OA、Workflow API 仅在对应模块已由 launch 引入且 `spectra.modules.<name>.enabled=true` 时注册。可选模块关闭不会产生空 Controller 或兼容回退入口；本系统不提供租户参数、租户切换或 SaaS 隔离 API。
 
@@ -46,7 +46,7 @@ tags:
 |---|---|---|---|
 | `UserController` | spectra-core | `/user/**` | 用户资料查询、`POST /user/onboarding` 新增用户及多角色 RoleAssignment、`PUT /user/onboarding` 编辑用户并增改/移除多个 RoleAssignment、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；提交接口在同一事务内完成资料和授权 |
 | `UserImportController` | spectra-core | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
-| `RoleController` | spectra-core | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、启用/禁用、逻辑删除和菜单查询；旧角色创建、修改和菜单独立写入路由已移除 |
+| `RoleController` | spectra-core | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、启用/禁用、逻辑删除和菜单查询 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`，包含临时密码、过期时间和必须修改密码标记。临时密码只在该次响应返回，服务端只保存哈希；用户使用临时密码登录后必须先修改密码。
@@ -56,7 +56,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `MenuController` | spectra-core | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树 |
-| `DepartmentController` | spectra-core | `/department/**` | 部门树查询；旧创建/修改写入口已冻结，新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
+| `DepartmentController` | spectra-core | `/department/**` | 部门树查询；新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
 | `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
@@ -110,11 +110,11 @@ tags:
 
 用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收结构化行（`real_name`、`username`、`phone`、`email`、`department_code`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`；`username` 写入 `sys_user`，`phone/email` 写入 `spectra_security.sec_user_contact` 和对应认证身份，不再写入用户主表。工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期以 `LocalDateTime` 响应，不接受 Role/Permission/Scope UUID；Web Excel 模板只包含用户基本信息，部门、语言、时区和授权方案由页面在数据预览上方统一选择后合并到每一行请求。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。XLSX 文件解析由前端完成。
 
-用户分页资料与当前用户资料中的角色展示已切换为读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary，旧 `sys_rel_user_role` 不再作为角色展示来源。
+用户分页资料与当前用户资料中的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary。
 
 Web 用户编辑器在编辑已有用户时提供多 RoleAssignment 管理：第 02 步自动加载当前活动角色并允许移除或新增多个角色，也可以套用包含多个角色的授权方案；方案中已经存在当前用户的角色会跳过并提示角色名称。第 03 步按角色分别调整 Permission-specific Access/Grant Boundary，至少保留一个角色，最后统一调用 `/user/onboarding`，由后端完成各 Assignment 的 Preview/Apply 和撤销。Scope 缺少显式配置或 RULES 未选择组织时前端拒绝提交。
 
-Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 仅允许对 ACTIVE 业务角色执行高风险授权变更。旧 `/role/{id}/authorities` 路由已移除，菜单 UX 配置仍由 RoleController 管理。
+Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；`POST /security/authorization/roles/{roleId}/impact-preview` 和带 preview token 的 `POST /security/authorization/roles/{roleId}/impact-apply` 仅允许对 ACTIVE 业务角色执行高风险授权变更。菜单 UX 配置由 RoleController 管理。
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要、版本、授权边界，并在事务内维护闭包表、递增 organizationVersion、推进受影响用户安全版本及撤销会话。
 
