@@ -85,7 +85,7 @@ def main() -> int:
     if unexpected:
         errors.append(f"后端本机模板包含源码未使用的旧变量：{', '.join(unexpected)}。")
 
-    for relative in ("10-后端/90-API总览.md", "70-AI速查/04-API端点.md"):
+    for relative in ("后端/10-后端模块/16-API总览.md", "AI速查/04-API端点.md"):
         content = (DOCS / relative).read_text(encoding="utf-8")
         documented = sorted(set(re.findall(r"`?([A-Z][A-Za-z0-9]+Controller)`?", content)))
         missing_names = sorted(set(controller_names) - set(documented))
@@ -110,13 +110,6 @@ def main() -> int:
                     for number, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
                         if pattern in line:
                             errors.append(f"过期内容: {path.relative_to(ROOT).as_posix()}:{number}: {line}")
-
-    plans = DOCS / "90-计划"
-    if plans.exists():
-        for path in plans.rglob("P-*.md"):
-            head = "\n".join(path.read_text(encoding="utf-8").splitlines()[:45])
-            if re.search(r"\*\*已完成(?:（[^）]+）)?\*\*|\*\*全部阶段已完成\*\*|status:\s*(?:completed|done)", head):
-                errors.append(f"已完成计划仍在执行计划目录: {path.relative_to(ROOT).as_posix()}")
 
     if errors:
         return fail(errors)

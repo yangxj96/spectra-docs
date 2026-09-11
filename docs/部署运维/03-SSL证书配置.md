@@ -1,0 +1,84 @@
+---
+tags:
+  - backend
+  - infrastructure
+  - security
+---
+
+# SSL 证书配置
+
+> 本地首次启动默认使用 HTTPS，需要先准备仅用于本机开发的 P12 证书。本页说明证书生成、后端加载和前端同步配置。
+
+## 哪些内容可复用
+
+| 内容 | 分类 |
+|---|---|
+| 后端证书相对路径 `spectra-admin/files/ssl/keystore.p12` | 可复用约定 |
+| `SSL_TYPE=PKCS12`、`SSL_ALIAS=tomcat` | 可复用默认值 |
+| P12 密码、CA、私钥、证书有效期 | 每台机器/每套环境自行生成 |
+| 系统证书库位置和企业 CA 流程 | 取决于操作系统和组织策略 |
+
+仓库不提交 CA 安装、证书生成或卸载脚本；不要依赖不存在的脚本。可以使用组织 CA，或在本机用 OpenSSL 生成开发证书。
+
+## 本机自签名证书示例
+
+要求 OpenSSL 已加入 PATH。以下命令从仓库根目录执行，生成仅用于本机开发的证书：
+
+```bash
+mkdir -p spectra-admin/files/ssl
+cd spectra-admin/files/ssl
+read -r -s -p '输入本机 P12 密码: ' SPECTRA_SSL_PASSWORD
+printf '\n'
+export SPECTRA_SSL_PASSWORD
+
+openssl req -x509 -newkey rsa:2048 -sha256 -days 825 -nodes \
+  -keyout localhost.key -out localhost.crt \
+  -subj '/CN=localhost' \
+  -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1'
+
+openssl pkcs12 -export -in localhost.crt -inkey localhost.key \
+  -out keystore.p12 -name tomcat -passout env:SPECTRA_SSL_PASSWORD
+unset SPECTRA_SSL_PASSWORD
+chmod 600 keystore.p12 localhost.key
+```
+
+生成的 `localhost.key`、`localhost.crt` 和 `keystore.p12` 都是本机材料，不得提交。确认 P12 可用后，可按本机安全策略处理不再需要的明文私钥文件。
+
+## 后端本机配置
+
+在 `spectra-admin/.mise.local.toml` 中设置：
+
+```toml
+SERVER_SSL_ENABLED = "true"
+SSL_PASSWORD = "<与生成 P12 时一致的本机密码>"
+SSL_TYPE = "PKCS12"
+SSL_ALIAS = "tomcat"
+```
+
+尖括号内容必须替换，不能直接复制。不要把真实密码写回 `.mise.local.toml.example`。
+
+## 前端同步
+
+把本机前端配置改成 HTTPS：
+
+```dotenv
+# spectra-ui/.env.development
+VITE_API_URL=https://127.0.0.1:4004/
+```
+
+浏览器默认不信任自签名证书。个人机器可以按操作系统策略信任 `localhost.crt`，团队或企业环境应使用组织 CA；不要共享或提交开发 CA 私钥。未建立信任时，健康检查和前端请求可能因证书校验失败。
+
+## 恢复 HTTP
+
+```toml
+SERVER_SSL_ENABLED = "false"
+```
+
+同时把 Web 前端 API URL 改回 `http://`。协议不一致是新环境最常见的“页面能打开但接口全部失败”原因之一。
+
+## 相关
+
+- [[00-环境搭建]]
+- [[02-脚本工具]]
+- [[12-基础设施]]
+- [[../后端/40-配置说明/00-后端配置说明]]

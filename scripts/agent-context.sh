@@ -58,8 +58,8 @@ Name: backend
 Agent: spectra-admin/AGENTS.md
 Skill: $spectra-admin-spec
 Docs:
-- docs/10-后端/目标领域笔记
-- docs/30-数据模型/目标实体笔记
+- docs/后端/10-后端模块/目标领域笔记
+- docs/后端/20-数据模型/目标实体笔记
 Validate: ./mvnw -pl <module> -am test
 ROUTE
     ;;
@@ -69,7 +69,7 @@ Name: web
 Agent: spectra-ui/AGENTS.md
 Skill: $spectra-ui-spec
 Docs:
-- docs/20-前端/10-spectra-ui.md（仅目标规则未覆盖时）
+- docs/前端/01-前端管理后台.md（仅目标规则未覆盖时）
 Validate: pnpm run type-check; pnpm run test
 ROUTE
     ;;
@@ -79,7 +79,7 @@ Name: plugin
 Agent: logicflow-plugin-flowable/AGENTS.md
 Skill: 无专用 Skill；使用插件 AGENTS.md
 Docs:
-- docs/20-前端/30-流程建模插件.md（仅节点行为未覆盖时）
+- docs/流程设计器/01-流程建模插件.md（仅节点行为未覆盖时）
 Validate: pnpm run format:check; pnpm run build
 ROUTE
     ;;

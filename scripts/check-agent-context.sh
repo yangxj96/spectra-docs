@@ -34,7 +34,7 @@ done
 
 for pattern in \
   '必读 `docs/00-项目总览.md`' \
-  '后端任务再读 `docs/40-规范/15-后端开发规范.md`' \
+  '后端任务再读 `docs/后端/30-规范/01-后端开发规范.md`' \
   '每次.*读取.*docs/'; do
   if rg -n --pcre2 "$pattern" "$project_root/AGENTS.md" >/dev/null 2>&1; then
     printf '根 AGENTS 包含无条件文档加载规则: %s\n' "$pattern" >&2
