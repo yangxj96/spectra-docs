@@ -33,7 +33,16 @@
       "routeOverrides": {
         "00-前端总览.md": "index.md",
         "01-前端管理后台.md": "fe-spectra-ui.md",
-        "02-前端命名规范.md": "fe-naming.md"
+        "02-前端命名规范.md": "fe-naming.md",
+        "03-前端启动与路由.md": "fe-bootstrap-routing.md",
+        "04-前端状态管理.md": "fe-state-management.md",
+        "05-前端请求与安全通信.md": "fe-http-security.md",
+        "06-前端页面与业务模块.md": "fe-page-modules.md",
+        "07-前端公共组件与文件能力.md": "fe-components-services.md",
+        "08-前端开发测试与构建.md": "fe-development.md"
+      },
+      "sidebarTitleOverrides": {
+        "01-前端管理后台.md": "管理后台"
       }
     },
     {
@@ -72,6 +81,18 @@
         "30-规范/04-Redis使用规范.md": "be-redis-guide.md",
         "30-规范/05-行政区域编码.md": "misc-code.md",
         "40-配置说明/00-后端配置说明.md": "spectra-config.md"
+      },
+      "sidebarTitleOverrides": {
+        "10-后端模块/03-核心模块.md": "核心模块",
+        "10-后端模块/07-调度内核.md": "调度内核",
+        "10-后端模块/08-OA模块.md": "办公自动化模块",
+        "10-后端模块/11-统一通知模块.md": "统一通知子域",
+        "10-后端模块/16-API总览.md": "接口总览",
+        "20-数据模型/00-实体关系图.md": "实体关系总览",
+        "30-规范/00-代码提交规范.md": "代码提交规范",
+        "30-规范/02-MapStruct命名规范.md": "对象映射命名规范",
+        "30-规范/04-Redis使用规范.md": "缓存使用规范",
+        "40-配置说明/00-后端配置说明.md": "后端配置说明"
       }
     },
     {
@@ -105,6 +126,16 @@
         "06-安全审计归档手册.md": "security-audit-archive.md",
         "07-安全备份恢复手册.md": "security-backup-recovery.md",
         "08-安全迁移盘点手册.md": "security-migration-inventory.md"
+      },
+      "sidebarTitleOverrides": {
+        "00-容器部署.md": "容器部署",
+        "01-反向代理配置.md": "反向代理配置",
+        "02-容器编排配置.md": "容器编排配置",
+        "03-SSL证书配置.md": "安全证书配置",
+        "05-运维应急解锁手册.md": "运维应急解锁手册",
+        "06-安全审计归档手册.md": "安全审计归档与恢复手册",
+        "07-安全备份恢复手册.md": "安全数据库备份、恢复、全局登出与回滚手册",
+        "08-安全迁移盘点手册.md": "安全迁移前数据盘点与权限映射"
       }
     },
     {
@@ -116,7 +147,20 @@
       "sidebar": "designerSidebar",
       "routeOverrides": {
         "01-流程建模插件.md": "fe-flowable-integration.md",
-        "00-流程设计器.md": "index.md"
+        "00-流程设计器.md": "index.md",
+        "02-插件架构与初始化.md": "plugin-architecture.md",
+        "03-BPMN元素与节点模型.md": "bpmn-elements.md",
+        "04-属性Schema与编辑面板.md": "property-schema.md",
+        "05-连接规则与交互行为.md": "connection-behaviors.md",
+        "06-BPMN导入导出.md": "bpmn-import-export.md",
+        "07-Spectra宿主集成.md": "spectra-integration.md",
+        "08-构建发布与扩展开发.md": "plugin-development.md"
+      },
+      "sidebarTitleOverrides": {
+        "03-BPMN元素与节点模型.md": "流程元素与节点模型",
+        "04-属性Schema与编辑面板.md": "属性结构与编辑面板",
+        "06-BPMN导入导出.md": "流程导入导出",
+        "07-Spectra宿主集成.md": "宿主平台集成"
       }
     }
   ],

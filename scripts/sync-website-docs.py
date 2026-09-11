@@ -102,7 +102,7 @@ def section_sidebar(pages: list[dict], section: dict) -> str:
         groups.setdefault(page["group"], []).append(page)
     blocks: list[str] = []
     for name, items in groups.items():
-        entries = ",\n".join(f"        {{ text: {mts(item['title'])}, link: {mts(item['route'])} }}" for item in items)
+        entries = ",\n".join(f"        {{ text: {mts(item['sidebarTitle'])}, link: {mts(item['route'])} }}" for item in items)
         blocks.append(f"    {{\n        text: {mts(name)},\n        items: [\n{entries}\n        ]\n    }}")
     return "[\n" + ",\n".join(blocks) + "\n]" if blocks else "[]"
 
@@ -243,6 +243,8 @@ def main() -> int:
                 target_relative += ".md"
             target_root = section_targets[section_id]
             target_path = contained(target_root, target_relative, "文档目标")
+            page_title = title(file.read_text(encoding="utf-8"), file.stem)
+            sidebar_title_overrides = section.get("sidebarTitleOverrides", {})
             item = {
                 "source": source_relative,
                 "sectionRelative": section_relative,
@@ -251,7 +253,8 @@ def main() -> int:
                 "section": section_id,
                 "route": route(str(section["routePrefix"]), target_relative),
                 "group": group_title(section, section_relative),
-                "title": title(file.read_text(encoding="utf-8"), file.stem),
+                "title": page_title,
+                "sidebarTitle": str(sidebar_title_overrides.get(section_relative, page_title)),
             }
             pages.append(item)
             for key in (source_relative, strip_md(source_relative), section_relative, strip_md(section_relative)):

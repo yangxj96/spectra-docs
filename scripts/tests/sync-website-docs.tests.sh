@@ -17,6 +17,9 @@ assert_absent() {
 assert_contains() {
   rg -F -- "$2" "$1" >/dev/null || { printf 'ASSERTION FAILED: %s does not contain %s\n' "$1" "$2" >&2; exit 1; }
 }
+assert_not_contains() {
+  ! rg -F -- "$2" "$1" >/dev/null || { printf 'ASSERTION FAILED: %s unexpectedly contains %s\n' "$1" "$2" >&2; exit 1; }
+}
 
 mkdir -p "$source_root/docs/后端/10-后端模块" "$source_root/docs/后端/40-配置说明"
 mkdir -p "$source_root/docs/前端" "$source_root/docs/流程设计器"
@@ -38,7 +41,7 @@ cat >"$source_root/scripts/website-docs-manifest.json" <<'JSON'
     {"id": "frontend", "sourceRoot": "前端", "target": "docs/pages/spectra-ui", "routePrefix": "spectra-ui", "sidebar": "frontendSidebar", "routeOverrides": {"00-前端总览.md": "index.md"}},
     {"id": "backend", "sourceRoot": "后端", "target": "docs/pages/spectra-admin", "routePrefix": "spectra-admin", "sidebar": "backendSidebar", "routeOverrides": {"10-后端模块/00-后端总览.md": "index.md", "40-配置说明/00-后端配置说明.md": "spectra-config.md"}},
     {"id": "guide", "sourceRoot": "开发指南", "target": "docs/pages/spectra-guide", "routePrefix": "spectra-guide", "sidebar": "guideSidebar"},
-    {"id": "operations", "sourceRoot": "部署运维", "target": "docs/pages/spectra-ops", "routePrefix": "spectra-ops", "sidebar": "operationsSidebar"},
+    {"id": "operations", "sourceRoot": "部署运维", "target": "docs/pages/spectra-ops", "routePrefix": "spectra-ops", "sidebar": "operationsSidebar", "sidebarTitleOverrides": {"05-运维应急解锁手册.md": "运维应急解锁手册"}},
     {"id": "designer", "sourceRoot": "流程设计器", "target": "docs/pages/logicflow-flowable", "routePrefix": "logicflow-flowable", "sidebar": "designerSidebar", "routeOverrides": {"00-流程设计器.md": "index.md"}}
   ],
   "attachments": [{"source": "后端/10-后端模块/permission-catalog.yaml", "target": "permission-catalog.yaml", "section": "backend"}]
@@ -50,6 +53,7 @@ printf '%s\n' '# 前端总览' '' '参见 [[00-后端总览]]。\n' >"$source_ro
 printf '%s\n' '# 流程设计器' '' '参见 [[00-后端总览]]。\n' >"$source_root/docs/流程设计器/00-流程设计器.md"
 printf '%s\n' '# 开发指南' >"$source_root/docs/开发指南/00-开发指南.md"
 printf '%s\n' '# 部署运维' >"$source_root/docs/部署运维/00-部署运维.md"
+printf '%s\n' '# DEV_OPS Break-glass Runbook' >"$source_root/docs/部署运维/05-运维应急解锁手册.md"
 printf '%s\n' '# 后端配置说明' >"$source_root/docs/后端/40-配置说明/00-后端配置说明.md"
 printf '%s\n' '# 旧页面' >"$source_root/docs/后端/10-后端模块/old.md"
 printf '%s\n' 'version: 1' 'items:' '  - code: demo.read' >"$source_root/docs/后端/10-后端模块/permission-catalog.yaml"
@@ -93,6 +97,8 @@ assert_contains "$website_root/.vitepress/generated/spectra-docs-sync.json" 'per
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const frontendSidebar'
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const guideSidebar'
 assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'export const operationsSidebar'
+assert_contains "$website_root/.vitepress/generated/project-sidebar.mts" '运维应急解锁手册'
+assert_not_contains "$website_root/.vitepress/generated/project-sidebar.mts" 'DEV_OPS Break-glass Runbook'
 if rg -i '\.env|token|password|secret|AI速查' "$website_root/.vitepress/generated/spectra-docs-sync.json" >/dev/null; then
   printf '%s\n' 'ASSERTION FAILED: sensitive path entered generated manifest' >&2
   exit 1
