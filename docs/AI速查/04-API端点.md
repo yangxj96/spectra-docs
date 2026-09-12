@@ -19,7 +19,7 @@ tags:
 | AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；高风险写入绑定短时 token |
 | AuthorizationProfileController | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除 |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
-| AuditLogController | `/audit/**` | 按 category 查询统一操作/安全审计日志，支持详情与 CSV 导出；详情键为 `event_id` + `occurred_at`，安全事件继续应用高风险及 operator/target 可见性策略 |
+| AuditLogController | `/audit/**` | 按 category、`operator`（用户 ID 或姓名）及 `event_type` / 操作说明查询统一操作与安全审计日志；响应提供 `operator_name`，事件类型列表展示 `@Audit.value`，安全事件继续应用高风险及 operator/target 可见性策略；支持详情与 CSV 导出 |
 | SecurityPolicyController | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | SystemInitializationController | `/system/initialization/**` | 首次保存六项系统基础配置、创建 DEV_OPS 用户、密码凭证和 RoleAssignment；启动需要初始化令牌 |
 | SystemGuideController | `/system/guide/**` | DEV_OPS 首次登录后查询并完成系统设置；提交根部门名称、区域、类型并保存 Core 通知业务和底部版权策略，内部密钥不在此处生成或配置 |

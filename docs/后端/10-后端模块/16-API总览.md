@@ -22,7 +22,7 @@ tags:
 | `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；所有高风险写入绑定短时 token |
 | `AuthorizationProfileController` | spectra-core | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除；方案保存使用稳定业务编码和版本校验 |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
-| `AuditLogController` | spectra-core | `/audit/**` | 查询、详情和 CSV 导出统一操作/安全审计日志；按 category 筛选，安全事件保留高风险与 operator/target 可见性规则 |
+| `AuditLogController` | spectra-core | `/audit/**` | 查询、详情和 CSV 导出统一操作/安全审计日志；按 category、用户 ID/姓名和稳定事件类型/操作说明筛选，响应提供操作人姓名，安全事件保留高风险与 operator/target 可见性规则 |
 | `SecurityPolicyController` | spectra-core | `/security/policy/**` | 查询/修改各登录端 Session 策略与系统密码策略；修改使用 version 乐观锁并写入 Security Audit |
 | `SystemInitializationController` | spectra-core | `/system/initialization/**` | 首次保存系统基础配置、创建 DEV_OPS 账号和完成初始化；完成后不自动登录，由客户端返回登录页 |
 
