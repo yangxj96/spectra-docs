@@ -17,7 +17,6 @@ NS = {"m": "http://maven.apache.org/POM/4.0.0"}
 MODULES = OrderedDict(
     (
         ("spectra-common", ("spectra-common", "com.devops00.spectra.common")),
-        ("spectra-config", ("spectra-config", "com.devops00.spectra.config")),
         ("spectra-framework", ("spectra-framework", "com.devops00.spectra.framework")),
         ("spectra-launch", ("spectra-launch", "com.devops00.spectra.launch")),
         ("spectra-core", ("spectra-modules/spectra-core", "com.devops00.spectra.core")),

@@ -9,7 +9,7 @@ command -v mise >/dev/null 2>&1 || { printf '未找到 mise。\n' >&2; exit 1; }
 cd "$backend_root"
 env SPECTRA_REGION_IMPORT=true mise exec -- ./mvnw \
   -Pmanual-integration \
-  -pl spectra-modules/spectra-core -am \
+  -pl spectra-launch -am \
   -Dgroups=manual-integration \
   -Dspectra.test.groups.exclude= \
   -Dtest=RegionServiceTest \

@@ -13,6 +13,7 @@ export PATH=$script_dir/fixtures:$PATH
 
 rg -F 'SPECTRA_REGION_IMPORT=true' "$capture" >/dev/null
 rg -F -- '-Pmanual-integration' "$capture" >/dev/null
+rg -F -- '-pl spectra-launch -am' "$capture" >/dev/null
 rg -F -- '-Dgroups=manual-integration' "$capture" >/dev/null
 rg -F -- '-Dspectra.test.groups.exclude=' "$capture" >/dev/null
 rg -F -- '-Dsurefire.failIfNoSpecifiedTests=false' "$capture" >/dev/null

@@ -113,15 +113,15 @@ def main() -> int:
         errors.append(f"项目总览中的 Controller 数量不是源码实际值 {len(controller_names)}。")
 
     expectations = (
-        ("spectra-admin/spectra-config/src/main/resources/application-dev.yml", r"(?m)^  port: 4004$", "后端开发配置端口 4004"),
-        ("spectra-admin/spectra-config/src/main/resources/application-dev.yml", r"(?m)^    key-store: .*keystore\.p12$", "后端开发配置启用 HTTPS"),
+        ("spectra-admin/spectra-launch/src/main/resources/application-dev.yml", r"(?m)^  port: 4004$", "后端开发配置端口 4004"),
+        ("spectra-admin/spectra-launch/src/main/resources/application-dev.yml", r"(?m)^    key-store: .*keystore\.p12$", "后端开发配置启用 HTTPS"),
         ("spectra-ui/.env.example", r"VITE_API_URL=https://127\.0\.0\.1:4004/", "Web 模板直连 HTTPS 4004"),
     )
     for relative, pattern, description in expectations:
         if not re.search(pattern, (ROOT / relative).read_text(encoding="utf-8")):
             errors.append(f"配置模板与首次启动文档不一致：{description}（{relative}）。")
 
-    dev_config = (ROOT / "spectra-admin/spectra-config/src/main/resources/application-dev.yml").read_text(
+    dev_config = (ROOT / "spectra-admin/spectra-launch/src/main/resources/application-dev.yml").read_text(
         encoding="utf-8"
     )
     required = sorted(set(re.findall(r"\$\{([A-Z][A-Z0-9_]*)(?::[^}]*)?\}", dev_config)))

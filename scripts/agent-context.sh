@@ -47,7 +47,7 @@ case "$area" in
     cat <<'ROUTES'
 Name      Agent                                      Skill                         Validate
 backend   spectra-admin/AGENTS.md                    $spectra-admin-spec           ./mvnw -pl <module> -am test
-web       spectra-ui/AGENTS.md                       $spectra-ui-spec              pnpm run type-check; pnpm run test
+web       spectra-ui/AGENTS.md                       $spectra-ui-spec              pnpm run type-check; pnpm run build
 plugin    logicflow-plugin-flowable/AGENTS.md        无专用 Skill；使用插件 AGENTS.md pnpm run format:check; pnpm run build
 ROUTES
     printf '%s\n' 'Docs: 仅按任务读取 docs/00-项目总览.md、架构笔记或一个目标领域笔记。'
@@ -70,7 +70,7 @@ Agent: spectra-ui/AGENTS.md
 Skill: $spectra-ui-spec
 Docs:
 - docs/前端/01-前端管理后台.md（仅目标规则未覆盖时）
-Validate: pnpm run type-check; pnpm run test
+Validate: pnpm run type-check; pnpm run build
 ROUTE
     ;;
   plugin)
