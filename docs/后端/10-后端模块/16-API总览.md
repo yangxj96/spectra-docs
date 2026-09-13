@@ -79,7 +79,7 @@ tags:
 | `DepartmentController` | spectra-core | `/department/**` | 部门树查询；新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理 |
-| `ConfiguredController` | spectra-core | `/configured/**` | 配置表管理 |
+| `ConfiguredController` | spectra-core | `/configured/**` | `GET /configured/settings` 按业务分类读取配置表单；`PUT /configured/batch` 在单个事务内保存当前分类 |
 | `ServiceMonitorController` | spectra-core | `/service/monitor/**` | 服务监控总览、30 分钟/6 小时/24 小时历史趋势、告警规则/事件/摘要、JVM 运行时只读诊断和受控线程/堆转储任务；读取、告警配置、诊断分别受 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 保护 |
 | `CacheManagementController` | spectra-core | `/cache/**` | 普通缓存监控/清理，以及通过安全端口编排的 Session、验证码、登录失败计数和 Web 加密 nonce 维护；nonce 两个写入口额外要求 `ROLE_DEV_OPS` |
 | `CryptoController` | spectra-core | `/system/crypto/**` | Web 加密初始化配置查询和客户端私钥获取；管理操作统一迁移到密钥管理 |

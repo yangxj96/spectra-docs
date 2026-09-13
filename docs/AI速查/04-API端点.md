@@ -72,7 +72,7 @@ Web 用户编辑器对已有用户提供多个 RoleAssignment 的新增、修改
 | DepartmentController | `/department/**` | 部门树查询；新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
 | RegionController | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | DictController | `/dict/**` | 字典组 / 字典项管理 |
-| ConfiguredController | `/configured/**` | 配置表管理 |
+| ConfiguredController | `/configured/**` | `GET /configured/settings` 按业务分类读取配置表单；`PUT /configured/batch` 在单个事务内保存当前分类 |
 | ServiceMonitorController | `/service/monitor/**` | 服务监控总览/历史趋势、告警摘要/规则/事件、运行时诊断和受控诊断任务；分别使用 `system:monitor:read`、`system:monitor:alert`、`system:monitor:configure`、`system:monitor:diagnose` 权限 |
 | CacheManagementController | `/cache/**` | `/monitor/*` 提供缓存和安全运行态只读查询，`/admin/business/*` 提供显式普通缓存预览/清理，`/admin/security/*` 提供 Session、验证码、登录失败和 nonce 维护；三个目标候选查询按对应清理权限隔离并最多返回 20 项，验证码联系方式展示脱敏，`KAPTCHA` 与 nonce 不提供枚举；nonce 写入口额外要求 `ROLE_DEV_OPS` |
 | CryptoController | `/system/crypto/**` | Web 加密配置查询 / 客户端私钥获取；密钥生成、发布、导入导出和刷新统一由 `SecretManagementController` 提供 |
