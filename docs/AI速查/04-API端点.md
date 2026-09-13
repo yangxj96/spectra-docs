@@ -44,7 +44,7 @@ Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息�
 | RoleController | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、`PUT /role/{id}/enable`、`PUT /role/{id}/disable`、逻辑删除和菜单查询 |
 | AuthorityController | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
-`PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`（临时密码、`expires_at`、`must_change`）。临时密码 24 小时有效，只在本次响应返回明文，服务端只保存哈希；临时会话必须先修改密码。
+`PUT /user/password/reset/{uid}` 无密码响应体；使用系统配置 `user.default-password` 重置并立即要求改密，同时撤销该用户全部 Session。默认密码未配置时拒绝重置。新建和导入用户也使用此配置；秘密值仅存储 BCrypt 哈希且配置接口不回显。必须改密的 Session 只允许读取密码规则、客户端私钥、修改密码和退出。
 
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`，且仅允许对 ACTIVE 业务角色执行。菜单 UX 配置由 RoleController 管理。
 

@@ -57,7 +57,7 @@ tags:
 | `RoleController` | spectra-core | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、启用/禁用、逻辑删除和菜单查询 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
-`PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`，包含临时密码、过期时间和必须修改密码标记。临时密码只在该次响应返回，服务端只保存哈希；用户使用临时密码登录后必须先修改密码。
+`PUT /user/password/reset/{uid}` 不返回密码信息。服务端将目标用户密码重置为系统配置 `user.default-password` 的哈希，设置必须立即改密并撤销该用户全部 Session；配置未设置或不符合当前密码策略时拒绝重置。
 
 用户修改密码时，页面规则和服务端共同使用 `SecurityPasswordPolicyProvider` 的当前策略；密码策略读取对所有已认证用户开放，修改策略仍受 `security:password-policy:update` 保护。
 
