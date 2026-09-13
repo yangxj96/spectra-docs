@@ -36,6 +36,14 @@ tags:
 | `POST` | `/security/authentication/logout` | 已认证/Refresh Token | 撤销当前访问会话或 Refresh Token 所属会话族 |
 | `POST` | `/security/authentication/refresh` | `permitAll` | 使用 Refresh Token 轮换并签发新的访问 Token |
 
+### 密码策略
+
+| 方法 | 路径 | 权限 | 说明 |
+|---|---|---|---|
+| `GET` | `/security/policy/password` | 已认证 | 返回当前系统密码策略，包含最小/最大长度和字符类型要求；普通已登录用户可读取，供修改密码页面校验 |
+| `PUT` | `/security/policy/password` | `security:password-policy:update` | 更新策略要求及版本；最小长度为 8–20 位，策略变更写入 Security Audit |
+| `PUT` | `/user/password` | 已认证 | 修改当前用户密码；后端按当前策略校验，密码长度上限为 20 位，成功后撤销该用户全部 Session |
+
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `CommonController` | spectra-core | `/common/**` | 验证码生成、公共接口 |
@@ -50,6 +58,8 @@ tags:
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`，包含临时密码、过期时间和必须修改密码标记。临时密码只在该次响应返回，服务端只保存哈希；用户使用临时密码登录后必须先修改密码。
+
+用户修改密码时，页面规则和服务端共同使用 `SecurityPasswordPolicyProvider` 的当前策略；密码策略读取对所有已认证用户开放，修改策略仍受 `security:password-policy:update` 保护。
 
 ### 在线用户与会话
 
