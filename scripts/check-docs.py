@@ -101,7 +101,11 @@ def main() -> int:
         if re.search(r"^\s*@RestController\s*$", path.read_text(encoding="utf-8"), re.MULTILINE)
     ]
     controller_names = sorted({path.stem for path in controller_files})
-    entity_count = sum("@TableName" in path.read_text(encoding="utf-8") for path in java_files)
+    entity_count = sum(
+        "@TableName" in path.read_text(encoding="utf-8")
+        for path in java_files
+        if "src" in path.parts and "main" in path.parts and "java" in path.parts
+    )
     overview = (DOCS / "00-项目总览.md").read_text(encoding="utf-8")
     if f"{entity_count} 个 Entity" not in overview:
         errors.append(f"项目总览中的 Entity 数量不是源码实际值 {entity_count}。")
