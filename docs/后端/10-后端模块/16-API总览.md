@@ -44,12 +44,22 @@ tags:
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `UserController` | spectra-core | `/user/**` | 用户资料查询、`POST /user/onboarding` 新增用户及多角色 RoleAssignment、`PUT /user/onboarding` 编辑用户并增改/移除多个 RoleAssignment、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；提交接口在同一事务内完成资料和授权 |
+| `UserController` | spectra-core | `/user/**` | 用户资料查询、按用户分组的 `GET /user/online` 在线会话分页、`POST /user/onboarding` 新增用户及多角色 RoleAssignment、`PUT /user/onboarding` 编辑用户并增改/移除多个 RoleAssignment、`GET /user/{uid}` 详情、分页查询 / 状态管理（无普通物理删除）；提交接口在同一事务内完成资料和授权 |
 | `UserImportController` | spectra-core | `/user/imports/**` | 用户批量导入 Preview/Apply、异步任务进度、任务详情和错误行查询；以固定模板行和文件摘要为后端契约 |
 | `RoleController` | spectra-core | `/role/**` | `POST /role/editor` 原子提交角色新增或编辑（基础信息、权限、可授予权限、授权等级和菜单），`GET /role/{id}` 详情、启用/禁用、逻辑删除和菜单查询 |
 | `AuthorityController` | spectra-core | `/authority/tree` | 只读 Permission Catalog 资源分组树；权限编码不提供业务 CRUD |
 
 `PUT /user/password/reset/{uid}` 返回一次性 `UserPasswordResetVO`，包含临时密码、过期时间和必须修改密码标记。临时密码只在该次响应返回，服务端只保存哈希；用户使用临时密码登录后必须先修改密码。
+
+### 在线用户与会话
+
+| 方法 | 路径 | 权限 | 说明 |
+|---|---|---|---|
+| `GET` | `/user/online?page_num=1&page_size=15&username=...&real_name=...&department_id=...` | `session:read` | 按用户分页，记录包含用户资料、有效会话数、最近登录时间和 `sessions`；会话仅返回稳定随机 `session_id`、客户端、IP、登录时间 |
+| `POST` | `/cache/admin/security/session/revoke-one` | `session:revoke` | 请求体为 `session_id`、`reason`、`confirmed`；精确撤销一个 Refresh Token Family，会话句柄不作为认证凭据；拒绝撤销发起当前请求的会话，但允许撤销同账号的其他客户端会话 |
+| `POST` | `/cache/admin/security/session/revoke-all` | `session:revoke` | 按 `user_id` 撤销用户会话；目标为当前管理员账号时保留当前 Access Token 并撤销其他会话 |
+
+会话句柄由安全 Redis 为每个 Refresh Token Family 保存随机映射，Access/Refresh Token 轮换时保持不变；查询发现升级前仍有效但没有句柄的会话时会惰性补齐。列表不返回 Token、Token 摘要、Family 标识或 Redis Key。单条和全部下线均要求操作理由及显式确认，并写入审计；单条下线会校验目标 Family 与当前请求会话，禁止踢出当前会话；全部下线针对当前管理员账号时保留当前 Access Token、撤销其他会话；安全 Redis 无法确认状态时拒绝操作。
 
 ## 核心 — 系统管理
 
@@ -80,7 +90,7 @@ tags:
 | `GET` | `/cache/admin/operations/{operationId}` | `system:cache:read` | 查询当前实例已知的普通缓存清理回执；未知操作返回 `UNKNOWN` |
 | `POST` | `/cache/admin/business/clear/preview` | `system:cache:clear` | 预览已注册普通缓存区域和实例范围 |
 | `POST` | `/cache/admin/business/clear` | `system:cache:clear` | 使用固定确认语句清理本实例，并按请求发布普通 Redis 多实例失效消息 |
-| `POST` | `/cache/admin/security/session/revoke`、`revoke-all` | `session:revoke` | 按用户/客户端或用户全部撤销安全 Session；不接收明文 Token |
+| `POST` | `/cache/admin/security/session/revoke`、`revoke-one`、`revoke-all` | `session:revoke` | 按用户/客户端、稳定会话句柄或用户撤销安全 Session；禁止撤销当前会话，当前账号全部下线时保留当前会话；不接收明文 Token |
 | `GET` | `/cache/admin/security/session/candidates?keyword=...` | `session:revoke` | 按用户编号、用户名、姓名或工号查询最多 20 个用户候选；只返回定位所需的最小用户资料 |
 | `POST` | `/cache/admin/security/verification/clear` | `security:verification:manage` | 按受控验证码类型和目标清理验证码，登录验证码可选清理尝试计数 |
 | `GET` | `/cache/admin/security/verification/candidates?type=...&keyword=...` | `security:verification:manage` | 按短信/邮箱验证码类型查询最多 20 个有效联系方式候选；展示值脱敏，`KAPTCHA` 不枚举会话句柄 |
