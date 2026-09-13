@@ -113,8 +113,8 @@ def main() -> int:
         errors.append(f"项目总览中的 Controller 数量不是源码实际值 {len(controller_names)}。")
 
     expectations = (
-        ("spectra-admin/.mise.local.toml.example", r'SERVER_PORT\s*=\s*"4004"', "后端模板端口 4004"),
-        ("spectra-admin/.mise.local.toml.example", r'SERVER_SSL_ENABLED\s*=\s*"true"', "后端模板首次启动启用 HTTPS"),
+        ("spectra-admin/spectra-config/src/main/resources/application-dev.yml", r"(?m)^  port: 4004$", "后端开发配置端口 4004"),
+        ("spectra-admin/spectra-config/src/main/resources/application-dev.yml", r"(?m)^    key-store: .*keystore\.p12$", "后端开发配置启用 HTTPS"),
         ("spectra-ui/.env.example", r"VITE_API_URL=https://127\.0\.0\.1:4004/", "Web 模板直连 HTTPS 4004"),
     )
     for relative, pattern, description in expectations:
@@ -128,7 +128,7 @@ def main() -> int:
     template = (ROOT / "spectra-admin/.mise.local.toml.example").read_text(encoding="utf-8")
     provided = sorted(set(re.findall(r"^([A-Z][A-Z0-9_]*)\s*=", template, re.MULTILINE)))
     missing = [name for name in required if name not in provided]
-    unexpected = [name for name in provided if name not in required and name not in {"SERVER_SSL_ENABLED"}]
+    unexpected = [name for name in provided if name not in required]
     if missing:
         errors.append(f"后端本机模板缺少 application-dev.yml 变量：{', '.join(missing)}。")
     if unexpected:
