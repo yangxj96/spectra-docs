@@ -15,10 +15,8 @@ Spectra 工作流入口由 `src/plugin/router/modules/system.ts` 注册：
 
 | 路由 | 页面 |
 |---|---|
-| `/system/workflow` | 表单定义和流程定义标签页 |
+| `/system/workflow` | 流程定义列表 |
 | `/system/flow-edit` | `WorkflowDesigner` 创建/编辑流程 |
-| `/system/form-edit` | 表单设计器 |
-| `/system/form-preview` | 表单预览 |
 
 流程编辑页通过 query 参数区分模式：
 
@@ -42,7 +40,7 @@ const lf = new LogicFlow({
   pluginsOptions: {
     flowable: {
       panel: { dnd: graph, property: panel },
-      pickers: ["form", "user", "group", "javaClass", "process"]
+      pickers: ["user", "group", "javaClass", "process"]
     }
   }
 });
@@ -74,13 +72,12 @@ Flowable.fromBpmnXml(bpmn_xml, logicFlow)
 
 | Picker | 宿主组件 | 返回值 |
 |---|---|---|
-| `form` | `FormPickerDialog.vue` | 表单编码和名称 |
 | `user` | `UserPickerDialog.vue` | 用户 ID 和名称，支持多选 |
 | `group` | `GroupPickerDialog.vue` | 用户组/部门 ID 和名称，支持多选 |
 | `javaClass` | `JavaClassPickerDialog.vue` | Java 全限定类名 |
 | `process` | `ProcessPickerDialog.vue` | 流程定义 Key |
 
-确认时调用 `payload.resolve(value, label)`；取消时关闭对话框但不回填。插件负责把 value 写入 BPMN form，宿主负责查询候选数据和展示选择界面。
+确认时调用 `payload.resolve(value, label)`；取消时关闭对话框但不回填。插件负责把 value 写入 BPMN 属性，宿主负责查询候选数据和展示选择界面。Spectra 不注册 `form` Picker，因此 Flowable 原生 `formKey` 在此宿主中作为普通文本编辑；插件的通用 Picker API 保持不变。
 
 ## 部署流程
 

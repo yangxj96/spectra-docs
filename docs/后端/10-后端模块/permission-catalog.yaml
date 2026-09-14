@@ -532,24 +532,6 @@ permissions:
     legacy: [OA_WORKBENCH:QUERY]
 
   # Workflow
-  - code: workflow:form:create
-    name: 流程表单创建
-    scopeMode: RULES
-    legacy: [WF_FORM:INSERT]
-  - code: workflow:form:read
-    name: 流程表单查看
-    scopeMode: RULES
-    legacy: [WF_FORM:QUERY]
-  - code: workflow:form:update
-    name: 流程表单维护
-    scopeMode: RULES
-    highRisk: true
-    legacy: [WF_FORM:UPDATE]
-  - code: workflow:form:disable
-    name: 流程表单停用
-    scopeMode: RULES
-    highRisk: true
-    legacy: [WF_FORM:DELETE]
   - code: workflow:process:create
     name: 流程定义创建
     scopeMode: RULES

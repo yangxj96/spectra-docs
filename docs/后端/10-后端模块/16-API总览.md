@@ -7,7 +7,7 @@ tags:
 
 # API 总览
 
-> spectra-admin 全部 REST API 控制器速查表。源码当前共 56 个 `@RestController`。
+> spectra-admin 全部 REST API 控制器速查表。源码当前共 55 个 `@RestController`。
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供兼容别名或第二套授权写入入口；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
@@ -180,7 +180,6 @@ Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Ro
 
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
-| `FormDefinitionController` | spectra-workflow | `/workflow/form-definitions/**` | 表单定义管理（CRUD + 版本管理） |
 | `ProcessDefinitionController` | spectra-workflow | `/workflow/process-definitions/**` | 流程定义查询/挂起/激活/获取资源/部署 |
 | `ProcessInstanceController` | spectra-workflow | `/workflow/process-instances/**` | 流程实例启动/查询/终止 |
 | `TaskController` | spectra-workflow | `/workflow/tasks/**` | 待办/已办支持 `process_definition_key` 类型筛选；审批/驳回/签收/转办/委派；写操作校验当前办理人 |
