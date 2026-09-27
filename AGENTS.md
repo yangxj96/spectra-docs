@@ -12,7 +12,7 @@
 | `spectra-ui/` | Vue Web 管理后台 | `spectra-ui/AGENTS.md` |
 | `logicflow-plugin-flowable/` | LogicFlow BPMN 插件 | `logicflow-plugin-flowable/AGENTS.md` |
 | `docs/` | 项目知识库和完整参考 | 按任务读取 |
-| `scripts/` | 运行时、上下文和文档检查 | 按需执行 |
+| `scripts/` | 行政区划数据导入和网站文档同步 | 按需执行 |
 
 ## 硬约束
 
@@ -20,7 +20,7 @@
 - 不读取、输出、提交 `.mise.local.toml`、数据库密码、Token、私钥、证书私钥或其他本机凭据。
 - 不改写用户已有的无关变更，不使用破坏性 Git 或文件操作。
 - 安全 Redis 是 Token、Session、验证码、防重放和登录失败锁定的事实源；连接失败、命令失败或无法确认状态时必须 fail-closed。
-- 修改代码后判断知识库是否需要同步；只在确实影响知识库时运行 `scripts/check-docs.sh`。
+- 修改代码后判断知识库是否需要同步，并更新受影响的知识库文档。
 
 ## 任务路由
 
