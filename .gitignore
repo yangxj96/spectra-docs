@@ -108,11 +108,7 @@ docker-volumes/
 # =================================================
 .codex-tmp/
 
-# Superpowers workspace
+# Superpowers workspace: only the directory README is tracked.
 # =================================================
-superpowers/
-
-# =================================================
-# CodeGraph
-# =================================================
-.codegraph/
+/docs/superpowers/*
+!/docs/superpowers/README.md

@@ -18,13 +18,12 @@
 
 - 当前 API 契约版本统一为 `1.0.0`。重构时同步迁移仓库内调用方，删除旧入口、别名、回退读取和临时兼容分支；除非用户明确要求，不承诺外部历史兼容。
 - 不读取、输出、提交 `.mise.local.toml`、数据库密码、Token、私钥、证书私钥或其他本机凭据。
-- 不改写用户已有的无关变更，不使用破坏性 Git 或文件操作。
-- 安全 Redis 是 Token、Session、验证码、防重放和登录失败锁定的事实源；连接失败、命令失败或无法确认状态时必须 fail-closed。
+- 安全 Redis 是 Token、Session、验证码、防重放和登录失败锁定的事实源；连接或命令失败、无法确认状态时必须 fail-closed，不能降级为“状态不存在”。
 - 修改代码后判断知识库是否需要同步，并更新受影响的知识库文档。
 
 ## 任务路由
 
-- 后端 Java：读取 `spectra-admin/AGENTS.md`，使用 `$spectra-admin-spec`；只读取目标领域笔记。
+- 后端 Java：读取 `spectra-admin/AGENTS.md`，使用 `$spectra-admin-spec`。
 - Web 前端：读取 `spectra-ui/AGENTS.md`，使用 `$spectra-ui-spec`。
 - `spectra-app-spec` 保留供独立的远程 app 仓库使用；本工作区已解除 app 子仓库关联，不路由或使用该 skill。
 - 流程插件：读取 `logicflow-plugin-flowable/AGENTS.md`；修改插件并联调 Web 时再读取对应流程建模笔记。
@@ -36,10 +35,9 @@
 
 ## 源码理解与验证
 
-- 根仓库 `spectra-docs/` 不包含 `.codegraph/`；以下三个子项目各自包含 CodeGraph 索引：`spectra-admin/.codegraph/`、`spectra-ui/.codegraph/`、`logicflow-plugin-flowable/.codegraph/`。
-- 需要理解或定位上述子项目的源码定义、实现、调用链、依赖关系或影响范围时，必须先进入对应子项目目录使用 `codegraph explore "..."`；跨项目任务按目标子项目分别调用 CodeGraph。不要在根目录假定存在或调用根级 CodeGraph。精确文本、配置和文档使用 `rg`。
-- 开发阶段优先目标模块或目标项目的快速检查；模块完成、交付或提交前再执行完整质量门禁。
-- 后端使用 `spectra-admin/mvnw`；前端和插件使用 mise 管理的 Node/pnpm 与项目脚本。完整命令维护在 `docs/开发指南/01-常见命令.md`，不要复制到本文件。
+- 根仓库和三个子项目均有独立 CodeGraph 索引：`.codegraph/`、`spectra-admin/.codegraph/`、`spectra-ui/.codegraph/`、`logicflow-plugin-flowable/.codegraph/`。
+- 需要分析源码定义、实现、调用链、依赖或影响范围时，从目标项目目录运行 `codegraph explore "..."`；跨项目任务逐个查询受影响项目。精确文本、配置和文档使用 `rg`。
+- 开发阶段优先目标模块或项目的快速检查；完成、交付或提交前再执行完整质量门禁。后端使用 `spectra-admin/mvnw.cmd`，前端和插件使用 mise 管理的 Node/pnpm 与项目脚本。
 
 ## 文档同步规则
 
@@ -50,4 +48,4 @@
 - 修改依赖版本：同步依赖版本速查。
 - 新增或修改 Flyway migration：同步实体清单和对应 schema 的数据模型文档。
 
-规范的完整解释、代码模板、命令和排障信息放在 `docs/` 或匹配的 Skill reference 中；不要在多个 Agent 指令文件中复制。
+完整命令见 `docs/开发指南/01-常见命令.md`；规范说明、代码模板和排障信息放在 `docs/` 或对应 Skill reference。Agent 指令只保留项目约束，不重复这些内容。
