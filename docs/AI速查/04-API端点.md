@@ -16,7 +16,7 @@ tags:
 |---|---|---|
 | AuthenticationController（spectra-core.security.authentication） | `/security/authentication/**` | 登录/登出/刷新 Token、登录验证码获取和认证身份绑定验证码 |
 | AuthenticationIdentityController | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
-| AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；高风险写入绑定短时 token |
+| AuthorizationController | `/security/authorization/**` | Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织变更及部门合并/部分拆分 Preview/Apply；高风险写入绑定短时 token |
 | AuthorizationProfileController | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除 |
 | SecurityContextController | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | AuditLogController | `/audit/**` | 按 category、`operator`（用户 ID 或姓名）及 `event_type` / 操作说明查询统一操作与安全审计日志；响应提供 `operator_name`，事件类型列表展示 `@Audit.value`，安全事件继续应用高风险及 operator/target 可见性策略；支持详情与 CSV 导出 |
@@ -49,6 +49,8 @@ Web 启动配置接口：`GET /system/bootstrap` 一次返回系统公开信息�
 Role 授权管理：`GET /security/authorization/roles/{roleId}` 返回目标 Role（包括 DISABLED Role）的 version、authorityLevel、Permission 与 GrantablePermission code；授权变更必须先调用 `POST /security/authorization/roles/{roleId}/impact-preview`，再携带 preview token 调用 `POST /security/authorization/roles/{roleId}/impact-apply`，且仅允许对 ACTIVE 业务角色执行。菜单 UX 配置由 RoleController 管理。
 
 组织结构管理：先调用 `GET /security/authorization/departments/organization-version` 获取 organizationVersion；新增部门调用无 ID 的 `POST /security/authorization/departments/impact-preview`，再携带 Preview 返回的 `department_id` 和 token 调用 `POST /security/authorization/departments/impact-apply`；已有部门编辑或移动调用 `/departments/{departmentId}/impact-preview` 与 `/impact-apply`。请求必须携带完整部门属性和 expected organizationVersion，Apply 会重新校验请求摘要和版本，并在事务内维护闭包表、递增 organizationVersion、撤销受影响会话。
+
+直属成员候选查询：`GET /user/department-members?departmentId=&keyword=&pageNum=&pageSize=` 只查所选部门的主/关联成员，不展开下级，要求 `department:read` 与 `user:read`。部门合并/部分拆分使用 `Api-Version: 1.0.0` 的 `POST /security/authorization/departments/merge/impact-preview`、`merge/impact-apply`、`split/impact-preview`、`split/impact-apply`；四个接口要求 `department:create` 与 `department:update`。Preview token 绑定操作者、操作、请求和组织版本，有效 5 分钟；Apply 在单个数据库事务中维护新部门、成员、授权引用、闭包和组织版本，OA 历史部门 ID 不变。
 
 授权方案管理：`GET /security/authorization/profiles` 查询方案列表，`GET /security/authorization/profiles/{id}` 查询详情，`POST` 创建，`PUT /security/authorization/profiles/{id}` 按 `expected_version` 修改，`PUT /security/authorization/profiles/{id}/enable` 启用，`PUT /security/authorization/profiles/{id}/disable` 停用，`DELETE /security/authorization/profiles/{id}` 删除方案模板。删除采用逻辑删除，并同步移除方案下的角色配置和边界模板，不影响已经生成的运行时授权；方案保存 Role/Permission/部门业务编码和版本快照，后续应用仍需经过 RoleAssignment Preview/Apply。
 

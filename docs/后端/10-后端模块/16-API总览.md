@@ -19,7 +19,7 @@ tags:
 |---|---|---|---|
 | `AuthenticationController` | spectra-core.security.authentication | `/security/authentication/**` | 登录/登出/刷新 Token、登录验证码获取和认证身份绑定验证码 |
 | `AuthenticationIdentityController` | spectra-core | `/security/identities/**` | 当前用户目标认证身份列表、手机/邮箱绑定与撤销；绑定必须使用对应用途的一次性验证码 |
-| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构版本查询与部门新增/编辑/移动 Preview/Apply；所有高风险写入绑定短时 token |
+| `AuthorizationController` | spectra-core | `/security/authorization/**` | 目标 Role 授权状态查询、Permission/Grantable/authorityLevel Impact Preview/Apply、RoleAssignment Boundary Preview/Apply、组织结构变更及部门合并/部分拆分 Preview/Apply；所有高风险写入绑定短时 token |
 | `AuthorizationProfileController` | spectra-core | `/security/authorization/profiles` | 可复用授权方案列表、详情、创建、修改、启用、停用和删除；方案保存使用稳定业务编码和版本校验 |
 | `SecurityContextController` | spectra-core | `/security/context` | 返回当前用户 Permission Catalog 权限和可授予权限，不返回角色名称 |
 | `AuditLogController` | spectra-core | `/audit/**` | 查询、详情和 CSV 导出统一操作/安全审计日志；按 category、用户 ID/姓名和稳定事件类型/操作说明筛选，响应提供操作人姓名，安全事件保留高风险与 operator/target 可见性规则 |
@@ -76,7 +76,7 @@ tags:
 | Controller | 模块 | 基础路径 | 说明 |
 |---|---|---|---|
 | `MenuController` | spectra-core | `/menu/**` | 菜单 CRUD / 完整管理树 / 当前用户授权树 |
-| `DepartmentController` | spectra-core | `/department/**` | 部门树查询；新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
+| `DepartmentController` | spectra-core | `/department/**` | 活动部门树查询；新增/编辑/移动使用 AuthorizationController 的组织 Impact Preview/Apply |
 | `RegionController` | spectra-core | `/region/**` | 区域查询（省/市/区县/乡镇街道/村级） |
 | `DictController` | spectra-core | `/dict/**` | 字典组 / 字典项管理；字典项仅启用或禁用、不提供删除，禁用项保留历史标签，默认项按组唯一；状态操作和默认项操作见系统管理说明 |
 | `ConfiguredController` | spectra-core | `/configured/**` | `GET /configured/settings` 按业务分类读取配置表单；`PUT /configured/batch` 在单个事务内保存当前分类 |
@@ -131,6 +131,8 @@ tags:
 用户批量导入使用 `POST /user/imports/preview`、`GET /user/imports/{id}`、`GET /user/imports/{id}/errors` 和 `POST /user/imports/{id}/apply`。Preview 接收结构化行（`real_name`、`username`、`phone`、`email`、`department_code`、`associated_department_codes`、`language`、`timezone`、`authorization_profile_code`）以及 `file_hash`；关联部门编码为可选分号分隔字符串，主部门仍由 `department_code` 指定；`username` 写入 `sys_user`，`phone/email` 写入 `spectra_security.sec_user_contact` 和对应认证身份，不再写入用户主表。工号由后端在 Preview 阶段按任务幂等键和行号生成并保存，任务有效期以 `LocalDateTime` 响应，不接受 Role/Permission/Scope UUID；Web Excel 模板包含可选关联部门列，部门、语言、时区和授权方案由页面在数据预览上方统一选择后合并到每一行请求。后端暂存原始行与规范化行，Apply 会重新校验请求摘要、授权方案版本、短时 Preview Token 和现有 Grant Boundary，返回 `APPLYING` 任务后在有界后台执行器中逐行复用用户创建与 RoleAssignment Preview/Apply；前端轮询任务详情中的 `completed_rows` 和最终状态，错误行通过 `/errors` 查询。XLSX 文件解析由前端完成。
 
 用户资料 DTO 显式使用 `primary_department_id` 与 `associated_department_ids`；用户分页、详情、个人资料、在线用户和通讯录返回主部门摘要与关联部门摘要。`department_id` 仍用于用户/在线用户列表的部门筛选参数。
+
+部门直属成员分页候选查询为 `GET /user/department-members?departmentId=&keyword=&pageNum=&pageSize=`，要求 `department:read` 和 `user:read`，只返回本部门的主/关联成员，不展开子部门。部门重组 API 使用 `Api-Version: 1.0.0`：`POST /security/authorization/departments/merge/impact-preview`、`merge/impact-apply`、`split/impact-preview` 和 `split/impact-apply`。四个接口均要求 `department:create` 与 `department:update`；先 Preview，再用同一请求、预期组织版本和 5 分钟短时 token Apply。合并要求多个同级源部门并创建新部门；拆分提交一个源部门和精确用户 ID 列表。数据库变更在单个事务内完成，OA 历史部门 ID 保持不变。
 
 用户分页资料与当前用户资料中的角色展示读取 `spectra_security.sec_role_assignment`；用户分页和详情的 `UserPageVO` 同时返回后端计算的 `authorization_status`（`UNCONFIGURED`、`INCOMPLETE`、`ACTIVE`、`PARTIAL`）。`GET /security/authorization/users/{userId}/assignments` 返回 Assignment/Role version、Role 状态、Role Permission 数量、Role 名称、系统托管标记以及分离的 Access/Grant Boundary。
 
