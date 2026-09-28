@@ -11,6 +11,8 @@ tags:
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供兼容别名或第二套授权写入入口；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
+四个内置角色的菜单、84 条前端路由和 331 个 Controller 方法级 API 门禁逐项矩阵见 [[17-内置角色接口与页面矩阵]]；角色 Permission 与默认数据范围见 [[04-用户与权限]] 和 [[05-数据权限设计]]。
+
 后端 API 运行在单体多模块组合根 `spectra-launch` 中：Core API（包含通知和文件上传 API）始终可用，OA、Workflow API 仅在对应模块已由 launch 引入且 `spectra.modules.<name>.enabled=true` 时注册。可选模块关闭不会产生空 Controller 或兼容回退入口；本系统不提供租户参数、租户切换或 SaaS 隔离 API。
 
 ## 认证与安全
@@ -88,7 +90,21 @@ tags:
 | `SystemGuideController` | spectra-core | `/system/guide/**` | DEV_OPS 首次登录后的系统设置引导状态查询与完成 |
 | `QuartzAdminController` | spectra-core | `/scheduler/quartz/**` | Quartz Job 类型、Job/Trigger、暂停/恢复、立即触发和执行历史；所有接口版本为 `1.0.0` |
 
-调度管理 API 的完整端点、请求约束和权限边界见 [[07-调度内核]]。公共 URL 前缀为 `/api/scheduler/quartz`；`ROLE_ADMIN_SYSTEM` 管理普通 Job，`ROLE_DEV_OPS` 处理立即触发和内置 Job 高风险操作，`ROLE_AUDIT` 只读。PostgreSQL/Quartz 不可用时返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。
+Quartz 的 12 个 Controller 方法（类型、Job、Trigger、执行历史的读取，以及 Job 创建/编辑/删除、暂停/恢复和触发）都要求 `hasRole('ROLE_DEV_OPS')`；`ROLE_ADMIN_SYSTEM` 与 `ROLE_AUDIT` 不再通过直接角色注解访问调度器。普通角色即使手工构造 HTTP 请求也会被后端拒绝。调度 API 的请求约束和业务行为见 [[07-调度内核]]；PostgreSQL/Quartz 不可用时返回 `503 SCHEDULER_DATABASE_UNAVAILABLE`。
+
+### 内置角色的端点判定规则
+
+单个 HTTP 方法最终按 Controller/方法级 `@PreAuthorize`、Catalog Permission、RoleAssignment Boundary 和资源级校验共同确定。逐角色 Permission 与菜单基线见 [[04-用户与权限#内置角色权限基线]]。
+
+| Controller / 方法门禁 | `ROLE_DEV_OPS` | `ROLE_ADMIN_SYSTEM` | `ROLE_AUDIT` | `ROLE_USER` | 数据范围说明 |
+|---|---|---|---|---|---|
+| `hasRole('ROLE_DEV_OPS')` | 允许（仍受 Root 专属规则） | 拒绝 | 拒绝 | 拒绝 | 适用于 Quartz 12 个方法、密钥管理及列明的安全运维入口 |
+| `hasPermission(null, code)`，code 属于角色直接授权，且存在有效 Access Boundary | 允许 `*` | 按 66 个角色 Permission 与用户 Boundary 交集 | 按 27 个角色 Permission 与用户 Boundary 交集 | 仅 13 个 `ROLE_USER` Permission | Admin/Audit 默认仅 `NONE`/专用审计查询生效；其 RULES 需显式部门配置。USER 个人 Permission 使用 `SELF` |
+| `isAuthenticated()` 自服务方法 | 认证主体本人 | 认证主体本人 | 认证主体本人 | 认证主体本人 | 方法可由所有登录角色调用，但资源 ID 必须绑定当前主体；不得把“已认证”扩展为任意用户访问 |
+| `permitAll` | 允许 | 允许 | 允许 | 允许 | 匿名契约仍执行验证码、签名、Refresh Cookie、频控及输入校验 |
+| 无 Permission/角色授权 | 不自动视为通配以外的许可 | 拒绝 | 拒绝 | 拒绝 | Spring Security 默认拒绝；Controller 内的自服务检查另行记录 |
+
+V8 后浏览器实测：Audit 的 `GET /audit/page`、`GET /notification/admin/providers` 与 `GET /notification/admin/templates` 成功，`GET /scheduler/quartz/jobs` 返回 403；Audit 直达 Root 专属配置路由进入 401。业务 RULES API 在未分配部门边界前不会因为菜单可见而变成可调用。DEV_OPS、Admin 的菜单和接口验收记录见四角色权限基线与当前执行计划；未登录的公共入口不纳入任何角色 Permission。
 
 ### 缓存监控与系统维护
 
@@ -124,7 +140,7 @@ tags:
 
 消息中心 Self API 强制使用认证上下文中的当前用户，并在 Service 层附加收件人条件；全局或部门权限不能扩大私人收件箱范围。
 
-菜单查询：`GET /menu/tree` 需要 `MENU:QUERY` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.sec_permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
+菜单查询：`GET /menu/tree` 需要 `menu:read` 权限并返回完整管理树；`GET /menu/current` 仅要求已认证，从认证主体读取用户 ID，供前端加载运行时导航。Permission Catalog `GET /authority/tree` 需要 `permission:read`，仅返回目标 `spectra_security.sec_permission` 的活动资源分组树，并在叶子节点返回该 Permission 允许的 Scope 模式；Permission code 不提供业务 CRUD。
 
 用户 RoleAssignment 不再作为用户资料字段或 `/user/{uid}/roles` 覆盖写入；独立授权编辑仍使用 AuthorizationController 的 Assignment Preview/Apply API，逐条提交 Role、Permission-specific Access Boundary 和可选 Grant Boundary。用户新增/编辑页面使用“基本信息 → 授权方案 → 角色授权”三步流程，最后改用 UserController 的 `/user/onboarding` 提交接口，一次接收多个保留/新增/修改的角色授权和被移除的授权实例，由后端在同一事务中逐条复用授权 Preview/Apply 并处理撤销。
 
