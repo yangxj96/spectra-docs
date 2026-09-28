@@ -107,6 +107,7 @@ docker-volumes/
 # Codex temporary workspace
 # =================================================
 .codex-tmp/
+.playwright-mcp
 
 # Superpowers workspace: only the directory README is tracked.
 # =================================================
