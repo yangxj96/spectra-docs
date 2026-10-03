@@ -19,18 +19,19 @@ package com.devops00.spectra.example.javabean.converter;
 import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
 import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
 import com.devops00.spectra.example.javabean.vo.ExampleFullVO;
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /**
  * MapStruct转换器完整示例
  *
  * 注意：
  * <ol>
- * <li>所有模块必须使用 MapStruct Converter 进行对象转换，禁止手动 setter</li>
+ * <li>复用结构映射；确需手写组装有明确职责，业务校验与数据库访问另行处理</li>
  * <li>统一放在 javabean/converter/</li>
  * <li>引用 GlobalMapperConfig.class 和 TimeMapper.class</li>
  * <li>使用 @Mapper 注解</li>
@@ -52,10 +53,26 @@ public interface ExampleFullConverter {
     /**
      * From 转实体
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "version", ignore = true)
     ExampleFullEntity toEntity(ExampleFullFrom source);
 
     /**
      * 更新已有实体
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "version", source = "version")
+    @Mapping(target = "code", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+    @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     void updateEntity(ExampleFullFrom source, @MappingTarget ExampleFullEntity target);
 }

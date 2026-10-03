@@ -19,10 +19,11 @@ package com.devops00.spectra.example.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.common.base.BaseServiceImpl;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.example.javabean.converter.ExampleFullConverter;
 import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
 import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
@@ -36,19 +37,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Service实现完整示例
+ * 实体 CRUD 持久化结构示例
+ *
+ * <p>采用时必须落实 Service 操作/数据范围授权、有效 Clock 配置、版本冲突错误映射和实际协议验证。
+ * 本片段不代表这些治理能力已实现；审计按入口与用例责任明确，不重复记录同一动作。</p>
  *
  * 注意：
  * <ol>
- * <li>继承 BaseServiceImpl<Mapper, Entity>，实现对应接口</li>
+ * <li>实体 CRUD 示例继承 BaseServiceImpl 并实现接口；编排服务采用组合</li>
  * <li>必须加 @Slf4j、@Service</li>
- * <li>写操作必须加 @Transactional</li>
+ * <li>用例需要同库原子提交时使用 @Transactional，外部副作用按独立契约处理</li>
  * <li>异常消息统一中文</li>
  * <li>使用 Converter 进行对象转换</li>
- * <li>关键业务节点用 log.info()，异常用 log.error()</li>
+ * <li>记录安全的操作结果；授权/数据范围必须在访问前落实，避免重复错误日志</li>
  * </ol>
  *
  * @author yangxj96
@@ -62,10 +68,13 @@ public class ExampleFullServiceImpl extends BaseServiceImpl<ExampleFullMapper, E
         implements ExampleFullService {
 
     private final ExampleFullConverter exampleConverter;
+    private final Clock clock;
 
     @Override
     public IPage<ExampleFullVO> page(PageFrom page, ExampleFullQuery params) {
+        // 实际用例先落实授权范围、分页预算和排序白名单。
         var wrapper = new LambdaQueryWrapper<ExampleFullEntity>();
+        wrapper.isNull(ExampleFullEntity::getDeleted);
         if (StringUtils.hasText(params.getName())) {
             wrapper.like(ExampleFullEntity::getName, params.getName());
         }
@@ -82,7 +91,7 @@ public class ExampleFullServiceImpl extends BaseServiceImpl<ExampleFullMapper, E
     @Override
     public ExampleFullVO getDetail(UUID id) {
         var entity = this.getById(id);
-        if (entity == null) {
+        if (entity == null || entity.getDeleted() != null) {
             throw new DataNotExistException("示例不存在");
         }
         return exampleConverter.toVO(entity);
@@ -95,19 +104,22 @@ public class ExampleFullServiceImpl extends BaseServiceImpl<ExampleFullMapper, E
         if (!this.save(entity)) {
             throw new DataSaveException("创建示例失败");
         }
-        log.info("创建示例成功: id={}, name={}", entity.getId(), entity.getName());
+        log.info("创建示例成功: id={}", entity.getId());
     }
 
     @Override
     @Transactional
     public void modify(UUID id, ExampleFullFrom from) {
         var entity = this.getById(id);
-        if (entity == null) {
+        if (entity == null || entity.getDeleted() != null) {
             throw new DataNotExistException("示例不存在");
         }
+        // 必需输入校验在入口执行；这里保留客户端读取版本，不使用数据库新版本。
         exampleConverter.updateEntity(from, entity);
+        entity.setVersion(from.getVersion());
         if (!this.updateById(entity)) {
-            throw new DataSaveException("更新示例失败");
+            // 目标统一异常映射必须区分版本冲突为 HTTP 409 / 稳定 error_code。
+            throw new EntityUpdateException("记录已变化，请刷新后重试");
         }
         log.info("更新示例成功: id={}", id);
     }
@@ -116,11 +128,12 @@ public class ExampleFullServiceImpl extends BaseServiceImpl<ExampleFullMapper, E
     @Transactional
     public void deleteById(UUID id) {
         var entity = this.getById(id);
-        if (entity == null) {
+        if (entity == null || entity.getDeleted() != null) {
             throw new DataNotExistException("示例不存在");
         }
-        if (!this.removeById(id)) {
-            throw new DataSaveException("删除示例失败");
+        entity.setDeleted(Instant.now(clock));
+        if (!this.updateById(entity)) {
+            throw new EntityUpdateException("记录已变化，请刷新后重试");
         }
         log.info("删除示例成功: id={}", id);
     }

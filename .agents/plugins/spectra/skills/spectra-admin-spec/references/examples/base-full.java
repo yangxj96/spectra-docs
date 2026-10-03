@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.base;
+package com.devops00.spectra.framework.persistence.base;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -31,7 +31,7 @@ import java.util.UUID;
  *
  * 注意：
  * <ol>
- * <li>所有实体必须继承 BaseEntity</li>
+ * <li>可维护业务实体复用实际 BaseEntity；特殊生命周期按领域约定</li>
  * <li>BaseEntity 包含以下字段：</li>
  * </ol>
  * <ul>
@@ -40,7 +40,7 @@ import java.util.UUID;
  * <li>createdAt：创建时间</li>
  * <li>updatedBy：更新人</li>
  * <li>updatedAt：更新时间</li>
- * <li>deleted：软删除标记（null = 未删除）</li>
+ * <li>deleted：删除时间（null = 未删除）；查询过滤需由实际用例落实</li>
  * <li>version：乐观锁版本号</li>
  * </ul>
  * <ol>

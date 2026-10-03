@@ -16,7 +16,8 @@ interface Props {
     status?: "idle" | "loading" | "success" | "error";
 }
 
-const props = withDefaults(defineProps<Props>(), {
+// 页面展示默认值不改变 API 响应的字段省略规则。
+withDefaults(defineProps<Props>(), {
     count: 0,
     items: () => [],
     status: "idle"
@@ -25,8 +26,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
     /** 值变化时触发 */
     change: [value: string];
-    /** 更新 v-model 时触发 */
-    "update:modelValue": [value: string];
 }>();
 
 const model = defineModel<string>({ required: true });

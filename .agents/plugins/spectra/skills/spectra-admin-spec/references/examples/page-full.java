@@ -14,43 +14,28 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.base.javabean.from;
+package com.devops00.spectra.example.javabean.from;
 
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
 
 /**
- * 分页请求参数完整示例
+ * 复用真实分页参数的业务查询示例。
  *
- * 注意：
- * <ol>
- * <li>分页参数使用 PageFrom</li>
- * <li>包路径：common.base.javabean.from</li>
- * <li>使用 @Data 注解</li>
- * <li>统一分页参数</li>
- * <li>使用 @Data 注解</li>
- * </ol>
+ * <p>分页基础契约以 Framework PageFrom 为准，不复制一份不同的 orders 模型。
+ * 用例必须校验分页预算、排序白名单并在分页/统计前落实数据范围。</p>
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/7/18
  */
 @Data
-public class PageFromFullExample {
+@EqualsAndHashCode(callSuper = true)
+public class PageFromFullExample extends PageFrom {
 
     /**
-     * 页码
+     * 可选名称筛选。
      */
-    private Integer pageNum = 1;
-
-    /**
-     * 每页大小
-     */
-    private Integer pageSize = 10;
-
-    /**
-     * 排序字段
-     */
-    private List<String> orders;
+    private String name;
 }

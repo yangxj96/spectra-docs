@@ -18,7 +18,7 @@ package com.devops00.spectra.example.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -31,7 +31,7 @@ import java.util.UUID;
  * <li>使用 @Data 注解</li>
  * <li>分页查询返回 IPage<XxxVO></li>
  * <li>与 Entity 分开定义，职责单一</li>
- * <li>响应时间使用 LocalDateTime/LocalDate/LocalTime，禁止暴露 Instant</li>
+ * <li>绝对时刻经后端时区转换并携带偏移；日期和纯时间保留各自语义</li>
  * </ol>
  *
  * @author yangxj96
@@ -69,10 +69,15 @@ public class ExampleFullVO {
     /**
      * 创建时间
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     /**
      * 更新时间
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
+
+    /**
+     * 编辑读取版本，提交时原样携带。
+     */
+    private Long version;
 }

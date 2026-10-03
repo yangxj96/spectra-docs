@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.example.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * 注意：
  * <ol>
- * <li>所有接口必须加 @PreAuthorize</li>
+ * <li>所有 HTTP 接口显式 @PreAuthorize；Service 仍承担操作与数据范围授权</li>
  * <li>公开接口用 @PreAuthorize("permitAll()") 显式标注</li>
  * <li>权限控制用 @PreAuthorize("hasPermission(null, 'MODULE:ACTION')")</li>
  * <li>角色控制用 @PreAuthorize("hasRole('ROLE_xxx')")</li>
@@ -47,7 +47,7 @@ public class SecurityFullExampleController {
     /**
      * 公开接口示例
      */
-    @ULog("'获取公开数据'")
+    @Audit("'获取公开数据'")
     @GetMapping(value = "/public", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public String publicEndpoint() {
@@ -57,7 +57,7 @@ public class SecurityFullExampleController {
     /**
      * 已认证用户接口示例
      */
-    @ULog("'获取用户数据'")
+    @Audit("'获取用户数据'")
     @GetMapping(value = "/authenticated", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public String authenticatedEndpoint() {
@@ -67,7 +67,7 @@ public class SecurityFullExampleController {
     /**
      * 权限控制接口示例
      */
-    @ULog("'获取管理数据'")
+    @Audit("'获取管理数据'")
     @GetMapping(value = "/admin", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'SYSTEM:ADMIN')")
     public String adminEndpoint() {
@@ -77,7 +77,7 @@ public class SecurityFullExampleController {
     /**
      * 角色控制接口示例
      */
-    @ULog("'获取开发数据'")
+    @Audit("'获取开发数据'")
     @GetMapping(value = "/dev", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public String devEndpoint() {

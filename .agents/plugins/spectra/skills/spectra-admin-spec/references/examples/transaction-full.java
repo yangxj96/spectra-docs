@@ -16,57 +16,36 @@
 
 package com.devops00.spectra.example.service.impl;
 
-import com.devops00.spectra.common.base.BaseServiceImpl;
-import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
 import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
-import com.devops00.spectra.example.mapper.ExampleFullMapper;
-import lombok.extern.slf4j.Slf4j;
+import com.devops00.spectra.example.service.ExampleFullService;
+import com.devops00.spectra.example.service.ExampleFullTransactionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 /**
- * 事务处理完整示例
+ * 同库组合用例的事务结构示例。
  *
- * 注意：
- * <ol>
- * <li>写操作必须加 @Transactional</li>
- * <li>异常消息统一中文</li>
- * <li>使用自定义异常，禁止裸 RuntimeException</li>
- * <li>使用 @Slf4j 注解</li>
- * <li>使用 @Service 注解</li>
- * </ol>
+ * <p>示范应用接口 + Impl 和语义 Service 组合，不为编排继承实体 CRUD。
+ * 两项写入属于同一原子单元，第二项失败时第一项一起回滚；外部操作不自动获得该保证。
+ * 实际入口必须执行两组输入约束，并在 Service 落实身份、授权与数据范围。</p>
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/7/18
  */
-@Slf4j
 @Service
-public class TransactionFullExample extends BaseServiceImpl<ExampleFullMapper, ExampleFullEntity> {
+@RequiredArgsConstructor
+public class ExampleFullTransactionServiceImpl implements ExampleFullTransactionService {
 
-    /**
-     * 事务处理示例
-     */
+    private final ExampleFullService exampleService;
+
+    @Override
     @Transactional
-    public void transactionExample(UUID id, ExampleFullFrom from) {
-        // 1. 查询实体
-        var entity = this.getById(id);
-        if (entity == null) {
-            throw new DataNotExistException("示例不存在");
-        }
-
-        // 2. 更新实体
-        entity.setName(from.getName());
-        if (!this.updateById(entity)) {
-            throw new DataSaveException("更新示例失败");
-        }
-
-        // 3. 记录日志
-        log.info("更新示例成功: id={}", id);
+    public void createdAndModify(UUID id, ExampleFullFrom created, ExampleFullFrom updated) {
+        exampleService.created(created);
+        exampleService.modify(id, updated);
     }
-
 }

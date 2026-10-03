@@ -16,11 +16,12 @@
 
 package com.devops00.spectra.example.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.framework.persistence.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -50,10 +51,10 @@ public class ExampleFullEntity extends BaseEntity {
     @TableField("name")
     private String name;
 
-    @TableField("code")
+    @TableField(value = "code", updateStrategy = FieldStrategy.ALWAYS)
     private String code;
 
-    @TableField("description")
+    @TableField(value = "description", updateStrategy = FieldStrategy.ALWAYS)
     private String description;
 
     @TableField("active")

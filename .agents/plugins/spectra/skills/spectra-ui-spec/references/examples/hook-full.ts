@@ -1,88 +1,91 @@
-import { onMounted, ref } from "vue";
+import { onScopeDispose, ref, shallowRef, watch, type Ref } from "vue";
+
+import { isRequestCancelled } from "@/plugin/request/error";
 
 /**
- * 表格分页 Hook
- *
- * @template T - 数据类型
- * @param request - 分页查询函数
- * @param parameters - 分页参数
- * @returns 表格相关状态和方法
+ * 有独立查询生命周期的分页 Hook 示例；简单页面不必机械提取。
+ * scopeKey 由调用方提供身份/会话范围标识，初次加载由调用方在合适生命周期触发。
+ * error 供页面内联反馈或单一提示责任方消费，不在 Hook 重复弹消息。
  */
-export function useTable<T>(
-    request: (params?: BasePageParams) => Promise<Page<T>>,
-    parameters: BasePageParams
+export function useTable<T, P extends BasePageParams>(
+    request: (params: P) => Promise<Page<T>>,
+    parameters: P,
+    scopeKey: Readonly<Ref<string>>
 ) {
-    // 分页实体
-    const pagination = ref<Pagination>({
-        size: 10,
-        page: 1,
-        page_sizes: [10, 15, 50, 100, 150, 300],
-        default_page_size: 10,
+    const pagination = ref({
+        page: parameters.page_num,
+        size: parameters.page_size,
         total: 0
     });
+    // 这是页面初始状态，不改写服务端空值或字段省略协议。
+    const tableData = shallowRef<T[]>([]);
+    const loading = ref(false);
+    const error = shallowRef<unknown>();
+    let requestVersion = 0;
+    let disposed = false;
 
-    // 表数据
-    const table_data = ref<T[]>([]);
+    function invalidate() {
+        requestVersion += 1;
+        loading.value = false;
+        error.value = undefined;
+        tableData.value = [];
+        pagination.value.total = 0;
+    }
 
-    // 加载状态
-    const loading = ref<boolean>(false);
-
-    onMounted(() => {
-        pagination.value.page = parameters.page_num;
-        pagination.value.size = parameters.page_size;
-        handleCurrentChange(pagination.value.page);
+    watch(scopeKey, invalidate, { flush: "sync" });
+    onScopeDispose(() => {
+        disposed = true;
+        invalidate();
     });
 
-    /**
-     * 处理页码改变
-     * @param value 页码
-     */
-    async function handleCurrentChange(value: number) {
-        parameters.page_num = value;
-        parameters.page_size = pagination.value.size;
-        await fetchData();
-    }
-
-    /**
-     * 处理每页数量改变
-     * @param value 每页数量
-     */
-    async function handleSizeChange(value: number) {
-        parameters.page_num = pagination.value.page;
-        parameters.page_size = value;
-        await fetchData();
-    }
-
-    /**
-     * 进行一次条件查询（重置到第一页）
-     */
-    async function handlerConditionQuery() {
-        parameters.page_num = 1;
-        pagination.value.page = 1;
-        await fetchData();
-    }
-
-    /**
-     * 获取数据
-     */
     async function fetchData() {
+        if (disposed) return;
+        const version = ++requestVersion;
         loading.value = true;
+        error.value = undefined;
         try {
-            const result = await request(parameters);
-            table_data.value = result.records ?? [];
-            pagination.value.total = result.total ?? 0;
+            // 调用参数约定为不可变过滤值；复杂嵌套过滤由所属用例提供稳定快照。
+            const result = await request({ ...parameters });
+            if (disposed || version !== requestVersion) return;
+            tableData.value = result.records;
+            pagination.value.total = result.total;
+        } catch (failure: unknown) {
+            if (disposed || version !== requestVersion) return;
+            if (!isRequestCancelled(failure)) error.value = failure;
         } finally {
-            loading.value = false;
+            if (!disposed && version === requestVersion) loading.value = false;
         }
     }
 
+    async function handleCurrentChange(page: number) {
+        pagination.value.page = page;
+        parameters.page_num = page;
+        await fetchData();
+    }
+
+    async function handleSizeChange(size: number) {
+        pagination.value.size = size;
+        parameters.page_size = size;
+        pagination.value.page = 1;
+        parameters.page_num = 1;
+        await fetchData();
+    }
+
+    async function queryFirstPage() {
+        pagination.value.page = 1;
+        parameters.page_num = 1;
+        await fetchData();
+    }
+
     return {
-        table_data,
+        tableData,
         pagination,
         loading,
+        error,
+        fetchData,
         handleCurrentChange,
         handleSizeChange,
-        handlerConditionQuery
+        queryFirstPage
     };
 }
 

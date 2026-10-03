@@ -1,50 +1,50 @@
 import { defineStore } from "pinia";
+import type {} from "pinia-plugin-persistedstate";
 
 interface StoreUser {
-    token: Token;
-    isLoggedIn: boolean;
+    token: Token | undefined;
 }
 
-export const useUserStore = defineStore("user", {
+/** 会话共享状态示例；显式加载项目已有的持久化类型扩展，临时表单留在所属页面。 */
+export const useExampleUserStore = defineStore("example-user", {
     state: (): StoreUser => ({
-        token: {} as Token,
-        isLoggedIn: false
+        token: undefined
     }),
     getters: {
-        /** 获取 Permission Catalog 权限编码 */
-        getPermissions(): string[] {
-            return this.token.permissions || [];
+        isLoggedIn(): boolean {
+            return this.token !== undefined;
         },
-        /**
-         * 统一权限检查方法
-         * 支持精确编码、同级通配符和全局通配符。
-         */
-        hasPermission(): (perm: string) => boolean {
-            return (perm: string): boolean => {
-                if (!perm) return false;
-                const required = perm.split(":");
+        getPermissions(): string[] {
+            return this.token?.permissions ?? [];
+        },
+        /** 仅控制界面可见性，Service 仍负责最终授权。 */
+        hasPermission(): (permission: string) => boolean {
+            return (permission: string): boolean => {
+                if (!permission) return false;
+                const required = permission.split(":");
                 return this.getPermissions.some(granted => {
                     if (granted === "*") return true;
                     const parts = granted.split(":");
-                    return parts.length === required.length && parts.every((part, index) => part === "*" || part === required[index]);
+                    return (
+                        parts.length === required.length &&
+                        parts.every((part, index) => part === "*" || part === required[index])
+                    );
                 });
             };
         },
-        /**
-         * 批量检查权限（用于 v-permission="[...]"）
-         */
-        hasAllPermissions(): (perms: string[]) => boolean {
-            return (perms: string[]): boolean => {
-                return perms.every(perm => this.hasPermission(perm));
-            };
+        hasAllPermissions(): (permissions: string[]) => boolean {
+            return (permissions: string[]): boolean => permissions.every(permission => this.hasPermission(permission));
         }
     },
     actions: {
-        /** 清除当前内存中的认证状态；Refresh Token 由 HttpOnly Cookie 管理。 */
+        setAuth(token: Token): void {
+            this.token = { ...token, permissions: [...token.permissions] };
+        },
+        /** 退出或切换身份时先清理会话状态；其他共享缓存也须按所属生命周期失效。 */
         clearAuth(): void {
-            this.token = {} as Token;
-            this.isLoggedIn = false;
+            this.token = undefined;
         }
     },
+    // Access Token 仅在内存；Refresh Token 由 HttpOnly Cookie 管理。
     persist: false
 });

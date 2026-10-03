@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "standard": "docs/开发指南/04-工作区工程标准.md",
+  "updated_at": "2026-10-03",
+  "status": "not_started",
+  "scope": {
+    "included": ["backend common/framework/core/launch", "web", "public scripts", "build/deploy", "plugin general engineering and host boundaries"],
+    "deferred": ["OA independent business governance", "Workflow independent business governance", "flow business pages and plugin behavior"],
+    "shared_change_policy": "Whole-workspace direct and indirect impact analysis first; determine necessary consistency changes and verification, including affected deferred areas."
+  },
+  "coverage": [],
+  "issues": [],
+  "impacts": [],
+  "exceptions": [],
+  "evidence": [
+    {
+      "id": "EV-SKILL-20261003",
+      "scope": "Backend/Web Skill entries and references; local Spectra plugin source and installed cache.",
+      "command_or_scenario": [
+        "Independent before/after decisions: application Service composition, Audit, offset-bearing time, >15/>200/>3/>5, full public-change impacts and target-versus-current state; Web state ownership, naming, real API types/NON_NULL, request lifecycle and read-only checks.",
+        "skill-creator quick_validate.py for spectra-admin-spec and spectra-ui-spec; current Java import and document-route resolution; exact-case Web alias and document-route resolution.",
+        "From spectra-ui: mise exec -- pnpm exec vue-tsc -p ../.temp/skill-validation/web-tsconfig.json --noEmit --composite false; mise exec -- pnpm exec vitest run --config ../.temp/skill-validation/web-vitest.config.mts; mise exec -- pnpm exec prettier ../.agents/plugins/spectra/skills/spectra-ui-spec/references/examples --check --config ./.prettierrc.yml --log-level warn.",
+        "Temporary TypeScript configuration extends spectra-ui/tsconfig.app.json, includes every Web example plus current project ambient types, and resolves dependencies from spectra-ui/node_modules. Temporary Vitest configuration includes test-full.ts under the workspace root, with current Vue/Pinia and @ aliases; it does not start the app.",
+        "codex plugin add spectra@spectra-project --json; compare SHA256 for every backend/Web Skill file between local source and the reported installed cache."
+      ],
+      "environment": "Native Windows, PowerShell 7.6.6, mise-managed Node/pnpm. Isolated example checks, no business application or external dependency integration.",
+      "tool_versions": {
+        "codex_cli": "0.159.2",
+        "node": "24.14.0",
+        "pnpm": "12.6.0",
+        "vitest": "5.0.1",
+        "vue_tsc": "3.2.4",
+        "typescript": "5.9.3",
+        "plugin": "1.0.0+codex.20261003224841"
+      },
+      "checked_at": "2026-10-03",
+      "result": "passed",
+      "artifacts": [
+        ".agents/plugins/spectra/skills/spectra-admin-spec/",
+        ".agents/plugins/spectra/skills/spectra-ui-spec/",
+        ".agents/plugins/spectra/.codex-plugin/plugin.json"
+      ],
+      "limits": "Both Skill structures and reference scenarios passed; 31 Java examples/40 project imports resolved; all Web examples passed strict type and format checks, and 5 request/session behavior tests passed. Installed backend/Web content matched all 44 source files. Java examples were not compiled as a complete application; real authorization, transactions, SQL, HTTP/error_code, timezone serialization and full workspace governance remain unverified. Installed cache is current; new-session Skill discovery has not been observed. App/Git Skills and business runtime code were not changed."
+    }
+  ],
+  "work_items": [
+    {"id": "GOV-001", "area": "inventory", "requirement": "Enumerate and review the complete included workspace; register coverage, behavior risks and dependencies.", "state": "pending", "resolution": "No full workspace standard-compliance inventory has been recorded in this ledger.", "evidence_ids": []},
+    {"id": "GOV-002", "area": "complexity", "requirement": "Pin actual PMD/ESLint definitions and calibrate >15/>200/>3/>5 with boundary samples; align checks and scoped special-code handling.", "state": "pending", "resolution": "Existing configurations retain legacy thresholds; mixed control-flow coverage must be verified.", "evidence_ids": []},
+    {"id": "GOV-003", "area": "exceptions", "requirement": "Implement automated field, scope, suppression-reference and stale-record reconciliation for the structured exception ledger.", "state": "pending", "resolution": "Ledger structure exists; automated validator is not implemented.", "evidence_ids": []},
+    {"id": "GOV-004", "area": "api contract", "requirement": "Export and validate actual backend OpenAPI; generate TypeScript data and endpoint types; check deterministic output and drift.", "state": "pending", "resolution": "Generation and contract verification chain must be implemented and verified.", "evidence_ids": []},
+    {"id": "GOV-005", "area": "shared changes", "requirement": "Analyze full impacts and unify error_code, offset-bearing time and affected use-case contracts/callers while preserving current response omission behavior.", "state": "pending", "resolution": "Target policies are confirmed; whole-workspace implementation and verification remain.", "evidence_ids": []},
+    {"id": "GOV-006", "area": "behavior and acceptance", "requirement": "Establish and run risk-based real-dependency, concurrency, outage/recovery, multi-instance, contract and critical Web acceptance gates.", "state": "pending", "resolution": "Existing checks and historical tests do not establish complete new-standard acceptance.", "evidence_ids": []},
+    {"id": "GOV-007", "area": "skills", "requirement": "Align local backend/Web Skill sources and affected examples with the canonical standard; validate reference/application scenarios before deployment.", "state": "resolved", "resolution": "Local entries and affected examples are aligned and verified; Spectra plugin 1.0.0+codex.20261003224841 is installed and its 44 backend/Web Skill files match source. Earlier scenario-agent usage limits were cleared this turn. New-session discovery remains an explicit verification limit, and this item does not establish full workspace code compliance.", "evidence_ids": ["EV-SKILL-20261003"]}
+  ]
+}

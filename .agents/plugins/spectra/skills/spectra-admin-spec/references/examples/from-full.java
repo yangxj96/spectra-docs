@@ -16,9 +16,10 @@
 
 package com.devops00.spectra.example.javabean.from;
 
-import jakarta.validation.constraints.Email;
+import com.devops00.spectra.common.base.Verify;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 /**
@@ -49,12 +50,12 @@ public class ExampleFullFrom {
     private String name;
 
     /**
-     * 示例编码（可选，后端自动生成）
+     * 示例业务编码（本例允许编辑；null 表示清空）
      */
     private String code;
 
     /**
-     * 描述
+     * 描述（null 表示清空）
      */
     private String description;
 
@@ -65,10 +66,10 @@ public class ExampleFullFrom {
     private Boolean active;
 
     /**
-     * 邮箱
+     * 编辑读取时的版本；创建不接受客户端设置持久化版本。
      */
-    @NotBlank(message = "邮箱不能为空")
-    @Email(message = "邮箱格式不正确")
-    private String email;
+    @NotNull(groups = Verify.Update.class, message = "版本不能为空")
+    @PositiveOrZero(groups = Verify.Update.class, message = "版本不能为负数")
+    private Long version;
 
 }

@@ -7,29 +7,49 @@ description: 仅在修改或审查 spectra-ui Web 的 Vue、TypeScript、API、P
 
 ## 使用边界
 
-- 最近的 `AGENTS.md` 已提供项目约束；已加载的规则不要重复读取。先查看目标文件附近的既有实现。
-- 跨文件关系、路由、API 或影响范围使用 CodeGraph；配置和精确文本使用 `rg`。
-- 仅在新增或不熟悉目标类型时读取一个示例；先定位，再读对应文件，不预加载整个 `references/examples/`。
-- 保持既有抽象，修改后优先执行目标测试或类型检查。
-- 后端 API 变化时检查 `spectra-admin` 和相关前端调用方。
+- 遵循最近 AGENTS 与用户已确认的 `docs/开发指南/04-工作区工程标准.md`，按职责读取相关章节；已加载的内容不重复读。改变架构、协议或验收基线需与用户明确讨论，不沿用冲突的旧模板。
+- 本文的 docs/spectra-ui 路径相对工作区根，references 相对本 Skill；安装缓存不是项目根。先定位目标实现，示例按需读取，不预加载整个示例目录。
+- 从目标项目使用 CodeGraph 分析路由、API、状态和依赖，rg 核对精确文本与遗漏。公共变更先完整分析全工作区直接、间接、协议、数据、构建及运行影响，再决定共同改造和验证。
+- OA、Workflow 与流程业务独立治理暂缓；受公共变更影响的页面/插件仍需一致性改造和验收，不能只改当前页面或只做类型检查。
+- 区分目标标准、现有实现及尚待治理能力；类型生成、错误协议和默认反馈链路未落地时如实登记，不写成已经具备。
 
 ## 核心规则
 
-- 使用 Vue 3.5+、TypeScript 和项目既有目录命名：页面/组件目录使用 PascalCase，API、Store 和 Hook 文件使用 kebab-case。
-- SFC 块顺序为 `<script>` → `<template>` → `<style>`。
-- Props、Emits 和 `v-model` 使用类型声明、`withDefaults` 和 `defineModel`；禁止用 `any` 绕过类型检查。
-- 业务请求必须经过 `src/plugin/request/` 的自定义客户端；不要新增 Axios 或在业务代码中直接调用 fetch。上传/下载使用项目封装。
-- Store、Hook、API 和类型放在已有目录，遵循当前命名和导出约定；不要为局部需求引入平行状态或请求抽象。
-- 测试使用 Vitest、`@vue/test-utils` 和项目既有 mock/Pinia 测试模式。
-- `pnpm start` 已通过 `prestart` 执行启动前检查，不要重复串联这些检查。
+### 组织与命名
+
+- 简单局部状态和交互留在页面/组件，按独立职责、生命周期、复用或验证需要提取 Hook，业务专属代码先放所属目录，不默认每页配 Hook。
+- Pinia 只承载生命周期明确的跨页面/会话共享状态，明确初始化、失效、退出登录与身份切换清理；临时表单不机械提升到 Store。
+- 页面/组件目录 PascalCase，入口 index.vue；独立组件 PascalCase.vue；普通 TS/API/Store/Hook 文件 kebab-case，Hook 文件 use-xxx.ts。组件/类型 PascalCase，自有函数与状态 camelCase；入口、生成与外部名称有明确例外。
+- 沿用项目 SFC 顺序 `<script>` → `<template>` → `<style>`，Props/Emits/v-model 用类型声明、withDefaults/defineModel。组件按展示、交互或实际复用拆分，不为行数制造层次。
+
+### 类型与契约
+
+- 工具版本以 mise、packageManager/POM 与锁文件为准；保持严格 TS，动态边界先验证再收窄，any 与未验证断言不绕过契约。
+- 后端定义及实际序列化是事实源，目标为已验证 OpenAPI 导出、生成 TS 数据与端点类型和漂移核对；薄 API 和必要页面模型手写。现有手写协议是待迁移状态，不新增第二份长期事实源，也不虚构尚不存在的生成导入路径。
+- JSON/生成 API 字段 snake_case，前端自有状态 camelCase；响应字段省略及空值保留现状，不统一补 null、空数组或 data:null。页面显示默认值与协议归一化区分。
+- 保留真实 HTTP 状态，code 表示状态，稳定 DOMAIN_REASON 标识在线为 error_code，msg 用于安全展示；按状态和标识处理行为，不猜提示文本。绝对时刻以后端转换且携带偏移的契约为准。
+- 普通编辑提交完整可编辑数据和读取版本，清空按字段契约；状态/密码采用专用操作。409 冲突保留编辑并支持刷新/重新处理，不覆盖为新读版本以绕过冲突。
+
+### 请求与状态
+
+- 薄 API 使用 `src/plugin/request/` 的既有客户端，上传/下载走现有封装，不新增平行 Axios/fetch 抽象；API 不管理页面 loading、提示或路由。
+- 局部 loading 和用例反馈默认，由页面或所属 Hook 管理；请求层分类错误和处理会话，单次失败一个提示责任方，全局遮罩仅用于确需阻断交互的操作。
+- 区分取消与失败，旧响应不覆盖当前查询或新会话；防止重复提交，保留失败编辑，所有结束路径释放 loading。取消等待不等于后端回滚。
+- 重试有明确条件、次数及截止，写入/外部副作用须证明幂等或未执行；缓存明确身份范围、失效和生命周期，基础设施故障不伪装为空数据。
+
+### 复杂度与验证
+
+- 普通函数圈复杂度 >15、嵌套 >3、显式参数 >5 必须按职责处理或登记具体有依据可验证的例外。ESLint 使用 classic 并校准边界；行数是评审线索，生成/配置/测试按职责处理，手写业务控制不整体豁免。
+- 行为与风险作为门禁，使用 Vitest 和已配置的组件/Pinia 测试方式验证可观察结果与失败路径；需组件测试时先确认依赖与环境，不虚构已有 @vue/test-utils。测试不复述实现或只断言内部调用，不统一每类每行测试或覆盖率下限。
 
 ## Reference 路由
 
-- 示例按目标类型选择一个：在 `references/examples/` 中查找 `component`、`api`、`store`、`hook`、`test`、`types` 或 `routes` 对应的 `*-full` 文件；测试示例同时参考目标组件真实的 Store/API 导入路径。
-- 完整项目说明：`docs/20-前端/10-spectra-ui.md`，只在目标规则未覆盖或任务明确要求时读取。
+- 示例按目标类型从 [references/examples/](references/examples/) 选择 component/api/store/hook/test/types/routes，不确定先 rg 列文件；示例需按当前契约及真实依赖采用，不代表完整业务已验收。
+- 项目说明：`docs/前端/01-前端管理后台.md`；命名：`docs/前端/02-前端命名规范.md`；请求现状及目标：`docs/前端/05-前端请求与安全通信.md`；验证：`docs/前端/08-前端开发测试与构建.md`。
+- 例外及集中治理：`docs/开发指南/05-集中治理与验收.md`、`docs/开发指南/工程治理/ledger.json`。
 
 ## 验证
 
-- 开发中优先执行目标测试或 `pnpm run type-check`。
-- 交付前按需执行 `format:check`、`lint`、`type-check`、`test` 和 `build`。
-- 修改 API、路由、权限或文件上传时检查后端契约和跨端调用方。
+- 开发中使用 mise + pnpm 做目标测试/type-check；代码交付执行完整适用 format:check、lint、type-check、test、build，另按风险验证实际协议/生成漂移和关键浏览器路径。
+- 检查与 format/lint:fix 分开。当前 prestart 会写回源码，不作为 CI 只读检查；开发启动不重复串联已有 prestart 流程。
+- 修改插件并联调先构建插件，公共变化依完整影响矩阵核对后端与所有受影响调用方。同步知识库，报告真实通过范围和未验证边界；命令见 `docs/开发指南/01-常见命令.md`。

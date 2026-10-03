@@ -17,8 +17,8 @@
 package com.devops00.spectra.example.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.base.BaseService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.example.javabean.entity.ExampleFullEntity;
 import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
 import com.devops00.spectra.example.javabean.query.ExampleFullQuery;
@@ -31,10 +31,10 @@ import java.util.UUID;
  *
  * 注意：
  * <ol>
- * <li>继承 BaseService<Entity></li>
+ * <li>本示例是实体 CRUD 接口；编排或非实体 Service 不机械继承 BaseService</li>
  * <li>禁止直接继承 MyBatis-Plus 的 IService</li>
  * <li>方法命名规范：created/modify/deleteById/page</li>
- * <li>返回类型使用具体 VO 类型</li>
+ * <li>返回具体 VO/结果；跨域只公开有业务含义的操作，不使用继承的 CRUD</li>
  * </ol>
  *
  * @author yangxj96

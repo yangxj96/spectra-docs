@@ -18,8 +18,8 @@ package com.devops00.spectra.example.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.example.javabean.from.ExampleFullFrom;
 import com.devops00.spectra.example.javabean.query.ExampleFullQuery;
 import com.devops00.spectra.example.javabean.vo.ExampleFullVO;
@@ -37,11 +37,11 @@ import java.util.UUID;
  *
  * 注意：
  * <ol>
- * <li>瘦 Controller：只做请求转发，不包含任何业务逻辑</li>
+ * <li>Controller 做绑定、入口校验和接口级授权，用例及记录范围由 Service 保障</li>
  * <li>统一 @RequiredArgsConstructor + private final 构造器注入</li>
  * <li>禁止返回 Object，必须返回具体类型</li>
  * <li>统一方法命名：created/modify/deleteById/page</li>
- * <li>所有接口必须加 @ULog、@PreAuthorize</li>
+ * <li>需要审计的入口使用 @Audit，接口显式 @PreAuthorize；审计避免敏感快照</li>
  * <li>写操作必须加 @Validated</li>
  * <li>Mapping 注解中统一 version = "1.0.0"</li>
  * </ol>
@@ -61,7 +61,7 @@ public class ExampleFullController {
     /**
      * 分页查询示例列表
      */
-    @ULog("'查询示例列表'")
+    @Audit("'查询示例列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public IPage<ExampleFullVO> page(PageFrom page, ExampleFullQuery params) {
@@ -71,7 +71,7 @@ public class ExampleFullController {
     /**
      * 查询示例详情
      */
-    @ULog("'查询示例详情'")
+    @Audit("'查询示例详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public ExampleFullVO getDetail(@PathVariable UUID id) {
@@ -81,7 +81,7 @@ public class ExampleFullController {
     /**
      * 创建示例
      */
-    @ULog("'创建示例'")
+    @Audit("'创建示例'")
     @PostMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody ExampleFullFrom from) {
@@ -91,7 +91,7 @@ public class ExampleFullController {
     /**
      * 更新示例
      */
-    @ULog("'更新示例'")
+    @Audit("'更新示例'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:UPDATE')")
     public void modify(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody ExampleFullFrom from) {
@@ -101,7 +101,7 @@ public class ExampleFullController {
     /**
      * 删除示例
      */
-    @ULog("'删除示例'")
+    @Audit("'删除示例'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'EXAMPLE:DELETE')")
     public void deleteById(@PathVariable UUID id) {

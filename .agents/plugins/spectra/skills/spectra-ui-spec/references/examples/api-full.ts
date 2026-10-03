@@ -1,58 +1,40 @@
-import { del, get, post, put } from "@/plugin/request/api";
+import { get, post, put } from "@/plugin/request/api";
 
 /**
- * 用户相关接口
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11 15:00:00
+ * 薄 API 示例：绑定当前真实 User 类型和端点，不复制另一份协议。
+ * OpenAPI 生成链路完成后改用生成的类型；当前不存在该导入入口。
+ * loading 是传输选项，局部状态和反馈由调用页面负责。
  */
-export const UserApi = {
-    /**
-     * 分页查询用户
-     * @param params 分页参数
-     */
-    getPage(params: UserPageParams): Promise<Page<UserVO>> {
-        return get<Page<UserVO>>("/api/user/page", params);
+export const ExampleUserApi = {
+    page(
+        params: UserPageParams,
+        options?: Pick<RequestOptions<"/api/user/page">, "loading">
+    ): Promise<Page<UserPageVO>> {
+        return get<Page<UserPageVO>>("/api/user/page", params, { loading: false, ...options });
     },
 
-    /**
-     * 获取用户详情
-     * @param id 用户ID
-     */
-    getById(id: string): Promise<UserVO> {
-        return get<UserVO>(`/api/user/${id}`);
+    detail(id: string): Promise<UserPageVO> {
+        return get<UserPageVO, "/api/user/{id}">("/api/user/{id}", undefined, {
+            pathParams: { id },
+            loading: false
+        });
     },
 
-    /**
-     * 创建用户
-     * @param params 用户信息
-     */
-    created(params: UserSaveFrom): Promise<void> {
-        return post<void>("/api/user/onboarding", params);
+    submitCreate(params: UserOnboardingDTO): Promise<UserOnboardingVO> {
+        return post<UserOnboardingVO>("/api/user/onboarding", params, { loading: false, retry: 0 });
     },
 
-    /**
-     * 修改用户
-     * @param params 用户信息
-     */
-    modify(params: UserSaveFrom): Promise<void> {
-        return put<void>("/api/user/onboarding", params);
+    submitUpdate(params: UserOnboardingDTO): Promise<UserOnboardingVO> {
+        // 可编辑集合、清空、版本及冲突按后端实际契约迁移，不伪造已经落地的版本字段。
+        return put<UserOnboardingVO>("/api/user/onboarding", params, { loading: false, retry: 0 });
     },
 
-    /**
-     * 删除用户
-     * @param id 用户ID
-     */
-    deleteById(id: string): Promise<void> {
-        return del<void>(`/api/user/${id}`);
-    },
-
-    /**
-     * 重置密码
-     * @param id 用户ID
-     */
     resetPassword(id: string): Promise<void> {
-        return put<void>(`/api/user/password/reset/${id}`);
+        return put<void, "/api/user/password/reset/{id}">("/api/user/password/reset/{id}", undefined, {
+            pathParams: { id },
+            noBody: true,
+            loading: false,
+            retry: 0
+        });
     }
 };

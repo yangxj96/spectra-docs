@@ -1,72 +1,133 @@
-import { createTestingPinia } from "@pinia/testing";
-import { mount } from "@vue/test-utils";
-import { ElOption, ElSelect } from "element-plus";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createPinia, setActivePinia } from "pinia";
+import { afterEach, describe, expect, it } from "vitest";
+import { effectScope, ref, type EffectScope } from "vue";
 
-import DictSelect from "../src/components/DictSelect/index.vue";
-import { useDictStore } from "../src/plugin/store/modules/use-dict-store";
+import { RequestCancelledError } from "@/plugin/request/error";
 
-const dictItems = [
-    { id: "1", gid: "state", label: "正常", value: "0", sort: 1, state: 0, default_flag: true },
-    { id: "2", gid: "state", label: "冻结", value: "1", sort: 2, state: 0, default_flag: false },
-    { id: "3", gid: "state", label: "封禁", value: "2", sort: 3, state: 0, default_flag: false }
-];
+import { useTable } from "./hook-full";
+import { useExampleUserStore } from "./store-full";
 
-function mountDictSelect(modelValue: string | undefined = "0") {
-    const pinia = createTestingPinia({ stubActions: true });
-    const store = useDictStore(pinia);
-    vi.mocked(store.getDictData).mockResolvedValue(dictItems);
-    return mount(DictSelect, {
-        props: { modelValue, dict_code: "sys_common_state" },
-        global: { plugins: [pinia], components: { ElSelect, ElOption } }
+type Row = { id: string };
+
+function deferred<T>() {
+    let resolve!: (value: T) => void;
+    let reject!: (reason: unknown) => void;
+    const promise = new Promise<T>((accept, decline) => {
+        resolve = accept;
+        reject = decline;
     });
+    return { promise, resolve, reject };
 }
 
-beforeEach(() => vi.clearAllMocks());
+function page(id: string): Page<Row> {
+    return {
+        current: 1,
+        size: 10,
+        total: 1,
+        pages: 1,
+        records: [{ id }],
+        optimize_count_sql: true,
+        search_count: true
+    };
+}
 
-describe("DictSelect 组件", () => {
-    it("应该正确接收并传递dict_code和model值", async () => {
-        const wrapper = mountDictSelect();
+const scopes: EffectScope[] = [];
+afterEach(() => {
+    for (const scope of scopes) scope.stop();
+    scopes.length = 0;
+});
 
-        // 检查props是否正确接收
-        expect(wrapper.props("modelValue")).toBe("0");
-        expect(wrapper.props("dict_code")).toBe("sys_common_state");
+function setupTable(request: (params: BasePageParams) => Promise<Page<Row>>) {
+    const scope = effectScope();
+    scopes.push(scope);
+    const scopeKey = ref("session-a");
+    const table = scope.run(() => useTable(request, { page_num: 1, page_size: 10 }, scopeKey));
+    if (!table) throw new Error("测试作用域未创建");
+    return { scope, scopeKey, table };
+}
+
+describe("分页查询的可观察行为", () => {
+    it("旧响应不能覆盖更新查询，也不能提前释放新请求的 loading", async () => {
+        const first = deferred<Page<Row>>();
+        const second = deferred<Page<Row>>();
+        const { table } = setupTable(params => (params.page_num === 1 ? first.promise : second.promise));
+        const earlier = table.fetchData();
+        const later = table.handleCurrentChange(2);
+
+        first.resolve(page("old"));
+        await earlier;
+        expect(table.loading.value).toBe(true);
+        expect(table.tableData.value).toEqual([]);
+
+        second.resolve(page("current"));
+        await later;
+        expect(table.tableData.value).toEqual([{ id: "current" }]);
+        expect(table.loading.value).toBe(false);
     });
 
-    it("应该正确渲染选项", async () => {
-        const wrapper = mountDictSelect();
+    it("切换身份立即清理数据，并拒绝上一会话的迟到响应", async () => {
+        const pending = deferred<Page<Row>>();
+        let next = Promise.resolve(page("visible"));
+        const { table, scopeKey } = setupTable(() => next);
+        await table.fetchData();
+        next = pending.promise;
+        const result = table.fetchData();
 
-        await wrapper.vm.$nextTick();
-
-        // 检查选项是否渲染
-        const options = wrapper.findAll(".el-select-dropdown__item");
-        expect(options.length).toBe(3);
+        scopeKey.value = "session-b";
+        expect(table.tableData.value).toEqual([]);
+        pending.resolve(page("previous-session"));
+        await result;
+        expect(table.tableData.value).toEqual([]);
+        expect(table.loading.value).toBe(false);
     });
 
-    it("应该触发 update:modelValue 事件", async () => {
-        const wrapper = mountDictSelect();
-
-        // 模拟选择新值
-        await wrapper.find(".el-select").trigger("click");
-        await wrapper.findAll(".el-select-dropdown__item")[1].trigger("click");
-
-        // 检查事件是否触发
-        expect(wrapper.emitted("update:modelValue")).toBeTruthy();
-    });
-
-    it("应该处理空字典数据", async () => {
-        const pinia = createTestingPinia({ stubActions: true });
-        const store = useDictStore(pinia);
-        vi.mocked(store.getDictData).mockResolvedValue([]);
-        const wrapper = mount(DictSelect, {
-            props: { modelValue: undefined, dict_code: "empty_dict" },
-            global: { plugins: [pinia], components: { ElSelect, ElOption } }
+    it("失败保留可识别错误并释放 loading，主动取消不变成失败提示", async () => {
+        const failure = new Error("查询失败");
+        let next: Promise<Page<Row>> | undefined;
+        const { table } = setupTable(() => {
+            if (!next) throw new Error("测试请求未准备");
+            return next;
         });
+        next = Promise.reject(failure);
+        await table.fetchData();
+        expect(table.error.value).toBe(failure);
+        expect(table.loading.value).toBe(false);
 
-        await wrapper.vm.$nextTick();
+        next = Promise.reject(new RequestCancelledError());
+        await table.fetchData();
+        expect(table.error.value).toBeUndefined();
+        expect(table.loading.value).toBe(false);
+    });
 
-        // 检查选项是否为空
-        const options = wrapper.findAll(".el-select-dropdown__item");
-        expect(options.length).toBe(0);
+    it("销毁作用域后迟到响应不能重新写入状态", async () => {
+        const pending = deferred<Page<Row>>();
+        const { table, scope } = setupTable(() => pending.promise);
+        const result = table.fetchData();
+        scope.stop();
+        pending.resolve(page("late"));
+        await result;
+        expect(table.tableData.value).toEqual([]);
+        expect(table.loading.value).toBe(false);
+    });
+});
+
+describe("会话共享状态", () => {
+    it("退出登录清除身份和权限，下一身份不继承旧权限", () => {
+        setActivePinia(createPinia());
+        const store = useExampleUserStore();
+        const token: Token = {
+            id: "user-a",
+            username: "first",
+            access_token: "example-only",
+            permissions: ["user:read"]
+        };
+        store.setAuth(token);
+        expect(store.hasPermission("user:read")).toBe(true);
+        store.clearAuth();
+        expect(store.isLoggedIn).toBe(false);
+        expect(store.getPermissions).toEqual([]);
+        store.setAuth({ ...token, id: "user-b", permissions: ["file:read"] });
+        expect(store.hasPermission("user:read")).toBe(false);
+        expect(store.hasPermission("file:read")).toBe(true);
     });
 });
