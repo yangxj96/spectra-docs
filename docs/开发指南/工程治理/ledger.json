@@ -3,6 +3,162 @@
   "standard": "docs/开发指南/04-工作区工程标准.md",
   "updated_at": "2026-10-05",
   "status": "inventory_complete",
+  "remediation_cycle": {
+    "id": "CYCLE-20261005",
+    "state": "scheduled",
+    "basis": "2026-10-05 diagnosis; 04-工作区工程标准 and 05-集中治理与验收",
+    "policy": "One concentrated cycle; complete each batch with its affected repository callers, deferred-area consistency checks and knowledge-base updates. A batch closes only with recorded evidence; global acceptance remains separate.",
+    "unresolved_blockers": [
+      "Isolated PostgreSQL/Redis, two-instance and real HTTP/browser environments are not yet supplied or verified; keep their behavior checks not_run until executed.",
+      "Plugin build currently stops at missing tinyglobby before source compilation; resolve in B00 and retain the failed diagnosis evidence.",
+      "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout."
+    ],
+    "batches": [
+      {
+        "id": "B00",
+        "name": "检查与隔离验证基础",
+        "stage": "4",
+        "depends_on": [],
+        "issue_ids": ["DIAG-BASE-012", "DIAG-BASE-013", "DIAG-BASE-019", "DIAG-BASE-020", "DIAG-WEB-007", "DIAG-BUILD-001", "DIAG-BUILD-002", "DIAG-SCRIPT-003"],
+        "impact_ids": ["IMP-BASE-006", "IMP-ENGINEERING-001"],
+        "work_item_ids": ["GOV-002", "GOV-003"],
+        "change_scope": "PMD/ESLint/SpotBugs/formatter and architecture checks, exception reconciliation, fixed mise/CI and plugin build inputs, script test command boundary, isolated DB/Redis and browser verification entrypoints",
+        "prerequisites": "Use fixed project tools and synthetic isolated data; no actual migration or destructive script Apply",
+        "checks": "15/200/3/5 boundary samples, suppression and stale exception checks, deliberate rule failures and nonzero exits, frozen plugin build plus ESM/CJS/type/style host consumption, isolated environment smoke checks",
+        "done_when": "Checks run reliably with actual version/exit evidence; missing isolated services remain explicit blockers, and legacy violations stay pending."
+      },
+      {
+        "id": "B01",
+        "name": "脚本删除与导入隔离",
+        "stage": "5",
+        "depends_on": ["B00"],
+        "issue_ids": ["DIAG-SCRIPT-001", "DIAG-SCRIPT-002", "DIAG-SCRIPT-004"],
+        "impact_ids": ["IMP-SCRIPTS-001"],
+        "work_item_ids": [],
+        "change_scope": "Website sync manifest/managed roots and rollback, Python launcher and root .venv/mise selection, region import target guard and restart semantics",
+        "prerequisites": "Use disposable directories and an allow-listed isolated database; protect outside sentinel files",
+        "checks": "BEH-IMP-SCRIPTS-001-1..5 and BC-BASE-013; polluted manifests, Preview/Apply rollback, native mise argument and failure propagation, interrupted import",
+        "done_when": "Outside paths cannot become delete targets; unsafe DB targets fail before connection; interrupted import has an explicit recoverable result."
+      },
+      {
+        "id": "B02",
+        "name": "安全事实源与授权核心",
+        "stage": "5",
+        "depends_on": ["B00"],
+        "issue_ids": ["DIAG-BASE-001", "DIAG-BASE-002", "DIAG-BASE-003", "DIAG-BASE-004", "DIAG-BASE-005", "DIAG-BASE-006", "DIAG-BASE-007", "DIAG-BASE-018", "DIAG-CORE-019", "DIAG-CORE-020", "DIAG-CORE-022", "DIAG-CORE-023", "DIAG-CORE-032", "DIAG-CORE-034"],
+        "impact_ids": ["IMP-BASE-001", "IMP-BASE-003", "IMP-CORE-007"],
+        "work_item_ids": ["GOV-005"],
+        "change_scope": "Framework Redis session/fence/lock and audit/sort boundaries; Core effective Root, identity bucket, credentials, role snapshot and explicit background identity; affected OA/Workflow callers",
+        "prerequisites": "B00 Redis/DB fixtures and full caller/role migration inventory; coordinate session revocation with B08 Web identity reset",
+        "checks": "BC-BASE-001..005, BC-BASE-008, CHECK-CORE-019..023, CHECK-CORE-032/034; concurrent replay and two instances, null versus empty, fail-closed, role shrink/relogin and audit redaction",
+        "done_when": "Security state is authoritative under concurrency and faults; all affected callers use the same authorization and identity semantics."
+      },
+      {
+        "id": "B03",
+        "name": "必需基础设施与启动运行门",
+        "stage": "5",
+        "depends_on": ["B00", "B02"],
+        "issue_ids": ["DIAG-BASE-011", "DIAG-BASE-014", "DIAG-BASE-015", "DIAG-BASE-016", "DIAG-BASE-017", "DIAG-CORE-033", "DIAG-ADDITIONAL-003"],
+        "impact_ids": ["IMP-BASE-004", "IMP-CORE-007", "IMP-ADDITIONAL-003"],
+        "work_item_ids": ["GOV-006"],
+        "change_scope": "Launch/Framework readiness gate, DB/Redis outage/recovery and task pause, cache corruption semantics, typed configuration, Flowable schema setting, Docker/runtime startup and upload settings",
+        "prerequisites": "Isolated DB/Redis and known empty/V7 database snapshots; analyze OA/Workflow assembly and background tasks",
+        "checks": "BC-BASE-009/010/014/015, BC-ADDITIONAL-003, CHECK-CORE-033; startup nonzero, running process unready, recovery validation, module combinations and no runtime DDL",
+        "done_when": "Required dependency failure rejects business consistently, startup fails when required, running faults preserve process and recover only after validation."
+      },
+      {
+        "id": "B04",
+        "name": "协议时间版本与生成类型",
+        "stage": "6",
+        "depends_on": ["B00", "B02", "B03"],
+        "issue_ids": ["DIAG-BASE-008", "DIAG-BASE-009", "DIAG-BASE-010", "DIAG-WEB-005", "DIAG-WEB-006", "DIAG-WEB-008", "DIAG-WEB-014", "DIAG-WEB-016", "DIAG-WEB-023", "DIAG-CORE-003", "DIAG-CORE-004", "DIAG-CORE-036", "DIAG-CORE-038", "DIAG-MODEL-001", "DIAG-MODEL-002", "DIAG-ADDITIONAL-001", "DIAG-ADDITIONAL-002"],
+        "impact_ids": ["IMP-BASE-002", "IMP-WEB-002", "IMP-WEB-003", "IMP-CORE-002", "IMP-ADDITIONAL-001", "IMP-ADDITIONAL-002"],
+        "work_item_ids": ["GOV-004", "GOV-005"],
+        "change_scope": "Backend response/error_code, time and edit/CAS models, HTTP range and version binding; actual OpenAPI export, generated Web types, thin APIs, editors and affected OA/Workflow/plugin consumers",
+        "prerequisites": "Record real JSON omission and snake_case; choose per-field clear semantics and version ownership before generator output",
+        "checks": "BC-BASE-006/007, BC-MODEL-001..005, BC-ADDITIONAL-001/002/005, BEH-WEB-004/005/011, real HTTP/SQL 409 and drift checks",
+        "done_when": "API 1.0.0 has actual HTTP/JSON/generated type agreement; stale writes reject, clears persist, offset/timezone rules hold, and old aliases/fallbacks are removed."
+      },
+      {
+        "id": "B05",
+        "name": "资产上传与持久校验",
+        "stage": "7",
+        "depends_on": ["B02", "B03", "B04"],
+        "issue_ids": ["DIAG-CORE-005", "DIAG-CORE-006", "DIAG-CORE-007", "DIAG-CORE-008", "DIAG-CORE-009", "DIAG-CORE-010", "DIAG-ADDITIONAL-004", "DIAG-WEB-017", "DIAG-WEB-018"],
+        "impact_ids": ["IMP-CORE-003"],
+        "work_item_ids": [],
+        "change_scope": "Core asset authorization, upload IDs/attempts, durable verification and cleanup, local/S3 range and staging; Web upload controls, retries, cancellation and identity isolation; OA attachment callers",
+        "prerequisites": "Agree operation intent and unknown-result handling; isolated storage, DB and two app instances",
+        "checks": "CHECK-CORE-005..010, BC-ADDITIONAL-004/006, BEH-WEB-003; foreign asset rejection, real multipart URL, late attempt, crash/restart and two-instance recovery",
+        "done_when": "Accepted uploads have recoverable outcomes, no cross-user asset access, correct bytes/IDs, and verified file cleanup."
+      },
+      {
+        "id": "B06",
+        "name": "通知诊断和共享运行任务",
+        "stage": "7",
+        "depends_on": ["B02", "B03", "B04"],
+        "issue_ids": ["DIAG-CORE-011", "DIAG-CORE-012", "DIAG-CORE-013", "DIAG-CORE-014", "DIAG-CORE-015", "DIAG-CORE-016", "DIAG-CORE-021", "DIAG-CORE-028", "DIAG-CORE-030", "DIAG-CORE-031", "DIAG-CORE-035", "DIAG-SYSTEM-001", "DIAG-SYSTEM-002", "DIAG-SYSTEM-003", "DIAG-SYSTEM-004", "DIAG-WEB-020"],
+        "impact_ids": ["IMP-CORE-004", "IMP-CORE-005", "IMP-CORE-006", "IMP-SYSTEM-001", "IMP-SYSTEM-002", "IMP-SYSTEM-003"],
+        "work_item_ids": [],
+        "change_scope": "Notification attempt/fence/key/provider and diagnostics, import, cache operations, monitor and local file tasks; Web diagnostic polling; OA/Workflow notification producers",
+        "prerequisites": "Define idempotency, durable acceptance, unknown external result, old ciphertext and local/shared ownership before changes; isolated DB/Redis and two instances",
+        "checks": "CHECK-CORE-011..016/021/028/030/031/035, BC-MODEL-006, BC-IMPACT-IMP-SYSTEM-001-1..5; slow workers, callbacks, provider failure, crash/restart, stale leases and cross-node file access",
+        "done_when": "Committed work is recoverable, historical results stay monotone, side effects do not retry blindly, and shared versus local state is explicit."
+      },
+      {
+        "id": "B07",
+        "name": "应用用例授权与数据边界",
+        "stage": "7",
+        "depends_on": ["B02", "B03", "B04", "B05", "B06"],
+        "issue_ids": ["DIAG-CORE-001", "DIAG-CORE-002", "DIAG-CORE-017", "DIAG-CORE-018", "DIAG-CORE-024", "DIAG-CORE-025", "DIAG-CORE-026", "DIAG-CORE-027", "DIAG-CORE-029", "DIAG-CORE-037", "DIAG-CORE-039", "DIAG-MODEL-003", "DIAG-SYSTEM-005"],
+        "impact_ids": ["IMP-BASE-005", "IMP-CORE-001", "IMP-SYSTEM-004"],
+        "work_item_ids": ["GOV-005"],
+        "change_scope": "Public application services and ports, final object/scope authorization, organization/role invariants, contact identities, menu/dictionary relations, safe export and bounded queries; affected OA/Workflow business callers",
+        "prerequisites": "Apply B04 edit/error contract and enumerate every direct/indirect caller before port changes",
+        "checks": "CHECK-CORE-001..004/017/018/024..027/029/037/039, BC-MODEL-004/007; SQL scope/count, unauthorized batches, rollback, CSV payload and relevant Web callers",
+        "done_when": "Use cases enforce final authorization and atomic invariants across all callers; soft-delete and pagination semantics are explicit and verified."
+      },
+      {
+        "id": "B08",
+        "name": "Web会话请求和页面交互",
+        "stage": "7",
+        "depends_on": ["B02", "B04", "B05", "B06", "B07"],
+        "issue_ids": ["DIAG-WEB-001", "DIAG-WEB-002", "DIAG-WEB-003", "DIAG-WEB-004", "DIAG-WEB-009", "DIAG-WEB-010", "DIAG-WEB-011", "DIAG-WEB-012", "DIAG-WEB-013", "DIAG-WEB-015", "DIAG-WEB-019", "DIAG-WEB-021", "DIAG-WEB-022", "DIAG-WEB-024", "DIAG-WEB-025", "DIAG-WEB-026", "DIAG-WEB-027", "DIAG-WEB-028", "DIAG-WEB-029", "DIAG-WEB-030"],
+        "impact_ids": ["IMP-WEB-001", "IMP-WEB-005"],
+        "work_item_ids": [],
+        "change_scope": "Request retry/dedupe/cancel/feedback, session generations and Store invalidation, editors/preview/apply and page polling; cross-check backend intent/409 results and affected deferred pages",
+        "prerequisites": "B02 session semantics and B04 contract available; browser fixture can switch users and delay responses deterministically",
+        "checks": "BEH-WEB-001..005/008..014 and BC-IMPACT-IMP-WEB-001-1..5; old response, logout/login, cancelled XHR, draft/409, one intent and unknown result",
+        "done_when": "Old identity/input results cannot overwrite current state, failures remain visible, writes preserve draft/intent and component resources release."
+      },
+      {
+        "id": "B09",
+        "name": "流程插件与宿主生命周期",
+        "stage": "7",
+        "depends_on": ["B00", "B04", "B08"],
+        "issue_ids": ["DIAG-PLUGIN-001", "DIAG-PLUGIN-002"],
+        "impact_ids": ["IMP-PLUGIN-001"],
+        "work_item_ids": [],
+        "change_scope": "Plugin common export/panel/event/timer disposal and four Pickers; Web host mount/destroy and stale target handling; affected deferred flow designer interactions",
+        "prerequisites": "Stable plugin build/host consumption and B08 request generation semantics",
+        "checks": "BEH-IMP-PLUGIN-001-1..4, BC-IMPACT-IMP-PLUGIN-001-1..8 and BEH-WEB-006; repeated mount, node switch, close and late picker return",
+        "done_when": "No stale editor writes or retained handlers/apps after destroy; export timing contract and host build pass."
+      },
+      {
+        "id": "B10",
+        "name": "知识库与整体验收",
+        "stage": "8",
+        "depends_on": ["B00", "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09"],
+        "issue_ids": ["DIAG-DOC-001"],
+        "impact_ids": [],
+        "work_item_ids": ["GOV-006"],
+        "change_scope": "Knowledge base, migration/config/dependency/API references and all included coverage, exceptions, impact records and quality gates",
+        "prerequisites": "All prior batches resolved or individually justified valid exceptions; every blocker and not_run requirement remains visible",
+        "checks": "Re-enumerate and validate digests/references, full backend/Web/plugin checks, OpenAPI drift, real DB/Redis and two-instance failure/recovery, browser and script acceptance, publish/restore review",
+        "done_when": "Every included issue resolved or validly excepted, required checks pass with current evidence and no mandatory behavior remains not_run; only then set accepted."
+      }
+    ]
+  },
   "scope": {
     "included": [
       "backend common/framework/core/launch",
@@ -3201,7 +3357,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-            "content_sha256": "3bc68de7e92894366eb18e8db898d4f64eb478774a036fd298a976a09eb3c8f2",
+      "content_sha256": "532bf457e03dd0720ab66b8a56c80ed97b7a61d884c832b61d4d93b9b3d4c2b1",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3227,7 +3383,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "91441d898d3748e9aa011fcd6110e72a592956469542cb76e23d64ffc464bff3",
+      "content_sha256": "56e0db089a3905ecaf832af7636409a86c64dadece5540c5478576ed7156ba0a",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3254,7 +3410,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "cb44f0740a6dfbf282fecafbd80a1335bcbbb986662b648cf6b01b2d551a5518",
+      "content_sha256": "9638f4af87e9726cd3c2c4b6c5e26828bc13f435576c5d9ebc6c2188726cc885",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4090,7 +4246,7 @@
       "role": "本地规划、历史证据或本阶段执行辅助；不据此推定源码已审查",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "6dc6cf44337546f2a09c1460bce3131cc8fac6cb2a315d318016389a1a336e4c",
+      "content_sha256": "f40ddcb3042373aaf7d1de07c584f0982a0311a6e560b8af375b95e3cafde900",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -61408,14 +61564,16 @@
           "line": 1
         }
       ],
-      "finding": "PMD方法CC=30、NPath=10000、参数=10，嵌套仅AvoidDeeplyNestedIf depth4；未落地目标15/200/5及混合控制嵌套3的校准，说明仍以旧通知复杂度放宽。",
-      "impact": "当前verify通过不能证明主标准达标；普通手写控制路径候选均未校准，不报告实测复杂度数值。",
+      "finding": "历史配置为PMD方法CC=30、NPath=10000、参数=10；B00已校准并改为16/201/5报告边界。Java混合控制流第4层仍不由现有纯if规则识别；存量违规与例外未完成处置。",
+      "impact": "新阈值下PMD全模块报告111条，门禁非零；校准通过不代表存量方法或Java混合嵌套达标。",
       "priority": "P2",
       "disposition": "required_fix",
-      "state": "pending",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B00-CALIBRATION-20261005",
+        "EV-B00-LEGACY-20261005"
       ],
       "impact_ids": [
         "IMP-BASE-006"
@@ -61786,14 +61944,16 @@
           "line": 10
         }
       ],
-      "finding": "未配置 classic complexity<=15 与max-depth<=3；max-params warn4 与超过5强制规则不一致，缺阈值校准、例外ID核对链。package无OpenAPI生成/漂移入口。",
-      "impact": "lint通过不能证明复杂度/例外/契约治理达标。",
+      "finding": "历史配置缺classic complexity和max-depth，max-params为warn4；B00已校准并配置15/3/5。存量复杂度违规、例外ID核对链和OpenAPI生成/漂移入口仍待处理。",
+      "impact": "新阈值下Web全量ESLint报告19条（其中复杂度10、嵌套6），门禁非零；不能据局部配置变更声称治理达标。",
       "priority": "P1",
       "disposition": "对齐固定工具口径并建立校准和例外及契约门禁",
-      "state": "pending",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-WEB-READ"
+        "EV-WEB-READ",
+        "EV-B00-CALIBRATION-20261005",
+        "EV-B00-LEGACY-20261005"
       ],
       "impact_ids": [
         "IMP-ENGINEERING-001"
@@ -66661,6 +66821,51 @@
       ]
     },
     {
+      "id": "EV-B00-CALIBRATION-20261005",
+      "scope": "B00 PMD/ESLint固定版本与15/200/3/5边界校准",
+      "command_or_scenario": [
+        "pwsh -NoProfile -File scripts/tests/complexity-calibration.tests.ps1",
+        "PMD: CC 15/16, NPath 200/201, 纯if嵌套3/4, 参数5/6, 混合嵌套第4层未识别",
+        "ESLint: classic CC 15/16, 混合嵌套3/4, 可选及剩余参数5/6"
+      ],
+      "environment": "原生Windows PowerShell、mise固定JDK25/Node24.14.0/pnpm12.6.0；ESLint依赖读取使用提升执行权限",
+      "tool_versions": {
+        "pmd": "7.17.0",
+        "eslint": "9.39.2",
+        "maven": "3.9.12"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "spectra-admin/config/pmd/calibration/src/main/java/BoundarySamples.java",
+        "spectra-ui/config/complexity-calibration/boundary-samples.txt",
+        "scripts/tests/complexity-calibration.tests.ps1"
+      ],
+      "limits": "只证明列出的固定规则边界；PMD仅识别纯if嵌套，Java混合控制流仍待评审；不证明存量违规已整改。"
+    },
+    {
+      "id": "EV-B00-LEGACY-20261005",
+      "scope": "B00新阈值下的后端/Web存量违规及门禁退出码",
+      "command_or_scenario": [
+        "spectra-admin: mise exec -- .\\mvnw.cmd pmd:check -DskipTests -q -> exit 1; package pmd:pmd -DskipTests -q -> exit 0并生成全模块报告",
+        "spectra-ui: mise exec -- pnpm exec eslint . --no-cache --format json -o ../.temp/b00-eslint.json; exit $LASTEXITCODE -> exit 1"
+      ],
+      "environment": "原生Windows PowerShell；Web依赖读取使用提升执行权限；未连接业务基础设施",
+      "tool_versions": {
+        "pmd": "7.17.0",
+        "eslint": "9.39.2",
+        "maven": "3.9.12",
+        "pnpm": "12.6.0"
+      },
+      "checked_at": "2026-10-05",
+      "result": "failed",
+      "artifacts": [
+        "spectra-admin/*/target/pmd.xml",
+        ".temp/b00-eslint.json"
+      ],
+      "limits": "PMD报告111条：CC44、参数49、NPath12、其他6；Web 226文件中11文件共19条：CC10、嵌套6、既有import/order3。均为存量待审查/整改候选，不能整体豁免；full verify未执行。"
+    },
+    {
       "id": "EV-DIAG-VERIFY-20261005",
       "scope": "第二步正式台账全量覆盖、当前内容及引用一致性",
       "command_or_scenario": [
@@ -66698,9 +66903,12 @@
       "id": "GOV-002",
       "area": "complexity",
       "requirement": "Pin actual PMD/ESLint definitions and calibrate >15/>200/>3/>5 with boundary samples; align checks and scoped special-code handling.",
-      "state": "pending",
-      "resolution": "Existing configurations retain legacy thresholds; mixed control-flow coverage must be verified.",
-      "evidence_ids": []
+      "state": "in_progress",
+      "resolution": "Fixed PMD/ESLint boundary samples and aligned thresholds; existing PMD/ESLint violations remain, and Java mixed control-flow nesting plus scoped special-code review require follow-up.",
+      "evidence_ids": [
+        "EV-B00-CALIBRATION-20261005",
+        "EV-B00-LEGACY-20261005"
+      ]
     },
     {
       "id": "GOV-003",

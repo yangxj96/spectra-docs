@@ -8,9 +8,9 @@ ledger.json（源码仓库的 `docs/开发指南/工程治理/ledger.json`） �
 
 第一步于 2026-10-03 建立文件枚举基线；第二步于 2026-10-04 开始，2026-10-05 补齐当前源码诊断、历史证据复核与公共影响记录。当前清单纳入诊断辅助和本地报告后为 1978 个文件：1518 个 included/shared_impact 文件登记实际职责审查，438 个暂缓业务文件保留独立治理边界并另记公共引用/影响，22 个排除文件不读取、不摘要；另有 22 个排除目录。
 
-第二步的完成记录见 `diagnosis`、issues、impacts 及 evidence；GOV-001 仅关闭清单、诊断与风险建账职责，GOV-005 的分析已完成而统一实现仍为 `in_progress`。全局状态继续为 `inventory_complete`，**诊断完成不代表问题解决、行为通过或集中治理已验收。** 新发现保持 pending，环境阻塞和静态候选明确区分；exceptions 为空不代表现有抑制已经合规。复杂度校准、例外自动核对、协议生成和真实依赖验收仍待实施。
+第二步的完成记录见 `diagnosis`、issues、impacts 及 evidence；第三步的依赖排序见 `remediation_cycle`。GOV-001 仅关闭清单、诊断与风险建账职责，GOV-005 的分析已完成而统一实现仍为 `in_progress`。全局状态继续为 `inventory_complete`，**诊断和排期完成不代表问题解决、行为通过或集中治理已验收。** 新发现保持 pending，环境阻塞和静态候选明确区分；exceptions 为空不代表现有抑制已经合规。复杂度校准、例外自动核对、协议生成和真实依赖验收仍待实施。
 
-GOV-007 已完成后端/Web Skill 的入口、受影响示例、修改前后场景和本地插件缓存对齐，验证摘要登记为 EV-SKILL-20261003。该证据只证明明确列出的 Skill 范围；当前会话仍需区分既有 Skill 目录快照与新安装版本，后续新会话加载状态另行核对。其他待办及全量代码治理不能由此推定完成。
+GOV-007 已完成后端/Web Skill 的入口、受影响示例、修改前后场景和本地插件缓存对齐，验证摘要登记为 EV-SKILL-20261003。该证据只证明明确列出的 Skill 范围；当前会话仍需区分既有 Skill 目录快照与新安装版本，后续新会话加载状态另行核对。B00 的 GOV-002 已完成固定版本边界校准与阈值配置，证据为 EV-B00-CALIBRATION-20261005；全量检查仍有后端 111 条和 Web 19 条存量报告，见 EV-B00-LEGACY-20261005。GOV-002 继续为 `in_progress`，Java 混合控制流嵌套及存量违规尚待处理。其他待办及全量代码治理不能由此推定完成。
 
 ## 结构与字段
 
@@ -59,6 +59,8 @@ GOV-007 已完成后端/Web Skill 的入口、受影响示例、修改前后场�
 | exceptions | `id`, `path`, `symbol`, `rule`, `measured_value`, `tool_version`, `necessity`, `risk`, `verification`, `owner_area`, `reevaluate_when`, `state`, `evidence_ids` |
 | evidence | `id`, `scope`, `command_or_scenario`, `environment`, `tool_versions`, `checked_at`, `result`, `artifacts`, `limits` |
 | work_items | `id`, `area`, `requirement`, `state`, `resolution`, `evidence_ids` |
+
+`remediation_cycle` 是正式整改顺序：每批记录 `id`、`depends_on`、`issue_ids`、`impact_ids`、`work_item_ids`、`change_scope`、`prerequisites`、`checks`、`done_when`。问题恰归属一个主批次；共同影响和治理工作可跨批出现。B00–B10 的 `scheduled` 仅表示排期，不能作为整改或验证通过的证据。已解决的 GOV-001/007 不再作为待整改项分派。
 
 `locations` 可以包含多个明确的路径、符号或行号；行号只用于定位，不能作为例外符号的唯一身份。`verification` 描述例外需要的验证，`evidence_ids` 指向实际记录；填了验证要求不表示验证已完成。
 

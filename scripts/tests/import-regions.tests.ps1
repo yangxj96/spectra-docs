@@ -60,8 +60,9 @@ try {
     $script:MockMiseExitCode = 0
     $successExitCode = Invoke-SpectraRegionImport
 
+    # PowerShell consumes -- when invoking a function; native mise receives it.
     $expectedArguments = @(
-        'exec', '--', '.\mvnw.cmd',
+        'exec', '.\mvnw.cmd',
         '-Pmanual-integration',
         '-pl', 'spectra-launch', '-am',
         '-Dgroups=manual-integration',
