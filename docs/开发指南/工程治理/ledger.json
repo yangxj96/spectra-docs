@@ -3605,7 +3605,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "dd4221555bb0da5e12cecc613540747b769e822547e4e02046211a601ed22004",
+      "content_sha256": "49e53b11b9d6e56c2b476456e540ee57d516d7b0d3461f04f3c0bcaf0febcb15",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -61157,14 +61157,16 @@
           "line": 1
         }
       ],
-      "finding": "发布workflow指定pnpm 11和Node 24浮动大版本，mise固定pnpm12.6.0/Node24.14.0；CI未使用项目固定版本或验证版本一致。",
+      "finding": "历史发布workflow使用pnpm 11和浮动Node 24；B00已固定为mise声明的pnpm 12.6.0/Node 24.14.0，并在冻结安装后校验实际版本与构建产物。未执行发布。",
       "impact": "本地和发布依赖安装/生成行为不能据同一固定基线复现。",
       "priority": "P2",
       "disposition": "构建发布入口采用项目固定版本，核对锁文件冻结安装和产物；仅诊断不发布。",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-ROOT-STATIC-20261004"
+        "EV-ROOT-STATIC-20261004",
+        "EV-B00-CLOSEOUT-20261005",
+        "EV-B00-HOST-20261005"
       ],
       "impact_ids": [
         "IMP-ENGINEERING-001"
@@ -61247,14 +61249,15 @@
           "line": 37
         }
       ],
-      "finding": "当前测试mock mise为PowerShell函数，exec后的--被PowerShell函数调用语义消费，捕获13参数但断言期待14，现有脚本以非零退出；与真实native mise的--分隔语义不同。",
+      "finding": "历史测试将PowerShell函数mock收到的13个参数误判为native mise应收到的14个；B00已按函数mock边界修正断言，回归测试退出0。真实导入仍属于B01隔离验证范围。",
       "impact": "行政区划脚本回归门禁本身不可通过；该证据只证明mock设计错误，不证明真实mise参数被漏传。",
       "priority": "P2",
       "disposition": "使用忠实的native可执行替身或按函数mock边界正确断言，并保持退出码/环境/位置恢复验证。",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-IMPORT-MOCK-20261004"
+        "EV-IMPORT-MOCK-20261004",
+        "EV-B00-CLOSEOUT-20261005"
       ],
       "impact_ids": [
         "IMP-SCRIPTS-001"
@@ -61845,11 +61848,11 @@
           "line": 32
         }
       ],
-      "finding": "SpotBugs全局omitVisitors及若干指定类/规则抑制、源码SuppressWarnings存在，但本范围文件没有关联正式exception_id/evidence_id。",
+      "finding": "历史SpotBugs全局及定点过滤、源码SuppressWarnings缺少正式例外引用；B00已补齐定点例外账、源码/过滤规则关联与自动核对，现存83条例外复核通过。",
       "impact": "规则豁免缺可审计批准与边界，应由根代理与正式exception账核验；不能把精确class匹配自动视为已批准。",
       "priority": "P2",
       "disposition": "reconcile_exception_registry",
-      "state": "in_progress",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
         "EV-BASE-001",
@@ -62199,11 +62202,11 @@
           "line": 10
         }
       ],
-      "finding": "历史配置缺classic complexity和max-depth，max-params为warn4；B00已校准并配置15/3/5。后端业务复杂度与例外核对已收口；依赖树按锁文件重建后，Web ESLint 与 TypeScript 门禁复验通过。",
+      "finding": "历史配置缺classic complexity和max-depth，max-params为warn4；B00已校准并配置15/3/5，依赖树按锁文件重建后Web ESLint与TypeScript门禁复验通过。",
       "impact": "B00 Web ESLint/TypeScript 门禁已有当前通过证据；OpenAPI生成、漂移检查和真实接口验收仍属于后续批次，不由本次静态门禁关闭。",
       "priority": "P1",
-      "disposition": "对齐固定工具口径并建立校准和例外及契约门禁",
-      "state": "in_progress",
+      "disposition": "对齐固定工具口径、校准样例及例外核对；OpenAPI生成与漂移检查归B04/GOV-004",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
         "EV-WEB-READ",
@@ -68557,12 +68560,36 @@
       "limits": "仅证明依赖恢复后的 ESLint 与 TypeScript 门禁；不替代 OpenAPI 漂移、真实接口和全局整体验收。"
     },
     {
+      "id": "EV-B00-CLOSEOUT-20261005",
+      "scope": "B00发布工具版本与行政区划脚本mock边界收口",
+      "command_or_scenario": [
+        "读取logicflow-plugin-flowable/.github/workflows/publish.yml与mise.toml：Node 24.14.0、pnpm 12.6.0一致，workflow包含冻结安装与实际版本断言",
+        "pwsh -NoProfile -File scripts/tests/import-regions.tests.ps1 -> exit 0；参数、环境、位置与退出码断言通过",
+        "插件冻结安装和构建产物另见EV-B00-HOST-20261005"
+      ],
+      "environment": "原生Windows PowerShell；静态核对发布配置，脚本使用mock且不连接数据库",
+      "tool_versions": {
+        "powershell": "7.6.6",
+        "node_declared": "24.14.0",
+        "pnpm_declared": "12.6.0"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "logicflow-plugin-flowable/.github/workflows/publish.yml",
+        "logicflow-plugin-flowable/mise.toml",
+        "scripts/tests/import-regions.tests.ps1",
+        "docs/superpowers/reviews/2026-10-05-B00执行记录.md"
+      ],
+      "limits": "未运行发布，也未执行真实行政区划导入；导入目标保护和中断恢复归B01验证。"
+    },
+    {
       "id": "EV-B00-EXCEPTION-20261005",
       "scope": "B00 GOV-003例外账字段、范围、抑制引用和失效记录自动核对",
       "command_or_scenario": [
         "pwsh -NoProfile -File scripts/tests/governance-exceptions.tests.ps1 -> exit 0",
         "pwsh -NoProfile -File scripts/check-governance-exceptions.ps1 -RootPath . -LedgerPath docs/开发指南/工程治理/ledger.json -SourceRoot spectra-admin -SuppressionFile spectra-admin/config/spotbugs/exclude.xml -> exit 1",
-        "真实工作区初始发现4项PMD抑制、2项全局SpotBugs抑制和64项SpotBugs过滤规则未登记，共70项；补齐4项PMD与2项全局SpotBugs例外后，当前剩余64项SpotBugs过滤规则未登记"
+        "真实工作区初始发现4项PMD抑制、2项全局SpotBugs抑制和64项SpotBugs过滤规则未登记，共70项；补齐登记后复验：PASS，83 exceptions，1534 files scanned"
       ],
       "environment": "原生Windows PowerShell 7.6.6；不访问业务基础设施",
       "tool_versions": {
