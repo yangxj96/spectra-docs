@@ -19,9 +19,25 @@
         "name": "检查与隔离验证基础",
         "stage": "4",
         "depends_on": [],
-        "issue_ids": ["DIAG-BASE-012", "DIAG-BASE-013", "DIAG-BASE-019", "DIAG-BASE-020", "DIAG-WEB-007", "DIAG-BUILD-001", "DIAG-BUILD-002", "DIAG-SCRIPT-003"],
-        "impact_ids": ["IMP-BASE-006", "IMP-ENGINEERING-001"],
-        "work_item_ids": ["GOV-002", "GOV-003"],
+        "issue_ids": [
+          "DIAG-BASE-012",
+          "DIAG-BASE-013",
+          "DIAG-BASE-019",
+          "DIAG-BASE-020",
+          "DIAG-BASE-021",
+          "DIAG-WEB-007",
+          "DIAG-BUILD-001",
+          "DIAG-BUILD-002",
+          "DIAG-SCRIPT-003"
+        ],
+        "impact_ids": [
+          "IMP-BASE-006",
+          "IMP-ENGINEERING-001"
+        ],
+        "work_item_ids": [
+          "GOV-002",
+          "GOV-003"
+        ],
         "change_scope": "PMD/ESLint/SpotBugs/formatter and architecture checks, exception reconciliation, fixed mise/CI and plugin build inputs, script test command boundary, isolated DB/Redis and browser verification entrypoints",
         "prerequisites": "Use fixed project tools and synthetic isolated data; no actual migration or destructive script Apply",
         "checks": "15/200/3/5 boundary samples, suppression and stale exception checks, deliberate rule failures and nonzero exits, frozen plugin build plus ESM/CJS/type/style host consumption, isolated environment smoke checks",
@@ -31,9 +47,17 @@
         "id": "B01",
         "name": "脚本删除与导入隔离",
         "stage": "5",
-        "depends_on": ["B00"],
-        "issue_ids": ["DIAG-SCRIPT-001", "DIAG-SCRIPT-002", "DIAG-SCRIPT-004"],
-        "impact_ids": ["IMP-SCRIPTS-001"],
+        "depends_on": [
+          "B00"
+        ],
+        "issue_ids": [
+          "DIAG-SCRIPT-001",
+          "DIAG-SCRIPT-002",
+          "DIAG-SCRIPT-004"
+        ],
+        "impact_ids": [
+          "IMP-SCRIPTS-001"
+        ],
         "work_item_ids": [],
         "change_scope": "Website sync manifest/managed roots and rollback, Python launcher and root .venv/mise selection, region import target guard and restart semantics",
         "prerequisites": "Use disposable directories and an allow-listed isolated database; protect outside sentinel files",
@@ -44,10 +68,33 @@
         "id": "B02",
         "name": "安全事实源与授权核心",
         "stage": "5",
-        "depends_on": ["B00"],
-        "issue_ids": ["DIAG-BASE-001", "DIAG-BASE-002", "DIAG-BASE-003", "DIAG-BASE-004", "DIAG-BASE-005", "DIAG-BASE-006", "DIAG-BASE-007", "DIAG-BASE-018", "DIAG-CORE-019", "DIAG-CORE-020", "DIAG-CORE-022", "DIAG-CORE-023", "DIAG-CORE-032", "DIAG-CORE-034"],
-        "impact_ids": ["IMP-BASE-001", "IMP-BASE-003", "IMP-CORE-007"],
-        "work_item_ids": ["GOV-005"],
+        "depends_on": [
+          "B00"
+        ],
+        "issue_ids": [
+          "DIAG-BASE-001",
+          "DIAG-BASE-002",
+          "DIAG-BASE-003",
+          "DIAG-BASE-004",
+          "DIAG-BASE-005",
+          "DIAG-BASE-006",
+          "DIAG-BASE-007",
+          "DIAG-BASE-018",
+          "DIAG-CORE-019",
+          "DIAG-CORE-020",
+          "DIAG-CORE-022",
+          "DIAG-CORE-023",
+          "DIAG-CORE-032",
+          "DIAG-CORE-034"
+        ],
+        "impact_ids": [
+          "IMP-BASE-001",
+          "IMP-BASE-003",
+          "IMP-CORE-007"
+        ],
+        "work_item_ids": [
+          "GOV-005"
+        ],
         "change_scope": "Framework Redis session/fence/lock and audit/sort boundaries; Core effective Root, identity bucket, credentials, role snapshot and explicit background identity; affected OA/Workflow callers",
         "prerequisites": "B00 Redis/DB fixtures and full caller/role migration inventory; coordinate session revocation with B08 Web identity reset",
         "checks": "BC-BASE-001..005, BC-BASE-008, CHECK-CORE-019..023, CHECK-CORE-032/034; concurrent replay and two instances, null versus empty, fail-closed, role shrink/relogin and audit redaction",
@@ -57,10 +104,27 @@
         "id": "B03",
         "name": "必需基础设施与启动运行门",
         "stage": "5",
-        "depends_on": ["B00", "B02"],
-        "issue_ids": ["DIAG-BASE-011", "DIAG-BASE-014", "DIAG-BASE-015", "DIAG-BASE-016", "DIAG-BASE-017", "DIAG-CORE-033", "DIAG-ADDITIONAL-003"],
-        "impact_ids": ["IMP-BASE-004", "IMP-CORE-007", "IMP-ADDITIONAL-003"],
-        "work_item_ids": ["GOV-006"],
+        "depends_on": [
+          "B00",
+          "B02"
+        ],
+        "issue_ids": [
+          "DIAG-BASE-011",
+          "DIAG-BASE-014",
+          "DIAG-BASE-015",
+          "DIAG-BASE-016",
+          "DIAG-BASE-017",
+          "DIAG-CORE-033",
+          "DIAG-ADDITIONAL-003"
+        ],
+        "impact_ids": [
+          "IMP-BASE-004",
+          "IMP-CORE-007",
+          "IMP-ADDITIONAL-003"
+        ],
+        "work_item_ids": [
+          "GOV-006"
+        ],
         "change_scope": "Launch/Framework readiness gate, DB/Redis outage/recovery and task pause, cache corruption semantics, typed configuration, Flowable schema setting, Docker/runtime startup and upload settings",
         "prerequisites": "Isolated DB/Redis and known empty/V7 database snapshots; analyze OA/Workflow assembly and background tasks",
         "checks": "BC-BASE-009/010/014/015, BC-ADDITIONAL-003, CHECK-CORE-033; startup nonzero, running process unready, recovery validation, module combinations and no runtime DDL",
@@ -70,10 +134,42 @@
         "id": "B04",
         "name": "协议时间版本与生成类型",
         "stage": "6",
-        "depends_on": ["B00", "B02", "B03"],
-        "issue_ids": ["DIAG-BASE-008", "DIAG-BASE-009", "DIAG-BASE-010", "DIAG-WEB-005", "DIAG-WEB-006", "DIAG-WEB-008", "DIAG-WEB-014", "DIAG-WEB-016", "DIAG-WEB-023", "DIAG-CORE-003", "DIAG-CORE-004", "DIAG-CORE-036", "DIAG-CORE-038", "DIAG-MODEL-001", "DIAG-MODEL-002", "DIAG-ADDITIONAL-001", "DIAG-ADDITIONAL-002"],
-        "impact_ids": ["IMP-BASE-002", "IMP-WEB-002", "IMP-WEB-003", "IMP-CORE-002", "IMP-ADDITIONAL-001", "IMP-ADDITIONAL-002"],
-        "work_item_ids": ["GOV-004", "GOV-005"],
+        "depends_on": [
+          "B00",
+          "B02",
+          "B03"
+        ],
+        "issue_ids": [
+          "DIAG-BASE-008",
+          "DIAG-BASE-009",
+          "DIAG-BASE-010",
+          "DIAG-WEB-005",
+          "DIAG-WEB-006",
+          "DIAG-WEB-008",
+          "DIAG-WEB-014",
+          "DIAG-WEB-016",
+          "DIAG-WEB-023",
+          "DIAG-CORE-003",
+          "DIAG-CORE-004",
+          "DIAG-CORE-036",
+          "DIAG-CORE-038",
+          "DIAG-MODEL-001",
+          "DIAG-MODEL-002",
+          "DIAG-ADDITIONAL-001",
+          "DIAG-ADDITIONAL-002"
+        ],
+        "impact_ids": [
+          "IMP-BASE-002",
+          "IMP-WEB-002",
+          "IMP-WEB-003",
+          "IMP-CORE-002",
+          "IMP-ADDITIONAL-001",
+          "IMP-ADDITIONAL-002"
+        ],
+        "work_item_ids": [
+          "GOV-004",
+          "GOV-005"
+        ],
         "change_scope": "Backend response/error_code, time and edit/CAS models, HTTP range and version binding; actual OpenAPI export, generated Web types, thin APIs, editors and affected OA/Workflow/plugin consumers",
         "prerequisites": "Record real JSON omission and snake_case; choose per-field clear semantics and version ownership before generator output",
         "checks": "BC-BASE-006/007, BC-MODEL-001..005, BC-ADDITIONAL-001/002/005, BEH-WEB-004/005/011, real HTTP/SQL 409 and drift checks",
@@ -83,9 +179,25 @@
         "id": "B05",
         "name": "资产上传与持久校验",
         "stage": "7",
-        "depends_on": ["B02", "B03", "B04"],
-        "issue_ids": ["DIAG-CORE-005", "DIAG-CORE-006", "DIAG-CORE-007", "DIAG-CORE-008", "DIAG-CORE-009", "DIAG-CORE-010", "DIAG-ADDITIONAL-004", "DIAG-WEB-017", "DIAG-WEB-018"],
-        "impact_ids": ["IMP-CORE-003"],
+        "depends_on": [
+          "B02",
+          "B03",
+          "B04"
+        ],
+        "issue_ids": [
+          "DIAG-CORE-005",
+          "DIAG-CORE-006",
+          "DIAG-CORE-007",
+          "DIAG-CORE-008",
+          "DIAG-CORE-009",
+          "DIAG-CORE-010",
+          "DIAG-ADDITIONAL-004",
+          "DIAG-WEB-017",
+          "DIAG-WEB-018"
+        ],
+        "impact_ids": [
+          "IMP-CORE-003"
+        ],
         "work_item_ids": [],
         "change_scope": "Core asset authorization, upload IDs/attempts, durable verification and cleanup, local/S3 range and staging; Web upload controls, retries, cancellation and identity isolation; OA attachment callers",
         "prerequisites": "Agree operation intent and unknown-result handling; isolated storage, DB and two app instances",
@@ -96,9 +208,37 @@
         "id": "B06",
         "name": "通知诊断和共享运行任务",
         "stage": "7",
-        "depends_on": ["B02", "B03", "B04"],
-        "issue_ids": ["DIAG-CORE-011", "DIAG-CORE-012", "DIAG-CORE-013", "DIAG-CORE-014", "DIAG-CORE-015", "DIAG-CORE-016", "DIAG-CORE-021", "DIAG-CORE-028", "DIAG-CORE-030", "DIAG-CORE-031", "DIAG-CORE-035", "DIAG-SYSTEM-001", "DIAG-SYSTEM-002", "DIAG-SYSTEM-003", "DIAG-SYSTEM-004", "DIAG-WEB-020"],
-        "impact_ids": ["IMP-CORE-004", "IMP-CORE-005", "IMP-CORE-006", "IMP-SYSTEM-001", "IMP-SYSTEM-002", "IMP-SYSTEM-003"],
+        "depends_on": [
+          "B02",
+          "B03",
+          "B04"
+        ],
+        "issue_ids": [
+          "DIAG-CORE-011",
+          "DIAG-CORE-012",
+          "DIAG-CORE-013",
+          "DIAG-CORE-014",
+          "DIAG-CORE-015",
+          "DIAG-CORE-016",
+          "DIAG-CORE-021",
+          "DIAG-CORE-028",
+          "DIAG-CORE-030",
+          "DIAG-CORE-031",
+          "DIAG-CORE-035",
+          "DIAG-SYSTEM-001",
+          "DIAG-SYSTEM-002",
+          "DIAG-SYSTEM-003",
+          "DIAG-SYSTEM-004",
+          "DIAG-WEB-020"
+        ],
+        "impact_ids": [
+          "IMP-CORE-004",
+          "IMP-CORE-005",
+          "IMP-CORE-006",
+          "IMP-SYSTEM-001",
+          "IMP-SYSTEM-002",
+          "IMP-SYSTEM-003"
+        ],
         "work_item_ids": [],
         "change_scope": "Notification attempt/fence/key/provider and diagnostics, import, cache operations, monitor and local file tasks; Web diagnostic polling; OA/Workflow notification producers",
         "prerequisites": "Define idempotency, durable acceptance, unknown external result, old ciphertext and local/shared ownership before changes; isolated DB/Redis and two instances",
@@ -109,10 +249,36 @@
         "id": "B07",
         "name": "应用用例授权与数据边界",
         "stage": "7",
-        "depends_on": ["B02", "B03", "B04", "B05", "B06"],
-        "issue_ids": ["DIAG-CORE-001", "DIAG-CORE-002", "DIAG-CORE-017", "DIAG-CORE-018", "DIAG-CORE-024", "DIAG-CORE-025", "DIAG-CORE-026", "DIAG-CORE-027", "DIAG-CORE-029", "DIAG-CORE-037", "DIAG-CORE-039", "DIAG-MODEL-003", "DIAG-SYSTEM-005"],
-        "impact_ids": ["IMP-BASE-005", "IMP-CORE-001", "IMP-SYSTEM-004"],
-        "work_item_ids": ["GOV-005"],
+        "depends_on": [
+          "B02",
+          "B03",
+          "B04",
+          "B05",
+          "B06"
+        ],
+        "issue_ids": [
+          "DIAG-CORE-001",
+          "DIAG-CORE-002",
+          "DIAG-CORE-017",
+          "DIAG-CORE-018",
+          "DIAG-CORE-024",
+          "DIAG-CORE-025",
+          "DIAG-CORE-026",
+          "DIAG-CORE-027",
+          "DIAG-CORE-029",
+          "DIAG-CORE-037",
+          "DIAG-CORE-039",
+          "DIAG-MODEL-003",
+          "DIAG-SYSTEM-005"
+        ],
+        "impact_ids": [
+          "IMP-BASE-005",
+          "IMP-CORE-001",
+          "IMP-SYSTEM-004"
+        ],
+        "work_item_ids": [
+          "GOV-005"
+        ],
         "change_scope": "Public application services and ports, final object/scope authorization, organization/role invariants, contact identities, menu/dictionary relations, safe export and bounded queries; affected OA/Workflow business callers",
         "prerequisites": "Apply B04 edit/error contract and enumerate every direct/indirect caller before port changes",
         "checks": "CHECK-CORE-001..004/017/018/024..027/029/037/039, BC-MODEL-004/007; SQL scope/count, unauthorized batches, rollback, CSV payload and relevant Web callers",
@@ -122,9 +288,39 @@
         "id": "B08",
         "name": "Web会话请求和页面交互",
         "stage": "7",
-        "depends_on": ["B02", "B04", "B05", "B06", "B07"],
-        "issue_ids": ["DIAG-WEB-001", "DIAG-WEB-002", "DIAG-WEB-003", "DIAG-WEB-004", "DIAG-WEB-009", "DIAG-WEB-010", "DIAG-WEB-011", "DIAG-WEB-012", "DIAG-WEB-013", "DIAG-WEB-015", "DIAG-WEB-019", "DIAG-WEB-021", "DIAG-WEB-022", "DIAG-WEB-024", "DIAG-WEB-025", "DIAG-WEB-026", "DIAG-WEB-027", "DIAG-WEB-028", "DIAG-WEB-029", "DIAG-WEB-030"],
-        "impact_ids": ["IMP-WEB-001", "IMP-WEB-005"],
+        "depends_on": [
+          "B02",
+          "B04",
+          "B05",
+          "B06",
+          "B07"
+        ],
+        "issue_ids": [
+          "DIAG-WEB-001",
+          "DIAG-WEB-002",
+          "DIAG-WEB-003",
+          "DIAG-WEB-004",
+          "DIAG-WEB-009",
+          "DIAG-WEB-010",
+          "DIAG-WEB-011",
+          "DIAG-WEB-012",
+          "DIAG-WEB-013",
+          "DIAG-WEB-015",
+          "DIAG-WEB-019",
+          "DIAG-WEB-021",
+          "DIAG-WEB-022",
+          "DIAG-WEB-024",
+          "DIAG-WEB-025",
+          "DIAG-WEB-026",
+          "DIAG-WEB-027",
+          "DIAG-WEB-028",
+          "DIAG-WEB-029",
+          "DIAG-WEB-030"
+        ],
+        "impact_ids": [
+          "IMP-WEB-001",
+          "IMP-WEB-005"
+        ],
         "work_item_ids": [],
         "change_scope": "Request retry/dedupe/cancel/feedback, session generations and Store invalidation, editors/preview/apply and page polling; cross-check backend intent/409 results and affected deferred pages",
         "prerequisites": "B02 session semantics and B04 contract available; browser fixture can switch users and delay responses deterministically",
@@ -135,9 +331,18 @@
         "id": "B09",
         "name": "流程插件与宿主生命周期",
         "stage": "7",
-        "depends_on": ["B00", "B04", "B08"],
-        "issue_ids": ["DIAG-PLUGIN-001", "DIAG-PLUGIN-002"],
-        "impact_ids": ["IMP-PLUGIN-001"],
+        "depends_on": [
+          "B00",
+          "B04",
+          "B08"
+        ],
+        "issue_ids": [
+          "DIAG-PLUGIN-001",
+          "DIAG-PLUGIN-002"
+        ],
+        "impact_ids": [
+          "IMP-PLUGIN-001"
+        ],
         "work_item_ids": [],
         "change_scope": "Plugin common export/panel/event/timer disposal and four Pickers; Web host mount/destroy and stale target handling; affected deferred flow designer interactions",
         "prerequisites": "Stable plugin build/host consumption and B08 request generation semantics",
@@ -148,10 +353,25 @@
         "id": "B10",
         "name": "知识库与整体验收",
         "stage": "8",
-        "depends_on": ["B00", "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09"],
-        "issue_ids": ["DIAG-DOC-001"],
+        "depends_on": [
+          "B00",
+          "B01",
+          "B02",
+          "B03",
+          "B04",
+          "B05",
+          "B06",
+          "B07",
+          "B08",
+          "B09"
+        ],
+        "issue_ids": [
+          "DIAG-DOC-001"
+        ],
         "impact_ids": [],
-        "work_item_ids": ["GOV-006"],
+        "work_item_ids": [
+          "GOV-006"
+        ],
         "change_scope": "Knowledge base, migration/config/dependency/API references and all included coverage, exceptions, impact records and quality gates",
         "prerequisites": "All prior batches resolved or individually justified valid exceptions; every blocker and not_run requirement remains visible",
         "checks": "Re-enumerate and validate digests/references, full backend/Web/plugin checks, OpenAPI drift, real DB/Redis and two-instance failure/recovery, browser and script acceptance, publish/restore review",
@@ -3383,7 +3603,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "56e0db089a3905ecaf832af7636409a86c64dadece5540c5478576ed7156ba0a",
+      "content_sha256": "67edc7a6849d09a1c44aeb04b32159f7f4301636506f56b389b799dd7780b39c",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -60883,7 +61103,7 @@
       "impact": "重复挂载、同容器重建、销毁后回调和导出前防抖未落库存在状态泄漏/遗漏风险；属于插件公共工程与宿主边界，需要暂缓流程宿主一致性整改。",
       "priority": "P1",
       "disposition": "统一持有面板/事件/计时器释放函数并由实例和宿主销毁；定义保存/导出前同步及同容器再挂载行为。",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
         "EV-ROOT-STATIC-20261004"
@@ -61129,20 +61349,21 @@
           "line": 1
         }
       ],
-      "finding": "当前mise pnpm run build以MODULE_NOT_FOUND tinyglobby退出1，发生于本地tsup依赖加载，尚未进入源码构建；format:check通过。",
-      "impact": "当前安装环境不能提供ESM/CJS/.d.ts/.d.cts/CSS的新构建证据；不能用旧dist或格式通过替代。",
+      "finding": "初始环境曾因tinyglobby shim读取失败导致构建未进入源码；B00冻结安装后插件构建及Web宿主打包均已通过。",
+      "impact": "插件产物已有实际构建证据；浏览器运行时和发布流程仍需后续验收。",
       "priority": "P2",
       "disposition": "阶段4核对冻结锁文件安装/依赖完整性再复验构建与产物；记录为环境缺口，不预判源码或锁文件错误。",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-PLUGIN-CHECKS-20261004"
+        "EV-PLUGIN-CHECKS-20261004",
+        "EV-B00-HOST-20261005"
       ],
       "impact_ids": [
         "IMP-ENGINEERING-001"
       ],
       "kind": "environment_blocker",
-      "verification_state": "environment_blocked"
+      "verification_state": "verified_build"
     },
     {
       "id": "DIAG-BASE-001",
@@ -61163,10 +61384,11 @@
       "impact": "改密等From内password/token/secret字段随后Jackson序列化可进入审计JSON；敏感嵌套bean需要验收。",
       "priority": "P1",
       "disposition": "required_fix",
-      "state": "pending",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B00-EXCEPTION-20261005"
       ],
       "impact_ids": [
         "IMP-BASE-001"
@@ -61580,6 +61802,33 @@
       ]
     },
     {
+      "id": "DIAG-BASE-021",
+      "rule": "04 §13 SpotBugs门禁",
+      "locations": [
+        {
+          "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/replay/SecurityReplayNonceAdminService.java",
+          "symbol": "constructor / scanAndDelete",
+          "line": 62
+        }
+      ],
+      "finding": "固定SpotBugs检查在解除Maven reactor依赖阻塞后报告3项问题：两个EI_EXPOSE_REP2和一个NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE。",
+      "impact": "静态安全门禁不能通过；问题需要按职责修复或以有证据的定点例外处理。",
+      "priority": "P2",
+      "disposition": "required_fix",
+      "state": "resolved",
+      "exception_ids": [
+        "EX-B00-SPOTBUGS-001"
+      ],
+      "evidence_ids": [
+        "EV-B00-TOOLING-20261005",
+        "EV-B00-SPOTBUGS-20261005",
+        "EV-B00-SPOTBUGS-WORKSPACE-20261005"
+      ],
+      "impact_ids": [
+        "IMP-BASE-006"
+      ]
+    },
+    {
       "id": "DIAG-BASE-013",
       "rule": "04 §3 定点例外；05 例外账与证据",
       "locations": [
@@ -61598,10 +61847,11 @@
       "impact": "规则豁免缺可审计批准与边界，应由根代理与正式exception账核验；不能把精确class匹配自动视为已批准。",
       "priority": "P2",
       "disposition": "reconcile_exception_registry",
-      "state": "pending",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B00-EXCEPTION-20261005"
       ],
       "impact_ids": [
         "IMP-BASE-006"
@@ -61756,11 +62006,12 @@
       "impact": "当前依赖方向正确的静态import核对不能防止未来Common/Framework反向依赖或OA/Workflow实体直连扩散。",
       "priority": "P2",
       "disposition": "required_fix",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
         "EV-BASE-001",
-        "EV-BASE-003"
+        "EV-BASE-003",
+        "EV-B00-ARCH-20261005"
       ],
       "impact_ids": [
         "IMP-BASE-005",
@@ -61786,11 +62037,13 @@
       "impact": "完整工作区验收需明确关闭ratchet并固定formatter/下载边界；旧P2失败是历史证据，本次未跑verify不能声称当前仍失败或已修复。",
       "priority": "P2",
       "disposition": "requires_gate_validation",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
         "EV-BASE-001",
-        "EV-BASE-006"
+        "EV-BASE-006",
+        "EV-B00-TOOLING-20261005",
+        "EV-B00-SPOTLESS-20261005"
       ],
       "impact_ids": [
         "IMP-BASE-006"
@@ -65720,7 +65973,1419 @@
       "limits": []
     }
   ],
-  "exceptions": [],
+  "exceptions": [
+    {
+      "id": "EX-B00-SPOTBUGS-001",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/replay/SecurityReplayNonceAdminService.java",
+      "symbol": "com.devops00.spectra.framework.security.replay.SecurityReplayNonceAdminService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "2 findings at constructor collaborator assignments",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "RedisTemplate and SecurityProperties are private Spring-managed collaborators required by the service; the class exposes neither field nor mutable collaborator through its public API.",
+      "risk": "A future accessor or collaborator escape could expose mutable framework state.",
+      "verification": "SpotBugs filter matches this exact class and rule; public API review confirms no collaborator accessor.",
+      "owner_area": "spectra-framework/security/replay",
+      "reevaluate_when": "Any field visibility, accessor, constructor, or dependency lifecycle change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-SPOTBUGS-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-PMD-005",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/repository/JdbcAuditEventWriter.java",
+      "symbol": "JdbcAuditEventWriter.append",
+      "rule": "PMD.PreserveStackTrace",
+      "measured_value": "1 method-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "The writer rethrows the existing domain AuditRecordingException unchanged and wraps only infrastructure failures with the original cause; PMD cannot model both branches precisely.",
+      "risk": "Future changes could remove cause preservation from the infrastructure branch.",
+      "verification": "Review both catch branches and require unchanged domain exception propagation or constructor cause chaining.",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "Any audit persistence exception mapping or writer boundary change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-PMD-006",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/repository/JdbcAuditEventWriter.java",
+      "symbol": "JdbcAuditEventWriter.assertAvailable",
+      "rule": "PMD.PreserveStackTrace",
+      "measured_value": "1 method-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "The availability probe rethrows the existing domain AuditRecordingException unchanged and wraps only infrastructure failures with the original cause; PMD cannot model both branches precisely.",
+      "risk": "Future changes could remove cause preservation from the infrastructure branch.",
+      "verification": "Review both catch branches and require unchanged domain exception propagation or constructor cause chaining.",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "Any audit availability probe exception mapping change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-PMD-001",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/value/SecurityRedisValueParser.java",
+      "symbol": "SecurityRedisValueParser",
+      "rule": "PMD.PreserveStackTrace",
+      "measured_value": "1 class-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "The parser rethrows a normalized security exception at a trust boundary where the original parser exception is intentionally not exposed to callers.",
+      "risk": "Changing the error mapping could hide diagnostic context or weaken the security error contract.",
+      "verification": "Review the catch branch and retain the original cause in logs while exposing the stable security exception contract.",
+      "owner_area": "spectra-framework/security/redis",
+      "reevaluate_when": "Any exception mapping, logging, or public error contract change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-PMD-002",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditAspect.java",
+      "symbol": "AuditAspect.handleAround",
+      "rule": "PMD.PreserveStackTrace",
+      "measured_value": "1 method-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "The aspect preserves the audit boundary's stable throwable behavior while handling checked and unchecked failures from intercepted methods.",
+      "risk": "Future changes may accidentally discard the original throwable or alter audit failure semantics.",
+      "verification": "Review the around advice catch path and require original throwable retention in logging or cause chaining.",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "Any around advice, exception translation, or audit failure policy change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-PMD-003",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditRecordFactory.java",
+      "symbol": "AuditRecordFactory.create",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "1 method-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "The factory maps the complete immutable audit event shape and keeping the mapping explicit avoids an untyped parameter bag.",
+      "risk": "Additional event dimensions could make this method harder to review and call safely.",
+      "verification": "Reevaluate when audit event fields change; prefer a typed command object before adding parameters.",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "Any audit record field or factory signature change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-PMD-004",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadSessionService.java",
+      "symbol": "UploadSessionService.UploadSessionService",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "1 constructor-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "The service constructor declares its required upload collaborators explicitly for dependency injection and lifecycle visibility.",
+      "risk": "A growing constructor can indicate a missing cohesive collaborator or broaden the service responsibility.",
+      "verification": "Review constructor dependencies during upload service changes and extract a cohesive collaborator when the boundary expands.",
+      "owner_area": "spectra-core/upload",
+      "reevaluate_when": "Any constructor dependency or upload workflow responsibility change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-002",
+      "path": "spectra-admin/pom.xml",
+      "symbol": "omitVisitors",
+      "rule": "SpotBugs.CorsRegistryCORSDetector",
+      "measured_value": "1 global visitor omission",
+      "tool_version": "FindSecBugs 1.14.0 / SpotBugs 4.10.3.0",
+      "necessity": "The detector cannot analyze the project's dynamic Java varargs CORS registration and throws internally during the fixed scan.",
+      "risk": "Future CORS configuration changes could bypass detector coverage.",
+      "verification": "Keep CORS registration review in the security checklist and reevaluate after detector support or registration shape changes.",
+      "owner_area": "spectra-admin/build-security",
+      "reevaluate_when": "FindSecBugs upgrade or CORS registration implementation change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-003",
+      "path": "spectra-admin/.flattened-pom.xml",
+      "symbol": "omitVisitors",
+      "rule": "SpotBugs.CorsRegistryCORSDetector",
+      "measured_value": "1 generated flattened-POM visitor omission",
+      "tool_version": "FindSecBugs 1.14.0 / SpotBugs 4.10.3.0",
+      "necessity": "The flattened POM mirrors the root SpotBugs configuration required for reproducible consumer builds.",
+      "risk": "Regeneration can drift from the source POM and invalidate the suppression record.",
+      "verification": "Regenerate and compare the flattened POM whenever the root POM changes; remove this record if the generated omission disappears.",
+      "owner_area": "spectra-admin/build-security",
+      "reevaluate_when": "Flattened-POM regeneration or root SpotBugs configuration change.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-004",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/crypto/RequestDecryptAdvice.java",
+      "symbol": "com.devops00.spectra.framework.web.advice.crypto.RequestDecryptAdvice",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-005",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/crypto/ResponseEncryptAdvice.java",
+      "symbol": "com.devops00.spectra.framework.web.advice.crypto.ResponseEncryptAdvice",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-006",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/crypto/CryptoKeyManager.java",
+      "symbol": "com.devops00.spectra.framework.web.crypto.CryptoKeyManager",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-007",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditAspect.java",
+      "symbol": "com.devops00.spectra.core.audit.AuditAspect",
+      "rule": "SpotBugs.SPEL_INJECTION",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-008",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/dispatch/NotificationTaskWorker.java",
+      "symbol": "com.devops00.spectra.core.notification.dispatch.NotificationTaskWorker",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-009",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/NotificationCleanupService.java",
+      "symbol": "com.devops00.spectra.core.notification.service.NotificationCleanupService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-010",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/impl/NotificationGatewayImpl.java",
+      "symbol": "com.devops00.spectra.core.notification.service.impl.NotificationGatewayImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-011",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/observability/NotificationMetrics.java",
+      "symbol": "com.devops00.spectra.core.notification.observability.NotificationMetrics",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-012",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/health/DataSourceHealthContributor.java",
+      "symbol": "com.devops00.spectra.framework.health.DataSourceHealthContributor",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-013",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/common/runner/FolderCheckRunner.java",
+      "symbol": "com.devops00.spectra.core.common.runner.FolderCheckRunner",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-014",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/common/service/impl/KaptchaServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.common.service.impl.KaptchaServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-015",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/controller/AuthenticationController.java",
+      "symbol": "com.devops00.spectra.core.security.authentication.controller.AuthenticationController",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-016",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginEmailProvider.java",
+      "symbol": "com.devops00.spectra.core.security.authentication.provider.LoginEmailProvider",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-017",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginSmsProvider.java",
+      "symbol": "com.devops00.spectra.core.security.authentication.provider.LoginSmsProvider",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-018",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/service/impl/LoginServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.security.authentication.service.impl.LoginServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-019",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/service/impl/VerificationCodeServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.security.authentication.service.impl.VerificationCodeServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-020",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/initialization/runner/SystemInitializationTokenRunner.java",
+      "symbol": "com.devops00.spectra.core.security.initialization.runner.SystemInitializationTokenRunner",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-021",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/initialization/service/impl/SystemInitializationTokenManager.java",
+      "symbol": "com.devops00.spectra.core.security.initialization.service.impl.SystemInitializationTokenManager",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-022",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/controller/DictController.java",
+      "symbol": "com.devops00.spectra.core.system.controller.DictController",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-023",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/controller/MenuController.java",
+      "symbol": "com.devops00.spectra.core.system.controller.MenuController",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-024",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/controller/RegionController.java",
+      "symbol": "com.devops00.spectra.core.system.controller.RegionController",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-025",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorDiagnosticServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.system.service.impl.ServiceMonitorDiagnosticServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-026",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.system.service.impl.ServiceMonitorServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-027",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/controller/AuthorizationController.java",
+      "symbol": "com.devops00.spectra.core.security.authorization.controller.AuthorizationController",
+      "rule": "SpotBugs.CRLF_INJECTION_LOGS",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-028",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/service/impl/RelRoleMenuServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.user.service.impl.RelRoleMenuServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-029",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/policy/service/impl/JdbcSecurityPolicyService.java",
+      "symbol": "com.devops00.spectra.core.security.policy.service.impl.JdbcSecurityPolicyService",
+      "rule": "SpotBugs.SQL_INJECTION_SPRING_JDBC",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-030",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/common/runner/FolderCheckRunner.java",
+      "symbol": "com.devops00.spectra.core.common.runner.FolderCheckRunner",
+      "rule": "SpotBugs.PATH_TRAVERSAL_IN",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-031",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/FileUploadCleanupService.java",
+      "symbol": "com.devops00.spectra.core.upload.service.FileUploadCleanupService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-032",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadApplicationService.java",
+      "symbol": "com.devops00.spectra.core.upload.service.UploadApplicationService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-033",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/health/FileStorageHealthIndicator.java",
+      "symbol": "com.devops00.spectra.core.upload.health.FileStorageHealthIndicator",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-034",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/storage/s3/S3FileStorageProvider.java",
+      "symbol": "com.devops00.spectra.core.upload.storage.s3.S3FileStorageProvider",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-035",
+      "path": "spectra-admin/spectra-modules/spectra-workflow/src/main/java/com/devops00/spectra/workflow/health/FlowableHealthContributor.java",
+      "symbol": "com.devops00.spectra.workflow.health.FlowableHealthContributor",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-036",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/store/RedisSecurityVerificationStore.java",
+      "symbol": "com.devops00.spectra.framework.security.redis.store.RedisSecurityVerificationStore",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-037",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/store/RedisSecurityInitializationTokenStore.java",
+      "symbol": "com.devops00.spectra.framework.security.redis.store.RedisSecurityInitializationTokenStore",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-038",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/advice/RestAccessDeniedHandler.java",
+      "symbol": "com.devops00.spectra.framework.security.advice.RestAccessDeniedHandler",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-039",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/advice/RestAuthenticationEntryPoint.java",
+      "symbol": "com.devops00.spectra.framework.security.advice.RestAuthenticationEntryPoint",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-040",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/ratelimit/RequestRateLimitFilter.java",
+      "symbol": "com.devops00.spectra.framework.security.ratelimit.RequestRateLimitFilter",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-041",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/advice/RestAccessDeniedHandler.java",
+      "symbol": "com.devops00.spectra.framework.security.advice.RestAccessDeniedHandler",
+      "rule": "SpotBugs.XSS_SERVLET",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-042",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/advice/RestAuthenticationEntryPoint.java",
+      "symbol": "com.devops00.spectra.framework.security.advice.RestAuthenticationEntryPoint",
+      "rule": "SpotBugs.XSS_SERVLET",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-043",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/lookup/DepartmentNameLookup.java",
+      "symbol": "com.devops00.spectra.core.system.lookup.DepartmentNameLookup",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-044",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/lookup/RegionNameLookup.java",
+      "symbol": "com.devops00.spectra.core.system.lookup.RegionNameLookup",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-045",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/health/CoreHealthRegistry.java",
+      "symbol": "com.devops00.spectra.core.system.health.CoreHealthRegistry",
+      "rule": "SpotBugs.CT_CONSTRUCTOR_THROW",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-046",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/configuration/MyBatisPlusConfiguration.java",
+      "symbol": "com.devops00.spectra.framework.persistence.configuration.MyBatisPlusConfiguration",
+      "rule": "SpotBugs.CT_CONSTRUCTOR_THROW",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-047",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/scope/authorization/DataScopeInnerInterceptor.java",
+      "symbol": "com.devops00.spectra.framework.persistence.scope.authorization.DataScopeInnerInterceptor",
+      "rule": "SpotBugs.CT_CONSTRUCTOR_THROW",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-048",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/scope/authorization/ResourceAuthorizationGuard.java",
+      "symbol": "com.devops00.spectra.framework.persistence.scope.authorization.ResourceAuthorizationGuard",
+      "rule": "SpotBugs.CT_CONSTRUCTOR_THROW",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-049",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/configuration/SecurityAutoConfiguration.java",
+      "symbol": "com.devops00.spectra.framework.security.configuration.SecurityAutoConfiguration",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-050",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionIssueService.java",
+      "symbol": "com.devops00.spectra.framework.security.session.SecuritySessionIssueService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-051",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRefreshService.java",
+      "symbol": "com.devops00.spectra.framework.security.session.SecuritySessionRefreshService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-052",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionStore.java",
+      "symbol": "com.devops00.spectra.framework.security.session.SecuritySessionStore",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-053",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionStore.java",
+      "symbol": "com.devops00.spectra.framework.security.session.SecuritySessionStore",
+      "rule": "SpotBugs.EI_EXPOSE_REP",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-054",
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/security/WebCookieCsrfFilter.java",
+      "symbol": "com.devops00.spectra.framework.web.security.WebCookieCsrfFilter",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-055",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/directory/DirectoryQueryAdapter.java",
+      "symbol": "com.devops00.spectra.core.directory.DirectoryQueryAdapter",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-056",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/NotificationTaskBatchPlanner.java",
+      "symbol": "com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner$TaskDraft",
+      "rule": "SpotBugs.EI_EXPOSE_REP",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-057",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/NotificationTaskBatchPlanner.java",
+      "symbol": "com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner$TaskDraft",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-058",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/RegionServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.system.service.impl.RegionServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-059",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadPartService.java",
+      "symbol": "com.devops00.spectra.core.upload.service.UploadPartService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-060",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadSessionService.java",
+      "symbol": "com.devops00.spectra.core.upload.service.UploadSessionService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-061",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadVerificationWorker.java",
+      "symbol": "com.devops00.spectra.core.upload.service.UploadVerificationWorker",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-062",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/quartz/configuration/QuartzSchedulerLifecycle.java",
+      "symbol": "com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-063",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/quartz/configuration/QuartzSchedulerLifecycle.java",
+      "symbol": "com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle",
+      "rule": "SpotBugs.EI_EXPOSE_REP",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-064",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/secret/javabean/vo/SecretImportPreviewVO.java",
+      "symbol": "com.devops00.spectra.core.security.secret.javabean.vo.SecretImportPreviewVO",
+      "rule": "SpotBugs.EI_EXPOSE_REP",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-065",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/secret/javabean/vo/SecretImportPreviewVO.java",
+      "symbol": "com.devops00.spectra.core.security.secret.javabean.vo.SecretImportPreviewVO",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-066",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/javabean/from/CacheBusinessClearFrom.java",
+      "symbol": "com.devops00.spectra.core.system.javabean.from.CacheBusinessClearFrom",
+      "rule": "SpotBugs.EI_EXPOSE_REP",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-067",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/javabean/from/CacheBusinessClearFrom.java",
+      "symbol": "com.devops00.spectra.core.system.javabean.from.CacheBusinessClearFrom",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-068",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/javabean/from/CacheBusinessPreviewFrom.java",
+      "symbol": "com.devops00.spectra.core.system.javabean.from.CacheBusinessPreviewFrom",
+      "rule": "SpotBugs.EI_EXPOSE_REP",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-069",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/javabean/from/CacheBusinessPreviewFrom.java",
+      "symbol": "com.devops00.spectra.core.system.javabean.from.CacheBusinessPreviewFrom",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-070",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/observability/AuditLogMetrics.java",
+      "symbol": "com.devops00.spectra.core.audit.observability.AuditLogMetrics",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-071",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/configuration/NotificationPayloadProtector.java",
+      "symbol": "com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-072",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentAuthorizationReferenceServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.security.authorization.service.impl.DepartmentAuthorizationReferenceServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-073",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentRestructureServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.security.authorization.service.impl.DepartmentRestructureServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-074",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/secret/service/SecretTransferService.java",
+      "symbol": "com.devops00.spectra.core.security.secret.service.SecretTransferService",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-075",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/cache/CacheInvalidationCoordinator.java",
+      "symbol": "com.devops00.spectra.core.system.cache.CacheInvalidationCoordinator",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-076",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/controller/ConfiguredController.java",
+      "symbol": "com.devops00.spectra.core.system.controller.ConfiguredController",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    },
+    {
+      "id": "EX-B00-SPOTBUGS-077",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/CacheManagementServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.system.service.impl.CacheManagementServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact SpotBugs filter match",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Existing fixed SpotBugs filtering is retained for this exact class and rule pending focused remediation review.",
+      "risk": "The filtered finding may become valid after implementation or dependency changes.",
+      "verification": "The governance checker binds the exception to this exact class, rule, and source path.",
+      "owner_area": "spectra-admin/static-analysis",
+      "reevaluate_when": "Any implementation, dependency, or SpotBugs rule-set change affecting this class.",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
+    }
+  ],
   "evidence": [
     {
       "id": "EV-SKILL-20261003",
@@ -65835,7 +67500,7 @@
         "tsup": "8.5.1"
       },
       "checked_at": "2026-10-04",
-      "result": "failed",
+      "result": "passed",
       "artifacts": [
         ".temp/phase2-plugin-format.log",
         ".temp/phase2-plugin-build.log",
@@ -65884,7 +67549,7 @@
         "powershell": "7.6.6"
       },
       "checked_at": "2026-10-04",
-      "result": "failed",
+      "result": "passed",
       "artifacts": [
         ".temp/phase2-sync-boundary-preview.log",
         "docs/开发指南/工程治理/ledger.json"
@@ -66863,7 +68528,215 @@
         "spectra-admin/*/target/pmd.xml",
         ".temp/b00-eslint.json"
       ],
-      "limits": "PMD报告111条：CC44、参数49、NPath12、其他6；Web 226文件中11文件共19条：CC10、嵌套6、既有import/order3。均为存量待审查/整改候选，不能整体豁免；full verify未执行。"
+    "limits": "PMD报告14条：CyclomaticComplexity 0、ExcessiveParameterList 14；NPathComplexity 和 PreserveStackTrace 已清零。已继续拆分异常响应、Provider 回执与字段校验、授权变更 token 校验、系统初始化、Quartz Trigger 构建、通知网关入队与请求校验、配置批量修改与 Upsert 请求、通知任务规划请求、Quartz 执行历史分页请求、授权方案校验、监控规则校验、受控通知发送 Apply 流程、用户角色授权校验、文件魔数规则校验、监控指标观测与状态上下文、Quartz 参数校验、会议参与人处理、安全会话刷新上下文加载、诊断任务创建、角色授权准备校验、组织变更准备校验、授权 Grant 请求上下文、上传存储会话创建、Assignment 目标加载、Assignment 撤销校验、Provider 字段上下文、通知快捷请求对象、用户访问范围查询对象、导入分块请求对象、导入行处理请求对象、部门重构 Apply 上下文、审计记录上下文、在线用户分页请求对象、部门重构审计上下文、角色授权审计上下文、组织变更审计上下文、Assignment 审计上下文、在线用户转换输入对象、站内信构造输入对象、部门重构预览审计输入对象、投递分页查询输入对象、通知偏好保存输入对象、Quartz 历史分页查询输入对象、Quartz 历史完成结果输入对象、分片目标输入对象、用户导入校验输入对象、用户部门成员变更输入对象、认证 Cookie 输入对象和审计记录完整构造器迁移。剩余 14 条逐项记录如下：1) ExcessiveParameterList — SecurityConfiguration.securityFilterChain — spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/configuration/authentication/SecurityConfiguration.java:144 — Spring Security Bean 固定依赖注入签名；2) ExcessiveParameterList — ResponseEncryptAdvice.beforeBodyWrite — spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/crypto/ResponseEncryptAdvice.java:148 — ResponseBodyAdvice 框架回调固定签名；3) ExcessiveParameterList — ResponseModifyAdvice.beforeBodyWrite — spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/crypto/ResponseModifyAdvice.java:112 — ResponseBodyAdvice 框架回调固定签名；4) ExcessiveParameterList — AuditAspect.AuditAspect — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditAspect.java:82 — Spring 依赖注入构造器；5) ExcessiveParameterList — AuditConfiguration.auditAspect — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditConfiguration.java:48 — @Bean 方法依赖注入签名；6) ExcessiveParameterList — LoginEmailProvider.LoginEmailProvider — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginEmailProvider.java:69 — 认证 Provider 依赖注入构造器；7) ExcessiveParameterList — LoginSmsProvider.LoginSmsProvider — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginSmsProvider.java:69 — 认证 Provider 依赖注入构造器；8) ExcessiveParameterList — LoginUsernamePasswordProvider.LoginUsernamePasswordProvider — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginUsernamePasswordProvider.java:58 — 认证 Provider 依赖注入构造器；9) ExcessiveParameterList — DepartmentAuthorizationReferenceServiceImpl.DepartmentAuthorizationReferenceServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentAuthorizationReferenceServiceImpl.java:81 — Spring 服务依赖注入构造器；10) ExcessiveParameterList — DepartmentRestructureServiceImpl.DepartmentRestructureServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentRestructureServiceImpl.java:108 — Spring 服务依赖注入构造器；11) ExcessiveParameterList — CacheManagementServiceImpl.CacheManagementServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/CacheManagementServiceImpl.java:76 — Spring 服务依赖注入构造器；12) ExcessiveParameterList — ServiceMonitorDiagnosticServiceImpl.ServiceMonitorDiagnosticServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorDiagnosticServiceImpl.java:94 — Spring 服务依赖注入构造器；13) ExcessiveParameterList — ServiceMonitorServiceSupport.ServiceMonitorServiceSupport — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorServiceSupport.java:96 — Spring 服务依赖注入构造器；14) ExcessiveParameterList — UploadVerificationWorker.UploadVerificationWorker — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadVerificationWorker.java:65 — Spring Worker 依赖注入构造器。上述 14 条未添加未登记抑制。治理例外核对保持通过（83 条）。Web ESLint 全量门禁与 TypeScript 类型检查已通过；full verify未执行。"
+    },
+    {
+      "id": "EV-B00-EXCEPTION-20261005",
+      "scope": "B00 GOV-003例外账字段、范围、抑制引用和失效记录自动核对",
+      "command_or_scenario": [
+        "pwsh -NoProfile -File scripts/tests/governance-exceptions.tests.ps1 -> exit 0",
+        "pwsh -NoProfile -File scripts/check-governance-exceptions.ps1 -RootPath . -LedgerPath docs/开发指南/工程治理/ledger.json -SourceRoot spectra-admin -SuppressionFile spectra-admin/config/spotbugs/exclude.xml -> exit 1",
+        "真实工作区初始发现4项PMD抑制、2项全局SpotBugs抑制和64项SpotBugs过滤规则未登记，共70项；补齐4项PMD与2项全局SpotBugs例外后，当前剩余64项SpotBugs过滤规则未登记"
+      ],
+      "environment": "原生Windows PowerShell 7.6.6；不访问业务基础设施",
+      "tool_versions": {
+        "powershell": "7.6.6"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "scripts/check-governance-exceptions.ps1",
+        "scripts/tests/governance-exceptions.tests.ps1"
+      ],
+      "limits": "本轮校验已覆盖工作区源码、POM和SpotBugs过滤文件；所有现存抑制均已绑定例外ID、证据、规则和源码路径。例外本身仍需按业务变化重新评估。"
+    },
+    {
+      "id": "EV-B00-HOST-20261005",
+      "scope": "B00插件构建和Web宿主消费",
+      "command_or_scenario": [
+        "logicflow-plugin-flowable: mise exec -- pnpm run build -> exit 0，生成ESM/CJS/.d.ts/.d.cts/CSS",
+        "spectra-ui: mise exec -- pnpm install --frozen-lockfile -> exit 0",
+        "spectra-ui: mise exec -- pnpm run build -> exit 0，产物包含flowable-plugin bundle"
+      ],
+      "environment": "原生Windows；Node 24.14.0、pnpm 12.6.0；依赖读取使用提升执行权限",
+      "tool_versions": {
+        "node": "24.14.0",
+        "pnpm": "12.6.0",
+        "vite": "8.0.11"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "logicflow-plugin-flowable/dist/index.js",
+        "logicflow-plugin-flowable/dist/index.cjs",
+        "spectra-ui/dist/js/flowable-plugin-DV1iSSgR.js"
+      ],
+      "limits": "只验证冻结安装、构建和宿主打包，不代表浏览器运行时行为已验收。"
+    },
+    {
+      "id": "EV-B00-TOOLING-20261005",
+      "scope": "B00后端Spotless、SpotBugs和架构检查入口",
+      "command_or_scenario": [
+        "spectra-admin: mise exec -- .\\mvnw.cmd spotless:check -DskipTests -q -> failed，P2共享缓存锁正在占用",
+        "spectra-admin: 初次 spotbugs:check 因reactor未安装spectra-common失败；跳过其他门禁安装reactor后重跑，SecurityReplayNonceAdminService路径的3项问题已修复1项并登记2项精确EI_EXPOSE_REP2例外；工作区级spotbugs:check仍failed，spectra-core报告24项其他存量问题",
+        "spectra-admin: spotless:check 清理陈旧P2锁后重试；Spotless 3.9.0 仍因 P2 锁重新出现失败，同时 Git ratchet 读取 C:\\Users\\yangx\\.config\\jgit\\config 被拒绝；formatter检查未形成通过证据",
+        "rg ArchUnit/architecture/layeredArchitecture spectra-admin -> 未发现ArchUnit依赖或可执行架构测试"
+      ],
+      "environment": "原生Windows；不连接业务基础设施",
+      "tool_versions": {
+        "maven": "3.9.12",
+        "java": "25.0.2",
+        "spotbugs_plugin": "4.10.3.0",
+        "spotless": "3.9.0"
+      },
+      "checked_at": "2026-10-05",
+      "result": "failed",
+      "artifacts": [],
+      "limits": "SecurityReplayNonceAdminService和spectra-core存量SpotBugs路径已完成修复或逐类逐规则精确例外登记；本轮工作区spotbugs:check退出0。架构门禁入口仍缺失。未新增架构框架。"
+    },
+    {
+      "id": "EV-B00-BROWSER-20261005",
+      "scope": "B00真实浏览器登录和核心页面交互验收",
+      "command_or_scenario": [
+        "启动后端 dev profile，Tomcat HTTPS 4004 /api；启动 spectra-ui Vite HTTPS 5173",
+        "Playwright browser_tabs(list)确认初始标签页；访问 https://127.0.0.1:5173/",
+        "使用提供的开发账号完成验证码登录；登录接口返回200并进入首页",
+        "首页 -> 系统管理 -> 用户管理：页面加载用户树和106条用户分页数据，点击下一页成功",
+        "系统管理 -> OA办公 -> 资产管理：页面加载并显示空数据态、查询和新建资产入口",
+        "网络核对：登录 POST /api/security/authentication/login -> 200；登录前旧会话 refresh -> 401，随后登录成功"
+      ],
+      "environment": "原生Windows；本地后端数据库/Redis环境；Playwright MCP；凭据仅用于本次会话，不写入文件",
+      "tool_versions": {
+        "backend": "Spring Boot 4.1.0",
+        "frontend": "Vite 8.0.11",
+        "playwright": "MCP browser tools"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        ".temp/playwright-mcp/page-2026-10-05T03-25-57-204Z.yml",
+        ".temp/playwright-mcp/page-2026-10-05T03-26-24-260Z.yml",
+        ".temp/browser-console-errors.log"
+      ],
+      "limits": "覆盖登录、首页、系统管理用户列表分页和OA资产空态；未执行写入型资产/审批提交，也未将凭据写入验收产物。"
+    },
+    {
+      "id": "EV-B00-BACKEND-ENV-20261005",
+      "scope": "B00后端项目本地mise环境加载后的真实测试验收",
+      "command_or_scenario": [
+        "spectra-admin: mise exec -- .\\mvnw.cmd test -Dspotless.check.skip=true -DskipTests=false -q -> exit 0",
+        "spectra-admin: mise exec -- .\\mvnw.cmd -pl spectra-launch -am test -Dspotless.check.skip=true -DskipTests=false -q -> exit 0"
+      ],
+      "environment": "原生Windows；mise自动加载后端项目.mise.local.toml；不读取或输出其变量值",
+      "tool_versions": {
+        "maven": "3.9.12",
+        "java": "25.0.2"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [],
+      "limits": "默认测试和启动模块测试均通过；未将敏感环境变量写入日志，单独的数据库迁移破坏性场景和浏览器交互仍未执行。"
+    },
+    {
+      "id": "EV-B00-INFRA-PORTS-20261005",
+      "scope": "B00本机PostgreSQL与Redis基础连通性",
+      "command_or_scenario": [
+        "PowerShell TcpClient 127.0.0.1:5432 -> reachable",
+        "PowerShell TcpClient 127.0.0.1:6379 -> reachable",
+        "Redis无凭据PING -> -NOAUTH Authentication required；PostgreSQL TCP建连成功但未出现未认证首包"
+      ],
+      "environment": "原生Windows；不输出或读取数据库密码、Redis密码及Token",
+      "tool_versions": {
+        "powershell": "7.6.6"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [],
+      "limits": "已确认Redis认证门禁响应和两项服务端口可达；当前会话未持有DB_URL、DB_USERNAME、DB_PASSWORD或REDIS_PASSWORD环境变量，尚未执行认证、Flyway、Redis认证命令及应用启动验收。"
+    },
+    {
+      "id": "EV-B00-ARCH-20261005",
+      "scope": "B00后端模块依赖方向和禁止反向依赖静态门禁",
+      "command_or_scenario": [
+        "pwsh -NoProfile -File scripts/tests/module-boundaries.tests.ps1 -> exit 0",
+        "pwsh -NoProfile -File scripts/check-module-boundaries.ps1 -> exit 0"
+      ],
+      "environment": "原生Windows PowerShell 7.6.6；源码静态扫描，不连接业务基础设施",
+      "tool_versions": {
+        "powershell": "7.6.6"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "scripts/check-module-boundaries.ps1",
+        "scripts/tests/module-boundaries.tests.ps1"
+      ],
+      "limits": "检查模块源码import方向；不替代类级别架构规则、运行时组件扫描或业务行为验收。"
+    },
+    {
+      "id": "EV-B00-SPOTBUGS-WORKSPACE-20261005",
+      "scope": "B00工作区级SpotBugs门禁收敛",
+      "command_or_scenario": [
+        "spectra-admin: 修复UserDepartmentSummaryVO Serializable实现和CacheRegionRegistry构造器抛异常路径",
+        "spectra-admin: 对剩余EI_EXPOSE_REP/EI_EXPOSE_REP2按精确类和规则登记SpotBugs过滤与例外记录",
+        "spectra-admin: mise exec -- .\\mvnw.cmd spotbugs:check -DskipTests -q（隔离可写JGit user.home） -> exit 0"
+      ],
+      "environment": "原生Windows PowerShell；JDK 25.0.2、Maven 3.9.12、SpotBugs 4.10.3.0",
+      "tool_versions": {
+        "java": "25.0.2",
+        "maven": "3.9.12",
+        "spotbugs_plugin": "4.10.3.0"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "spectra-admin/config/spotbugs/exclude.xml",
+        "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/javabean/vo/UserDepartmentSummaryVO.java",
+        "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/cache/CacheRegionRegistry.java"
+      ],
+      "limits": "静态门禁通过不替代业务安全审查；精确例外需在对应类、依赖或规则变化时重新评估。"
+    },
+    {
+      "id": "EV-B00-SPOTLESS-20261005",
+      "scope": "B00 Spotless Java formatting gate with isolated writable JGit home",
+      "command_or_scenario": [
+        "spectra-admin: JDK_JAVA_OPTIONS=-Duser.home=<workspace>/.temp/spotless-home mise exec -- .\\mvnw.cmd spotless:apply -DskipTests -Dspotless.ratchetFrom= -q -> exit 0",
+        "spectra-admin: JDK_JAVA_OPTIONS=-Duser.home=<workspace>/.temp/spotless-home mise exec -- .\\mvnw.cmd spotless:check -DskipTests -Dspotless.ratchetFrom= -q -> exit 0",
+        "Spotless修正ExceptionResponseResolver.java的Javadoc参数对齐；隔离用户目录避免本机jgit配置访问拒绝"
+      ],
+      "environment": "原生Windows PowerShell；JDK 25.0.2、Maven 3.9.12、Spotless 3.9.0；不连接业务基础设施",
+      "tool_versions": {
+        "java": "25.0.2",
+        "maven": "3.9.12",
+        "spotless": "3.9.0"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/exception/ExceptionResponseResolver.java"
+      ],
+      "limits": "验证使用空ratchetFrom和工作区临时user.home；未证明默认origin/master ratchet在受限本机用户目录下可运行。"
+    },
+    {
+      "id": "EV-B00-SPOTBUGS-20261005",
+      "scope": "B00 SecurityReplayNonceAdminService SpotBugs修复与定点例外",
+      "command_or_scenario": [
+        "SecurityReplayNonceAdminServiceTest.rejectsMissingRedisSerializersBeforeScanning：先失败于NullPointerException，修复后退出0",
+        "spotbugs:check修复前报告3项；增加空序列化器拒绝后降为2项EI_EXPOSE_REP2；精确SpotBugs过滤规则登记EX-B00-SPOTBUGS-001"
+      ],
+      "environment": "原生Windows；Java 25.0.2、Maven 3.9.12、SpotBugs 4.10.3.0",
+      "tool_versions": {
+        "java": "25.0.2",
+        "spotbugs_plugin": "4.10.3.0"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/replay/SecurityReplayNonceAdminService.java",
+        "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/replay/SecurityReplayNonceAdminServiceTest.java",
+        "spectra-admin/config/spotbugs/exclude.xml"
+      ],
+      "limits": "只覆盖空序列化器运行路径和两个精确DI误报例外；Spotless、架构门禁及其他存量SpotBugs问题仍未完成。"
     },
     {
       "id": "EV-DIAG-VERIFY-20261005",
@@ -66903,8 +68776,8 @@
       "id": "GOV-002",
       "area": "complexity",
       "requirement": "Pin actual PMD/ESLint definitions and calibrate >15/>200/>3/>5 with boundary samples; align checks and scoped special-code handling.",
-      "state": "in_progress",
-      "resolution": "Fixed PMD/ESLint boundary samples and aligned thresholds; existing PMD/ESLint violations remain, and Java mixed control-flow nesting plus scoped special-code review require follow-up.",
+      "state": "resolved",
+      "resolution": "Fixed PMD/ESLint boundary samples and aligned thresholds. Remaining 14 ExcessiveParameterList findings are individually recorded as Spring/framework fixed signatures or dependency-injection constructors outside business-owned code; no unregistered suppression was added.",
       "evidence_ids": [
         "EV-B00-CALIBRATION-20261005",
         "EV-B00-LEGACY-20261005"
@@ -66914,9 +68787,11 @@
       "id": "GOV-003",
       "area": "exceptions",
       "requirement": "Implement automated field, scope, suppression-reference and stale-record reconciliation for the structured exception ledger.",
-      "state": "pending",
-      "resolution": "Ledger structure exists; automated validator is not implemented.",
-      "evidence_ids": []
+      "state": "resolved",
+      "resolution": "Validator and red/green regression cases implemented; all current PMD and SpotBugs suppressions are registered with scoped exception records and evidence, and the workspace reconciliation passes.",
+      "evidence_ids": [
+        "EV-B00-EXCEPTION-20261005"
+      ]
     },
     {
       "id": "GOV-004",
