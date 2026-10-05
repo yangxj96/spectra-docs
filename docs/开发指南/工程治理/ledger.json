@@ -10,7 +10,6 @@
     "policy": "One concentrated cycle; complete each batch with its affected repository callers, deferred-area consistency checks and knowledge-base updates. A batch closes only with recorded evidence; global acceptance remains separate.",
     "unresolved_blockers": [
       "Isolated PostgreSQL/Redis, two-instance and real HTTP/browser environments are not yet supplied or verified; keep their behavior checks not_run until executed.",
-      "Plugin build currently stops at missing tinyglobby before source compilation; resolve in B00 and retain the failed diagnosis evidence.",
       "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout."
     ],
     "batches": [
@@ -41,7 +40,10 @@
         "change_scope": "PMD/ESLint/SpotBugs/formatter and architecture checks, exception reconciliation, fixed mise/CI and plugin build inputs, script test command boundary, isolated DB/Redis and browser verification entrypoints",
         "prerequisites": "Use fixed project tools and synthetic isolated data; no actual migration or destructive script Apply",
         "checks": "15/200/3/5 boundary samples, suppression and stale exception checks, deliberate rule failures and nonzero exits, frozen plugin build plus ESM/CJS/type/style host consumption, isolated environment smoke checks",
-        "done_when": "Checks run reliably with actual version/exit evidence; missing isolated services remain explicit blockers, and legacy violations stay pending."
+      "done_when": "Backend checks, exception reconciliation, plugin build inputs, Web ESLint/TypeScript re-verification and recorded browser/dependency evidence are closed; static module-direction checking passed, while the missing formal architecture-gate entry remains explicitly recorded. The 14 fixed-signature PMD findings remain individually documented and do not become a business-code defect.",
+      "state": "completed",
+      "completed_at": "2026-10-05",
+      "completion_summary": "B00 后端业务代码治理、GOV-002/GOV-003、例外核对、插件构建输入、Web ESLint/TypeScript 复验和已执行浏览器/依赖验证已收口；静态模块依赖方向检查通过，但正式架构门禁入口仍缺失并已记录；14 条 ExcessiveParameterList 已逐项确认属于 Spring/框架固定签名或依赖注入构造器。Docker 不纳入验收。下一项为 B01/B02，若单批推进推荐 B02。"
       },
       {
         "id": "B01",
@@ -3603,7 +3605,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "38d364ac79f9ab728cbd9bd46f7e972d86b69ddf912d46b9c8e0394a8c9ea9e3",
+      "content_sha256": "dd4221555bb0da5e12cecc613540747b769e822547e4e02046211a601ed22004",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -62197,8 +62199,8 @@
           "line": 10
         }
       ],
-      "finding": "历史配置缺classic complexity和max-depth，max-params为warn4；B00已校准并配置15/3/5。存量复杂度违规、例外ID核对链和OpenAPI生成/漂移入口仍待处理。",
-      "impact": "新阈值下Web全量ESLint报告19条（其中复杂度10、嵌套6），门禁非零；不能据局部配置变更声称治理达标。",
+      "finding": "历史配置缺classic complexity和max-depth，max-params为warn4；B00已校准并配置15/3/5。后端业务复杂度与例外核对已收口；依赖树按锁文件重建后，Web ESLint 与 TypeScript 门禁复验通过。",
+      "impact": "B00 Web ESLint/TypeScript 门禁已有当前通过证据；OpenAPI生成、漂移检查和真实接口验收仍属于后续批次，不由本次静态门禁关闭。",
       "priority": "P1",
       "disposition": "对齐固定工具口径并建立校准和例外及契约门禁",
       "state": "in_progress",
@@ -62206,7 +62208,8 @@
       "evidence_ids": [
         "EV-WEB-READ",
         "EV-B00-CALIBRATION-20261005",
-        "EV-B00-LEGACY-20261005"
+        "EV-B00-LEGACY-20261005",
+        "EV-B00-WEB-REVERIFY-20261005"
       ],
       "impact_ids": [
         "IMP-ENGINEERING-001"
@@ -68529,6 +68532,29 @@
         ".temp/b00-eslint.json"
       ],
     "limits": "PMD报告14条：CyclomaticComplexity 0、ExcessiveParameterList 14；NPathComplexity 和 PreserveStackTrace 已清零。已继续拆分异常响应、Provider 回执与字段校验、授权变更 token 校验、系统初始化、Quartz Trigger 构建、通知网关入队与请求校验、配置批量修改与 Upsert 请求、通知任务规划请求、Quartz 执行历史分页请求、授权方案校验、监控规则校验、受控通知发送 Apply 流程、用户角色授权校验、文件魔数规则校验、监控指标观测与状态上下文、Quartz 参数校验、会议参与人处理、安全会话刷新上下文加载、诊断任务创建、角色授权准备校验、组织变更准备校验、授权 Grant 请求上下文、上传存储会话创建、Assignment 目标加载、Assignment 撤销校验、Provider 字段上下文、通知快捷请求对象、用户访问范围查询对象、导入分块请求对象、导入行处理请求对象、部门重构 Apply 上下文、审计记录上下文、在线用户分页请求对象、部门重构审计上下文、角色授权审计上下文、组织变更审计上下文、Assignment 审计上下文、在线用户转换输入对象、站内信构造输入对象、部门重构预览审计输入对象、投递分页查询输入对象、通知偏好保存输入对象、Quartz 历史分页查询输入对象、Quartz 历史完成结果输入对象、分片目标输入对象、用户导入校验输入对象、用户部门成员变更输入对象、认证 Cookie 输入对象和审计记录完整构造器迁移。剩余 14 条逐项记录如下：1) ExcessiveParameterList — SecurityConfiguration.securityFilterChain — spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/configuration/authentication/SecurityConfiguration.java:144 — Spring Security Bean 固定依赖注入签名；2) ExcessiveParameterList — ResponseEncryptAdvice.beforeBodyWrite — spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/crypto/ResponseEncryptAdvice.java:148 — ResponseBodyAdvice 框架回调固定签名；3) ExcessiveParameterList — ResponseModifyAdvice.beforeBodyWrite — spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/web/advice/crypto/ResponseModifyAdvice.java:112 — ResponseBodyAdvice 框架回调固定签名；4) ExcessiveParameterList — AuditAspect.AuditAspect — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditAspect.java:82 — Spring 依赖注入构造器；5) ExcessiveParameterList — AuditConfiguration.auditAspect — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditConfiguration.java:48 — @Bean 方法依赖注入签名；6) ExcessiveParameterList — LoginEmailProvider.LoginEmailProvider — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginEmailProvider.java:69 — 认证 Provider 依赖注入构造器；7) ExcessiveParameterList — LoginSmsProvider.LoginSmsProvider — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginSmsProvider.java:69 — 认证 Provider 依赖注入构造器；8) ExcessiveParameterList — LoginUsernamePasswordProvider.LoginUsernamePasswordProvider — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginUsernamePasswordProvider.java:58 — 认证 Provider 依赖注入构造器；9) ExcessiveParameterList — DepartmentAuthorizationReferenceServiceImpl.DepartmentAuthorizationReferenceServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentAuthorizationReferenceServiceImpl.java:81 — Spring 服务依赖注入构造器；10) ExcessiveParameterList — DepartmentRestructureServiceImpl.DepartmentRestructureServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentRestructureServiceImpl.java:108 — Spring 服务依赖注入构造器；11) ExcessiveParameterList — CacheManagementServiceImpl.CacheManagementServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/CacheManagementServiceImpl.java:76 — Spring 服务依赖注入构造器；12) ExcessiveParameterList — ServiceMonitorDiagnosticServiceImpl.ServiceMonitorDiagnosticServiceImpl — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorDiagnosticServiceImpl.java:94 — Spring 服务依赖注入构造器；13) ExcessiveParameterList — ServiceMonitorServiceSupport.ServiceMonitorServiceSupport — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorServiceSupport.java:96 — Spring 服务依赖注入构造器；14) ExcessiveParameterList — UploadVerificationWorker.UploadVerificationWorker — spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadVerificationWorker.java:65 — Spring Worker 依赖注入构造器。上述 14 条未添加未登记抑制。治理例外核对保持通过（83 条）。Web ESLint 全量门禁与 TypeScript 类型检查已通过；full verify未执行。"
+    },
+    {
+      "id": "EV-B00-WEB-REVERIFY-20261005",
+      "scope": "B00 Web ESLint 与 TypeScript 依赖恢复后复验",
+      "command_or_scenario": [
+        "spectra-ui: Move-Item node_modules to a timestamped backup; mise exec -- pnpm install --frozen-lockfile -> exit 0",
+        "spectra-ui: mise exec -- pnpm exec eslint . --no-cache --format json -> exit 0; 226 files, 0 errors, 0 warnings",
+        "spectra-ui: mise exec -- pnpm exec vue-tsc --noEmit -> exit 0"
+      ],
+      "environment": "原生Windows PowerShell；Node 24.14.0、pnpm 12.6.0；使用提升执行权限重建依赖并复验",
+      "tool_versions": {
+        "node": "24.14.0",
+        "pnpm": "12.6.0",
+        "eslint": "9.39.2",
+        "typescript": "5.9.3",
+        "vue_tsc": "3.2.4"
+      },
+      "checked_at": "2026-10-05",
+      "result": "passed",
+      "artifacts": [
+        ".temp/b00-eslint-after-fix.json"
+      ],
+      "limits": "仅证明依赖恢复后的 ESLint 与 TypeScript 门禁；不替代 OpenAPI 漂移、真实接口和全局整体验收。"
     },
     {
       "id": "EV-B00-EXCEPTION-20261005",
