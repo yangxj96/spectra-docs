@@ -49,12 +49,14 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 | Key 前缀 | 用途 |
 |---|---|
 | `sec:sess:*` | Access Session 事实源 |
-| `sec:uc:*` / `sec:ut:*` / `sec:online` | 用户-客户端索引、用户 Token 集合和在线用户集合 |
+| `sec:uc:*` / `sec:ut:*` / `sec:online` | 最近 Access 指针、覆盖 Refresh 生命周期的用户会话摘要索引和在线用户集合；`sec:uc:*` 不能作为批量撤销事实源 |
 | `sec:family:*` / `sec:rt:family:*` | Access/Refresh Token Family |
 | `sec:rt:*` / `sec:rt:claim:*` / `sec:replay:*` | Refresh 映射、一次性消费声明和重放撤销围栏 |
 | `sec:fail:*` | 登录失败锁定 |
 
 旧 `auth:*`、`sec:v2:*` 和兼容 Key 不再由运行时读取或写入；运行时不维护双命名空间迁移逻辑。
+
+BASE-003 的会话索引与撤销规则：`sec:ut:*` 为每个 Access 摘要保留条目，直到该 Access 及其 Refresh 都失效或被撤销；不同客户端的新会话只可延长索引 TTL，不可缩短已有 Refresh 的窗口。Access Hash 到期而 Refresh 仍有效时，撤销从 Refresh Hash 确认用户、客户端及 Family，按用户、按客户端、管理句柄和踢旧均清理该 Refresh；`ALLOW` 模式按索引覆盖同端全部会话。Refresh Hash 仍存在却缺少所属用户索引时拒绝轮换，避免先前被剔除的孤儿 Refresh 重新签发会话。索引映射或归属不一致时拒绝操作，不按状态不存在处理。此项专项验证及完整门禁边界见 [[开发指南/工程治理/2026-10-09-B02会话撤销生命周期验证|BASE-003 验证]]；B02 其余 Family 并发围栏和故障场景仍按正式台账推进。
 
 ## Key 设计
 

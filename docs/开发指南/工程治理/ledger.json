@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "standard": "docs/开发指南/04-工作区工程标准.md",
-  "updated_at": "2026-10-08",
+  "updated_at": "2026-10-09",
   "status": "unification_in_progress",
   "remediation_cycle": {
     "id": "CYCLE-20261005",
@@ -9,7 +9,7 @@
     "basis": "2026-10-05 diagnosis; 04-工作区工程标准 and 05-集中治理与验收",
     "policy": "One concentrated cycle; complete each batch with its affected repository callers, deferred-area consistency checks and knowledge-base updates. A batch closes only with recorded evidence; global acceptance remains separate.",
     "unresolved_blockers": [
-      "B00 retains its recorded completion. B02 sorting has isolated PostgreSQL and MockMvc evidence; Redis security faults, two application instances and real HTTP/browser scenarios still require their own batch evidence, without inferring acceptance from fixture availability.",
+      "B00 retains its recorded completion. B02 sorting and BASE-003 revocation have isolated PostgreSQL/Redis evidence within their stated scopes; Redis fault recovery, two application processes and real HTTP/browser scenarios still require batch evidence, without inferring acceptance from fixture availability.",
       "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout."
     ],
     "batches": [
@@ -104,10 +104,12 @@
         "done_when": "Security state is authoritative under concurrency and faults; all affected callers use the same authorization and identity semantics.",
         "evidence_ids": [
           "EV-B02-SORT-20261008",
-          "EV-B02-SORT-GATES-20261008"
+          "EV-B02-SORT-GATES-20261008",
+          "EV-B02-BASE003-20261009",
+          "EV-B02-BASE003-GATES-20261009"
         ],
         "state": "in_progress",
-        "progress_summary": "本轮串行仅推进 DIAG-BASE-002；85 项排序专项及改动文件格式通过，完整门禁失败。其他 B02 问题和 B08 会话失效协调继续逐项复核；本批未满足 done_when。"
+        "progress_summary": "DIAG-BASE-002 排序专项 85 项通过；DIAG-BASE-003 会话撤销专项 19 项、七个改动文件格式及全 Reactor 测试编译通过。完整 verify、全量测试与格式仍失败；两应用进程、故障恢复、Core 实际入口和 B08 浏览器身份失效未验收，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -454,6 +456,33 @@
       "review_kind": "pagination_source_or_evidence_review",
       "impact_ids": [
         "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "docs/开发指南/工程治理/2026-10-09-B02会话撤销生命周期验证.md",
+      "role": "B02 安全会话专项正式证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "993ac152f830b17e20ec325c038b2bb0848a84483773e04573e0fb7bf2d5b65a",
+      "reviewed_rules": [
+        "04 §8 安全 Redis 事实源",
+        "04 §10 会话生命周期",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-003"
+      ],
+      "evidence_ids": [
+        "EV-B02-BASE003-20261009",
+        "EV-B02-BASE003-GATES-20261009"
+      ],
+      "review_summary": "逐项记录 BASE-003 实现、受影响调用方、19 项隔离 Redis 专项、完整门禁实际失败和未验收边界。",
+      "review_limits": [
+        "不证明两个应用进程、Core 真实业务入口、Web 浏览器或 B02 整体验收。"
+      ],
+      "review_kind": "security_session_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-003"
       ]
     },
     {
@@ -2975,26 +3004,31 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "8cfec0aa78ebe7433bee522120aa2b859522a85dc4916b5ebc9e1959def50e47",
+      "content_sha256": "f04a795aebcb5c08b7b81b6b7da0314771dbccd49636dbdb801cf22124836717",
       "reviewed_rules": [
         "04§1",
         "04§4",
         "04§12",
         "04§13"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-BASE-003"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 用户与权限；全文文档结构/本地引用及高影响事实检索，19个一级至三级标题，0个待核对链接候选。",
+      "review_summary": "# 用户与权限；BASE-003 已同步过期 Access/有效 Refresh 的撤销与当前 Web 刷新失败清理语义；页面级验收仍归 B08。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
       "review_kind": "document_structure_and_high_impact_claim_scan",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
     },
     {
       "path": "docs/后端/10-后端模块/05-数据权限设计.md",
@@ -3603,26 +3637,31 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "c084c478fb360ff011c4fdc19d2ed70b6fa43aaba502997df626d3eb83dd3195",
+      "content_sha256": "c0ae99ae17236f36483fd603f8dfc5e449b0305138f9033efed683ad7c021aad",
       "reviewed_rules": [
         "04§1",
         "04§4",
         "04§12",
         "04§13"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-BASE-003"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# Redis 使用规范；全文文档结构/本地引用及高影响事实检索，21个一级至三级标题，0个待核对链接候选。",
+      "review_summary": "# Redis 使用规范；BASE-003 已同步用户会话索引、Refresh 生命周期、批量撤销及孤儿 Refresh 拒绝语义。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
       "review_kind": "document_structure_and_high_impact_claim_scan",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
     },
     {
       "path": "docs/后端/30-规范/05-行政区域编码.md",
@@ -3846,7 +3885,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "fc448eafcabc567b25974a1d9cb304a1b65d9ceb713a1c81a13585663dceaec9",
+      "content_sha256": "be5416c68749954e9bf44aaf3fdbe68352b997fa515655f67b8ccc38127b6ff1",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3873,7 +3912,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "9638f4af87e9726cd3c2c4b6c5e26828bc13f435576c5d9ebc6c2188726cc885",
+      "content_sha256": "68f10e787a2ae71f8f8f546957fa4ea0967da5665644b4988bf47b435daa8244",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3883,11 +3922,13 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-BASE003-20261009",
+        "EV-B02-BASE003-GATES-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 工程治理台账；全文文档结构/本地引用及高影响事实检索，5个一级至三级标题，0个待核对链接候选。",
+      "review_summary": "# 工程治理台账；2026-10-09 核对当前有限范围清单、全局 in_progress 和 BASE-003 专项/门禁边界。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -15890,7 +15931,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "9a9faf4e8e2678080874dd528bbcc46ea96b78a0ae17ed916d49ddb1e494b629",
+      "content_sha256": "a354a973561f3b313a41a82120f51a097163562e054f61c6e0cfe232b3264ee1",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -15903,11 +15944,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "逐一撤销活动Access token；该索引不能保证覆盖存活Refresh，会话并发控制非原子。",
+      "review_summary": "BASE-003 已在 Access 过期时从 Refresh Hash 辨认并撤销同端旧会话；跨实例并发预留仍非原子，归 BASE-006。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -16341,7 +16383,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "33db9b04bb94c0fb983c6f68eda293830179f77fe46779b30d33ba8e9890e9af",
+      "content_sha256": "e6c1a4b411ae4ed3bbd4baa536874ae7ad55a7fa0fbe68c4cf3968bf7c3a566a",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16358,11 +16400,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "按Access索引统计活动token并执行并发策略后多命令签发；刷新重新写login/active时间，absolute/idle未消费；并发签发未原子预留。",
+      "review_summary": "BASE-003 已让用户索引保留有效 Refresh、只延长索引 TTL，旧会话计入并发策略；绝对/空闲时限及多命令签发竞态仍归 BASE-005/006。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -16413,7 +16456,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "5bfce9853f8656901aa0f97fa1be996214ed5d7306a1095f921e2afc63fcf5d3",
+      "content_sha256": "631d755570de7a41e3a637bb5f497f4e8fc9f4f088c23c4e0396ba34c1e32bbe",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16426,11 +16469,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "Luaclaim Refresh后读取主体、检查family fence、清除旧Access并再签发；并发重放可在检查与创建之间撤销family。",
+      "review_summary": "BASE-003 已拒绝不在用户索引内的孤儿 Refresh；Lua claim 后 Family fence 与签发跨命令的并发重放风险仍归 BASE-004。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -16446,7 +16490,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "d2f545a375154014c6950896874030f222607aaa27a39ef56f94c28859363b1c",
+      "content_sha256": "c8523e39d52ae49b60c4bf006169cabe4c726b650f1353b4994c005fbdd7baed",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16459,11 +16503,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "用户撤销遍历Access索引、客户端撤销单latest映射；Access过期清理索引后存活Refresh可能漏撤，Family撤销与签发有竞态。",
+      "review_summary": "BASE-003 按用户/客户端遍历 Refresh 生命周期索引，Access 过期时从 Refresh Hash 恢复归属并撤销；Family 撤销与签发竞态仍归 BASE-004/006。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -17306,11 +17351,39 @@
       "impact_ids": []
     },
     {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/session/SecuritySessionLifecycleRedisTest.java",
+      "role": "B02 安全会话隔离 Redis 合成测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "c4363a4bff18e1d306e21e187635afd978aeb9780c9702e3f22ee2979872f063",
+      "reviewed_rules": [
+        "04 §8 安全 Redis 事实源",
+        "04 §10 会话生命周期",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-003",
+        "DIAG-BASE-005"
+      ],
+      "evidence_ids": [
+        "EV-B02-BASE003-20261009",
+        "EV-B02-BASE003-GATES-20261009"
+      ],
+      "review_summary": "BASE-003 的 13 项隔离 Redis 测试覆盖过期 Access/有效 Refresh、用户/客户端/句柄撤销、踢旧、限额、索引损坏与两个独立连接；另 3 项时限/登录时间测试仍失败。",
+      "review_limits": [
+        "两个独立连接不等于两个应用进程；BASE-005 时限失败不计入 BASE-003 专项通过。"
+      ],
+      "review_kind": "isolated_redis_behavior_review",
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
+    },
+    {
       "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/session/SecuritySessionRefreshServiceTest.java",
       "role": "测试与夹具",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "68507aa9ba23d3b937aa363c0798f08dd5831fd0c937c091544f5647bc0b0f79",
+      "content_sha256": "3b04b857bd2f149c37775a2ea9990913fb164662d512f933ecb5447a79ae6593",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -17321,11 +17394,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "mock验证刷新加载当前主体、删除旧会话、基础重放行为；未覆盖真实Redis并行签发/fence交错。",
+      "review_summary": "BASE-003 已增加用户索引 isMember 返回 null 时拒绝 Refresh 的 mock 测试；真实 Redis 并发签发/fence 交错仍未覆盖。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -17339,7 +17413,7 @@
       "role": "测试与夹具",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "35f9b7c71284d223f0f5157053cf8bb99ed13b4622ab69c607b19f24013c1d57",
+      "content_sha256": "237db25eaa691615a03594af21beafddd3e54c0a27429ca22896b5855e369d47",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -17350,11 +17424,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "mock验证移除索引并广播logout等副作用；真实Redis失败与过期Access/存活Refresh未证实。",
+      "review_summary": "mock 副作用测试已随 BASE-003 调整完整 Refresh Hash 与原子映射脚本预期；过期 Access/存活 Refresh 另有隔离 Redis 实测。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -62052,31 +62127,35 @@
         {
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionIssueService.java",
           "symbol": "activeTokenDigests",
-          "line": 254
+          "line": 257
         },
         {
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRevocationService.java",
           "symbol": "deleteByUserIdInternal",
-          "line": 234
+          "line": 273
         },
         {
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRevocationService.java",
           "symbol": "deleteByUserIdAndClient",
-          "line": 286
+          "line": 318
         }
       ],
       "finding": "活动索引以Access存活为准并清除过期Access，而Refresh仍可存活；按用户撤销只扫该索引，按客户端撤销只读一个latest Access。",
       "impact": "管理员撤销/改密/踢旧可能遗漏可再次刷新登录的Session；ALLOW同客户端多会话也可能漏撤。",
       "priority": "P1",
       "disposition": "required_fix",
-      "state": "pending",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009",
+        "EV-B02-BASE003-GATES-20261009"
       ],
       "impact_ids": [
         "IMP-BASE-003"
-      ]
+      ],
+      "resolution": "用户索引保留有效 Refresh，TTL 只延长；用户、客户端、句柄和踢旧撤销覆盖过期 Access，拒绝无用户索引的孤儿 Refresh，19 项隔离 Redis 专项通过。完整门禁失败，真实 Core 入口、两个应用进程和故障恢复未验收。",
+      "verification_record": "docs/开发指南/工程治理/2026-10-09-B02会话撤销生命周期验证.md"
     },
     {
       "id": "DIAG-BASE-004",
@@ -65542,17 +65621,19 @@
       "required_changes": [
         "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。"
       ],
-      "deferred_boundary": "没有运行Redis、没有令牌或真实凭据输出；static race未宣称已利用复现。",
-      "state": "pending",
+      "deferred_boundary": "BASE-003 只在隔离 Redis 与两个独立连接验证；两个应用进程、重放交错、故障恢复、实际 Core/Web 入口尚未验收。没有令牌或真实凭据输出。",
+      "state": "in_progress",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE003-20261009",
+        "EV-B02-BASE003-GATES-20261009"
       ],
       "verification": [
         "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。"
       ],
       "limits": [
-        "没有运行Redis、没有令牌或真实凭据输出；static race未宣称已利用复现。"
+        "BASE-003 专项通过不关闭同影响下 BASE-004/005/006/007/018；完整门禁与双进程/故障验证仍待完成。"
       ]
     },
     {
@@ -68087,6 +68168,60 @@
       "limits": "被阻断的后续模块未执行对应完整门禁；不以专项通过替代验收，不关闭 B02 或全周期。"
     },
     {
+      "id": "EV-B02-BASE003-20261009",
+      "scope": "DIAG-BASE-003 / IMP-BASE-003 / BC-BASE-002 隔离 Redis 会话撤销专项",
+      "command_or_scenario": [
+        "仓库 Maven Wrapper：-pl spectra-framework -am -Dtest=SecuritySessionLifecycleRedisTest#...+independentRedisConnectionsShareClientRevocation,SecuritySessionRevocationSideEffectsTest,SecuritySessionRefreshServiceTest -Dsurefire.failIfNoSpecifiedTests=false -Dspectra.test.redis.port=26379 test；完整方法选择见验证记录和 base003-targeted-19.log",
+        "七个改动 Java 文件逐一执行 Spotless check；全 Reactor 执行 test-compile；CodeGraph 从 admin/UI 查询调用图后用当前源码 rg 核对"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 2026.10.4 管理的 Temurin 25.0.2 / Maven Wrapper 3.9.12 / Redis 8.8.0 127.0.0.1:26379 DB14；PostgreSQL 18.4 隔离夹具仅用于受影响门禁，无业务数据、Docker 或本机凭据。mise exec 配置加载崩溃后直接使用仓库包装器和 mise 管理的 JAVA_HOME。",
+      "tool_versions": {
+        "java": "25.0.2+10",
+        "maven_wrapper": "3.9.12",
+        "surefire": "3.5.6",
+        "spotless": "3.9.0",
+        "redis": "8.8.0",
+        "postgresql": "18.4"
+      },
+      "checked_at": "2026-10-09",
+      "result": "passed",
+      "exit_code": 0,
+      "summary": "BASE-003 专项 19 项全通过；七个改动 Java 文件格式通过；8 个 Reactor 项目 test-compile 通过。覆盖自然/模拟 Access 到期、Refresh 有效撤销、ALLOW 多会话、KICK_OLD/REJECT_NEW、孤儿索引拒绝、跨两个独立 Redis 连接、损坏映射和 isMember=null 拒绝。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-09-B02会话撤销生命周期验证.md",
+        ".temp/b02/base003-targeted-19.log",
+        ".temp/b02/base003-reactor-test-compile-final.log",
+        ".temp/b02/base003-format-SecuritySessionIssueService.log",
+        ".temp/b02/base003-format-SecuritySessionRevocationService.log"
+      ],
+      "limits": "两个独立 Redis 连接不是两个应用进程；Core 改密/授权变更 HTTP/数据库链路、OA/Workflow 业务端到端、Web 浏览器、Redis 故障恢复和 Family 并发重放未由本证据证明。"
+    },
+    {
+      "id": "EV-B02-BASE003-GATES-20261009",
+      "scope": "BASE-003 修改后适用的完整后端门禁",
+      "command_or_scenario": [
+        "仓库 Maven Wrapper：-fae -Dspotless.ratchetFrom=NONE -Dspectra.test.redis.port=26379 -Dspectra.test.postgres.port=25432 verify",
+        "仓库 Maven Wrapper：-fae -Dspectra.test.redis.port=26379 -Dspectra.test.postgres.port=25432 test",
+        "仓库 Maven Wrapper：-fae -Dspotless.ratchetFrom=NONE com.diffplug.spotless:spotless-maven-plugin:3.9.0:check"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 安装的 Temurin 25.0.2 / Maven Wrapper 3.9.12；Redis 专用 26379/DB14、PostgreSQL 专用 25432/b02_test；仅合成数据。",
+      "checked_at": "2026-10-09",
+      "result": "failed",
+      "exit_codes": [
+        1,
+        1,
+        1
+      ],
+      "summary": "verify 在 Common 的既有 SpotBugs 14 项失败并跳过后续模块；全项目 test 的 Framework 72 项中空闲时限、绝对时限和登录时间 3 项失败，并跳过 Core/OA/Workflow；全量格式在未改动的 SecuritySessionStoreTest.java 失败。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-09-B02会话撤销生命周期验证.md",
+        ".temp/b02/base003-full-verify-final.log",
+        ".temp/b02/base003-full-test-final.log",
+        ".temp/b02/base003-full-format-final.log"
+      ],
+      "limits": "完整门禁没有通过，后续模块不能标为已运行；不关闭 B02 或集中治理周期。"
+    },
+    {
       "id": "EV-SKILL-20261003",
       "scope": "Backend/Web Skill entries and references; local Spectra plugin source and installed cache.",
       "command_or_scenario": [
@@ -69738,14 +69873,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1496,
+      "included": 1498,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 22
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh adds 8 sorting files and records 38 current file digests. 16 changed existing included files are stale for full-file review; their pagination changes have separate remediation_reviews. Deferred independent business remains enumerated with separate public-impact evidence. This is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh adds the Redis test and evidence report, updates nine changed source/knowledge file digests and self digest. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -69755,7 +69890,7 @@
       "deferred_business": 438,
       "excluded": 22
     },
-    "refreshed_at": "2026-10-08"
+    "refreshed_at": "2026-10-09"
   },
   "diagnosis": {
     "phase": 2,
@@ -69926,15 +70061,41 @@
       {
         "id": "BC-BASE-002",
         "name": "撤销生命周期",
-        "status": "not_executed",
+        "status": "partially_executed",
         "necessary_acceptance": "Access自然到期/从索引剔除但Refresh仍有效时，按用户/客户端/改密/踢旧后Refresh必须拒绝；ALLOW同客户端多会话全覆盖。",
-        "boundary": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。",
+        "boundary": "隔离 Redis 已验证按用户/客户端/句柄、KICK_OLD、ALLOW 多会话和旧孤儿 Refresh；Core 改密实际入口、双应用进程及完整门禁仍未通过，不标整项 passed。",
         "scenario": "Access自然到期/从索引剔除但Refresh仍有效时，按用户/客户端/改密/踢旧后Refresh必须拒绝；ALLOW同客户端多会话全覆盖。",
-        "state": "not_run",
-        "issue_ids": [],
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。"
+        "state": "inconclusive",
+        "issue_ids": [
+          "DIAG-BASE-003"
+        ],
+        "impact_ids": [
+          "IMP-BASE-003"
+        ],
+        "evidence_ids": [
+          "EV-B02-BASE003-20261009",
+          "EV-B02-BASE003-GATES-20261009"
+        ],
+        "required_environment": "隔离 Redis 已运行；剩余 Core HTTP/数据库调用链、独立应用进程和完整门禁需继续验证。",
+        "subchecks": [
+          {
+            "id": "BC-BASE-002-REDIS-REVOCATION",
+            "state": "passed",
+            "evidence_ids": [
+              "EV-B02-BASE003-20261009"
+            ]
+          },
+          {
+            "id": "BC-BASE-002-CORE-CALLERS",
+            "state": "not_run",
+            "evidence_ids": []
+          },
+          {
+            "id": "BC-BASE-002-TWO-PROCESSES",
+            "state": "not_run",
+            "evidence_ids": []
+          }
+        ]
       },
       {
         "id": "BC-BASE-003",
