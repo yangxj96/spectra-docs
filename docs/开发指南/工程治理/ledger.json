@@ -110,10 +110,12 @@
           "EV-B02-BASE004-20261009",
           "EV-B02-BASE004-GATES-20261009",
           "EV-B02-BASE007-20261009",
-          "EV-B02-BASE007-GATES-20261009"
+          "EV-B02-BASE007-GATES-20261009",
+          "EV-B02-BASE018-20261009",
+          "EV-B02-BASE018-GATES-20261009"
         ],
         "state": "in_progress",
-        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 当前源码已 fail-closed，隔离 Redis 与调用方专项 8 项通过，Framework 格式和八模块测试编译通过。完整 verify、全量测试与格式仍失败；双应用进程、故障恢复、Core 实际入口和 B08 浏览器身份失效未验收，本批未满足 done_when。"
+        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项和 BASE-018 计数 TTL 10 项隔离/单元专项通过，Framework 格式和八模块测试编译通过。完整 verify、全量测试与格式仍失败；双应用进程、实际 Redis 断连恢复、Core 实际入口和 B08 浏览器身份失效未验收，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -536,6 +538,32 @@
       "review_summary": "记录当前成员读取已 fail-closed 的源码复核、撤销调用方与隔离 Redis 8 项专项、完整门禁和 BC-BASE-003 未覆盖范围。",
       "review_limits": [
         "不证明 BASE-018 计数 TTL、多应用进程、Redis 断连恢复或 B02 整体验收。"
+      ],
+      "review_kind": "security_redis_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
+    },
+    {
+      "path": "docs/开发指南/工程治理/2026-10-09-B02安全计数TTL验证.md",
+      "role": "B02 安全 Redis 计数 TTL 专项正式证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "8e63e47e8da23d8d23e539a969c58cdfac1998cce830809d567e0b5aabc7f5c4",
+      "reviewed_rules": [
+        "04 §8 安全 Redis 事实源",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-018"
+      ],
+      "evidence_ids": [
+        "EV-B02-BASE018-20261009",
+        "EV-B02-BASE018-GATES-20261009"
+      ],
+      "review_summary": "记录原子 SET PX 计数、旧无 TTL 键拒绝、写入前后故障注入、10 项专项及完整门禁和真实断连恢复边界。",
+      "review_limits": [
+        "不证明两个独立应用进程、真实 Redis 断连恢复、Core HTTP 登录或 B02 整体验收。"
       ],
       "review_kind": "security_redis_evidence_review",
       "impact_ids": [
@@ -3696,7 +3724,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "4d201af64ce12de9bd03c7f33e421146d2ef0460d34a9f86542fdef8f816faf1",
+      "content_sha256": "66bb56990501463be4c6b5732620c87c411c5581179c7a985d3bf2ac1a84f1dc",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3706,18 +3734,20 @@
       "issue_ids": [
         "DIAG-BASE-003",
         "DIAG-BASE-004",
-        "DIAG-BASE-007"
+        "DIAG-BASE-007",
+        "DIAG-BASE-018"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
         "EV-ROOT-DOC-20261004",
         "EV-B02-BASE003-20261009",
         "EV-B02-BASE004-20261009",
-        "EV-B02-BASE007-20261009"
+        "EV-B02-BASE007-20261009",
+        "EV-B02-BASE018-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# Redis 使用规范；BASE-003 会话撤销、BASE-004 重放围栏及 BASE-007 安全集合 null/empty 与失败拒绝语义已同步。",
+      "review_summary": "# Redis 使用规范；BASE-003 会话撤销、BASE-004 重放围栏、BASE-007 安全集合及 BASE-018 原子计数 TTL 与异常结果拒绝语义已同步。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -3948,7 +3978,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "9706c3802ec3ad3307761ba137c8e2912d994a8d4472ccdbb2629d65bbc76093",
+      "content_sha256": "203b7a57e0e92feb4296d42a39b79fc073253d1d35e2912d6ff3ae6978d9ebd4",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3979,7 +4009,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "daa7af640618e4e8d596b4597608294b5133dea3b774bd10f1173001e7dd333a",
+      "content_sha256": "b22b273e9cb94c33d36c037cc3a69949189b6bb70e6210d4533bd2f025ffd015",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3995,11 +4025,13 @@
         "EV-B02-BASE004-20261009",
         "EV-B02-BASE004-GATES-20261009",
         "EV-B02-BASE007-20261009",
-        "EV-B02-BASE007-GATES-20261009"
+        "EV-B02-BASE007-GATES-20261009",
+        "EV-B02-BASE018-20261009",
+        "EV-B02-BASE018-GATES-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 工程治理台账；2026-10-09 核对有限范围清单、全局 in_progress、BASE-003/004/007 专项及门禁边界。",
+      "review_summary": "# 工程治理台账；2026-10-09 核对有限范围清单、全局 in_progress、BASE-003/004/007/018 专项及门禁边界。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -15762,7 +15794,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "51b1f1e8af6aa444ff1691339b3d73aaf51c76b01dc20ebba46ca065602d99ef",
+      "content_sha256": "7ddea8962c7cdd8d91062ce6ed54e7f384e2b64a0b04ae108433a7bd930d9d45",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -15775,17 +15807,44 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE018-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "验证码存储/尝试次数Redis操作，递增后独立expire；命令失败抛错但expire false/进程中断一致性待验证。",
+      "review_summary": "验证码尝试次数已调用共用 SecurityRedisCounter；隔离 Redis 验证旧无 TTL 键拒绝、命令中断及并发窗口，原先独立 expire 路径已不存在。",
       "review_limits": [
-        "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
+        "已运行隔离 Redis 计数专项；未运行真实 Redis 断连恢复、Core HTTP 登录或独立应用进程。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
         "复杂度指标未校准/未实测，候选不等于已超阈值。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/store/SecurityRedisCounter.java",
+      "role": "B02 安全 Redis 原子计数和 TTL 事实源",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "5a532fb9246d1046d4fa7e9088789732ee67cc876f5b0437fdc460d8a3e1e27b",
+      "reviewed_rules": [
+        "04 §8 安全 Redis 事实源",
+        "04 §10 生命周期",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-018"
+      ],
+      "evidence_ids": [
+        "EV-B02-BASE018-20261009"
+      ],
+      "review_summary": "Lua SET PX 首次计数及 TTL 原子写入；既有键检查 TTL，异常脚本返回结果拒绝；10 项专项验证调用方、竞争和中断。",
+      "review_limits": [
+        "合成命令中断不等于真实 Redis 断连恢复，未运行两个独立应用进程。"
+      ],
+      "review_kind": "security_redis_failure_path_review",
       "impact_ids": [
         "IMP-BASE-003"
       ]
@@ -16368,7 +16427,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "96941faa18cd3e246d5da140791f52e3c91c6804e4851f847868fa8156e65f71",
+      "content_sha256": "e485834f93a1163c711a7fcdbd28bf14204cd4fc02c76178c67cccbb3e683253",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16381,13 +16440,14 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE018-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "原始username直接构建计数key，Core身份哈希trim+lowercase不一致归Core跨层发现；increment后expire返回值未确认。",
+      "review_summary": "登录失败锁定已调用共用原子计数存储并确认读取 TTL；合成中断及隔离 Redis 首次窗口专项通过。传入身份桶归一化仍归 DIAG-CORE-020。",
       "review_limits": [
-        "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
+        "已运行隔离 Redis 计数专项；未运行真实 Redis 断连恢复、Core HTTP 登录或独立应用进程。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
         "复杂度指标未校准/未实测，候选不等于已超阈值。"
       ],
@@ -17433,6 +17493,31 @@
       "impact_ids": []
     },
     {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/redis/store/SecurityRedisCounterTest.java",
+      "role": "B02 安全计数脚本未知返回边界单元测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "598b70fe3a6a2aa701e3f139d58a250eb27660256d419ca769ba386928b4bb5d",
+      "reviewed_rules": [
+        "04 §8 安全 Redis 事实源",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-018"
+      ],
+      "evidence_ids": [
+        "EV-B02-BASE018-20261009"
+      ],
+      "review_summary": "null、零及负数递增回包拒绝，正常缺失读取为零而负数读取回包拒绝；2 项单元测试通过。",
+      "review_limits": [
+        "模拟脚本返回不替代真实 Redis 命令和故障恢复，隔离 Redis 由 SecurityCounterRedisTest 验证。"
+      ],
+      "review_kind": "security_redis_failure_path_review",
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
+    },
+    {
       "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/session/RefreshTokenRotationStoreTest.java",
       "role": "B02 Refresh Lua 异常结果与故障单元测试",
       "scope": "included",
@@ -17454,6 +17539,32 @@
         "单元测试不替代独立应用进程及 Redis 断连恢复验证。"
       ],
       "review_kind": "security_session_failure_path_review",
+      "impact_ids": [
+        "IMP-BASE-003"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/session/SecurityCounterRedisTest.java",
+      "role": "B02 安全计数隔离 Redis 并发、TTL 与中断测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "1bec34216b4de095a33a957e97517ad65ace48a8331bfa0d090e0c6fd4e92a42",
+      "reviewed_rules": [
+        "04 §8 安全 Redis 事实源",
+        "04 §10 生命周期",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-018"
+      ],
+      "evidence_ids": [
+        "EV-B02-BASE018-20261009"
+      ],
+      "review_summary": "隔离 Redis DB12 验证旧无 TTL 键拒绝及受控清理、首次写入前后中断、32 次并发递增和首次窗口不延长；8 项通过。",
+      "review_limits": [
+        "命令故障由合成适配器注入；未运行真实 Redis 断连恢复或两个独立应用进程。"
+      ],
+      "review_kind": "isolated_redis_behavior_review",
       "impact_ids": [
         "IMP-BASE-003"
       ]
@@ -62841,14 +62952,18 @@
       "impact": "计数生命周期可能持久锁定或与配置窗口不符；命令错误抛出本身不能保证多命令原子性，需注入失败验证。",
       "priority": "P2",
       "disposition": "requires_behavior_validation",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE018-20261009",
+        "EV-B02-BASE018-GATES-20261009"
       ],
       "impact_ids": [
         "IMP-BASE-003"
-      ]
+      ],
+      "resolution": "当前源码已用 Lua SET PX 原子建立首次计数及 TTL，既有计数缺少 TTL 时拒绝；本次增加未知/无效脚本计数结果的拒绝。隔离 Redis 10 项专项覆盖遗留无 TTL 键、写入前失败、写入后回包丢失、并发与窗口保持；完整门禁和实际 Redis 断连恢复另记。",
+      "verification_record": "docs/开发指南/工程治理/2026-10-09-B02安全计数TTL验证.md"
     },
     {
       "id": "DIAG-BASE-019",
@@ -65765,22 +65880,28 @@
       ],
       "direct": [
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/store/RefreshTokenRotationStore.java",
+        "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/store/RedisSecurityVerificationStore.java",
+        "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/redis/store/SecurityRedisCounter.java",
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionIssueService.java",
+        "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecurityLoginFailureStore.java",
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionReaderService.java",
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRefreshService.java",
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRevocationService.java",
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionStore.java"
       ],
       "indirect": [
-        "Core登录/刷新/登出、管理员会话撤销、改密/安全版本变化、WebCookieRefresh全部依赖FrameworkRedis事实源；Family及USER_CLIENT索引必须统一生命周期。"
+        "Core登录/刷新/登出、管理员会话撤销、改密/安全版本变化、WebCookieRefresh全部依赖FrameworkRedis事实源；Family及USER_CLIENT索引必须统一生命周期。",
+        "Core LoginService、邮件/短信验证码 Provider 与缓存管理使用登录失败/验证码尝试端口；OA/Workflow 共享认证边界，Web 登录及安全状态清理入口间接受失败拒绝影响，无协议变更。"
       ],
       "data_protocol_runtime": [
-        "Core登录/刷新/登出、管理员会话撤销、改密/安全版本变化、WebCookieRefresh全部依赖FrameworkRedis事实源；Family及USER_CLIENT索引必须统一生命周期。"
+        "Core登录/刷新/登出、管理员会话撤销、改密/安全版本变化、WebCookieRefresh全部依赖FrameworkRedis事实源；Family及USER_CLIENT索引必须统一生命周期。",
+        "BASE-018 的登录失败和验证码尝试在 Redis 中按首次窗口原子保存计数及 TTL；未知脚本结果拒绝 Core 调用，公共端口和 Web 协议形状未改变，真实 HTTP 映射未实测。"
       ],
       "required_changes": [
-        "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。"
+        "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。",
+        "安全计数首次写入与 TTL 原子化；拒绝无 TTL、异常脚本返回和结果未知，验证竞争递增及窗口保持。"
       ],
-      "deferred_boundary": "BASE-003/004 已在隔离 Redis 验证撤销与双独立连接的可控重放交错；BASE-007 已验证集合 null/empty 及故障拒绝。两个应用进程、Redis 断连恢复、实际 Core/Web 入口和尚未治理的 BASE-005/006/018 仍未验收。没有令牌或真实凭据输出。",
+      "deferred_boundary": "BASE-003/004 已在隔离 Redis 验证撤销与双独立连接的可控重放交错；BASE-007 已验证集合 null/empty 及故障拒绝，BASE-018 已验证计数 TTL 原子性及故障注入。两个应用进程、实际 Redis 断连恢复、真实 Core/Web 入口和尚未治理的 BASE-005/006 仍未验收。没有令牌或真实凭据输出。",
       "state": "in_progress",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
@@ -65790,13 +65911,16 @@
         "EV-B02-BASE004-20261009",
         "EV-B02-BASE004-GATES-20261009",
         "EV-B02-BASE007-20261009",
-        "EV-B02-BASE007-GATES-20261009"
+        "EV-B02-BASE007-GATES-20261009",
+        "EV-B02-BASE018-20261009",
+        "EV-B02-BASE018-GATES-20261009"
       ],
       "verification": [
-        "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。"
+        "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。",
+        "隔离 Redis DB12 的 BASE-018 计数专项 10 项通过；首次写入中断的前后结果和旧无 TTL 状态由合成故障注入验证。"
       ],
       "limits": [
-        "BASE-007 集合 fail-closed 已按当前源码和隔离 Redis 测试解决；两个独立应用进程、故障恢复、完整门禁与同影响下 BASE-005/006/018 仍待完成。"
+        "BASE-007 集合与 BASE-018 计数 TTL 已按当前源码和隔离 Redis 测试解决；两个独立应用进程、真实断连恢复、完整门禁与同影响下 BASE-005/006 仍待完成。"
       ]
     },
     {
@@ -68487,6 +68611,57 @@
       "limits": "完整门禁没有通过，被跳过模块不能标为已运行；不关闭 IMP-BASE-003、BC-BASE-003、B02 或集中治理周期。"
     },
     {
+      "id": "EV-B02-BASE018-20261009",
+      "scope": "DIAG-BASE-018 / IMP-BASE-003 / BC-BASE-003-COUNTER-TTL 安全计数窗口专项",
+      "command_or_scenario": [
+        "仓库 Maven Wrapper：.\\mvnw.cmd -pl spectra-framework -am '-Dtest=SecurityRedisCounterTest' '-Dsurefire.failIfNoSpecifiedTests=false' test",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -pl spectra-framework -am '-Dtest=SecurityCounterRedisTest,SecurityRedisCounterTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.redis.port=26379' test",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -pl spectra-framework '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae test-compile；admin、root 和 UI CodeGraph 及当前源码 rg 核对调用方"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 管理的 Temurin 25.0.2 / Maven Wrapper 3.9.12 / 隔离 Redis 8.8.0 127.0.0.1:26379 DB12；执行前后空库，仅合成数据。mise exec 配置加载退出 101 后直接使用仓库包装器；无 Docker、业务数据或本机凭据。",
+      "checked_at": "2026-10-09",
+      "result": "passed",
+      "exit_code": 0,
+      "summary": "2 项脚本返回边界单测和 10 项含隔离 Redis 的计数专项通过；遗留无 TTL 键拒绝且不改写、受控清理后恢复、首次写入前失败及写入后回包丢失、32 个并发首次递增和首次窗口保持均已验证。Framework 格式与八模块 test-compile 通过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-09-B02安全计数TTL验证.md",
+        ".temp/b02/base018-unit-wrapper.log",
+        ".temp/b02/base018-targeted.log",
+        ".temp/b02/base018-format-framework-final.log",
+        ".temp/b02/base018-reactor-test-compile.log"
+      ],
+      "limits": "旧独立 expire=false 分支已由单条 SET PX 脚本消除，等效遗留无 TTL 状态实测拒绝；命令中断为合成 Redis 适配器故障注入，未运行真实 Redis 断连恢复、独立应用进程或 Core HTTP/数据库登录。"
+    },
+    {
+      "id": "EV-B02-BASE018-GATES-20261009",
+      "scope": "BASE-018 改动后 Core 认证调用方及适用完整后端门禁",
+      "command_or_scenario": [
+        "仓库 Maven Wrapper：.\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=AuthenticationBoundaryTest' '-Dsurefire.failIfNoSpecifiedTests=false' test",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' '-Dspectra.test.redis.port=26379' '-Dspectra.test.postgres.port=25432' verify",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspectra.test.redis.port=26379' '-Dspectra.test.postgres.port=25432' test"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 管理的 Temurin 25.0.2 / Maven Wrapper 3.9.12；隔离 Redis 26379/DB12、隔离 PostgreSQL 25432/b02_test；仅合成数据。",
+      "checked_at": "2026-10-09",
+      "result": "failed",
+      "exit_codes": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "summary": "Core AuthenticationBoundaryTest 四项中三项通过，DIAG-CORE-034 匿名受众边界一项失败；完整格式 Framework 通过、Core 15 文件失败；verify 在 Common 14 项 SpotBugs 处失败且 Framework 后续跳过；全量 test 的 Framework 87 项中计数 10 项通过、BASE-005 三项时限/登录时间失败，Core/OA/Workflow 跳过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-09-B02安全计数TTL验证.md",
+        ".temp/b02/base018-core-caller.log",
+        ".temp/b02/base018-full-format.log",
+        ".temp/b02/base018-full-verify.log",
+        ".temp/b02/base018-full-test.log"
+      ],
+      "limits": "完整门禁未通过，被跳过模块不能标为已运行；实际 Redis 断连恢复未执行，不关闭 IMP-BASE-003、BC-BASE-003、B02 或集中治理周期。"
+    },
+    {
       "id": "EV-SKILL-20261003",
       "scope": "Backend/Web Skill entries and references; local Spectra plugin source and installed cache.",
       "command_or_scenario": [
@@ -70138,14 +70313,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1502,
+      "included": 1506,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 22
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report, updates current Store and four changed test/knowledge file digests plus self digest. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report; updates direct source, test, knowledge and self digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -70164,7 +70339,7 @@
     "completed_at": "2026-10-05",
     "method": "Current-source responsibility/failure-path review, whole-workspace public-boundary analysis, historical reconciliation, separated behavior evidence.",
     "reviewed_included": 1510,
-    "current_review_state": "partial_refresh_for_B02_sorting; historical diagnosis complete does not imply current whole-file revalidation",
+    "current_review_state": "partial_refresh_for_B02_sorting_and_security; historical diagnosis complete does not imply current whole-file revalidation",
     "deferred_public_inputs": 438,
     "behavior_checks": [
       {
@@ -70394,7 +70569,7 @@
         "name": "Redisfailclosed",
         "status": "partially_executed",
         "necessary_acceptance": "members=null、正常empty、超时、连接/命令异常、expire=false与首increment后中断分别证明拒绝/正常miss/TTL一致性。",
-        "boundary": "BASE-007 当前源码已使用 require；模拟 null、超时、断连和撤销调用方，真实隔离 Redis 正常空集合均已验证。BASE-018 的 expire=false、首增后中断及 TTL 一致性未执行。",
+        "boundary": "BASE-007 已验证成员集合 null/empty 与拒绝；BASE-018 当前源码用原子 SET PX 消除独立 expire=false 窗口，隔离 Redis 验证等效遗留无 TTL 键拒绝、写入前中断、写入后回包丢失、竞争递增和 TTL 一致性。真实 Redis 断连后恢复未运行。",
         "scenario": "members=null、正常empty、超时、连接/命令异常、expire=false与首increment后中断分别证明拒绝/正常miss/TTL一致性。",
         "state": "inconclusive",
         "issue_ids": [
@@ -70406,9 +70581,11 @@
         ],
         "evidence_ids": [
           "EV-B02-BASE007-20261009",
-          "EV-B02-BASE007-GATES-20261009"
+          "EV-B02-BASE007-GATES-20261009",
+          "EV-B02-BASE018-20261009",
+          "EV-B02-BASE018-GATES-20261009"
         ],
-        "required_environment": "BASE-007 单元故障注入与隔离 Redis 正常空集合已运行；BASE-018 故障时 TTL 仍需隔离 Redis 注入，完整门禁需继续验证。",
+        "required_environment": "BASE-007 与 BASE-018 单元故障注入和隔离 Redis 专项已运行；真实 Redis 断连后恢复、独立应用进程和完整门禁仍需验证。",
         "subchecks": [
           {
             "id": "BC-BASE-003-MEMBERS-UNKNOWN-EMPTY",
@@ -70419,8 +70596,10 @@
           },
           {
             "id": "BC-BASE-003-COUNTER-TTL",
-            "state": "not_run",
-            "evidence_ids": []
+            "state": "passed",
+            "evidence_ids": [
+              "EV-B02-BASE018-20261009"
+            ]
           },
           {
             "id": "BC-BASE-003-FAULT-RECOVERY",

@@ -42,7 +42,7 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 
 生产代码统一使用 `SecurityRedisExecutor` 包裹安全 Redis 操作。普通业务缓存与安全事实源都不能故障降级；安全场景还必须停止继续认证、刷新或执行依赖安全事实的业务。
 
-安全集合读取使用 `require`：Redis 正常返回空集合代表已确认不存在，`null` 代表无法确认，必须拒绝。登录失败和验证码尝试通过 `SecurityRedisCounter` 的 Lua 脚本原子创建计数及 TTL，后续递增保持首次窗口；已有计数缺少 TTL、数值畸形或命令失败时拒绝。登录锁定读取同样原子确认计数与 TTL，不能只凭计数值推断可登录；关闭登录锁定时不再创建永久计数。
+安全集合读取使用 `require`：Redis 正常返回空集合代表已确认不存在，`null` 代表无法确认，必须拒绝。登录失败和验证码尝试通过 `SecurityRedisCounter` 的 Lua 脚本原子创建计数及 TTL，后续递增保持首次窗口；已有计数缺少 TTL、数值畸形、命令失败或脚本返回无效计数时拒绝。登录锁定读取同样原子确认计数与 TTL，不能只凭计数值推断可登录；关闭登录锁定时不再创建永久计数。
 
 安全运行态统一使用 `sec:*` 命名空间，Key 中只允许摘要或非敏感标识，不允许出现明文 Token：
 
@@ -60,7 +60,9 @@ BASE-003 的会话索引与撤销规则：`sec:ut:*` 为每个 Access 摘要保�
 
 BASE-004 的重放围栏规则：Refresh Hash、所属用户索引、一次性 claim 与 Family 围栏在单条 Redis Lua 命令内判定；重复消费先原子立围栏，再清理整个 Family。已轮换旧 Refresh 即使不在用户索引中仍按重放处理，正常孤儿 Refresh 则拒绝。签发前后与 Reader 认证均核对围栏，因此交错写入的 Session Hash 不构成可用 Access。围栏 TTL 覆盖尚存 Family 与当前 Access/Refresh 的较长有效期；Redis 未知结果拒绝操作。隔离 Redis 的可控交错、失败与策略收缩证据及双进程、恢复边界见 [[开发指南/工程治理/2026-10-09-B02重放围栏并发验证|BASE-004 验证]]。
 
-BASE-007 的安全集合读取规则：`SecuritySessionStore.members` 对 Redis `members` 返回的 `null`、超时及连接/命令异常一律拒绝，只有 Redis 确认返回的空 Set 才代表索引为空。按用户撤销、Family 清理、在线查询和会话签发不得把未知集合当成空集合继续执行。当前源码、撤销调用方测试和隔离 Redis 正常空集合证据见 [[开发指南/工程治理/2026-10-09-B02安全集合事实源验证|BASE-007 验证]]；失败计数的 TTL 原子性继续归 BASE-018。
+BASE-007 的安全集合读取规则：`SecuritySessionStore.members` 对 Redis `members` 返回的 `null`、超时及连接/命令异常一律拒绝，只有 Redis 确认返回的空 Set 才代表索引为空。按用户撤销、Family 清理、在线查询和会话签发不得把未知集合当成空集合继续执行。当前源码、撤销调用方测试和隔离 Redis 正常空集合证据见 [[开发指南/工程治理/2026-10-09-B02安全集合事实源验证|BASE-007 验证]]。
+
+BASE-018 的安全计数规则：首次计数与 TTL 必须在同一条 Redis 脚本内写入；原先独立 `expire=false` 可留下无 TTL 键的路径已消除。遗留无 TTL 计数拒绝使用并需受控清理，回包丢失时不得把结果未知解释为未计数；后续递增保留首次窗口。隔离 Redis 并发、故障注入和完整门禁边界见 [[开发指南/工程治理/2026-10-09-B02安全计数TTL验证|BASE-018 验证]]。
 
 ## Key 设计
 
