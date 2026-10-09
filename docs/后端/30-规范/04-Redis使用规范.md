@@ -60,6 +60,8 @@ BASE-003 的会话索引与撤销规则：`sec:ut:*` 为每个 Access 摘要保�
 
 BASE-004 的重放围栏规则：Refresh Hash、所属用户索引、一次性 claim 与 Family 围栏在单条 Redis Lua 命令内判定；重复消费先原子立围栏，再清理整个 Family。已轮换旧 Refresh 即使不在用户索引中仍按重放处理，正常孤儿 Refresh 则拒绝。签发前后与 Reader 认证均核对围栏，因此交错写入的 Session Hash 不构成可用 Access。围栏 TTL 覆盖尚存 Family 与当前 Access/Refresh 的较长有效期；Redis 未知结果拒绝操作。隔离 Redis 的可控交错、失败与策略收缩证据及双进程、恢复边界见 [[开发指南/工程治理/2026-10-09-B02重放围栏并发验证|BASE-004 验证]]。
 
+BASE-007 的安全集合读取规则：`SecuritySessionStore.members` 对 Redis `members` 返回的 `null`、超时及连接/命令异常一律拒绝，只有 Redis 确认返回的空 Set 才代表索引为空。按用户撤销、Family 清理、在线查询和会话签发不得把未知集合当成空集合继续执行。当前源码、撤销调用方测试和隔离 Redis 正常空集合证据见 [[开发指南/工程治理/2026-10-09-B02安全集合事实源验证|BASE-007 验证]]；失败计数的 TTL 原子性继续归 BASE-018。
+
 ## Key 设计
 
 ### cacheNames 结构（强制）
