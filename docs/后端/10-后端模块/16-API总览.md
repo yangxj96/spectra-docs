@@ -11,6 +11,8 @@ tags:
 
 当前所有 REST Mapping 统一使用 API 版本 `1.0.0`，不提供兼容别名或第二套授权写入入口；高风险 Role、RoleAssignment 和组织结构写入统一使用 Preview/Apply API。
 
+分页排序仍使用 `orders[].column` 与 `orders[].asc` 请求字段；每个入口仅接受其登记字段，非法排序返回 HTTP 400，固定排序入口拒绝非空 `orders`。完整字段清单见 [[后端/30-规范/06-分页排序契约]]。Web 当前页面未发送自定义排序；本次不改变分页响应形状或 API 版本。
+
 四个内置角色的菜单、84 条前端路由和 331 个 Controller 方法级 API 门禁逐项矩阵见 [[17-内置角色接口与页面矩阵]]；角色 Permission 与默认数据范围见 [[04-用户与权限]] 和 [[05-数据权限设计]]。
 
 后端 API 运行在单体多模块组合根 `spectra-launch` 中：Core API（包含通知和文件上传 API）始终可用，OA、Workflow API 仅在对应模块已由 launch 引入且 `spectra.modules.<name>.enabled=true` 时注册。可选模块关闭不会产生空 Controller 或兼容回退入口；本系统不提供租户参数、租户切换或 SaaS 隔离 API。

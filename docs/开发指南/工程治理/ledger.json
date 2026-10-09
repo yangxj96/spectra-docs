@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0.0",
   "standard": "docs/开发指南/04-工作区工程标准.md",
-  "updated_at": "2026-10-05",
-  "status": "inventory_complete",
+  "updated_at": "2026-10-08",
+  "status": "unification_in_progress",
   "remediation_cycle": {
     "id": "CYCLE-20261005",
-    "state": "scheduled",
+    "state": "in_progress",
     "basis": "2026-10-05 diagnosis; 04-工作区工程标准 and 05-集中治理与验收",
     "policy": "One concentrated cycle; complete each batch with its affected repository callers, deferred-area consistency checks and knowledge-base updates. A batch closes only with recorded evidence; global acceptance remains separate.",
     "unresolved_blockers": [
-      "Isolated PostgreSQL/Redis, two-instance and real HTTP/browser environments are not yet supplied or verified; keep their behavior checks not_run until executed.",
+      "B00 retains its recorded completion. B02 sorting has isolated PostgreSQL and MockMvc evidence; Redis security faults, two application instances and real HTTP/browser scenarios still require their own batch evidence, without inferring acceptance from fixture availability.",
       "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout."
     ],
     "batches": [
@@ -92,7 +92,8 @@
         "impact_ids": [
           "IMP-BASE-001",
           "IMP-BASE-003",
-          "IMP-CORE-007"
+          "IMP-CORE-007",
+          "IMP-BASE-005"
         ],
         "work_item_ids": [
           "GOV-005"
@@ -100,7 +101,13 @@
         "change_scope": "Framework Redis session/fence/lock and audit/sort boundaries; Core effective Root, identity bucket, credentials, role snapshot and explicit background identity; affected OA/Workflow callers",
         "prerequisites": "B00 Redis/DB fixtures and full caller/role migration inventory; coordinate session revocation with B08 Web identity reset",
         "checks": "BC-BASE-001..005, BC-BASE-008, CHECK-CORE-019..023, CHECK-CORE-032/034; concurrent replay and two instances, null versus empty, fail-closed, role shrink/relogin and audit redaction",
-        "done_when": "Security state is authoritative under concurrency and faults; all affected callers use the same authorization and identity semantics."
+        "done_when": "Security state is authoritative under concurrency and faults; all affected callers use the same authorization and identity semantics.",
+        "evidence_ids": [
+          "EV-B02-SORT-20261008",
+          "EV-B02-SORT-GATES-20261008"
+        ],
+        "state": "in_progress",
+        "progress_summary": "本轮串行仅推进 DIAG-BASE-002；85 项排序专项及改动文件格式通过，完整门禁失败。其他 B02 问题和 B08 会话失效协调继续逐项复核；本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -397,6 +404,214 @@
     "shared_change_policy": "Whole-workspace direct and indirect impact analysis first; determine necessary consistency changes and verification, including affected deferred areas."
   },
   "coverage": [
+    {
+      "path": "docs/后端/30-规范/06-分页排序契约.md",
+      "role": "分页契约或本轮正式证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "5c0011fc5479997ae7c21b28eb50848eaabf5964e97bab1a655cc333bd36c803",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "docs/开发指南/工程治理/2026-10-08-B02分页排序验证.md",
+      "role": "分页契约或本轮正式证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "abba7619aa1af47113b3c1d8c08b1d2df86a8477f73e9e179833f7241655c25b",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/pagination/PageOrderFrom.java",
+      "role": "B02 分页请求边界或专项测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "4b222c75c15c3f04a807337fdc60fd5b715944eba35065c9374926dc9b36e7fc",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/persistence/pagination/PageFromSortHttpTest.java",
+      "role": "B02 分页请求边界或专项测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "af3250ff2c883a908d7801e63807ca77315e75432d076bc60c10c491cc6aa56c",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/persistence/pagination/PageFromSortPostgresTest.java",
+      "role": "B02 分页请求边界或专项测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "383f004bffd3a55806dc42a16f4e723089005a08959b984bbdf2bdfe57572779",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/persistence/pagination/PageFromSortTest.java",
+      "role": "B02 分页请求边界或专项测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "1f20b00098e8d6f5d9b5316f962c2fca6e933b5725928e04399c9f3bbec2656b",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-launch/src/test/java/com/devops00/spectra/launch/pagination/FixedPaginationCallerTest.java",
+      "role": "B02 分页请求边界或专项测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "f8da2a36be15f81e2c22e5424e854a493eca3f0bac9b4c211f876d3bb955cbbd",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-launch/src/test/java/com/devops00/spectra/launch/pagination/PaginationCallerBoundaryTest.java",
+      "role": "B02 分页请求边界或专项测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "57b4a61aafd6166806bacac75bca47983a914d9134d1adb81c9ca3b9317a7ab1",
+      "reviewed_rules": [
+        "04 §5 接口/排序输入安全",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-002"
+      ],
+      "evidence_ids": [
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_limits": [
+        "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
+      ],
+      "review_kind": "pagination_source_or_evidence_review",
+      "impact_ids": [
+        "IMP-BASE-005"
+      ]
+    },
     {
       "path": ".agents/plugins/marketplace.json",
       "role": "本地 Skill、插件规则及参考示例",
@@ -3075,7 +3290,7 @@
       "path": "docs/后端/10-后端模块/16-API总览.md",
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "655a7ae2b25d449dc73c7505f93d20d09f3b081372f8b12f505f77f7909f3bcf",
       "reviewed_rules": [
         "04§1",
@@ -3092,10 +3307,23 @@
       "impact_state": null,
       "review_summary": "# API 总览；全文文档结构/本地引用及高影响事实检索，17个一级至三级标题，0个待核对链接候选。",
       "review_limits": [
-        "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
+        "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "document_structure_and_high_impact_claim_scan",
-      "impact_ids": []
+      "impact_ids": [],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "ea12753a08c0b8ac719ea9e11c40563969992f2c6b864860d4e9499f39f61422",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
+      ]
     },
     {
       "path": "docs/后端/10-后端模块/17-内置角色接口与页面矩阵.md",
@@ -3283,7 +3511,7 @@
       "path": "docs/后端/30-规范/01-后端开发规范.md",
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "f0a587b1f77602a8d2ade17bbe92cde22369f9aeb9d3d9ed0f8b934114502592",
       "reviewed_rules": [
         "04§1",
@@ -3300,10 +3528,23 @@
       "impact_state": null,
       "review_summary": "# 后端开发规范；全文文档结构/本地引用及高影响事实检索，41个一级至三级标题，0个待核对链接候选。",
       "review_limits": [
-        "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
+        "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "document_structure_and_high_impact_claim_scan",
-      "impact_ids": []
+      "impact_ids": [],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "349d2fc84fc35df8ad3b2601b44c4b26bc04878c6406e975dae62a3e8fd44692",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
+      ]
     },
     {
       "path": "docs/后端/30-规范/02-MapStruct命名规范.md",
@@ -3605,7 +3846,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "49e53b11b9d6e56c2b476456e540ee57d516d7b0d3461f04f3c0bcaf0febcb15",
+      "content_sha256": "fc448eafcabc567b25974a1d9cb304a1b65d9ceb713a1c81a13585663dceaec9",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -14530,24 +14771,27 @@
       "role": "后端 spectra-framework / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "3fc9373145f24152c341bb65ad9b04aa3316875c616fc99c32b7d5c5986475ed",
+      "content_sha256": "dbe0f5f0885dadb9bbc2bfd714a273ba669977a817d0f5150074fc8efd18f5f9",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
         "04 §4 模型与映射",
         "04 §7 事务/并发",
-        "04 §10 生命周期"
+        "04 §10 生命周期",
+        "04 §5 接口/排序输入安全"
       ],
       "issue_ids": [
         "DIAG-BASE-002"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "page/size及List<OrderItem>直接传Page.setOrders；没有字段白名单或将HTTP排序映射为受控领域项。",
+      "review_summary": "独立 PageOrderFrom 保留原始输入；toPage 显式白名单/可信别名映射及防御性复制；requireUnsorted 拒绝固定排序入口的非空请求。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -14556,6 +14800,18 @@
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-BASE-005"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "dbe0f5f0885dadb9bbc2bfd714a273ba669977a817d0f5150074fc8efd18f5f9",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -18401,7 +18657,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/service/AuditLogQueryService.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "140c6cbd1da30f578d1c680ec37d47df51b1b4e5978b79092d7eba7ad8f09663",
       "reviewed_rules": [
         "04§2",
@@ -18424,12 +18680,25 @@
       "impact_state": null,
       "review_summary": "完整核对审计入口/同步事务及独立失败记录、读取可见性、查询限额、字段和JSONB映射；Service接口缺失及CSV公式转义需整改，时间/脱敏公共问题关联Foundation。",
       "review_limits": [
-        "Java机械许可证/import/Javadoc省略；未实测HTTP、DB、Redis、竞争。"
+        "Java机械许可证/import/Javadoc省略；未实测HTTP、DB、Redis、竞争。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-005",
         "IMP-ENGINEERING-001"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "87518daa755d489517d7ee36cd9a191df6b4a1907afd47c34b02ec19ea949fc1",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -21577,7 +21846,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/impl/NotificationAdminServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "9578a9dd6501e23e357a3a89648d9cc3f3ba287345b6b6d9b848b767a669b136",
       "reviewed_rules": [
         "04§2",
@@ -21601,11 +21870,24 @@
       "impact_state": null,
       "review_summary": "管理概览7天与列表31天边界、详情/分页、重试与取消全控制体核对；retry重置attemptCount且保留历史；仅Controller粗权限；取消结果聚合及未检查request更新。",
       "review_limits": [
-        "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。"
+        "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-004"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "a397973886d0ac31ec4bd75be7ae2d6d386db1b0ce5df192d6865a30a3357f9e",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -21705,7 +21987,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/impl/NotificationInboxServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "843886cf56664c148381c01c7dd9fbf6da380ce080107c4dfc401a4ad60a1635",
       "reviewed_rules": [
         "04§2",
@@ -21729,11 +22011,24 @@
       "impact_state": null,
       "review_summary": "列表/详情/标读/删除按传入userId约束，软删一致；批量删除只更新归属行且不检查全部id结果，夹带越权id无声部分成功；时间委托TimeMapper。",
       "review_limits": [
-        "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。"
+        "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-006"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "7902dea0d72e2e32af96569eaf23a13a0f8dc8846cc575f84456328bbf8f4082",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -21961,7 +22256,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/impl/NotificationTemplateServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "4cc5ae6810bf86b235f07b2dddae6b8c8c504433516f82a963712591c764f920",
       "reviewed_rules": [
         "04§2",
@@ -21985,11 +22280,24 @@
       "impact_state": null,
       "review_summary": "模板草稿/发布/停用/启用/归档及提交version比对，版本序号与组渠道聚合；分页先全量读入再切片、versions无规模边界；冲突抛DataSaveException；清空和发布并发待DB验证。",
       "review_limits": [
-        "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。"
+        "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-006"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "5de6af3dcce23f0dc3b2d2a76e4b56196a9f36deb4f32573bcef287a94cc4f51",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -23158,7 +23466,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/quartz/service/impl/QuartzJobManagementServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "4dab2ae1abac17db2ec50d3e68e552f30439f23957eed64dc668fb8cfeb0573f",
       "reviewed_rules": [
         "04§2",
@@ -23182,11 +23490,24 @@
       "impact_state": null,
       "review_summary": "核对类型目录、参数版本/敏感字段拒绝、JDBC集群装配、生命周期、API身份门禁、调度CRUD、历史字段及清理状态；服务最终授权、编辑版本、启动故障及历史清理竞争需整改。",
       "review_limits": [
-        "Java机械许可证/import/Javadoc省略；未实测Quartz集群、DB及HTTP；复杂度未工具校准。"
+        "Java机械许可证/import/Javadoc省略；未实测Quartz集群、DB及HTTP；复杂度未工具校准。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-001"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "443cb8afaa7b682d1dc168cc0aa8199e5c22d28ed5a11184a16dbe0236f20498",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -33780,7 +34101,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/RegionServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "3b9c97d50f877ffb82b6d56b514f879b47829c55382919e27ca9577445b6f135",
       "reviewed_rules": [
         "04§2",
@@ -33804,12 +34125,25 @@
       "impact_state": null,
       "review_summary": "完整核对本文件可执行控制流或字段/约束/映射声明及直接协作关系，关联本批诊断问题；版本、字段清空、授权边界和任务生命周期按职责分别核对。",
       "review_limits": [
-        "Java许可证/import/机械Javadoc省略；仅静态审查，未实际DB/Redis/HTTP、多实例或协议序列化验证。"
+        "Java许可证/import/机械Javadoc省略；仅静态审查，未实际DB/Redis/HTTP、多实例或协议序列化验证。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-001",
         "IMP-CORE-002"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "aa71f6e2a0bb2f077090509752833d1f44b36aa3431814ab28928f93068fedc0",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -34543,7 +34877,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/controller/FileAssetController.java",
       "role": "后端 spectra-core / controller",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "b68b9bcc532c10f1b52120ec411ef03208a1e3cffb56f9fa4c231fd2acb60f8f",
       "reviewed_rules": [
         "04§2",
@@ -34563,10 +34897,23 @@
       "impact_state": null,
       "review_summary": "实际方法[page,delete]；资产分页/删除入口粗权限与Audit，版本1.0.0；page DTO无Validated，规模由PageFrom/分页插件；最终授权在ApplicationService另复核Core001。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "47d05368e1c0c4b62126ce13d826e9c5469dd1f6032780f8e8ef1ef6ae1d0269",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/controller/FileAssetStreamController.java",
@@ -34607,7 +34954,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/controller/FileReferenceController.java",
       "role": "后端 spectra-core / controller",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "80f7ae5c110fb772f25d31f7de89cb890cc31c0d5fcd565d166808fcc7ae3fc4",
       "reviewed_rules": [
         "04§2",
@@ -34629,18 +34976,31 @@
       "impact_state": null,
       "review_summary": "实际方法[register,remove,page]；登记/删引用file:reference，管理员page file:admin:read；绑定强类型Command与View；目标业务可读不证明原资产可引用授权，支持Core007。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-003"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "d28b258bb15d489414bbe2e172a526685fbcbb1cdb0608d8911d1bab24d7889e",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/controller/FileTypeController.java",
       "role": "后端 spectra-core / controller",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "606d65c33c7708115792b2d80ca5c336de30a4401f23ed1cf1aa76da75209620",
       "reviewed_rules": [
         "04§2",
@@ -34660,16 +35020,29 @@
       "impact_state": null,
       "review_summary": "实际方法[page,get,create,modify,enable,disable]；Page/get与create/modify/enable/disable独立管理权限、Audit、@Valid；modify策略请求version允许null，用例可绕过提交版本支持Core003。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "f180bb695b1970b3a973c962c1602f6afcdd9a0b296d61abaadc3d3049f4b8f3",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/controller/FileUploadAdminController.java",
       "role": "后端 spectra-core / controller",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "f72aba5fcdd7f59b76d9c69fe69201b8081124284014b36bf3a843aee3658bb6",
       "reviewed_rules": [
         "04§2",
@@ -34689,10 +35062,23 @@
       "impact_state": null,
       "review_summary": "实际方法[page,detail,cancel]；管理员page/detail/cancel入口粗权限，cancel接收原因和幂等键但服务不消费；不把DTO字段当幂等证据，Service最终授权归Core001。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "2f3826eb003fe2e1a00bba01239acb9ad75f49201b38060393db8241d8bde443",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/controller/FileUploadController.java",
@@ -38125,7 +38511,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/service/impl/DepartmentMemberQueryServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "08501dbddbee184afbf328a452d4a4eae411c62775ca4dda349ca073cb40ed71",
       "reviewed_rules": [
         "04§2",
@@ -38150,11 +38536,24 @@
       "impact_state": null,
       "review_summary": "实际方法[page]；先验证活动部门，再同时department:read/user:read范围，缺当前身份不放行；分页之前范围判定，SQL前置成员过滤/自动count同源；跨域DepartmentMapper引用补Core002。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-001"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "fe31b30a1a10a8d042f2fad6990451cbec3ae3971512c7e932b6204d40c3892b",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -38298,7 +38697,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/service/impl/RoleServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "370a3394f319cfb1ea33441875c01a0945ffc69f91d38338547c07dfa846516a",
       "reviewed_rules": [
         "04§2",
@@ -38326,12 +38725,25 @@
       "impact_state": null,
       "review_summary": "实际方法[save,enable,disable,deleteById,page,all,detail,getSystemDefaultUserRole,toVO,generatedCode,ensureNameAvailable,codeExists,normalize,getRole,ensureNotSystemManaged,ensureNoActiveAssignments]；业务角色系统保护、名称/编码重复检测、code不可改、禁删活动assignment、结果检查；普通save RoleFrom无version，SecurityRole子version无MP锁补MODEL001/CORE003；缺操作授权补CORE001、跨security Mapper补CORE002；all无规模上限待资源验。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-CORE-001",
         "IMP-CORE-002"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "1a6c138e75ad675e681f17ae57e56730f23c9bb8084127f4ac3224dd0fed065a",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -38651,7 +39063,7 @@
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/service/impl/UserServiceImpl.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "f6bace744e17800139ab519df1784eec8719e69532958e66bf0357f2495d1142",
       "reviewed_rules": [
         "04§2",
@@ -38683,7 +39095,8 @@
       "impact_state": null,
       "review_summary": "实际方法[getByUsername,searchSecurityCandidates,create,createWithDefaultPasswordHash,modify,passwordResetById,page,detail,assertUserReadable,assertUserWithinPermission,appendUserReadScope,online,getProfile,updateProfile,changePassword,changeStatus,lifecycleEventType,appendAudit,revokeActiveAssignments,targetRoles,syncProvisionedContacts,fillAuthorization,fillAssociatedDepartments,currentOperatorId,parseUuid]；逐方法核对创建/修改/密码/生命周期/分页/online/profile；用户列表范围在分页前、online列表先全量再按session权限过滤并内存分页有预算缺口；普通编辑新读版本、联系字段modify无同步、reinstatement null departedAt不保证写库；status防护Root guard无调用Core019；后台内部profile/password接受任意ID缺最终身份检查补Core001；password到期null/Core022；直接多跨域Mapper补Core002。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
@@ -38691,13 +39104,25 @@
         "IMP-CORE-001",
         "IMP-CORE-002",
         "IMP-CORE-005"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "c99aa12bb6f445337e1fa14a1d18cc307192b9d9977602531d987745e9652bba",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/service/OnlineUserPageAssembler.java",
       "role": "后端 spectra-core / service",
       "scope": "included",
-      "state": "reviewed",
+      "state": "stale",
       "content_sha256": "e45222638a90f3b079edc8e8b0491615cc71e7396aaa7707a8fc51d136eef7c7",
       "reviewed_rules": [
         "04§2",
@@ -38720,10 +39145,23 @@
       "impact_state": null,
       "review_summary": "实际方法[page,matches,containsIgnoreCase]；按user分组session排序、姓名关键字/主关联部门筛选后计数分页，溢出乘法安全处理；默认page15但无最大pageSize/全量会话预算，方法6显式参数触发规则；样例测试仅关联部门聚合，不证明实际Redis规模。",
       "review_limits": [
-        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。"
+        "逐文件读取完整实现及测试断言；仅省略版权/Javadoc/import展示，不省略业务控制流。未执行测试/真实DB/Redis/S3/HTTP或PMD指标测量，静态reviewed不等于通过。",
+        "2026-10-08 仅增量复核分页排序改动；历史整文件内容摘要保留，完整职责审查尚未按当前全文件更新。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "2cce6d4d2125038ec2c84b1aadaed94ae39e32fa83197a5092f9d330e07645f6",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/user/service/PermissionService.java",
@@ -41781,7 +42219,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "fb180fe4e800f6e0223df40c326e8af63a7df55e94798ffb721958b34308b5ec",
+      "impact_content_sha256": "c10d4fc4ca32f4a3251a278545674c37b62a5ce7c91bb12710e67d8ba0fd7661",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -41797,7 +42235,7 @@
         "Transactional",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -41814,7 +42252,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "c10d4fc4ca32f4a3251a278545674c37b62a5ce7c91bb12710e67d8ba0fd7661",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -42682,7 +43134,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "cef70da0d9998d243c6b5753f2048b5b1b90d7f73a04438c1f65d845acf074a5",
+      "impact_content_sha256": "fc305203a9e8cb4f054d28827a650ba58dd82b5ddea3f01472e9fddd8073e578",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -42699,7 +43151,7 @@
         "Transactional",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -42716,7 +43168,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "fc305203a9e8cb4f054d28827a650ba58dd82b5ddea3f01472e9fddd8073e578",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -43061,7 +43527,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "f8554c68b3af6ab1fb319c281736598b8d8e3e9b8e14cf90630b8f52a78b8df3",
+      "impact_content_sha256": "23843ee83be6f29df5ebb6032b1841e801e3cf43e5648ba209291de174bc45ba",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -43078,7 +43544,7 @@
         "Transactional",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -43095,7 +43561,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "23843ee83be6f29df5ebb6032b1841e801e3cf43e5648ba209291de174bc45ba",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -43361,7 +43841,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "7f0832a15e59b470cdf2ca08f2d0a242e6ac94625c5c90e7ca3a075dfe10d24d",
+      "impact_content_sha256": "f1c224a6ffcddd5d395bc6ec762807e2be7eda6f8ff7a4c8918c11a663aadbe9",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.port.directory.DirectoryContactSnapshot",
@@ -43374,7 +43854,7 @@
         "version",
         "DirectoryQuery"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -43391,7 +43871,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "f1c224a6ffcddd5d395bc6ec762807e2be7eda6f8ff7a4c8918c11a663aadbe9",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -44177,7 +44671,7 @@
       ],
       "scope_reason": null,
       "impact_state": "public_boundary_reviewed",
-      "impact_content_sha256": "4299b025323ccc193e04bf140edbe05c2a3fb712e9c06811c10dada8f78a65fb",
+      "impact_content_sha256": "ed94d9ee24f18fe0c49455ab50a9632414907463e1e424dad15b6ad6f23ac593",
       "impact_review_kind": "shared_boundary_source_review",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -44204,7 +44698,7 @@
         "FileAsset",
         "SecurityContext"
       ],
-      "impact_review_summary": "公共资产引用与后台合同getById范围路径实际追踪，独立合同生命周期不重构",
+      "impact_review_summary": "公共资产引用与后台合同getById范围路径实际追踪，独立合同生命周期不重构 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。",
@@ -44223,7 +44717,21 @@
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
         "EV-DEFERRED-20261004",
-        "EV-CORE-005"
+        "EV-CORE-005",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "ed94d9ee24f18fe0c49455ab50a9632414907463e1e424dad15b6ad6f23ac593",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -45051,7 +45559,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "05c24e3acb462e4a739bc6ccde5be936797b1d61e8d5931f0800f1f7720abd27",
+      "impact_content_sha256": "cbdc8ad132f5b3a3e32ad0bf0f67cc2542ab41c9db69ed7a5293e1d6c732efd0",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -45076,7 +45584,7 @@
         "DirectoryQuery",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -45093,7 +45601,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "cbdc8ad132f5b3a3e32ad0bf0f67cc2542ab41c9db69ed7a5293e1d6c732efd0",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -45803,7 +46325,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "99b558f011fbcc60506d69f78498053f4bc41d8621e2eeb14a5d356f7cdb081b",
+      "impact_content_sha256": "482f20d1eec71a1efd5c8d2ac2aeec950b9ebea8d3d9c9e1cb3abe4aa32e539a",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -45821,7 +46343,7 @@
         "Transactional",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -45838,7 +46360,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "482f20d1eec71a1efd5c8d2ac2aeec950b9ebea8d3d9c9e1cb3abe4aa32e539a",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -46579,7 +47115,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "2fc04b9a21d369aa35239e3f91a02a15854992e97da0e14662d79796707639c0",
+      "impact_content_sha256": "a48a61c6659eccb46aee1b9d30402278975ac2f3543e1194611cf35acf1572ee",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -46603,7 +47139,7 @@
         "DirectoryQuery",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -46620,7 +47156,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "a48a61c6659eccb46aee1b9d30402278975ac2f3543e1194611cf35acf1572ee",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -47085,7 +47635,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "0c5906911b753ba5168de239898298e494828675e624a90fc7d33f3bbb077868",
+      "impact_content_sha256": "38f9e5baae21fd13139b580c4eae585f8eea52caa3fd60ebb189b87bf7012709",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -47108,7 +47658,7 @@
         "DirectoryQuery",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -47125,7 +47675,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "38f9e5baae21fd13139b580c4eae585f8eea52caa3fd60ebb189b87bf7012709",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -48144,7 +48708,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "8d5cdbf7a6b4e7d51ea1fa4bec1ec0b1c9d9c7754c9df5e4e667d0df9537bf29",
+      "impact_content_sha256": "f033d526047c484f607a30e2c00817a06e71b3cc0c2427a1b3a94d5aa8de054f",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -48161,7 +48725,7 @@
         "Transactional",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -48178,7 +48742,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "f033d526047c484f607a30e2c00817a06e71b3cc0c2427a1b3a94d5aa8de054f",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -48918,7 +49496,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "108661c07040a370968e22e6c46aa207852c6a6f545a1755a77e2d1839d25bb9",
+      "impact_content_sha256": "e648bf00bb2a6edd4a4c9bfcf22fda64b7e52f54402d8d3299e5c03ca0e26e64",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -48939,7 +49517,7 @@
         "FileAsset",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -48956,7 +49534,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "e648bf00bb2a6edd4a4c9bfcf22fda64b7e52f54402d8d3299e5c03ca0e26e64",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -49941,7 +50533,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "f2be907626c579f09447b29f2d84b0fe352cd3ef5b7cdb0851db6216d679d1e2",
+      "impact_content_sha256": "ffb387705ea97fa6a22aea1a63cc65b99a748eb9fc0b5d65a8e367ed270335f8",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -49958,7 +50550,7 @@
         "Transactional",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -49975,7 +50567,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "ffb387705ea97fa6a22aea1a63cc65b99a748eb9fc0b5d65a8e367ed270335f8",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -52467,7 +53073,7 @@
       ],
       "scope_reason": null,
       "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "d4dfefbe367e266573964e3000f34b9d1896c868482348cf38520314c5288c6a",
+      "impact_content_sha256": "b31f73bcdb9740a3ccb6da4165426824a587dbdf363fee8252e09bc14e924ffa",
       "impact_review_kind": "shared_reference_scan_only",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -52482,7 +53088,7 @@
         "version",
         "Transactional"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -52499,7 +53105,21 @@
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-08",
+          "issue_id": "DIAG-BASE-002",
+          "content_sha256": "b31f73bcdb9740a3ccb6da4165426824a587dbdf363fee8252e09bc14e924ffa",
+          "scope": "仅分页输入转换/拒绝及调用方一致性；完整字段清单和证据见分页排序契约。",
+          "evidence_ids": [
+            "EV-B02-SORT-20261008",
+            "EV-B02-SORT-GATES-20261008"
+          ]
+        }
       ]
     },
     {
@@ -61405,22 +62025,25 @@
       "locations": [
         {
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/pagination/PageFrom.java",
-          "symbol": "toPage",
-          "line": 69
+          "symbol": "toPage(Map<String, String>), requireUnsorted"
         }
       ],
       "finding": "HTTP分页模型接受MyBatis OrderItem并直接setOrders，未建立字段白名单。",
       "impact": "Core与暂缓OA分页调用可能让客户端指定表达式/敏感列；既有历史探针不可替代本次当前版本验证。",
       "priority": "P1",
       "disposition": "required_fix",
-      "state": "pending",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
       ],
       "impact_ids": [
         "IMP-BASE-005"
-      ]
+      ],
+      "resolution": "独立 PageOrderFrom、显式字段/别名映射、固定排序拒绝和请求对象隔离已实现；22 个 SQL + 10 个固定排序入口全部迁移，85 项专项通过，完整门禁未通过，尚未验收关闭。",
+      "verification_record": "docs/开发指南/工程治理/2026-10-08-B02分页排序验证.md"
     },
     {
       "id": "DIAG-BASE-003",
@@ -64992,7 +65615,8 @@
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/serialization/mapper/GlobalMapperConfig.java",
         "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/base/BaseEntity.java",
         "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/port/file/FileReferenceService.java",
-        "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/port/directory/DirectoryQueryPort.java"
+        "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/port/directory/DirectoryQueryPort.java",
+        "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/pagination/PageOrderFrom.java"
       ],
       "indirect": [
         "分页排序/范围拦截、Mapper系统字段和局部clear、目录批查询与文件引用跨Common→Framework→Core→OA/Workflow间接扩散；ORM @Version并不提供客户端旧版本约束。"
@@ -65004,16 +65628,20 @@
         "Core agent负责各From/version/CAS证据；OA合同/文档/附件与Flowable主体查询只作共享影响验收，资源上限与引用权限需纳入后续必要改造。"
       ],
       "deferred_boundary": "本范围不重复认领Core各Mapper实体具体缺陷；ScopeSqlPolicy alias/method-name以及cache key碰撞仍为候选，未断言越权或现网泄漏。",
-      "state": "pending",
+      "state": "in_progress",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-SORT-20261008",
+        "EV-B02-SORT-GATES-20261008"
       ],
       "verification": [
-        "Core agent负责各From/version/CAS证据；OA合同/文档/附件与Flowable主体查询只作共享影响验收，资源上限与引用权限需纳入后续必要改造。"
+        "Core agent负责各From/version/CAS证据；OA合同/文档/附件与Flowable主体查询只作共享影响验收，资源上限与引用权限需纳入后续必要改造。",
+        "排序 32 个入口已迁移，85 项专项通过；字段清单见 docs/后端/30-规范/06-分页排序契约.md，完整门禁仍失败。"
       ],
       "limits": [
-        "本范围不重复认领Core各Mapper实体具体缺陷；ScopeSqlPolicy alias/method-name以及cache key碰撞仍为候选，未断言越权或现网泄漏。"
+        "本范围不重复认领Core各Mapper实体具体缺陷；ScopeSqlPolicy alias/method-name以及cache key碰撞仍为候选，未断言越权或现网泄漏。",
+        "不关闭 DIAG-BASE-011/019 和 ScopeSqlPolicy 范围候选；未验证全部业务 HTTP/schema、双实例与浏览器。"
       ]
     },
     {
@@ -67394,6 +68022,71 @@
   ],
   "evidence": [
     {
+      "id": "EV-B02-SORT-20261008",
+      "scope": "DIAG-BASE-002 / IMP-BASE-005 / BC-BASE-008 排序子场景",
+      "command_or_scenario": [
+        "mise exec -- .\\mvnw.cmd -pl spectra-launch -am '-Dtest=PageFromSort*Test,PaginationCallerBoundaryTest,FixedPaginationCallerTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.postgres.port=25432' '-DargLine=-javaagent:D:/Develop/Platform/mavenrepo/net/bytebuddy/byte-buddy-agent/1.18.10/byte-buddy-agent-1.18.10.jar' test",
+        "定向 Spotless、CodeGraph 和 RED/中间失败完整命令见 docs/开发指南/工程治理/2026-10-08-B02分页排序验证.md",
+        "& ./docs/superpowers/2026-10-08-分页排序台账核对.ps1；退出 0。核对问题/影响/证据 ID 唯一、本轮引用、38 个当前文件摘要、范围统计及 PowerShell 规范化台账自摘要；不重新验证历史全库 coverage。"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 2026.10.3 / Temurin 25.0.2+10 / Maven Wrapper 3.9.12；隔离 PostgreSQL 127.0.0.1:25432/b02_test，VALUES 合成查询，无 Docker/业务数据/本机凭据",
+      "tool_versions": {
+        "java": "25.0.2+10",
+        "maven_wrapper": "3.9.12",
+        "surefire": "3.5.6",
+        "spotless": "3.9.0",
+        "postgresql": "18.4"
+      },
+      "checked_at": "2026-10-08",
+      "result": "passed",
+      "exit_code": 0,
+      "summary": "最终 85 项测试，0 失败/错误/跳过；8 个 reactor 项目成功；7 个基础类型/测试文件及 27 个受影响调用方文件格式通过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-08-B02分页排序验证.md",
+        "docs/后端/30-规范/06-分页排序契约.md",
+        ".temp/b02/sort-final-test.log",
+        ".temp/b02/sort-format-green.log",
+        ".temp/b02/sort-callers-format-green.log",
+        ".temp/b02/sort-codegraph-admin.log",
+        ".temp/b02/sort-codegraph-ui.log",
+        ".temp/b02/sort-ledger-check.log"
+      ],
+      "limits": "调用方在转换边界捕获，不是所有业务端点/schema 的完整验收；HTTP 为测试 Controller+正式异常处理器；Flowable 查询使用 mock。两线程转换不是双应用实例；范围候选/浏览器/B02其他问题未由本证据证明。"
+    },
+    {
+      "id": "EV-B02-SORT-GATES-20261008",
+      "scope": "B02 排序修改后适用完整后端门禁",
+      "command_or_scenario": [
+        "mise exec -- .\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' '-Dspectra.test.postgres.port=25432' '-DargLine=-javaagent:D:/Develop/Platform/mavenrepo/net/bytebuddy/byte-buddy-agent/1.18.10/byte-buddy-agent-1.18.10.jar' verify",
+        "mise exec -- .\\mvnw.cmd -fae '-Dspectra.test.postgres.port=25432' '-DargLine=-javaagent:D:/Develop/Platform/mavenrepo/net/bytebuddy/byte-buddy-agent/1.18.10/byte-buddy-agent-1.18.10.jar' test",
+        "mise exec -- .\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 2026.10.3 / Temurin 25.0.2+10 / Maven Wrapper 3.9.12；隔离 PostgreSQL 127.0.0.1:25432/b02_test，VALUES 合成查询，无 Docker/业务数据/本机凭据",
+      "tool_versions": {
+        "java": "25.0.2+10",
+        "maven_wrapper": "3.9.12",
+        "surefire": "3.5.6",
+        "spotless": "3.9.0",
+        "postgresql": "18.4",
+        "spotbugs_plugin": "4.10.3.0"
+      },
+      "checked_at": "2026-10-08",
+      "result": "failed",
+      "exit_codes": [
+        1,
+        1,
+        1
+      ],
+      "summary": "verify：Common 通知模型 14 条 EI_EXPOSE_REP/EI_EXPOSE_REP2；test：CORE-034 匿名受众读取失败（Core 63 项，1 失败、2 跳过）；全量格式：Framework 3 个会话文件失败。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-08-B02分页排序验证.md",
+        ".temp/b02/sort-full-verify.log",
+        ".temp/b02/sort-full-test.log",
+        ".temp/b02/sort-full-format.log"
+      ],
+      "limits": "被阻断的后续模块未执行对应完整门禁；不以专项通过替代验收，不关闭 B02 或全周期。"
+    },
+    {
       "id": "EV-SKILL-20261003",
       "scope": "Backend/Web Skill entries and references; local Spectra plugin source and installed cache.",
       "command_or_scenario": [
@@ -69045,14 +69738,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1488,
+      "included": 1496,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 22
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "Initial responsibility routing retained; all included/shared reviewed, deferred independent business stays enumerated with separate public-impact records. Mechanical references are not complete business review.",
+    "classification_limits": "2026-10-08 bounded refresh adds 8 sorting files and records 38 current file digests. 16 changed existing included files are stale for full-file review; their pagination changes have separate remediation_reviews. Deferred independent business remains enumerated with separate public-impact evidence. This is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -69062,7 +69755,7 @@
       "deferred_business": 438,
       "excluded": 22
     },
-    "refreshed_at": "2026-10-05"
+    "refreshed_at": "2026-10-08"
   },
   "diagnosis": {
     "phase": 2,
@@ -69070,7 +69763,8 @@
     "started_at": "2026-10-04",
     "completed_at": "2026-10-05",
     "method": "Current-source responsibility/failure-path review, whole-workspace public-boundary analysis, historical reconciliation, separated behavior evidence.",
-    "reviewed_included": 1518,
+    "reviewed_included": 1510,
+    "current_review_state": "partial_refresh_for_B02_sorting; historical diagnosis complete does not imply current whole-file revalidation",
     "deferred_public_inputs": 438,
     "behavior_checks": [
       {
@@ -69310,15 +70004,36 @@
       {
         "id": "BC-BASE-008",
         "name": "排序与范围",
-        "status": "not_executed",
+        "status": "partially_executed",
         "necessary_acceptance": "各分页endpoint仅允许注册字段，恶意expression拒绝；范围关系SQL别名和insert/create/add名称拦截候选检查。",
-        "boundary": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。",
+        "boundary": "排序已专项验证；范围拦截的 SQL alias 和 insert/create/add 名称匹配仍未执行，整体不可标 passed。",
         "scenario": "各分页endpoint仅允许注册字段，恶意expression拒绝；范围关系SQL别名和insert/create/add名称拦截候选检查。",
-        "state": "not_run",
-        "issue_ids": [],
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。"
+        "state": "inconclusive",
+        "issue_ids": [
+          "DIAG-BASE-002"
+        ],
+        "impact_ids": [
+          "IMP-BASE-005"
+        ],
+        "evidence_ids": [
+          "EV-B02-SORT-20261008",
+          "EV-B02-SORT-GATES-20261008"
+        ],
+        "required_environment": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。",
+        "subchecks": [
+          {
+            "id": "BC-BASE-008-SORT",
+            "state": "passed",
+            "evidence_ids": [
+              "EV-B02-SORT-20261008"
+            ]
+          },
+          {
+            "id": "BC-BASE-008-SCOPE",
+            "state": "not_run",
+            "evidence_ids": []
+          }
+        ]
       },
       {
         "id": "BC-BASE-009",

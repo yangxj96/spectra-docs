@@ -42,6 +42,8 @@ source: https://www.devops00.com/spectra-admin/be-redis-guide
 
 生产代码统一使用 `SecurityRedisExecutor` 包裹安全 Redis 操作。普通业务缓存与安全事实源都不能故障降级；安全场景还必须停止继续认证、刷新或执行依赖安全事实的业务。
 
+安全集合读取使用 `require`：Redis 正常返回空集合代表已确认不存在，`null` 代表无法确认，必须拒绝。登录失败和验证码尝试通过 `SecurityRedisCounter` 的 Lua 脚本原子创建计数及 TTL，后续递增保持首次窗口；已有计数缺少 TTL、数值畸形或命令失败时拒绝。登录锁定读取同样原子确认计数与 TTL，不能只凭计数值推断可登录；关闭登录锁定时不再创建永久计数。
+
 安全运行态统一使用 `sec:*` 命名空间，Key 中只允许摘要或非敏感标识，不允许出现明文 Token：
 
 | Key 前缀 | 用途 |
