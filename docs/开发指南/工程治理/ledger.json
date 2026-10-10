@@ -112,10 +112,12 @@
           "EV-B02-BASE007-20261009",
           "EV-B02-BASE007-GATES-20261009",
           "EV-B02-BASE018-20261009",
-          "EV-B02-BASE018-GATES-20261009"
+          "EV-B02-BASE018-GATES-20261009",
+          "EV-B02-CORE034-20261009",
+          "EV-B02-CORE034-GATES-20261009"
         ],
         "state": "in_progress",
-        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项和 BASE-018 计数 TTL 10 项隔离/单元专项通过，Framework 格式和八模块测试编译通过。完整 verify、全量测试与格式仍失败；双应用进程、实际 Redis 断连恢复、Core 实际入口和 B08 浏览器身份失效未验收，本批未满足 done_when。"
+        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项、BASE-018 计数 TTL 10 项和 CORE-034 匿名/后台通知身份 10 项定点通过。CORE-034 的 Common/Core/OA/Workflow 调用方已迁移且八模块测试编译、改动范围格式通过；完整 verify、全量测试与全量格式仍失败。真实 HTTP/Quartz/Workflow 入口、双应用进程、实际 Redis 断连恢复及 B08 浏览器身份失效未验收，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -568,6 +570,32 @@
       "review_kind": "security_redis_evidence_review",
       "impact_ids": [
         "IMP-BASE-003"
+      ]
+    },
+    {
+      "path": "docs/开发指南/工程治理/2026-10-09-B02后台通知身份验证.md",
+      "role": "B02 通知目录与后台系统身份专项正式证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "54fd31b713b41e3799ce4e9936025238beb1c01a7c0095749f3ded4f2ebfac5f",
+      "reviewed_rules": [
+        "04 §7 身份与授权上下文",
+        "04 §12 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
+      "evidence_ids": [
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
+      ],
+      "review_summary": "记录匿名目录拒绝、显式系统通知身份、OA/Workflow/监控调用方、用户与联系方式表的数据范围静态复核、10 项定点与完整门禁及真实入口边界。",
+      "review_limits": [
+        "不证明真实 HTTP、Quartz、Workflow 流程实例、数据库投递事务、多实例或 B02 整体验收。"
+      ],
+      "review_kind": "authorization_boundary_evidence_review",
+      "impact_ids": [
+        "IMP-CORE-007"
       ]
     },
     {
@@ -3282,26 +3310,31 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "4334f96b6ea5e80bd17f5de538f914af40847ecba558eca1222e325ccc996367",
+      "content_sha256": "00b6b07f5722d02eb529713f146fc020ecb224d2f4bb7e6b8802420dc50617b7",
       "reviewed_rules": [
         "04§1",
         "04§4",
         "04§12",
         "04§13"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# Core 统一通知子域；全文文档结构/本地引用及高影响事实检索，13个一级至三级标题，0个待核对链接候选。",
+      "review_summary": "# Core 统一通知子域；B02 同步普通收件人缺身份拒绝、四类系统身份来源/用途/模板及 OA/Workflow 调用方边界。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
       "review_kind": "document_structure_and_high_impact_claim_scan",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "docs/后端/10-后端模块/12-基础设施.md",
@@ -3978,7 +4011,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "203b7a57e0e92feb4296d42a39b79fc073253d1d35e2912d6ff3ae6978d9ebd4",
+      "content_sha256": "acb9c91236cf18d4db7c950fdae3b970b2aa2fa07fc1d45a0141fa3c5f23e977",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3992,11 +4025,15 @@
         "EV-B02-BASE004-20261009",
         "EV-B02-BASE004-GATES-20261009",
         "EV-B02-BASE007-20261009",
-        "EV-B02-BASE007-GATES-20261009"
+        "EV-B02-BASE007-GATES-20261009",
+        "EV-B02-BASE018-20261009",
+        "EV-B02-BASE018-GATES-20261009",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "正式台账逐项合并当前文件审查、问题、影响与独立行为状态；BASE-007 已解决、B02 保持进行中，本体使用自摘要置空后的 PowerShell 规范化 JSON 摘要。",
+      "review_summary": "正式台账逐项合并当前文件、问题、影响与行为状态；BASE-007/018、CORE-034 定点已解决，完整门禁和真实后台入口仍未验收，B02 保持进行中；本体使用自摘要置空后的 PowerShell 规范化 JSON 摘要。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4009,7 +4046,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "b22b273e9cb94c33d36c037cc3a69949189b6bb70e6210d4533bd2f025ffd015",
+      "content_sha256": "3fbefab87b6defff8e17e353dc4bbcadf2f8cc6f8e5fcc36d88fc988187be18f",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4027,11 +4064,13 @@
         "EV-B02-BASE007-20261009",
         "EV-B02-BASE007-GATES-20261009",
         "EV-B02-BASE018-20261009",
-        "EV-B02-BASE018-GATES-20261009"
+        "EV-B02-BASE018-GATES-20261009",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 工程治理台账；2026-10-09 核对有限范围清单、全局 in_progress、BASE-003/004/007/018 专项及门禁边界。",
+      "review_summary": "# 工程治理台账；2026-10-09 核对 2000 文件有限范围清单、全局 in_progress、BASE-003/004/007/018 与 CORE-034 专项及门禁边界。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -12158,7 +12197,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "a36dfdaf0cc78804758929da0947346e52dce51cebcc35c5219444f16b75a1a6",
+      "content_sha256": "5d5642f49a60e75b9ff21c78fcc07a1081b08042b469b6e5cbed8abee3b86866",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -12167,21 +12206,26 @@
         "04 §6 时间",
         "04 §10 生命周期/资源"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "通知接受/提交公共端口，具体持久化、提交后投递及幂等由Core实现；暂缓OA/Workflow直接消费。",
+      "review_summary": "通知接受/提交公共端口，CORE-034 增加显式系统入队并在 Core 校验运行身份的来源、用途、模板和收件人；暂缓 OA/Workflow 公共调用已迁移。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
         "复杂度指标未校准/未实测，候选不等于已超阈值。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationPurpose.java",
@@ -12278,7 +12322,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "6e0f8690dc797288247b73b76ef8094d134ba82fe70becac2fef908ca6402cf8",
+      "content_sha256": "bbd7d73ba3d0e580ce241148d3070e3c99ac47919b5edf058f6aa5032a1949b2",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -12287,21 +12331,26 @@
         "04 §6 时间",
         "04 §10 生命周期/资源"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "Core 向通知模块提供的收件人解析端口，只返回投递所需的最小快照。；通知公共枚举/快照/收件契约逐项阅读，集合和必填参数边界核对；投递幂等与持久执行由Core实现。",
+      "review_summary": "Core 收件人最小快照端口；CORE-034 区分普通认证主体和已登记的系统运行身份，Workflow 登录名解析独立受限。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
         "复杂度指标未校准/未实测，候选不等于已超阈值。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationRequest.java",
@@ -12368,7 +12417,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "4c45899fd15a3247eef9274be4c8a52b684f9ddcbb5dbdfc496ef8d425f38d73",
+      "content_sha256": "ad74eb7984dd617c766a8baf45a1852f889da84eb0e4ee3b65d79e04a6555689",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -12377,21 +12426,51 @@
         "04 §6 时间",
         "04 §10 生命周期/资源"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "业务模块使用的快捷通知服务。 调用方只需要组装模板、渠道、收件人和参数；通知模块负责转换为统一网关请求并执行后续投递流程。；通知公共枚举/快照/收件契约逐项阅读，集合和必填参数边界核对；投递幂等与持久执行由Core实现。",
+      "review_summary": "业务通知快捷服务；CORE-034 增加仅供明确内部运行身份使用的 sendAsSystem，普通发送保留认证主体数据范围。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
         "复杂度指标未校准/未实测，候选不等于已超阈值。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationSystemActor.java",
+      "role": "B02 内部通知运行身份与固定来源/用途/模板映射",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "0dbf227e84a85547a0aafd87fc6219ac98c9ad1cb42b66380eaa2d2563bb0bdb",
+      "reviewed_rules": [
+        "04 §7 内部任务显式身份与最小范围",
+        "04 §12 行为验证"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
+      "evidence_ids": [
+        "EV-B02-CORE034-20261009"
+      ],
+      "review_summary": "四种内部运行身份只允许对应来源模块、用途和模板，且必须有明确用户 ID、不得带直接地址；Workflow 登录名查询另受身份限制。",
+      "review_limits": [
+        "新增内部调用方需另行登记和验证；不代表 HTTP/Quartz/流程实例已实测。"
+      ],
+      "review_kind": "authorization_boundary_source_review",
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationTemplateCode.java",
@@ -22286,7 +22365,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "730b062ad4e50dd320d547b9617fc5817213362d157bec108410bc1bd9d50b92",
+      "content_sha256": "894f9b5f2dcd64759fb076c3223d84995889b7e91f41746d1b1ee7756768634d",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -22298,19 +22377,24 @@
         "04§10",
         "04§12"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "事务保存请求/模板快照/批量任务，幂等键查询后写、渠道/敏感参数/链接校验；目标偏好与免打扰过滤，直接地址特定用途允许；未限制普通Service请求规模/幂等键内容一致性。",
+      "review_summary": "事务保存请求/模板快照/批量任务；CORE-034 系统入口在目录读取与持久化前校验身份-用途-模板及明确收件人，普通入口继续由用户范围解析；其他原有幂等/发送限制未在本项重构。",
       "review_limits": [
         "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/impl/NotificationInboxServiceImpl.java",
@@ -22493,7 +22577,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "efa2a4fb1f19ad7bed37b51a7496902d8b1f2c7f53ff1c723359dc42a0b69ffd",
+      "content_sha256": "cd25a685be5d8c747380ae475255fc5cba179f96f350e06b058ebf2f61e5e8ec",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -22505,19 +22589,24 @@
         "04§10",
         "04§12"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "Common通知发送端口检查请求及每渠道可用，转NotificationRequest入Gateway；未创建旁路状态，渠道状态拒绝在持久受理之前。",
+      "review_summary": "Common 通知端口转网关；CORE-034 系统请求先校验运行身份映射，再查渠道并走显式系统网关入口；普通请求仍走用户身份路径。",
       "review_limits": [
         "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/service/impl/NotificationTemplateDigest.java",
@@ -24851,7 +24940,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "bebfbaedb23d1435032632331da125d95dd241cf108f29a73e5850398d21a20c",
+      "content_sha256": "18a6fd81920915770dd1b85fc465c29f4263db1da49fd72c87f9cba44c56f7cb",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -24868,11 +24957,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "用户/地址/时区解析、HTTP身份快照user:read与部门祖先范围；currentUserId=null直接全允许，非HTTP缺上下文成为全量，业务后台需显式系统身份。",
+      "review_summary": "用户/地址/时区解析先按当前认证主体 user:read 和部门祖先范围授权；缺认证身份的非空目录查询在读取用户及联系方式前拒绝。后台路径要求显式系统身份，只有 Workflow 任务身份可按登录名解析。",
       "review_limits": [
         "2026-10-05静态逐文件实现/控制流/调用边界审查；省略许可证、import与机械Javadoc；未运行依赖/HTTP/Provider/并发验证，复杂度未用校准PMD实测。"
       ],
@@ -34517,7 +34607,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "b76c76032b5245be58f5331d9bcec57163f532e55953f01fde74989070fa25ba",
+      "content_sha256": "b6cf9f6f3212796056bc2c4858424a9da9e7ba49fecc657c8f7c0553033304c3",
       "reviewed_rules": [
         "04§2 职责/应用Service及跨域",
         "04§3 控制体复杂度/例外适用边界",
@@ -34534,15 +34624,17 @@
         "DIAG-BASE-008",
         "DIAG-BASE-009",
         "DIAG-CORE-001",
-        "DIAG-CORE-002"
+        "DIAG-CORE-002",
+        "DIAG-CORE-034"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-SYSTEM-READ-20261005"
+        "EV-SYSTEM-READ-20261005",
+        "EV-B02-CORE034-20261009"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "569行分段全读observe/operator/active event/notification/cooldown、规则版本写入及summary/转换；操作授权/跨域Mapper补CORE001/002，规则停用/在途评估及副作用原子问题SYSTEM002。",
+      "review_summary": "observe/operator/active event/notification/cooldown、规则版本写入及 summary/转换；CORE-034 监控告警按有效运维角色显式用户 ID，使用限定来源/用途/模板的 SERVICE_MONITOR_ALERT 身份入队；其他系统管理待办维持原登记。",
       "review_limits": [
         "静态当前源文件控制体和声明读取；未运行数据库/Redis/JVM诊断文件生成/浏览器/质量门禁。",
         "未运行固定PMD复杂度测量，不能凭行数或人工阅读宣称数值阈值通过。"
@@ -34551,7 +34643,8 @@
       "impact_ids": [
         "IMP-SYSTEM-002",
         "IMP-BASE-002",
-        "IMP-CORE-001"
+        "IMP-CORE-001",
+        "IMP-CORE-007"
       ]
     },
     {
@@ -41350,6 +41443,31 @@
       "impact_ids": []
     },
     {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/notification/service/impl/NotificationSystemIdentityTest.java",
+      "role": "B02 后台通知身份来源/用途/模板及入队路径测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "f0b02270d40dd2f5021b129109516c0006f25e7030c80d87dfc7247615173b6a",
+      "reviewed_rules": [
+        "04 §7 内部任务显式身份与最小范围",
+        "04 §12 行为验证"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-034"
+      ],
+      "evidence_ids": [
+        "EV-B02-CORE034-20261009"
+      ],
+      "review_summary": "3 项单测验证 Workflow、OA、监控身份的合法请求及空身份、错误来源、用途/模板和非明确收件人拒绝。",
+      "review_limits": [
+        "Mockito 隔离网关，未运行真实数据库投递事务、HTTP 或任务实例。"
+      ],
+      "review_kind": "authorization_boundary_test_review",
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
+    },
+    {
       "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/quartz/controller/QuartzAdminControllerAuthorizationTest.java",
       "role": "测试与夹具",
       "scope": "included",
@@ -41406,6 +41524,32 @@
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": []
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/authentication/service/impl/AuthenticationBoundaryTest.java",
+      "role": "B02 登录身份与通知目录匿名/范围边界测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "a7d82b012db06d2930675b89ec8b94d4a9830e213ff5c7a4103393c1e6d16d79",
+      "reviewed_rules": [
+        "04 §7 身份与授权上下文",
+        "04 §12 行为验证"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-020",
+        "DIAG-CORE-034"
+      ],
+      "evidence_ids": [
+        "EV-B02-CORE034-20261009"
+      ],
+      "review_summary": "7 项测试中 CORE-034 覆盖匿名用户 ID/登录名预读拒绝、显式系统身份限制、已登录范围保留及匿名/已认证并行隔离；既有三项登录身份桶测试不据此关闭 CORE-020。",
+      "review_limits": [
+        "无网络/数据库的单元边界；不证明 Core 实际 HTTP 登录或完整门禁。"
+      ],
+      "review_kind": "authorization_boundary_test_review",
+      "impact_ids": [
+        "IMP-CORE-007"
+      ]
     },
     {
       "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/authentication/service/impl/CoreNotificationAudienceDirectoryTest.java",
@@ -42610,14 +42754,15 @@
         "EV-INVENTORY-20261003"
       ],
       "scope_reason": null,
-      "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "c4d1769d68dc123d45e58323cc72f2f782511210d908eeb32c4908f9051da937",
-      "impact_review_kind": "shared_reference_scan_only",
+      "impact_state": "public_boundary_reviewed",
+      "impact_content_sha256": "9e95d8ed28ba5541eadef9892c8c76553758ad61859586c19c9a9ba9b5371188",
+      "impact_review_kind": "shared_boundary_source_review",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
         "com.devops00.spectra.common.notification.NotificationPurpose",
         "com.devops00.spectra.common.notification.NotificationSendRequest",
         "com.devops00.spectra.common.notification.NotificationService",
+        "com.devops00.spectra.common.notification.NotificationSystemActor",
         "com.devops00.spectra.common.notification.NotificationTemplateCode",
         "com.devops00.spectra.common.port.security.SecurityContextAccessor"
       ],
@@ -42625,7 +42770,7 @@
         "version",
         "SecurityContext"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。",
+      "impact_review_summary": "CORE-034 实际追踪 OA 流程回调至申请人通知：按申请实体明确用户 ID，使用 OA_WORKFLOW_RESULT 系统身份；其余独立 OA 业务语义仍暂缓。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -42638,11 +42783,26 @@
         "IMP-CORE-001",
         "IMP-CORE-003",
         "IMP-CORE-004",
-        "IMP-CORE-005"
+        "IMP-CORE-005",
+        "IMP-CORE-007"
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
-        "EV-DEFERRED-20261004"
+        "EV-DEFERRED-20261004",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
+      ],
+      "remediation_reviews": [
+        {
+          "checked_at": "2026-10-09",
+          "issue_id": "DIAG-CORE-034",
+          "content_sha256": "9e95d8ed28ba5541eadef9892c8c76553758ad61859586c19c9a9ba9b5371188",
+          "scope": "仅 OA 流程申请结果通知的明确申请人及系统身份迁移；真实流程实例/数据库投递未执行，独立 OA 业务继续暂缓。",
+          "evidence_ids": [
+            "EV-B02-CORE034-20261009",
+            "EV-B02-CORE034-GATES-20261009"
+          ]
+        }
       ]
     },
     {
@@ -45000,7 +45160,7 @@
       ],
       "scope_reason": null,
       "impact_state": "public_boundary_reviewed",
-      "impact_content_sha256": "ed94d9ee24f18fe0c49455ab50a9632414907463e1e424dad15b6ad6f23ac593",
+      "impact_content_sha256": "6226810530d9cd7d8e1809927a8acb7ed1a8109fdf32c528afa1cd127f3417e7",
       "impact_review_kind": "shared_boundary_source_review",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
@@ -45008,6 +45168,7 @@
         "com.devops00.spectra.common.notification.NotificationPurpose",
         "com.devops00.spectra.common.notification.NotificationSendRequest",
         "com.devops00.spectra.common.notification.NotificationService",
+        "com.devops00.spectra.common.notification.NotificationSystemActor",
         "com.devops00.spectra.common.notification.NotificationTemplateCode",
         "com.devops00.spectra.common.port.file.FileAssetPort",
         "com.devops00.spectra.common.port.file.FileReferenceService",
@@ -45027,7 +45188,7 @@
         "FileAsset",
         "SecurityContext"
       ],
-      "impact_review_summary": "公共资产引用与后台合同getById范围路径实际追踪，独立合同生命周期不重构 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
+      "impact_review_summary": "公共资产引用、后台合同 getById 范围路径及分页排序既有记录保留。CORE-034 合同提醒在明确 owner/assignee 用户 ID 后用 OA_CONTRACT_REMINDER 入队；Quartz 上游 DataScope 缺身份仍属其他待办，独立合同生命周期不重构。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。",
@@ -45041,14 +45202,17 @@
         "IMP-CORE-001",
         "IMP-CORE-003",
         "IMP-CORE-004",
-        "IMP-CORE-005"
+        "IMP-CORE-005",
+        "IMP-CORE-007"
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
         "EV-DEFERRED-20261004",
         "EV-CORE-005",
         "EV-B02-SORT-20261008",
-        "EV-B02-SORT-GATES-20261008"
+        "EV-B02-SORT-GATES-20261008",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ],
       "remediation_reviews": [
         {
@@ -45059,6 +45223,16 @@
           "evidence_ids": [
             "EV-B02-SORT-20261008",
             "EV-B02-SORT-GATES-20261008"
+          ]
+        },
+        {
+          "checked_at": "2026-10-09",
+          "issue_id": "DIAG-CORE-034",
+          "content_sha256": "6226810530d9cd7d8e1809927a8acb7ed1a8109fdf32c528afa1cd127f3417e7",
+          "scope": "仅合同提醒通知系统身份与明确收件人迁移；Quartz 上游 DataScope、实际合同任务/数据库事务仍待验，独立业务继续暂缓。",
+          "evidence_ids": [
+            "EV-B02-CORE034-20261009",
+            "EV-B02-CORE034-GATES-20261009"
           ]
         }
       ]
@@ -53401,15 +53575,16 @@
         "EV-INVENTORY-20261003"
       ],
       "scope_reason": null,
-      "impact_state": "shared_references_scanned",
-      "impact_content_sha256": "b31f73bcdb9740a3ccb6da4165426824a587dbdf363fee8252e09bc14e924ffa",
-      "impact_review_kind": "shared_reference_scan_only",
+      "impact_state": "public_boundary_reviewed",
+      "impact_content_sha256": "79835f95be999e333fdd1133ebc1d7a162e45e74b6eb448c76e9204d9b59f0df",
+      "impact_review_kind": "shared_boundary_source_review",
       "shared_dependency_refs": [
         "com.devops00.spectra.common.exception.DataNotExistException",
         "com.devops00.spectra.common.notification.NotificationPurpose",
         "com.devops00.spectra.common.notification.NotificationRecipientDirectory",
         "com.devops00.spectra.common.notification.NotificationSendRequest",
         "com.devops00.spectra.common.notification.NotificationService",
+        "com.devops00.spectra.common.notification.NotificationSystemActor",
         "com.devops00.spectra.common.notification.NotificationTemplateCode",
         "com.devops00.spectra.framework.persistence.pagination.PageFrom"
       ],
@@ -53417,7 +53592,7 @@
         "version",
         "Transactional"
       ],
-      "impact_review_summary": "当前完整文本提取公共导入和风险候选；结合公共能力影响图登记潜在间接一致性边界。 2026-10-08 增量复核分页排序公共调用：白名单转换或固定排序拒绝已迁移并验证。",
+      "impact_review_summary": "分页排序既有核对保留；CORE-034 任务结果及待办从明确 operator/assignee 登录名解析，使用 WORKFLOW_TASK 身份按固定用途/模板入队。实际流程实例及数据库事务未运行，独立 Workflow 业务暂缓。",
       "impact_review_limits": [
         "完整读取供导入/公共符号及风险候选机械核对；未独立审查暂缓业务语义，不以未命中证明无间接影响。关键调用结合CodeGraph及人工职责审查另记。",
         "独立业务语义与复杂度治理暂缓；机械未命中不表示无间接影响。"
@@ -53430,13 +53605,16 @@
         "IMP-CORE-001",
         "IMP-CORE-003",
         "IMP-CORE-004",
-        "IMP-CORE-005"
+        "IMP-CORE-005",
+        "IMP-CORE-007"
       ],
       "impact_link_kind": "shared_or_potential_transitive_boundary",
       "impact_evidence_ids": [
         "EV-DEFERRED-20261004",
         "EV-B02-SORT-20261008",
-        "EV-B02-SORT-GATES-20261008"
+        "EV-B02-SORT-GATES-20261008",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ],
       "remediation_reviews": [
         {
@@ -53447,6 +53625,16 @@
           "evidence_ids": [
             "EV-B02-SORT-20261008",
             "EV-B02-SORT-GATES-20261008"
+          ]
+        },
+        {
+          "checked_at": "2026-10-09",
+          "issue_id": "DIAG-CORE-034",
+          "content_sha256": "79835f95be999e333fdd1133ebc1d7a162e45e74b6eb448c76e9204d9b59f0df",
+          "scope": "仅 Workflow 待办/结果的明确处理人解析及系统身份迁移；真实流程实例和数据库投递未运行，独立业务继续暂缓。",
+          "evidence_ids": [
+            "EV-B02-CORE034-20261009",
+            "EV-B02-CORE034-GATES-20261009"
           ]
         }
       ]
@@ -65052,10 +65240,12 @@
       "impact": "通知普通管理端口与后台运行端口边界混用；OA/Workflow后台受众及未来内部调用必须迁移显式运行身份，不能靠空上下文扩大权限。",
       "priority": "P1",
       "disposition": "集中整改并执行对应行为验证",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-CORE-005"
+        "EV-CORE-005",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ],
       "impact_ids": [
         "IMP-CORE-007"
@@ -66701,11 +66891,13 @@
       "required_changes": [
         "Launch+Framework+所有业务端口/任务+Web反馈；保留暂缓域独立重构边界"
       ],
-      "deferred_boundary": "OA合同Quartz→ContractService读DataScope表在无用户上下文时被Framework拒绝；Workflow及OA公共授权、通知和后台任务均须纳入一致迁移和验证",
+      "deferred_boundary": "CORE-034 通知目录的匿名放行已消除，Workflow、OA 流程/合同及监控通知调用方已迁移显式运行身份，定点单测和编译通过；实际 HTTP、Quartz、Workflow、数据库投递事务仍未验收。OA合同Quartz→ContractService读DataScope表在无用户上下文时被Framework拒绝，属同影响图其他待办；角色权限、基础设施恢复和后台任务整体仍待治理。",
       "state": "pending",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ],
       "verification": [
         "DB/Redis启动故障矩阵，保留Flyway既有失败保护",
@@ -68662,6 +68854,54 @@
       "limits": "完整门禁未通过，被跳过模块不能标为已运行；实际 Redis 断连恢复未执行，不关闭 IMP-BASE-003、BC-BASE-003、B02 或集中治理周期。"
     },
     {
+      "id": "EV-B02-CORE034-20261009",
+      "scope": "DIAG-CORE-034 / IMP-CORE-007 / CHECK-CORE-034 匿名收件人拒绝与显式后台通知身份",
+      "command_or_scenario": [
+        "仓库 Maven Wrapper：.\\mvnw.cmd -pl spectra-modules/spectra-core,spectra-modules/spectra-oa,spectra-modules/spectra-workflow -am '-DskipTests' compile",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=AuthenticationBoundaryTest,NotificationSystemIdentityTest' '-Dsurefire.failIfNoSpecifiedTests=false' test",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae test-compile",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspotless.ratchetFrom=origin/master' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check",
+        "admin、UI CodeGraph 和全工作区 rg 复核 Common/Core/OA/Workflow/Web 直接与间接调用方"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 管理的 Temurin 25.0.2 / Maven Wrapper 3.9.12；B00 隔离 PostgreSQL 127.0.0.1:25432 接受连接、隔离 Redis 127.0.0.1:26379 TCP 可连；仅合成数据。mise exec 配置加载 panic 退出 1，后续直接使用仓库包装器。",
+      "checked_at": "2026-10-09",
+      "result": "passed",
+      "exit_code": 0,
+      "summary": "Core 定点 10/10 通过：空用户列表正常为空；匿名非空 ID/登录名查询在读取账号或联系方式前拒绝，已登录权限范围保留，匿名/已认证并行隔离；无身份、错误来源、错误用途/模板和非明确收件人被拒绝；Workflow、OA 流程/合同及监控四种系统通知映射通过。Common/Core/OA/Workflow 编译、八模块测试编译与改动范围格式通过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-09-B02后台通知身份验证.md",
+        ".temp/b02/core034-targeted-final.log",
+        ".temp/b02/core034-testcompile-final.log",
+        ".temp/b02/core034-format-final.log"
+      ],
+      "limits": "定点测试为无网络合成边界和接口路径；没有运行真实 HTTP、Quartz、Workflow 流程实例、数据库投递事务或独立应用进程。"
+    },
+    {
+      "id": "EV-B02-CORE034-GATES-20261009",
+      "scope": "CORE-034 改动后的完整后端格式、verify 与全项目测试门禁",
+      "command_or_scenario": [
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' '-Dspectra.test.redis.port=26379' '-Dspectra.test.postgres.port=25432' verify",
+        "仓库 Maven Wrapper：.\\mvnw.cmd -fae '-Dspectra.test.redis.port=26379' '-Dspectra.test.postgres.port=25432' test"
+      ],
+      "environment": "Windows 11 / PowerShell 7.6.6 / mise 管理的 Temurin 25.0.2 / Maven Wrapper 3.9.12；隔离 Redis 26379、隔离 PostgreSQL 25432；仅合成状态。",
+      "checked_at": "2026-10-09",
+      "result": "failed",
+      "exit_codes": [
+        1,
+        1,
+        1
+      ],
+      "summary": "全量格式在 Core 14 个既有文件失败，Common/Framework/Workflow 通过而 OA/Launch 跳过；verify 在 Common 14 项 SpotBugs 发现处失败，下游跳过；全量 test 的 Framework 87 项中 BASE-005 Session TTL/登录时间 3 项失败，Core/OA/Workflow/Launch 跳过。不能据此宣布完整门禁或 CHECK-CORE-034 通过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-09-B02后台通知身份验证.md",
+        ".temp/b02/core034-full-format.log",
+        ".temp/b02/core034-full-verify.log",
+        ".temp/b02/core034-full-test.log"
+      ],
+      "limits": "被跳过模块未执行全套质量与依赖测试；真实 HTTP、Quartz、Workflow、数据库投递及多实例行为仍未验证，不关闭 IMP-CORE-007、B02 或集中治理周期。"
+    },
+    {
       "id": "EV-SKILL-20261003",
       "scope": "Backend/Web Skill entries and references; local Spectra plugin source and installed cache.",
       "command_or_scenario": [
@@ -70127,9 +70367,11 @@
       "area": "shared changes",
       "requirement": "Analyze full impacts and unify error_code, offset-bearing time and affected use-case contracts/callers while preserving current response omission behavior.",
       "state": "in_progress",
-      "resolution": "Stage 2 public-impact records complete; implementation of public security/error/time/edit/use-case contracts and all affected callers remains pending.",
+      "resolution": "Stage 2 public-impact records complete; B02 CORE-034 已迁移 Common/Core 与受影响 OA/Workflow 通知调用方，定点测试通过。其他公共安全、错误、时间、编辑和用例契约及真实调用入口、完整门禁仍待推进。",
       "evidence_ids": [
-        "EV-DIAG-VERIFY-20261005"
+        "EV-DIAG-VERIFY-20261005",
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE034-GATES-20261009"
       ]
     },
     {
@@ -70313,14 +70555,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1506,
+      "included": 1510,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 22
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report; updates direct source, test, knowledge and self digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -71312,12 +71554,17 @@
         "issue_ids": [
           "DIAG-CORE-034"
         ],
-        "state": "not_run",
+        "state": "inconclusive",
         "scenario": "通知普通管理端口与后台运行端口边界混用；OA/Workflow后台受众及未来内部调用必须迁移显式运行身份，不能靠空上下文扩大权限。",
-        "validation": "仅当前静态审查；031另有无网络JDK构造复现，真实DB/Redis/HTTP/多实例/故障及恢复仍待验证",
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "仅当前静态审查；031另有无网络JDK构造复现，真实DB/Redis/HTTP/多实例/故障及恢复仍待验证"
+        "validation": "CORE-034 当前源码要求普通目录查询具备认证身份；显式系统身份仅允许登记的来源、用途、模板与明确用户 ID。Core 定点 10/10（含匿名/已认证并行隔离）、八模块测试编译和改动范围格式通过；全量格式、verify 与全量测试失败或跳过下游模块，不标整项 passed。",
+        "impact_ids": [
+          "IMP-CORE-007"
+        ],
+        "evidence_ids": [
+          "EV-B02-CORE034-20261009",
+          "EV-B02-CORE034-GATES-20261009"
+        ],
+        "required_environment": "真实隔离 HTTP 通知/受控发送、OA 合同 Quartz、Workflow 流程实例与数据库投递事务仍未运行；同影响图的 DataScope 后台拒绝、角色快照和基础设施恢复待各自专项处理。"
       },
       {
         "id": "CHECK-CORE-035",
