@@ -1,16 +1,28 @@
 {
   "schema_version": "1.0.0",
   "standard": "docs/开发指南/04-工作区工程标准.md",
-  "updated_at": "2026-10-09",
+  "updated_at": "2026-10-10",
   "status": "unification_in_progress",
   "remediation_cycle": {
     "id": "CYCLE-20261005",
     "state": "in_progress",
     "basis": "2026-10-05 diagnosis; 04-工作区工程标准 and 05-集中治理与验收",
-    "policy": "One concentrated cycle; complete each batch with its affected repository callers, deferred-area consistency checks and knowledge-base updates. A batch closes only with recorded evidence; global acceptance remains separate.",
+    "policy": "One concentrated cycle; complete each batch with its affected repository callers, deferred-area consistency checks and knowledge-base updates. For every backend batch, load spectra-admin/.mise.test.toml with mise -E test exec for real-dependency tests and test-environment application runs; require PostgreSQL devops00_spectra_db_test, Redis DB 5 and a test S3 bucket, without exposing credentials. A batch closes only with recorded evidence; global acceptance remains separate.",
+    "test_environment": {
+      "scope": "all backend remediation batches and cycle acceptance",
+      "loader": "spectra-admin: mise -E test exec --",
+      "config_path": "spectra-admin/.mise.test.toml",
+      "postgres_database": "devops00_spectra_db_test",
+      "redis_db": 5,
+      "s3_bucket": "test environment only; value remains local",
+      "real_dependency_switch": "-Dspectra.test.real-deps=true",
+      "state": "configured_not_executed",
+      "evidence_ids": ["EV-CYCLE-TEST-ENV-20261010"]
+    },
     "unresolved_blockers": [
       "B00 retains its recorded completion. B02 sorting and BASE-003 revocation have isolated PostgreSQL/Redis evidence within their stated scopes; Redis fault recovery, two application processes and real HTTP/browser scenarios still require batch evidence, without inferring acceptance from fixture availability.",
-      "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout."
+      "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout.",
+      "mise 2026.10.4 currently panics with exit 101 while loading the backend test environment; migrated real-dependency tests are compiled but have not been rerun against PostgreSQL devops00_spectra_db_test and Redis DB 5."
     ],
     "batches": [
       {
@@ -93,13 +105,14 @@
           "IMP-BASE-001",
           "IMP-BASE-003",
           "IMP-CORE-007",
-          "IMP-BASE-005"
+          "IMP-BASE-005",
+          "IMP-CORE-001"
         ],
         "work_item_ids": [
           "GOV-005"
         ],
         "change_scope": "Framework Redis session/fence/lock and audit/sort boundaries; Core effective Root, identity bucket, credentials, role snapshot and explicit background identity; affected OA/Workflow callers",
-        "prerequisites": "B00 Redis/DB fixtures and full caller/role migration inventory; coordinate session revocation with B08 Web identity reset",
+        "prerequisites": "B00 Redis/DB fixtures and full caller/role migration inventory; use the cycle-level backend test environment for real dependency evidence. Coordinate session revocation with B08 Web identity reset",
         "checks": "BC-BASE-001..005, BC-BASE-008, CHECK-CORE-019..023, CHECK-CORE-032/034; concurrent replay and two instances, null versus empty, fail-closed, role shrink/relogin and audit redaction",
         "done_when": "Security state is authoritative under concurrency and faults; all affected callers use the same authorization and identity semantics.",
         "evidence_ids": [
@@ -114,10 +127,13 @@
           "EV-B02-BASE018-20261009",
           "EV-B02-BASE018-GATES-20261009",
           "EV-B02-CORE034-20261009",
-          "EV-B02-CORE034-GATES-20261009"
+          "EV-B02-CORE034-GATES-20261009",
+          "EV-B02-COMMON14-20261010",
+          "EV-B02-COMMON14-GATES-20261010",
+          "EV-B02-DEPS-PORTS-20261010"
         ],
         "state": "in_progress",
-        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项、BASE-018 计数 TTL 10 项和 CORE-034 匿名/后台通知身份 10 项定点通过。CORE-034 的 Common/Core/OA/Workflow 调用方已迁移且八模块测试编译、改动范围格式通过；完整 verify、全量测试与全量格式仍失败。真实 HTTP/Quartz/Workflow 入口、双应用进程、实际 Redis 断连恢复及 B08 浏览器身份失效未验收，本批未满足 done_when。"
+        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项、BASE-018 计数 TTL 10 项和 CORE-034 匿名/后台通知身份 10 项定点通过。Common 通知请求 14 条 SpotBugs 已修复，5 项快照及并发回归与 Common verify 通过。先前 B00/B02 在独立旧库/DB 的 PostgreSQL 分页/审计 5 项通过、Redis 30 项中 3 项 BASE-005 失败、Root 2 项失败，均为历史证据。现已迁移到周期级 test 环境入口，八模块测试编译及 Redis 键隔离单测通过；mise 加载 test 环境退出 101，新测试库/DB 5 上未重跑。全项目静态门禁仍停在 Framework 4 项 Checkstyle；真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 断连恢复及 B08 浏览器身份失效未验收，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -244,6 +260,7 @@
           "DIAG-CORE-030",
           "DIAG-CORE-031",
           "DIAG-CORE-035",
+          "DIAG-CORE-040",
           "DIAG-SYSTEM-001",
           "DIAG-SYSTEM-002",
           "DIAG-SYSTEM-003",
@@ -254,6 +271,7 @@
           "IMP-CORE-004",
           "IMP-CORE-005",
           "IMP-CORE-006",
+          "IMP-CORE-008",
           "IMP-SYSTEM-001",
           "IMP-SYSTEM-002",
           "IMP-SYSTEM-003"
@@ -261,7 +279,7 @@
         "work_item_ids": [],
         "change_scope": "Notification attempt/fence/key/provider and diagnostics, import, cache operations, monitor and local file tasks; Web diagnostic polling; OA/Workflow notification producers",
         "prerequisites": "Define idempotency, durable acceptance, unknown external result, old ciphertext and local/shared ownership before changes; isolated DB/Redis and two instances",
-        "checks": "CHECK-CORE-011..016/021/028/030/031/035, BC-MODEL-006, BC-IMPACT-IMP-SYSTEM-001-1..5; slow workers, callbacks, provider failure, crash/restart, stale leases and cross-node file access",
+        "checks": "CHECK-CORE-011..016/021/028/030/031/035/040, BC-MODEL-006, BC-IMPACT-IMP-SYSTEM-001-1..5; slow workers, callbacks, provider failure, crash/restart, stale leases and cross-node file access",
         "done_when": "Committed work is recoverable, historical results stay monotone, side effects do not retry blindly, and shared versus local state is explicit."
       },
       {
@@ -599,6 +617,80 @@
       ]
     },
     {
+      "path": "docs/开发指南/工程治理/2026-10-10-B02通知请求快照与静态门禁验证.md",
+      "role": "B02 Common 通知请求快照、端口调整与完整门禁专项正式证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "d9ec5c39ce7798a5dace583f3abed403f6d9768f07b82991c06d8bfc73400061",
+      "reviewed_rules": [
+        "04 §4 公共请求快照",
+        "04 §13 验证与证据"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-040",
+        "DIAG-BASE-005",
+        "DIAG-CORE-019"
+      ],
+      "evidence_ids": [
+        "EV-B02-COMMON14-20261010",
+        "EV-B02-COMMON14-GATES-20261010",
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
+      ],
+      "review_summary": "记录 Common 14 条 SpotBugs 修复、5 项快照及并发回归、独立测试实例端口/认证与合成库、真实 Redis/PostgreSQL 失败以及完整门禁边界。",
+      "review_limits": [
+        "完整后端门禁、BASE-005、Root 有效性与通知实际投递未通过；不证明 B02 已验收。"
+      ],
+      "review_kind": "current_source_and_gate_evidence_review",
+      "impact_ids": [
+        "IMP-CORE-008",
+        "IMP-BASE-003",
+        "IMP-CORE-001"
+      ]
+    },
+    {
+      "path": "docs/开发指南/工程治理/2026-10-10-集中治理后端测试环境迁移验证.md",
+      "role": "全周期后端真实依赖测试环境迁移及执行边界证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "8cb5973646cf382a3b9048386fe5de3ef3e2a79edea52ec3629c428b90dfe11b",
+      "reviewed_rules": ["04 §13 真实依赖与验证证据"],
+      "issue_ids": [],
+      "evidence_ids": ["EV-CYCLE-TEST-ENV-20261010"],
+      "review_summary": "记录全周期 test 环境的数据库、Redis、S3 边界，测试编译和无网络隔离检查，以及 mise 加载退出 101。",
+      "review_limits": ["新测试库和 Redis DB 5 的真实依赖场景未运行。"],
+      "review_kind": "test_environment_evidence_review",
+      "impact_ids": ["IMP-BASE-003", "IMP-CORE-001"]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/session/RealRedisTestEnvironment.java",
+      "role": "真实 Redis 测试配置守卫、用例键隔离与定向清理",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "038b92b588865c8b3922aa72c033badd67d273ace3d23067b550812a06830247",
+      "reviewed_rules": ["04 §8 安全 Redis", "04 §13 真实依赖隔离"],
+      "issue_ids": ["DIAG-BASE-003", "DIAG-BASE-018"],
+      "evidence_ids": ["EV-CYCLE-TEST-ENV-20261010"],
+      "review_summary": "从 test 环境读取 Redis 配置，仅允许 DB 5，每用例独立物理键前缀并扫描删除自身键。",
+      "review_limits": ["无网络测试已通过；真实 Redis DB 5 因 mise 加载故障未运行。"],
+      "review_kind": "test_fixture_source_review",
+      "impact_ids": ["IMP-BASE-003"]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/security/session/RealRedisTestEnvironmentTest.java",
+      "role": "真实 Redis 用例键前缀的无网络隔离回归",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "213a5c0e65ce2f1c302e9482cd19380cdf60db39ad9b333f868e617624e47746",
+      "reviewed_rules": ["04 §13 测试隔离与行为验证"],
+      "issue_ids": [],
+      "evidence_ids": ["EV-CYCLE-TEST-ENV-20261010"],
+      "review_summary": "2 项无网络测试验证同名逻辑键隔离、跨前缀拒绝反序列化及 Redis DB 5/连接参数守卫。",
+      "review_limits": ["不证明真实 Redis 命令、定向清理或并发恢复。"],
+      "review_kind": "test_fixture_unit_review",
+      "impact_ids": ["IMP-BASE-003"]
+    },
+    {
       "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/persistence/pagination/PageOrderFrom.java",
       "role": "B02 分页请求边界或专项测试",
       "scope": "included",
@@ -655,7 +747,7 @@
       "role": "B02 分页请求边界或专项测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "383f004bffd3a55806dc42a16f4e723089005a08959b984bbdf2bdfe57572779",
+      "content_sha256": "d4f4efe88fb7a177753b418cf988133b668b9e82d8291a32dbf00fc6ef6fe4f3",
       "reviewed_rules": [
         "04 §5 接口/排序输入安全",
         "04 §12 验证与证据"
@@ -665,9 +757,11 @@
       ],
       "evidence_ids": [
         "EV-B02-SORT-20261008",
-        "EV-B02-SORT-GATES-20261008"
+        "EV-B02-SORT-GATES-20261008",
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
       ],
-      "review_summary": "2026-10-08 阅读并验证本文件的分页排序输入、映射、失败或证据边界。",
+      "review_summary": "历史 PostgreSQL 5432/B02 专用库排序 2/2 通过；现从 test 环境读取连接并只允许 devops00_spectra_db_test，编译通过但未在新库重跑。",
       "review_limits": [
         "限定分页排序；不证明完整门禁/B02其他问题或全周期验收。"
       ],
@@ -3310,7 +3404,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "00b6b07f5722d02eb529713f146fc020ecb224d2f4bb7e6b8802420dc50617b7",
+      "content_sha256": "5cd882390f4740843b7e588bf830a53abc299ea371c6c3b07c9449f63d5a9b62",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3318,16 +3412,18 @@
         "04§13"
       ],
       "issue_ids": [
-        "DIAG-CORE-034"
+        "DIAG-CORE-034",
+        "DIAG-CORE-040"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
         "EV-ROOT-DOC-20261004",
-        "EV-B02-CORE034-20261009"
+        "EV-B02-CORE034-20261009",
+        "EV-B02-COMMON14-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# Core 统一通知子域；B02 同步普通收件人缺身份拒绝、四类系统身份来源/用途/模板及 OA/Workflow 调用方边界。",
+      "review_summary": "# Core 统一通知子域；B02 同步显式系统身份与 OA/Workflow 调用边界，并补充 Common 请求容器快照及空值语义。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -3872,7 +3968,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "d76dc2b86fe601f3fa8571f85ed15242cf4dd100279e394bbfd9550adba42242",
+      "content_sha256": "62bb526ff6d9453298f7f49b245d12856bbd12b373bf0e7011f7847194b52ab0",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3985,7 +4081,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "532bf457e03dd0720ab66b8a56c80ed97b7a61d884c832b61d4d93b9b3d4c2b1",
+      "content_sha256": "e518d2f86cb13c67e9c4c0d91513dfd620210aff365c828a16b818a8898aeb0d",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3995,11 +4091,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 集中治理与验收；全文文档结构/本地引用及高影响事实检索，7个一级至三级标题，0个待核对链接候选。",
+      "review_summary": "# 集中治理与验收；B02 前置条件增加后端 PostgreSQL/Redis 连通性、mise 本地注入与独立合成测试边界。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4011,7 +4108,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "acb9c91236cf18d4db7c950fdae3b970b2aa2fa07fc1d45a0141fa3c5f23e977",
+      "content_sha256": "6e008e5108cb692ff2481664c2f54668a87b12a18132ef2538fcea33dcea575b",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4029,7 +4126,11 @@
         "EV-B02-BASE018-20261009",
         "EV-B02-BASE018-GATES-20261009",
         "EV-B02-CORE034-20261009",
-        "EV-B02-CORE034-GATES-20261009"
+        "EV-B02-CORE034-GATES-20261009",
+        "EV-B02-COMMON14-20261010",
+        "EV-B02-COMMON14-GATES-20261010",
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -4046,7 +4147,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "3fbefab87b6defff8e17e353dc4bbcadf2f8cc6f8e5fcc36d88fc988187be18f",
+      "content_sha256": "ac766ef534bba32e6a2f21a81664379c497061c8534dc24c3b27678795a15fcd",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4066,11 +4167,14 @@
         "EV-B02-BASE018-20261009",
         "EV-B02-BASE018-GATES-20261009",
         "EV-B02-CORE034-20261009",
-        "EV-B02-CORE034-GATES-20261009"
+        "EV-B02-CORE034-GATES-20261009",
+        "EV-B02-COMMON14-20261010",
+        "EV-B02-COMMON14-GATES-20261010",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 工程治理台账；2026-10-09 核对 2000 文件有限范围清单、全局 in_progress、BASE-003/004/007/018 与 CORE-034 专项及门禁边界。",
+      "review_summary": "# 工程治理台账；2026-10-10 局部登记 2007 文件、Common 14 条 SpotBugs 修复、全周期后端 test 环境迁移和 mise 阻塞；BASE-005/Root 与完整门禁未通过，全局仍 in_progress。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4836,7 +4940,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "0d2cd071cbc3ee39036f152031cbd80c7032813bf9c1cd05224d7c123d41af1b",
+      "content_sha256": "c4d7a4725368653c1edb1a48016b7a843e4aedf3459c3a89288629ed278d3b90",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4846,11 +4950,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 配置清单；全文文档结构/本地引用及高影响事实检索，18个一级至三级标题，0个待核对链接候选。",
+      "review_summary": "# 配置清单；补充 B02 真实依赖测试端口、专用 DB/数据库与仅供测试进程使用的 Redis 认证环境变量。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -10665,7 +10770,7 @@
       "role": "构建、依赖、工具链、部署或质量入口",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "8b14a819cad15306c2f4c5f7118aa53f23da121fff9ffba5eb1eb5ebf7504c1b",
+      "content_sha256": "d130cffd096b7a274d628c689b9208b9c6e6de8449a2cfe36234270c00b41812",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -10676,11 +10781,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-COMMON14-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "Common仅无基础设施公共依赖，rg未发现Spring/MyBatis/Servlet/领域模块导入；按端口快照边界阅读。",
+      "review_summary": "Common 保持无基础设施公共依赖；增加测试范围 JUnit Jupiter 验证通知请求快照，编译和模块 verify 通过。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。"
       ],
@@ -12357,7 +12463,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "cb5d72b3aff3e8be9eee93a089806106afe5e2c1fa5b01e9ca1898cefa422e25",
+      "content_sha256": "bd0967dc6f8261fdccd1b180924880f949a6012ec53b31271d9c6ff35258a8b5",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -12366,21 +12472,26 @@
         "04 §6 时间",
         "04 §10 生命周期/资源"
       ],
-      "issue_ids": [],
+      "issue_ids": [
+        "DIAG-CORE-040"
+      ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-COMMON14-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "请求快照含模板、来源、业务ID、收件与时间；复制集合，DTO多字段构造与手写控制分开评估复杂度。",
+      "review_summary": "InAppInput 构造时复制收件人容器，null 容器为空；Common 快照回归与 SpotBugs 0 通过。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
         "复杂度指标未校准/未实测，候选不等于已超阈值。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
-      "impact_ids": []
+      "impact_ids": [
+        "IMP-CORE-008"
+      ]
     },
     {
       "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationSendRequest.java",
@@ -12417,7 +12528,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "ad74eb7984dd617c766a8baf45a1852f889da84eb0e4ee3b65d79e04a6555689",
+      "content_sha256": "02647898debfbfa308f9ec422902e381dcadfe23d5652273dee91fd502208215",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -12427,16 +12538,18 @@
         "04 §10 生命周期/资源"
       ],
       "issue_ids": [
-        "DIAG-CORE-034"
+        "DIAG-CORE-034",
+        "DIAG-CORE-040"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
         "EV-BASE-001",
-        "EV-B02-CORE034-20261009"
+        "EV-B02-CORE034-20261009",
+        "EV-B02-COMMON14-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "业务通知快捷服务；CORE-034 增加仅供明确内部运行身份使用的 sendAsSystem，普通发送保留认证主体数据范围。",
+      "review_summary": "业务通知快捷服务保留 CORE-034 显式系统身份；两个中间请求 record 构造时复制容器，null/非法值按已记录契约处理。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -12444,7 +12557,8 @@
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
-        "IMP-CORE-007"
+        "IMP-CORE-007",
+        "IMP-CORE-008"
       ]
     },
     {
@@ -14184,6 +14298,31 @@
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
         "IMP-BASE-003"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-common/src/test/java/com/devops00/spectra/common/notification/NotificationRequestSnapshotTest.java",
+      "role": "Common 通知公共请求容器快照合成回归",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "b6a0bc170569c51052e84df6706164066e09b0ee249fcb73476bbd4191854d05",
+      "reviewed_rules": [
+        "04 §4 公共请求快照",
+        "04 §13 行为验证"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-040"
+      ],
+      "evidence_ids": [
+        "EV-B02-COMMON14-20261010"
+      ],
+      "review_summary": "五项无网络 JUnit 回归验证三类 record 的输入/访问器修改、并发观察、null 容器及非法值边界。",
+      "review_limits": [
+        "只验证浅层容器快照，不验证外部通知投递。"
+      ],
+      "review_kind": "notification_contract_test_review",
+      "impact_ids": [
+        "IMP-CORE-008"
       ]
     },
     {
@@ -17627,7 +17766,7 @@
       "role": "B02 安全计数隔离 Redis 并发、TTL 与中断测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "1bec34216b4de095a33a957e97517ad65ace48a8331bfa0d090e0c6fd4e92a42",
+      "content_sha256": "dab206068d95811c9ce8caa4b69f8e3ec4adbb55a7d2d8bc139145b8f2928a95",
       "reviewed_rules": [
         "04 §8 安全 Redis 事实源",
         "04 §10 生命周期",
@@ -17637,9 +17776,11 @@
         "DIAG-BASE-018"
       ],
       "evidence_ids": [
-        "EV-B02-BASE018-20261009"
+        "EV-B02-BASE018-20261009",
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
       ],
-      "review_summary": "隔离 Redis DB12 验证旧无 TTL 键拒绝及受控清理、首次写入前后中断、32 次并发递增和首次窗口不延长；8 项通过。",
+      "review_summary": "历史 Redis DB12 的 8/8 计数/TTL 测试通过；现改为 test 环境 DB5 和用例键隔离，编译通过但真实 Redis 未重跑。",
       "review_limits": [
         "命令故障由合成适配器注入；未运行真实 Redis 断连恢复或两个独立应用进程。"
       ],
@@ -17653,7 +17794,7 @@
       "role": "B02 安全会话隔离 Redis 合成测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "677fe19ec08e6cce1a5c09ffe23ba7ddb22f807225c242948309582a60eb8952",
+      "content_sha256": "a2a45d314d8fc657ecf489d111d98cae85f195f33d95b9fc75bb74cf190b94ea",
       "reviewed_rules": [
         "04 §8 安全 Redis 事实源",
         "04 §10 会话生命周期",
@@ -17671,9 +17812,11 @@
         "EV-B02-BASE004-20261009",
         "EV-B02-BASE004-GATES-20261009",
         "EV-B02-BASE007-20261009",
-        "EV-B02-BASE007-GATES-20261009"
+        "EV-B02-BASE007-GATES-20261009",
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
       ],
-      "review_summary": "BASE-003 的 13 项及 BASE-004 的 5 项隔离 Redis 专项通过；BASE-007 新增真实 Redis 缺失集合返回空 Set 并正常撤销测试通过。另 3 项 BASE-005 时限/登录时间测试仍失败。",
+      "review_summary": "历史 Redis DB14 的 22 项中 19 项通过、BASE-005 三项失败；现改为 test 环境 DB5 和用例键隔离，编译通过但真实 Redis 未重跑。",
       "review_limits": [
         "两个独立连接不等于两个应用进程；BASE-005 时限失败不计入 BASE-003 专项通过。"
       ],
@@ -41354,6 +41497,58 @@
       "impact_ids": []
     },
     {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/audit/AuditTransactionPostgresTest.java",
+      "role": "B02 审计脱敏与同库事务真实 PostgreSQL 合成测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "234bc586e27b9e085946a7eda170f6c7e0791383369be8d26c803816076a6ad5",
+      "reviewed_rules": [
+        "04 §12 审计",
+        "04 §13 真实依赖验证"
+      ],
+      "issue_ids": [
+        "DIAG-BASE-001"
+      ],
+      "evidence_ids": [
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
+      ],
+      "review_summary": "历史 b02_test 库审计事务 3/3 通过；现从 test 环境读取连接并只允许 devops00_spectra_db_test，编译通过但新库未重跑。",
+      "review_limits": [
+        "未覆盖嵌套 Bean/List/record、实际 HTTP 及完整审计验收。"
+      ],
+      "review_kind": "isolated_postgres_test_review",
+      "impact_ids": [
+        "IMP-BASE-001"
+      ]
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/root/RootGovernancePostgresTest.java",
+      "role": "B02 有效 Root 专用 PostgreSQL 合成测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "d1dd089634b9b6b2117e67b149311d1d693ea9b1a4d837133025709302d3d7f8",
+      "reviewed_rules": [
+        "04 §7 有效身份与最后 Root",
+        "04 §13 真实依赖验证"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-019"
+      ],
+      "evidence_ids": [
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-CYCLE-TEST-ENV-20261010"
+      ],
+      "review_summary": "历史 b02_root_test 库 2 项有效 Root 测试失败；现从 test 环境读取连接并只允许 devops00_spectra_db_test，编译通过但新库未重跑。",
+      "review_limits": [
+        "当前失败不能证明最后有效 Root 保护；未运行真实管理用例和并发事务。"
+      ],
+      "review_kind": "isolated_postgres_test_review",
+      "impact_ids": [
+        "IMP-CORE-001"
+      ]
+    },
+    {
       "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/audit/mapper/AuditLogQueryVisibilitySqlTest.java",
       "role": "测试与夹具",
       "scope": "included",
@@ -62530,7 +62725,8 @@
       "exception_ids": [],
       "evidence_ids": [
         "EV-BASE-001",
-        "EV-B00-EXCEPTION-20261005"
+        "EV-B00-EXCEPTION-20261005",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "impact_ids": [
         "IMP-BASE-001"
@@ -62668,7 +62864,8 @@
       "state": "pending",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "impact_ids": [
         "IMP-BASE-003"
@@ -64797,7 +64994,8 @@
       "state": "pending",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "impact_ids": [
         "IMP-CORE-001"
@@ -65369,6 +65567,34 @@
       ],
       "impact_ids": [
         "IMP-CORE-006"
+      ]
+    },
+    {
+      "id": "DIAG-CORE-040",
+      "rule": "04§4 公共请求快照、§13 SpotBugs EI_EXPOSE_REP/EI_EXPOSE_REP2",
+      "locations": [
+        {
+          "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationRequest.java",
+          "symbol": "InAppInput"
+        },
+        {
+          "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/notification/NotificationService.java",
+          "symbol": "UserNotificationRequest / DirectNotificationRequest"
+        }
+      ],
+      "finding": "Common 通知中间请求持有并暴露可变集合，固定 SpotBugs 报告 EI_EXPOSE_REP 7 条及 EI_EXPOSE_REP2 7 条；调用方可在构造后或经访问器改变收件人、渠道、地址和参数容器。",
+      "impact": "Core 网关/验证码及 OA、Workflow 通知生产者共享该请求契约；请求快照不稳定会使入队前数据与调用时意图不一致，并阻断 B02 全后端静态门禁。",
+      "priority": "P2",
+      "disposition": "构造时复制容器并覆盖可变输入、空值及无效映射回归；核对 Common/Core/OA/Workflow 调用方和静态门禁。",
+      "state": "resolved",
+      "exception_ids": [],
+      "evidence_ids": [
+        "EV-B02-COMMON14-20261010",
+        "EV-B02-COMMON14-GATES-20261010"
+      ],
+      "verification_state": "common_module_passed_workspace_gate_failed",
+      "impact_ids": [
+        "IMP-CORE-008"
       ]
     },
     {
@@ -66000,7 +66226,8 @@
       "state": "pending",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "verification": [
         "Core改密/敏感From/审计保存与Web错误解释同步；暂缓OA/Workflow审计输入和统一响应也需消费回归。"
@@ -66091,7 +66318,7 @@
         "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。",
         "安全计数首次写入与 TTL 原子化；拒绝无 TTL、异常脚本返回和结果未知，验证竞争递增及窗口保持。"
       ],
-      "deferred_boundary": "BASE-003/004 已在隔离 Redis 验证撤销与双独立连接的可控重放交错；BASE-007 已验证集合 null/empty 及故障拒绝，BASE-018 已验证计数 TTL 原子性及故障注入。两个应用进程、实际 Redis 断连恢复、真实 Core/Web 入口和尚未治理的 BASE-005/006 仍未验收。没有令牌或真实凭据输出。",
+      "deferred_boundary": "BASE-003/004 已在隔离 Redis 验证撤销与双独立连接的可控重放交错；BASE-007 已验证集合 null/empty 及故障拒绝，BASE-018 已验证计数 TTL 原子性及故障注入。2026-10-10 独立 Redis 6379 的 30 项回归中 BASE-005 三项时限/登录时间仍失败。两个应用进程、实际 Redis 断连恢复、真实 Core/Web 入口及 BASE-006 仍未验收；没有凭据输出。",
       "state": "in_progress",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
@@ -66103,7 +66330,8 @@
         "EV-B02-BASE007-20261009",
         "EV-B02-BASE007-GATES-20261009",
         "EV-B02-BASE018-20261009",
-        "EV-B02-BASE018-GATES-20261009"
+        "EV-B02-BASE018-GATES-20261009",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "verification": [
         "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。",
@@ -66546,12 +66774,13 @@
         "公开业务操作与必要DTO、最终授权/系统上下文、Mapper SQL、Common端口、所有直接间接仓库调用者、Web编辑及错误展示",
         "Core组织用例与Framework范围策略，历史组织数据语义"
       ],
-      "deferred_boundary": "OA/Workflow独立业务治理暂缓，公共权限/目录/时区/历史部门改变影响的调用方必须一致迁移",
+      "deferred_boundary": "OA/Workflow独立业务治理暂缓，公共权限/目录/时区/历史部门改变影响的调用方必须一致迁移。2026-10-10 独立 PostgreSQL 的 Root 有效计数两项测试失败，最后有效 Root 保护未验收。",
       "state": "pending",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
         "EV-CORE-001",
-        "EV-MODEL-004"
+        "EV-MODEL-004",
+        "EV-B02-DEPS-PORTS-20261010"
       ],
       "verification": [
         "隔离DB/Redis权限范围与撤权故障",
@@ -66905,6 +67134,42 @@
         "重连后数据/安全状态校验再服务",
         "角色权限删减后登录/重组",
         "无身份后台拒绝及可信身份最小范围"
+      ],
+      "limits": []
+    },
+    {
+      "id": "IMP-CORE-008",
+      "change_source": [
+        "DIAG-CORE-040"
+      ],
+      "issue_ids": [
+        "DIAG-CORE-040"
+      ],
+      "direct": [
+        "Common 通知请求 record 与快捷 NotificationService 公共契约",
+        "Core 通知网关、安全验证码和系统通知转换"
+      ],
+      "indirect": [
+        "OA 与 Workflow 的通知生产者经公共 Service 入队",
+        "Web 经现有通知 HTTP API 间接受影响，当前 Java 请求快照改动没有新增 HTTP 字段"
+      ],
+      "data_protocol_runtime": [
+        "构造时浅层容器快照；null 容器为空，null 渠道/地址元素跳过，非法收件人或映射值拒绝",
+        "无数据库迁移或外部 API 字段变化，模板参数值仍需调用方提供稳定对象"
+      ],
+      "required_changes": [
+        "Common 三个 record 与回归；Core/OA/Workflow 测试编译；通知领域知识库和配置入口同步"
+      ],
+      "deferred_boundary": "本项只处理公共请求容器快照；OA/Workflow 独立业务治理及实际通知投递、HTTP 与两实例行为仍按 B02/B06 专项核对。",
+      "state": "pending",
+      "analysis_state": "current_source_reviewed",
+      "evidence_ids": [
+        "EV-B02-COMMON14-20261010",
+        "EV-B02-COMMON14-GATES-20261010"
+      ],
+      "verification": [
+        "Common 输入/访问器修改、并发观察、空容器及无效值回归通过",
+        "八模块测试编译通过；实际通知投递和完整后端门禁未通过"
       ],
       "limits": []
     },
@@ -68902,6 +69167,93 @@
       "limits": "被跳过模块未执行全套质量与依赖测试；真实 HTTP、Quartz、Workflow、数据库投递及多实例行为仍未验证，不关闭 IMP-CORE-007、B02 或集中治理周期。"
     },
     {
+      "id": "EV-B02-COMMON14-20261010",
+      "scope": "DIAG-CORE-040 Common 通知请求 14 条 SpotBugs 容器暴露修复",
+      "command_or_scenario": [
+        "spectra-admin: .\\mvnw.cmd -pl spectra-common -am '-Dtest=NotificationRequestSnapshotTest' '-Dsurefire.failIfNoSpecifiedTests=false' test -> exit 0, 5/5",
+        "spectra-admin: .\\mvnw.cmd -pl spectra-common -am '-Dspotless.ratchetFrom=NONE' verify -> exit 0, SpotBugs BugInstance 0, Checkstyle 0",
+        "spectra-admin: .\\mvnw.cmd -fae test-compile -> exit 0, eight reactor modules",
+        "spectra-admin: .\\mvnw.cmd -pl spectra-framework -am '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> exit 0"
+      ],
+      "environment": "原生 Windows PowerShell 7.6.6；mise 管理 Temurin 25.0.2；仓库 Maven Wrapper 3.9.12；无网络合成请求测试。mise exec 加载配置 panic 后改用仓库 Wrapper。",
+      "checked_at": "2026-10-10",
+      "result": "passed",
+      "exit_code": 0,
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-10-B02通知请求快照与静态门禁验证.md",
+        ".temp/b02/spotbugs14-common-test-five.log",
+        ".temp/b02/spotbugs14-common-verify-five.log",
+        ".temp/b02/spotbugs14-reactor-testcompile-final.log",
+        ".temp/b02/spotbugs14-framework-spotless-ports.log"
+      ],
+      "limits": "证明 Common 请求容器快照与模块静态门禁；不证明实际通知投递或全后端门禁。"
+    },
+    {
+      "id": "EV-B02-COMMON14-GATES-20261010",
+      "scope": "DIAG-CORE-040 改动后的全后端格式、静态和真实依赖完整 verify 边界",
+      "command_or_scenario": [
+        "spectra-admin: .\\mvnw.cmd -fae '-DskipTests' '-Dspotless.ratchetFrom=origin/master' verify -> exit 1, Framework 4 AvoidStarImport",
+        "spectra-admin: .\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> exit 1, Core 14 existing files",
+        "spectra-admin: authenticated test process, .\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' '-Dspectra.test.redis.port=6379' '-Dspectra.test.postgres.port=5432' verify -> exit 1, Framework 87 tests with 3 DIAG-BASE-005 failures"
+      ],
+      "environment": "原生 Windows PowerShell 7.6.6；mise 管理 Temurin 25.0.2；仓库 Maven Wrapper 3.9.12；当前确认独立的 PostgreSQL 5432/Redis 6379 测试实例；认证值仅在进程内。",
+      "checked_at": "2026-10-10",
+      "result": "failed",
+      "exit_codes": [1, 1, 1],
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-10-B02通知请求快照与静态门禁验证.md",
+        ".temp/b02/spotbugs14-reactor-static-verify-current.log",
+        ".temp/b02/spotbugs14-reactor-spotless-check.log",
+        ".temp/b02/spotbugs14-full-verify-current.log"
+      ],
+      "limits": "Common 已通过；Framework 及后续模块未完成完整 verify，不能将 B02 或集中治理标记完成。"
+    },
+    {
+      "id": "EV-B02-DEPS-PORTS-20261010",
+      "scope": "B00 PostgreSQL/Redis 真实依赖测试入口改为确认独立的 5432/6379 实例",
+      "command_or_scenario": [
+        "pg_isready -h 127.0.0.1 -p 5432 -> exit 0；Redis 6379 TCP reachable，认证后 PONG；运行前 DB12/14 DBSIZE 0",
+        "PostgreSQL 独立测试实例创建 b02_test 无密码本机角色和 b02_test/b02_root_test 空库；psql -w 只读连接两库 -> exit 0",
+        "spectra-admin: .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=PageFromSortPostgresTest,AuditTransactionPostgresTest,RootGovernancePostgresTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.postgres.port=5432' test -> exit 1, pagination 2/2 and audit 3/3 passed, Root 2 failed",
+        "spectra-admin: authenticated test process, .\\mvnw.cmd -pl spectra-framework -am '-Dtest=SecuritySessionLifecycleRedisTest,SecurityCounterRedisTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.redis.port=6379' test -> exit 1, 27/30 passed and 3 DIAG-BASE-005 failed"
+      ],
+      "environment": "原生 Windows PowerShell 7.6.6；用户确认两服务仅供合成测试；未读取本机凭据或业务数据；测试认证值不入日志。",
+      "checked_at": "2026-10-10",
+      "result": "failed",
+      "exit_codes": [0, 0, 1, 1],
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-10-B02通知请求快照与静态门禁验证.md",
+        ".temp/b02/spotbugs14-postgres-default-port-test.log",
+        ".temp/b02/spotbugs14-redis-default-port-test.log"
+      ],
+      "limits": "仅当前独立测试实例和列明场景；BASE-005 与 Root 失败未修复，历史旧端口证据不追改。"
+    },
+    {
+      "id": "EV-CYCLE-TEST-ENV-20261010",
+      "scope": "集中治理全周期后端 test 环境入口迁移与当前验证边界",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- pwsh -NoProfile -Command <safe presence checks> -> exit 101, config_root.rs:95 panic before child process",
+        "spectra-admin: .\\mvnw.cmd -pl spectra-framework -am '-Dtest=RealRedisTestEnvironmentTest' '-Dsurefire.failIfNoSpecifiedTests=false' test -> exit 0, 2/2",
+        "spectra-admin: .\\mvnw.cmd -pl spectra-framework -am '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> exit 0",
+        "spectra-admin: .\\mvnw.cmd -fae test-compile -> exit 0, eight reactor modules",
+        "spectra-admin: .\\mvnw.cmd -fae '-DskipTests' '-Dspotless.ratchetFrom=origin/master' verify -> exit 1, Framework four AvoidStarImport findings",
+        "spectra-admin: .\\mvnw.cmd -fae '-Dspotless.ratchetFrom=NONE' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> exit 1, Core two existing main source files"
+      ],
+      "environment": "原生 Windows PowerShell 7.6.6；mise 2026.10.4；mise 管理 Temurin 25.0.2；仓库 Maven Wrapper 3.9.12。未读取或输出测试配置值及凭据。",
+      "checked_at": "2026-10-10",
+      "result": "failed",
+      "exit_codes": [101, 0, 0, 0, 1, 1],
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-10-集中治理后端测试环境迁移验证.md",
+        ".temp/b02/test-env-redis-namespace-unit-final3.log",
+        ".temp/b02/test-env-migration-framework-spotless-final4.log",
+        ".temp/b02/test-env-migration-testcompile-final3.log",
+        ".temp/b02/test-env-migration-static-verify.log",
+        ".temp/b02/test-env-migration-reactor-spotless.log"
+      ],
+      "limits": "只验证源码编译、无网络键序列化和 Framework 格式；全后端静态及格式门禁未通过。mise 尚未成功加载 .mise.test.toml，未连接 PostgreSQL 测试库、Redis DB 5、测试 S3，未启动后端或执行真实依赖/双实例/恢复检查。旧 B02 库与 Redis DB 证据仅保留为历史事实。"
+    },
+    {
       "id": "EV-SKILL-20261003",
       "scope": "Backend/Web Skill entries and references; local Spectra plugin source and installed cache.",
       "command_or_scenario": [
@@ -70555,7 +70907,7 @@
       }
     ],
     "scope_counts": {
-      "included": 1510,
+      "included": 1517,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 22
@@ -70572,7 +70924,7 @@
       "deferred_business": 438,
       "excluded": 22
     },
-    "refreshed_at": "2026-10-09"
+    "refreshed_at": "2026-10-10"
   },
   "diagnosis": {
     "phase": 2,
@@ -70580,7 +70932,7 @@
     "started_at": "2026-10-04",
     "completed_at": "2026-10-05",
     "method": "Current-source responsibility/failure-path review, whole-workspace public-boundary analysis, historical reconciliation, separated behavior evidence.",
-    "reviewed_included": 1510,
+    "reviewed_included": 1517,
     "current_review_state": "partial_refresh_for_B02_sorting_and_security; historical diagnosis complete does not imply current whole-file revalidation",
     "deferred_public_inputs": 438,
     "behavior_checks": [
@@ -70853,28 +71205,28 @@
       {
         "id": "BC-BASE-004",
         "name": "TTL与时钟",
-        "status": "not_executed",
+        "status": "partially_executed",
         "necessary_acceptance": "absolute/idle TTL不被refresh重置，业务Clock可控制，恢复后安全版本/family/缓存校验再服务。",
-        "boundary": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。",
+        "boundary": "独立 Redis 6379/DB14 的会话生命周期 22 项中 19 项通过；空闲/绝对过期与刷新保留原始登录时间 3 项失败，受控 Clock、实际断连恢复和服务再就绪仍未执行。",
         "scenario": "absolute/idle TTL不被refresh重置，业务Clock可控制，恢复后安全版本/family/缓存校验再服务。",
-        "state": "not_run",
-        "issue_ids": [],
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。"
+        "state": "failed",
+        "issue_ids": ["DIAG-BASE-005"],
+        "impact_ids": ["IMP-BASE-003"],
+        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010"],
+        "required_environment": "已在独立 Redis 运行；需修复 BASE-005 后复验受控时钟、真实断连恢复和再就绪。"
       },
       {
         "id": "BC-BASE-005",
         "name": "审计脱敏",
-        "status": "not_executed",
+        "status": "partially_executed",
         "necessary_acceptance": "改密From、嵌套bean/Map/List/record的password/token/secret不得进入JSONB、异常message或日志；成功审计与业务同事务。",
-        "boundary": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。",
+        "boundary": "独立 b02_test PostgreSQL 已运行改密 From 和 Map 结果的成功脱敏、审计失败回滚及业务失败独立审计 3 项并通过；嵌套 Bean/List/record、实际 HTTP 和日志输出尚未覆盖。",
         "scenario": "改密From、嵌套bean/Map/List/record的password/token/secret不得进入JSONB、异常message或日志；成功审计与业务同事务。",
-        "state": "not_run",
-        "issue_ids": [],
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "只审查；需纯合成/隔离基础设施验收，不读取本机秘密或误连开发库。"
+        "state": "inconclusive",
+        "issue_ids": ["DIAG-BASE-001"],
+        "impact_ids": ["IMP-BASE-001"],
+        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010"],
+        "required_environment": "合成 PostgreSQL 已运行；还需嵌套数据、日志和真实 HTTP 审计入口验证。"
       },
       {
         "id": "BC-BASE-006",
@@ -71374,12 +71726,12 @@
         "issue_ids": [
           "DIAG-CORE-019"
         ],
-        "state": "not_run",
+        "state": "failed",
         "scenario": "最后可登录DEV_OPS可被停用/撤权而系统正常管理不可恢复；需要所有减少有效Root用例同事务锁与统一有效计数。",
-        "validation": "待隔离依赖/实际HTTP/并发/故障与多实例验证；现阶段仅静态源码",
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "待隔离依赖/实际HTTP/并发/故障与多实例验证；现阶段仅静态源码"
+        "validation": "独立 b02_root_test PostgreSQL 中，软删除用户及未来生效 assignment 的 2 项有效 Root 计数测试均失败；完整减少 Root 用例、锁和并发尚未执行。",
+        "impact_ids": ["IMP-CORE-001"],
+        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010"],
+        "required_environment": "已在独立合成库运行两项计数检查；需修复后继续实际服务/HTTP、事务竞争及最后 Root 保护。"
       },
       {
         "id": "CHECK-CORE-020",
@@ -71625,6 +71977,22 @@
         "impact_ids": [],
         "evidence_ids": [],
         "required_environment": "仅当前静态审查；031另有无网络JDK构造复现，真实DB/Redis/HTTP/多实例/故障及恢复仍待验证"
+      },
+      {
+        "id": "CHECK-CORE-040",
+        "issue_ids": [
+          "DIAG-CORE-040"
+        ],
+        "state": "passed",
+        "scenario": "通知中间请求接收可变集合后立即形成稳定快照；调用方继续修改或经访问器修改均不能改变收件人、渠道、地址及参数容器；null/非法值遵守既有契约。",
+        "validation": "Common 5 项 JUnit 快照及并发回归、Common verify 的 SpotBugs 0 和八模块测试编译通过。",
+        "impact_ids": [
+          "IMP-CORE-008"
+        ],
+        "evidence_ids": [
+          "EV-B02-COMMON14-20261010"
+        ],
+        "required_environment": "无需外部依赖；实际投递、完整门禁及其他通知业务行为另验。"
       },
       {
         "required_environment": "隔离PostgreSQL，实际服务用例与HTTP409/error_code",
