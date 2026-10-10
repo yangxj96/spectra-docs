@@ -23,7 +23,7 @@
     "unresolved_blockers": [
       "B00 retains its recorded completion. B02 sorting and BASE-003 revocation have isolated PostgreSQL/Redis evidence within their stated scopes; Redis fault recovery, two application processes and real HTTP/browser scenarios still require batch evidence, without inferring acceptance from fixture availability.",
       "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout.",
-      "mise 2026.10.4 still panics with exit 101 when the faulty global config is loaded. A Git-ignored spectra-admin/.miserc.local.toml now makes direct mise -E test exec -- work in the backend checkout; PostgreSQL devops00_spectra_db_test and Redis DB 5 tests ran, with three session TTL/login-time failures and two effective-Root count failures."
+      "mise 2026.10.4 still panics with exit 101 when the faulty global config is loaded. A Git-ignored spectra-admin/.miserc.local.toml now makes direct mise -E test exec -- work in the backend checkout; PostgreSQL devops00_spectra_db_test and Redis DB 5 tests ran. Three session TTL/login-time failures remain; the earlier two effective-Root count failures passed after CORE-019 changes, while full HTTP and static gates remain open."
     ],
     "batches": [
       {
@@ -132,10 +132,11 @@
           "EV-B02-COMMON14-20261010",
           "EV-B02-COMMON14-GATES-20261010",
           "EV-B02-DEPS-PORTS-20261010",
-          "EV-CYCLE-TEST-ENV-20261010"
+          "EV-CYCLE-TEST-ENV-20261010",
+          "EV-B02-CORE019-20261010"
         ],
         "state": "in_progress",
-        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项、BASE-018 计数 TTL 10 项和 CORE-034 匿名/后台通知身份 10 项定点通过。Common 通知请求 14 条 SpotBugs 已修复，5 项快照及并发回归与 Common verify 通过。周期级 test 环境现在可在后端目录直接通过 mise -E test exec -- 加载；devops00_spectra_db_test 与 Redis DB 5 的直接命令组合回归 13/13 通过；扩大到目标失败场景后，PostgreSQL 分页 2/2、审计 3/3 通过、有效 Root 0/2 通过，Redis 30 项中 27 项通过、BASE-005 会话 TTL/登录时间 3 项失败。目录外原全局 mise 配置加载仍以 101 崩溃；全项目静态门禁仍停在 Framework 4 项 Checkstyle。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 断连恢复、测试 S3 操作及 B08 浏览器身份失效未验收，本批未满足 done_when。"
+        "progress_summary": "排序专项 85 项、BASE-003 会话撤销 19 项、BASE-004 重放围栏 10 项及 BASE-003 再回归 19 项通过；BASE-007 安全集合 8 项、BASE-018 计数 TTL 10 项和 CORE-034 匿名/后台通知身份 10 项定点通过。Common 通知请求 14 条 SpotBugs 已修复，5 项快照及并发回归与 Common verify 通过。周期级 test 环境现在可在后端目录直接通过 mise -E test exec -- 加载；devops00_spectra_db_test 与 Redis DB 5 的直接命令组合回归 13/13 通过。CORE-019 修复有效 Root SQL/事务锁、身份恢复上限和用户编辑锁顺序，在专用 PostgreSQL 完成 14 项计数、回滚和并发测试，连同异常映射及入职回归共 19/19；实际 HTTP/组合服务链未验收。BASE-005 会话 TTL/登录时间 3 项仍失败，目录外原全局 mise 配置加载仍以 101 崩溃；完整模块门禁停在 Framework 4 项既有 Checkstyle，继续定位还有 Framework PMD 5 项、SpotBugs 4 项；Core 单独检查剩余 Checkstyle 8、PMD 12、SpotBugs 33 项遗留。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 断连恢复、测试 S3 操作及 B08 浏览器身份失效未验收，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -435,6 +436,62 @@
   },
   "coverage": [
     {
+      "path": "docs/开发指南/工程治理/2026-10-10-B02有效Root保护验证.md",
+      "role": "B02 有效 Root 专项执行证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "8b0818afed8f2953816e8655aae5272b05b677dcb6de78d1a30c57350ec20c66",
+      "reviewed_rules": ["04§7", "04§12", "04§13"],
+      "issue_ids": ["DIAG-CORE-019"],
+      "evidence_ids": ["EV-B02-CORE019-20261010"],
+      "review_summary": "核对 Root 专项命令、退出码、合成 PostgreSQL 场景、跨项目调用边界与未执行范围。",
+      "review_limits": ["文件记录执行事实；不代表 HTTP/双进程或完整门禁通过。"],
+      "review_kind": "document_structure_and_high_impact_claim_scan",
+      "impact_ids": ["IMP-CORE-001"]
+    },
+    {
+      "path": "spectra-admin/spectra-common/src/main/java/com/devops00/spectra/common/exception/BusinessConflictException.java",
+      "role": "Common 业务冲突异常契约",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "611be2225799380f5412e89d5dd47fd39fd1a68732dc563216b1357ffde01b9e",
+      "reviewed_rules": ["04§5", "04§7", "04§12"],
+      "issue_ids": ["DIAG-CORE-019"],
+      "evidence_ids": ["EV-B02-CORE019-20261010"],
+      "review_summary": "核对 409 业务冲突与基础设施异常的类型边界。",
+      "review_limits": ["泛型异常映射单元测试通过；实际 HTTP 响应尚未执行。"],
+      "review_kind": "source_responsibility_and_failure_path_review",
+      "impact_ids": ["IMP-CORE-001"]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/web/advice/exception/ExceptionResponseResolverConflictTest.java",
+      "role": "Framework 业务冲突 HTTP 状态单元测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "7dbb8c47f496fce34d8ef7b0fbcd68a10f80da190cd6ef83d3a98f1ba47fe856",
+      "reviewed_rules": ["04§5", "04§7", "04§12"],
+      "issue_ids": ["DIAG-CORE-019"],
+      "evidence_ids": ["EV-B02-CORE019-20261010"],
+      "review_summary": "核对冲突 409、未知内部异常 500 两种分支并执行单元测试。",
+      "review_limits": ["不代表实际 Controller 到 HTTP 客户端的全链路响应。"],
+      "review_kind": "source_responsibility_and_failure_path_review",
+      "impact_ids": ["IMP-CORE-001"]
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/root/RootGovernanceConflictException.java",
+      "role": "Core Root 人数边界冲突异常",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "eb711be0f7fa970989e1031513f6e4c276d3213426ac2b199073417f64e30302",
+      "reviewed_rules": ["04§7", "04§12"],
+      "issue_ids": ["DIAG-CORE-019"],
+      "evidence_ids": ["EV-B02-CORE019-20261010"],
+      "review_summary": "核对 Root 策略人数及版本冲突的类型分支。",
+      "review_limits": ["未执行实际 Controller HTTP 链路。"],
+      "review_kind": "source_responsibility_and_failure_path_review",
+      "impact_ids": ["IMP-CORE-001"]
+    },
+    {
       "path": "docs/后端/30-规范/06-分页排序契约.md",
       "role": "分页契约或本轮正式证据",
       "scope": "included",
@@ -655,10 +712,10 @@
       "role": "全周期后端真实依赖测试环境迁移及执行边界证据",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "2c84da018d35bdea0c561b6902ef70d9206c4f9be06e13ada640c55ab782af3d",
+      "content_sha256": "044f44afae2de70fc702ae5ebd54445e0601452911727ee3ee36387585bd8a32",
       "reviewed_rules": ["04 §13 真实依赖与验证证据"],
       "issue_ids": [],
-      "evidence_ids": ["EV-CYCLE-TEST-ENV-20261010"],
+      "evidence_ids": ["EV-CYCLE-TEST-ENV-20261010", "EV-B02-CORE019-20261010"],
       "review_summary": "记录全周期 test 环境边界、mise 全局配置崩溃及本机目录覆盖、直接命令入口、专用 PostgreSQL 建库与 Redis DB 5 真实依赖复验。",
       "review_limits": ["PostgreSQL/Redis 组合 13/13 通过；扩大到目标失败场景后 Root 两项和会话三项失败，测试 S3、HTTP、双实例与故障恢复未运行。"],
       "review_kind": "test_environment_evidence_review",
@@ -3213,7 +3270,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "18d4131f0908ab1e5e83cb80ad19777be16136f30775c220ac110e12fd9c15cd",
+      "content_sha256": "022261175bb37534769a1d92aaf7509ef77eb1da722d4f68f88dc3934028d7e9",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3228,7 +3285,8 @@
         "EV-INVENTORY-20261003",
         "EV-ROOT-DOC-20261004",
         "EV-B02-BASE003-20261009",
-        "EV-B02-BASE004-20261009"
+        "EV-B02-BASE004-20261009",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -3543,7 +3601,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "stale",
-      "content_sha256": "655a7ae2b25d449dc73c7505f93d20d09f3b081372f8b12f505f77f7909f3bcf",
+      "content_sha256": "a722a64a8a8c79779fb4d72c2a13ae382f4b2850f47c2dd406f2436082e9192b",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3553,7 +3611,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ROOT-DOC-20261004"
+        "EV-ROOT-DOC-20261004",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -4110,7 +4169,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "0c95bdfdb8467e613d731b753e1ff2007a239e15fcbf6e3524bbee806352c837",
+      "content_sha256": "e5b18d29c786226a0c2c7fb551cea0c7fa2f0ad97f56f2881ae4a76c90782949",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4149,7 +4208,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "e1c6a4b12dbc3a4b1f3c25863aee2897f33ad28f0433a596f2adfce7e6ad6dbf",
+      "content_sha256": "0eb39d0d837375e0a2aa02124c3ba3a0d0ee2238383c8fe2da62e83c9afaaa40",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4172,7 +4231,8 @@
         "EV-B02-CORE034-GATES-20261009",
         "EV-B02-COMMON14-20261010",
         "EV-B02-COMMON14-GATES-20261010",
-        "EV-B02-DEPS-PORTS-20261010"
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -17290,7 +17350,7 @@
       "role": "后端 spectra-framework / exception",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "8906f1b15abf7f9180defd375735904423824c560f96fb09f35f1cfc302bd68d",
+      "content_sha256": "a7000e595d3c69680f0dfcb26af975dace5355e5c70ea5c8dcd07faa0c9b3d87",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界"
@@ -17300,7 +17360,8 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -25047,7 +25108,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "8bede3f5d9d7f971e6365f49548387386ff49e680334349cab9e604fdc71aba3",
+      "content_sha256": "7956997953d7f268eb9cca5f4a336d3e362447f1df44efaefeac66b425a9a85d",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25062,7 +25123,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -25241,7 +25303,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "f5c723b6eaa42f0ee0fb9d47f5f2f189fb501503da979ec1cd1901c720dfe609",
+      "content_sha256": "1d370f154f2b379633723b8f3ab95a3ca1fe18f212be134c350c867560b970d4",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25257,7 +25319,8 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -28009,7 +28072,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "874979ba10e6bfc19d137dc305a3e9a5dc2cf41c8e7a96e7891923b80153f714",
+      "content_sha256": "3b53a30df17066fe383b082adf6ad5bfc3a8f7e361e4cfd55cdbd2dcaa79c36c",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -28027,7 +28090,8 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -29556,7 +29620,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "4b15ee78a00645eb797924541ca5c149419becf1d8ea24bc30724c90ec8f7c95",
+      "content_sha256": "7c2b1e18951370648ad8811499541d79b97e51fa0d39d4e37c260769967edbf5",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -29571,7 +29635,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -29618,7 +29683,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "0cd2272f7fbf9881a127e6f7efc50e4866f23f84d783ca7fec1cc6d98590b34d",
+      "content_sha256": "48625ab946080b182654367dde82d33bef63f52f0e1e6c6f2df7dac9e93e1419",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -29633,7 +29698,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -29649,7 +29715,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "a9dfb916d23032f23c0367f3570280246f5ff8971b812df5d33e08f3fa0f6c20",
+      "content_sha256": "f72e81723a26cc63bd4949259cc76e6e21baf776bdd71f8fb75b561c777cd603",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -29666,7 +29732,8 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -29777,7 +29844,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "aad08d7fd9a643aab2f09bd306a25808352db98c405a23fd3810b39b7aa0086b",
+      "content_sha256": "706b7e38964036d9c3255c6a3427fd6d00107e85c6961f34ebfab1254c79c708",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -29792,7 +29859,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -39618,7 +39686,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "d74edf53155d75dbca6d486381bb9d3bbaa93a1cd505cbf590289257bfd82257",
+      "content_sha256": "4500d472614ab388df9725ecefa5cf241ff6eeeb752cd26c236a9624c4765d35",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39637,7 +39705,8 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ADDITIONAL-001"
+        "EV-ADDITIONAL-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -39655,7 +39724,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "stale",
-      "content_sha256": "f6bace744e17800139ab519df1784eec8719e69532958e66bf0357f2495d1142",
+      "content_sha256": "b5035e9fcf1e3498e5ae84a9001d585e7c5f915ab64d28d5a93529118394b193",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39680,7 +39749,8 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ADDITIONAL-001"
+        "EV-ADDITIONAL-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -41553,7 +41623,7 @@
       "role": "B02 有效 Root 专用 PostgreSQL 合成测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "d1dd089634b9b6b2117e67b149311d1d693ea9b1a4d837133025709302d3d7f8",
+      "content_sha256": "6519509528b5bb33eccc1c732bc67beea650f1b565fa6c531e00265a93dc85bb",
       "reviewed_rules": [
         "04 §7 有效身份与最后 Root",
         "04 §13 真实依赖验证"
@@ -41563,7 +41633,8 @@
       ],
       "evidence_ids": [
         "EV-B02-DEPS-PORTS-20261010",
-        "EV-CYCLE-TEST-ENV-20261010"
+        "EV-CYCLE-TEST-ENV-20261010",
+        "EV-B02-CORE019-20261010"
       ],
       "review_summary": "test 环境 devops00_spectra_db_test 中有效 Root 两项均失败：软删除用户及未来生效角色未从有效计数排除；过期凭证断言未执行到。",
       "review_limits": [
@@ -42155,7 +42226,7 @@
       "role": "测试与夹具",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "90f685114c0b38a3eeeaac4c93830545b111bb3276cf3603afba081184ef397a",
+      "content_sha256": "420125c5c03a0c12d88883484a793799e4c5f3cc82fdb3dcd29a2dcec111a91e",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -42171,7 +42242,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-ADDITIONAL-001"
+        "EV-ADDITIONAL-001",
+        "EV-B02-CORE019-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -65016,12 +65088,13 @@
       "finding": "LastEffectiveDevOpsGuard仅声明/实现，无调用方；生命周期锁定/停用/离职及授权移除没有接入最小有效Root保护。 JdbcRootPolicyRepository有效计数SQL还未考虑用户deleted、assignment有效起止及凭证到期，不能代表当前可登录有效Root。",
       "impact": "最后可登录DEV_OPS可被停用/撤权而系统正常管理不可恢复；需要所有减少有效Root用例同事务锁与统一有效计数。",
       "priority": "P1",
-      "disposition": "集中整改并执行对应行为验证",
-      "state": "pending",
+      "disposition": "已接入用户状态、授权、登录身份创建/撤销、密码凭据、密码策略及用户编辑的事务锁和前后人数复核，并修复有效计数条件；专用 PostgreSQL 计数、回滚及两类并发 14/14 通过。待实际服务/HTTP 和完整门禁验证。",
+      "state": "in_progress",
       "exception_ids": [],
       "evidence_ids": [
         "EV-CORE-001",
-        "EV-B02-DEPS-PORTS-20261010"
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-B02-CORE019-20261010"
       ],
       "impact_ids": [
         "IMP-CORE-001"
@@ -66800,13 +66873,14 @@
         "公开业务操作与必要DTO、最终授权/系统上下文、Mapper SQL、Common端口、所有直接间接仓库调用者、Web编辑及错误展示",
         "Core组织用例与Framework范围策略，历史组织数据语义"
       ],
-      "deferred_boundary": "OA/Workflow独立业务治理暂缓，公共权限/目录/时区/历史部门改变影响的调用方必须一致迁移。2026-10-10 周期级 test 环境专用 PostgreSQL 的 Root 有效计数两项测试失败，最后有效 Root 保护未验收。",
+      "deferred_boundary": "OA/Workflow独立业务治理暂缓，公共权限/目录/时区/历史部门改变影响的调用方必须一致迁移。CORE-019 当前没有发现 OA/Workflow 直接调用 Root 人数减少入口；其目录与授权读取仍是间接影响。2026-10-10 专用 PostgreSQL Root 计数、回滚与并发测试 14/14 通过，但实际公共服务/HTTP 与 OA/Workflow 间接行为未验收。",
       "state": "pending",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
         "EV-CORE-001",
         "EV-MODEL-004",
-        "EV-B02-DEPS-PORTS-20261010"
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-B02-CORE019-20261010"
       ],
       "verification": [
         "隔离DB/Redis权限范围与撤权故障",
@@ -69255,6 +69329,44 @@
       "limits": "仅当前独立测试实例和列明场景；BASE-005 与 Root 失败未修复，历史旧端口证据不追改。"
     },
     {
+      "id": "EV-B02-CORE019-20261010",
+      "scope": "DIAG-CORE-019 / IMP-CORE-001 / CHECK-CORE-019 有效 Root SQL、事务锁、人数边界和冲突映射",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=RootGovernancePostgresTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' test -> exit 0, initial 7/7 and expanded 11/11",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=RootGovernancePostgresTest,ExceptionResponseResolverConflictTest,UserOnboardingServiceImplTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' test -> exit 0, first 16/16 then identity-restoration-expanded 19/19",
+        "spectra-admin: mise exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dspotless.ratchetFrom=origin/master' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> exit 0 after one test formatting correction",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -fae -pl spectra-modules/spectra-core -am '-Dspotless.ratchetFrom=NONE' verify -> first and final-source rerun exit 1, Framework existing four AvoidStarImport Checkstyle findings",
+        "spectra-admin: same reactor verify with -DskipTests -Dcheckstyle.skip and changed-file Spotless -> exit 1, Framework existing five PMD findings",
+        "spectra-admin: same reactor verify with -DskipTests -Dcheckstyle.skip -Dpmd.skip and changed-file Spotless -> exit 1, Framework existing four SpotBugs findings",
+        "spectra-admin: mise exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core org.apache.maven.plugins:maven-checkstyle-plugin:3.6.0:check -> exit 1, after fixing one newly unused test import eight findings remain in unchanged files",
+        "spectra-admin: mise exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core org.apache.maven.plugins:maven-pmd-plugin:3.28.0:check -> exit 1, twelve findings in unchanged files",
+        "spectra-admin: mise exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core com.github.spotbugs:spotbugs-maven-plugin:4.10.3.0:check -> exit 1, 33 findings in unchanged classes"
+      ],
+      "environment": "Windows PowerShell 7.6; mise Java 25 and Maven Wrapper; direct mise -E test exec -- loads the cycle-level test environment. Root tests used only synthetic tables in PostgreSQL devops00_spectra_db_test; no credentials or business data read/output, and no Redis access in this issue.",
+      "checked_at": "2026-10-10",
+      "result": "inconclusive",
+      "exit_codes": [0, 0, 0, 1, 1, 1, 1, 1, 1],
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-10-B02有效Root保护验证.md",
+        ".temp/b02/core019-target-expanded-20261010.log",
+        ".temp/b02/core019-focused-20261010.log",
+        ".temp/b02/core019-identity-expanded-20261010.log",
+        ".temp/b02/core019-spotless-20261010.log",
+        ".temp/b02/core019-spotless-final-20261010.log",
+        ".temp/b02/core019-module-verify-20261010.log",
+        ".temp/b02/core019-module-verify-final-20261010.log",
+        ".temp/b02/core019-static-verify-20261010.log",
+        ".temp/b02/core019-static-rest-20261010.log",
+        ".temp/b02/core019-core-checkstyle-20261010.log",
+        ".temp/b02/core019-core-checkstyle-final-20261010.log",
+        ".temp/b02/core019-core-pmd-20261010.log",
+        ".temp/b02/core019-core-pmd-final-20261010.log",
+        ".temp/b02/core019-core-spotbugs-20261010.log",
+        ".temp/b02/core019-core-spotbugs-final-20261010.log"
+      ],
+      "limits": "PostgreSQL guard/SQL and focused tests pass; actual Service/Controller/HTTP 409 response, Redis Session side effects, OA/Workflow indirect paths and two processes not run. Full verify fails in Framework before Core, with existing Checkstyle/PMD/SpotBugs findings. Direct Core checks have unchanged-file findings; no skipped-check command represents full gate passage."
+    },
+    {
       "id": "EV-CYCLE-TEST-ENV-20261010",
       "scope": "集中治理全周期后端 test 环境入口迁移与当前验证边界",
       "command_or_scenario": [
@@ -70947,14 +71059,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1517,
+      "included": 1521,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 24
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -71766,12 +71878,12 @@
         "issue_ids": [
           "DIAG-CORE-019"
         ],
-        "state": "failed",
+        "state": "partially_executed",
         "scenario": "最后可登录DEV_OPS可被停用/撤权而系统正常管理不可恢复；需要所有减少有效Root用例同事务锁与统一有效计数。",
-        "validation": "周期级 test 环境 devops00_spectra_db_test 中，软删除用户及未来生效 assignment 的 2 项有效 Root 计数测试均失败；过期凭证后续断言未执行到，完整减少 Root 用例、锁和并发尚未执行。",
+        "validation": "周期级 test 环境 devops00_spectra_db_test 中，修复后的有效计数、最后 Root 回滚、角色/身份撤销、身份恢复上限、密码年龄与策略及两类事务竞争共 14/14 通过；相关异常映射与入职回归 5/5 通过。实际服务/HTTP 组合、Redis Session 侧效应和双进程尚未执行；完整 verify 被既有 Framework Checkstyle 阻断。",
         "impact_ids": ["IMP-CORE-001"],
-        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010", "EV-CYCLE-TEST-ENV-20261010"],
-        "required_environment": "已在独立合成库运行两项计数检查；需修复后继续实际服务/HTTP、事务竞争及最后 Root 保护。"
+        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010", "EV-CYCLE-TEST-ENV-20261010", "EV-B02-CORE019-20261010"],
+        "required_environment": "已在专用合成库运行锁、回滚和竞争；后续需实际服务/HTTP、Redis Session 侧效应及双进程。"
       },
       {
         "id": "CHECK-CORE-020",
