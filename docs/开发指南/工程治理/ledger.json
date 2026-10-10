@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "standard": "docs/开发指南/04-工作区工程标准.md",
-  "updated_at": "2026-10-10",
+  "updated_at": "2026-10-11",
   "status": "unification_in_progress",
   "remediation_cycle": {
     "id": "CYCLE-20261005",
@@ -143,10 +143,13 @@
           "EV-B02-FRAMEWORK-SPOTBUGS-20261010",
           "EV-B02-FRAMEWORK-SPOTBUGS-GATES-20261010",
           "EV-B02-BASE006-20261010",
-          "EV-B02-BASE006-GATES-20261010"
+          "EV-B02-BASE006-GATES-20261010",
+          "EV-B02-BASE001-20261011",
+          "EV-B02-BASE001-GATES-20261011",
+          "EV-B02-STATIC-20261011"
         ],
         "state": "in_progress",
-  "progress_summary": "排序专项、BASE-003/004/005/006/007/018、CORE-019/034、Common 14 条 SpotBugs 均有专项证据。BASE-006 以 Redis Lua 原子预留及提交会话名额，双连接 REJECT_NEW 上限与跨客户端提交再检查、KICK_OLD 踢旧、ALLOW 同端、租约/围栏/无 TTL 拒绝和连接失败后健康连接恢复已验证。最终 Framework 完整 verify 退出 0，SpotBugs 0，Framework 113/113；全后端测试阶段 258/258，OA/Workflow 编译通过。全后端标准 verify 被 Workflow 无测试引擎但有 excludedGroups 的 Surefire 配置阻断；命令级绕行后又被 Core 八条 Checkstyle 违规阻断。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 停启恢复、测试 S3 操作、旧格式会话上线处置及 B08 浏览器身份失效未验收；其余 B02 问题仍需逐项处理，本批未满足 done_when。"
+  "progress_summary": "排序专项、BASE-001/003/004/005/006/007/018、CORE-019/034 和 Common 14 条 SpotBugs 均有专项证据。Core 六条未使用导入和 S3 无用变量已修复；Core 请求容器结构快照和分页选项已收口，11 条 Spring 装配 PMD 与 2 条 Spring 协作者 SpotBugs 按精确例外登记。mise test 环境下全后端八模块 verify 退出 0，选定测试 267/267，Checkstyle/PMD/SpotBugs 均通过；OA/Workflow 编译与静态检查通过但没有测试用例，RegionServiceTest 被显式排除。BASE-001 合成 PostgreSQL 事务/JSONB 与单元测试通过，真实 HTTP 和正式审计表仍未验证。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 停启恢复、测试 S3 操作、旧格式会话上线处置及 B08 浏览器身份失效未验收；其余 B02 问题仍需逐项处理，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -446,6 +449,76 @@
   },
   "coverage": [
     {
+      "path": "docs/开发指南/工程治理/2026-10-11-B02后端静态门禁收口.md",
+      "role": "B02 后端静态质量门禁收口和验证证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "3908734d11eeea95b4624fd7723e7ad1f423b2fe100b244d2826f531865c6399",
+      "reviewed_rules": ["04 §3 复杂度与例外", "04 §13 验证", "05 集中治理验收"],
+      "issue_ids": [],
+      "evidence_ids": ["EV-B02-STATIC-20261011"],
+      "review_summary": "记录 Core 六条 Checkstyle、十二条 PMD、三十三条 SpotBugs 的修复或定点例外，八模块 verify 与 267 项测试结果。",
+      "review_limits": ["仅静态质量门禁收口，不替代未运行的 B02 行为和整体验收。"],
+      "review_kind": "documented_static_gate_evidence_review",
+      "impact_ids": []
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/user/service/impl/RequestSnapshotTest.java",
+      "role": "Core 服务内请求快照回归测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "245836e0a91c9d60dcea4e16352a94112f8a92a56da327ecc2e10cb3c90824d4",
+      "reviewed_rules": ["04 §3 复杂度与例外", "04 §7 授权", "04 §13 自动验证"],
+      "issue_ids": [],
+      "evidence_ids": ["EV-B02-STATIC-20261011"],
+      "review_summary": "通知规划、部门授权与用户导入的集合结构快照、空值边界及暂存行实体身份测试。",
+      "review_limits": ["单元测试只验证容器快照；共享实体元素的内容与真实并发写入不在此测试范围。"],
+      "review_kind": "service_request_snapshot_unit_test_review",
+      "impact_ids": []
+    },
+    {
+      "path": "docs/开发指南/工程治理/2026-10-11-B02审计脱敏验证.md",
+      "role": "B02 审计脱敏实现、真实依赖和门禁证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "19f05d905294ba2a8c90bb870c0cc644b00d544f645e0ed803824c161a6e49b3",
+      "reviewed_rules": ["04 §12 审计与敏感日志", "04 §13 验证证据", "05 集中治理验收"],
+      "issue_ids": ["DIAG-BASE-001"],
+      "evidence_ids": ["EV-B02-BASE001-20261011", "EV-B02-BASE001-GATES-20261011"],
+      "review_summary": "逐项记录审计脱敏实现、OA/Workflow/Web 影响、合成 PostgreSQL 与日志测试、全后端 263 项测试及未通过的静态门禁。",
+      "review_limits": ["文档记录执行事实；不替代真实 HTTP、正式审计表或完整后端 verify。"],
+      "review_kind": "documented_verification_evidence_review",
+      "impact_ids": ["IMP-BASE-001"]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/test/java/com/devops00/spectra/framework/web/advice/exception/CommonExceptionAdviceSensitiveLogTest.java",
+      "role": "Framework 参数校验敏感日志单元测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "40a2bfcc8e8ac42a56ae57831f691c050c8ed227cd76a5a34430094902be2a9d",
+      "reviewed_rules": ["04 §12 审计与敏感日志", "04 §13 自动验证"],
+      "issue_ids": ["DIAG-BASE-001"],
+      "evidence_ids": ["EV-B02-BASE001-20261011"],
+      "review_summary": "带合成拒绝值的 Bean Validation 异常返回 400，日志不含原值或 Throwable。",
+      "review_limits": ["直接调用 Advice；真实 HTTP Controller 未运行。"],
+      "review_kind": "sensitive_log_unit_test_review",
+      "impact_ids": ["IMP-BASE-001"]
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/audit/AuditSanitizationTest.java",
+      "role": "Core 审计结构化快照和文本脱敏单元测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "fe4e7cc15ba0a781e586f9c969f61d572ec5545efd2acb1ac804848cc1f84ac5",
+      "reviewed_rules": ["04 §12 审计与敏感日志", "04 §13 自动验证"],
+      "issue_ids": ["DIAG-BASE-001"],
+      "evidence_ids": ["EV-B02-BASE001-20261011"],
+      "review_summary": "改密表单、嵌套 Bean/record、未知对象拒绝保留、Bearer/URL 及 reason 中带前缀键值脱敏 6 项。",
+      "review_limits": ["单元测试，不代替正式审计表或真实 HTTP 验证。"],
+      "review_kind": "audit_sanitization_unit_test_review",
+      "impact_ids": ["IMP-BASE-001"]
+    },
+    {
       "path": "docs/开发指南/工程治理/2026-10-10-B02会话并发配额验证.md",
       "role": "B02 会话并发配额专项执行证据",
       "scope": "included",
@@ -562,11 +635,11 @@
       "role": "Framework 业务冲突 HTTP 状态单元测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "7dbb8c47f496fce34d8ef7b0fbcd68a10f80da190cd6ef83d3a98f1ba47fe856",
+      "content_sha256": "b1e2530814531e0c5b19ad92f6b2efd0272d9ffb0b97e9e160fb5770d004c518",
       "reviewed_rules": ["04§5", "04§7", "04§12"],
-      "issue_ids": ["DIAG-CORE-019"],
-      "evidence_ids": ["EV-B02-CORE019-20261010"],
-      "review_summary": "核对冲突 409、未知内部异常 500 两种分支并执行单元测试。",
+      "issue_ids": ["DIAG-CORE-019", "DIAG-BASE-001"],
+      "evidence_ids": ["EV-B02-CORE019-20261010", "EV-B02-BASE001-20261011"],
+      "review_summary": "核对冲突 409、未知内部异常 500；新增审计写入失败含敏感原因时 503 固定响应且不打印异常栈。",
       "review_limits": ["不代表实际 Controller 到 HTTP 客户端的全链路响应。"],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": ["IMP-CORE-001"]
@@ -3365,7 +3438,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "1bb8a1af99906e27ea48c79b787a1ce006eec28ddc08e27437b4dbf1a97f1427",
+      "content_sha256": "a9a02a51af26fb252f7879f7ed92c4894143a27079997a0a23e2db5bafb4934f",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3563,7 +3636,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "5cd882390f4740843b7e588bf830a53abc299ea371c6c3b07c9449f63d5a9b62",
+      "content_sha256": "fe2c7316bdeb3230c2fecfb0a170b239995dd1cf76114c1740353a656525b1fb",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3596,22 +3669,23 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "9edffc428e988ae7c0993ef3f647fd7e0f3d7840a02c9681d8641726432f274d",
+      "content_sha256": "eb44a0f92038cbc2385f4efe2653a718158c39a89eceb65eddd5414612475dd0",
       "reviewed_rules": [
         "04§1",
         "04§4",
         "04§12",
         "04§13"
       ],
-      "issue_ids": ["DIAG-BASE-005"],
+      "issue_ids": ["DIAG-BASE-005", "DIAG-BASE-001"],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
         "EV-ROOT-DOC-20261004",
-        "EV-B02-BASE005-20261010"
+        "EV-B02-BASE005-20261010",
+        "EV-B02-BASE001-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 基础设施；同步 BASE-005 安全 Session 的绝对/空闲期限、Lua 原子活动续期与旧格式会话失败拒绝；实际断连恢复尚未验收。",
+      "review_summary": "基础设施知识库；同步安全 Session 期限及审计快照、reason、日志与失败响应的脱敏边界，并列出真实 HTTP/正式审计表未验证范围。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4269,7 +4343,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "64748e6398327c9d12ff6d2947c3b9771f33cab40935c7bc7ef2ed64f276862c",
+      "content_sha256": "36e8e881cb9b5eb78e07d18019bb082d6366588811058169b2d950351df9b9e4",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4293,11 +4367,13 @@
         "EV-B02-DEPS-PORTS-20261010",
     "EV-CYCLE-TEST-ENV-20261010",
     "EV-B02-FRAMEWORK-SPOTBUGS-20261010",
-    "EV-B02-FRAMEWORK-SPOTBUGS-GATES-20261010"
+    "EV-B02-FRAMEWORK-SPOTBUGS-GATES-20261010",
+    "EV-B02-BASE001-20261011",
+    "EV-B02-BASE001-GATES-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-  "review_summary": "正式台账逐项合并当前文件、问题、影响与行为状态；Framework 四条 SpotBugs 已修复且模块 verify 通过，全后端完整门禁和真实后台入口仍未验收，B02 保持进行中；本体使用自摘要置空后的 PowerShell 规范化 JSON 摘要。",
+  "review_summary": "正式台账局部登记 BASE-001 审计脱敏的实现、合成 PostgreSQL/日志专项、全后端 263 项测试与 Core 静态门禁阻断；B02 保持进行中，本体使用自摘要置空后的 PowerShell 规范化 JSON 摘要。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4310,7 +4386,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "ab60ac4e154893ec7efe8021f5fee62ed61023ae50a662d457ddcfef8f977855",
+      "content_sha256": "677ce114006b5d012e404c1656f9759a036bf2633c773279a8e8a00c0e3b9ef3",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4338,11 +4414,13 @@
         "EV-B02-BASE005-20261010",
         "EV-B02-BASE005-GATES-20261010",
         "EV-B02-BASE006-20261010",
-        "EV-B02-BASE006-GATES-20261010"
+        "EV-B02-BASE006-GATES-20261010",
+        "EV-B02-BASE001-20261011",
+        "EV-B02-BASE001-GATES-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 工程治理台账；2026-10-10 局部登记 BASE-006 双连接原子配额、Framework 113 项及全后端 258 项测试，完整后端 verify 仍受 Workflow/Core 既有门禁阻断；全局仍 in_progress。",
+      "review_summary": "工程治理台账索引；2026-10-11 局部登记 BASE-001 审计脱敏、全后端 263 项测试和 Core Checkstyle/PMD/SpotBugs 阻断，全局仍 in_progress。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -10720,7 +10798,7 @@
       "role": "工程说明与规则入口",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "c9779d273b5d656f3c5d44367ebad3eb578c43fa062a26e73d1f14cf7565d37a",
+      "content_sha256": "ce21f05a1ce9340de0cdacf2c2cb48c61bde4f1700d04506984004b007aaa755",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -11129,7 +11207,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "0fd31c5fb7b309c5497a220912e7ac9c45ef8d2bfa633d2ef767a254f426edb3",
+      "content_sha256": "910b73276f436d7943a0b8c550387b3b4cb9d9193c95adca045c7ab907365596",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -11142,11 +11220,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE001-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "不可变审计快照复制Map/Collection/数组；任意bean仍保留原值，occurredAt默认Instant.now，未统一注入Clock。",
+      "review_summary": "结构化快照在记录创建时防御性复制并脱敏，reason 同时清洗内嵌凭据；嵌套数据与合成 JSONB 已回归。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -11220,7 +11299,7 @@
       "role": "后端 spectra-common / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "26cf9bcbbbadbcc9b596f3267176f4b797f4e86babb2aa5842f8f2a7b43eb18e",
+      "content_sha256": "511dbba96edbd7bb65a83dbdf3d4c898d09c782d857b3b1222bebce24b8a341f",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -11233,11 +11312,12 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE001-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "敏感key归一化和Bearer/URL文本脱敏；递归覆盖Map/Iterable/array，POJO直接返回，改密From存在泄漏路径。",
+      "review_summary": "Map/Iterable/array 递归清洗、未知 POJO 拒绝保留，Bearer/URL 与文本内带前缀敏感键值一并脱敏；改密及嵌套数据已有合成测试。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -17445,19 +17525,20 @@
       "role": "后端 spectra-framework / exception",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "a640e945ba06767180d8adb5158f21f472df3b99731e428fe306573cc57704f7",
+      "content_sha256": "0006fdad9efa49e26bb3da97ed3bc753320daff25b3ddf1119bb572c56e35e9a",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界"
       ],
-      "issue_ids": [],
+      "issue_ids": ["DIAG-BASE-001"],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE001-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "通用异常处理；异常继承/消息构造逐项阅读，统一HTTP及稳定errorCode由Framework决策，不能以异常类存在证明协议完成。",
+      "review_summary": "Bean Validation 异常只记录关联 ID，不记录包含拒绝值的异常文本或栈；HTTP 返回仍走既有 400 统一响应。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -17471,22 +17552,24 @@
       "role": "后端 spectra-framework / exception",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "a7000e595d3c69680f0dfcb26af975dace5355e5c70ea5c8dcd07faa0c9b3d87",
+      "content_sha256": "f315389f901e66fc44b58df605bf1eccd57c3c15883f7a465a004ef9a8747a98",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界"
       ],
       "issue_ids": [
-        "DIAG-BASE-010"
+        "DIAG-BASE-010",
+        "DIAG-BASE-001"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
         "EV-BASE-001",
-        "EV-B02-CORE019-20261010"
+        "EV-B02-CORE019-20261010",
+        "EV-B02-BASE001-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "异常链映射HTTP与中文message/logStackTrace，无稳定errorCode；EntityUpdateException继承通用异常走500而非409。",
+      "review_summary": "审计写入异常映射固定 503 且不打印可能含 SQL 参数的栈；稳定 error_code 等 DIAG-BASE-010 协议问题仍未处置。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -18935,7 +19018,7 @@
       "role": "后端 spectra-core / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "2dcc2e35882bac0ba929f2113d829056970dba2bd4d51e3b7412da0e97735eb6",
+      "content_sha256": "7058cb4f38c750848d76b3aa95efa441fe35352ab28137eb76ced4045377a46a",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -18945,14 +19028,15 @@
         "04§10",
         "04§12"
       ],
-      "issue_ids": [],
+      "issue_ids": ["DIAG-BASE-001"],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-BASE001-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "完整核对审计入口/同步事务及独立失败记录、读取可见性、查询限额、字段和JSONB映射；Service接口缺失及CSV公式转义需整改，时间/脱敏公共问题关联Foundation。",
+      "review_summary": "审计入口同步写入与失败记录独立事务已核对；写入失败只记异常类型，业务异常仅附固定安全说明；读取可见性与导出独立治理仍保留。",
       "review_limits": [
         "Java机械许可证/import/Javadoc省略；未实测HTTP、DB、Redis、竞争。"
       ],
@@ -18964,7 +19048,7 @@
       "role": "后端 spectra-core / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "f0b92e8291e51e27abff6582adc84bc54ab9b38c6bbec00e49af5e35169ddd36",
+      "content_sha256": "beafac31468fcf299ee58d3ec539884e7d10c03acbf5f8c5bb6627f198eedd2f",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -23336,7 +23420,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "d6d58e20d4171ff78093536dfd3965a2e32d40e3231f10ad4e6554a93bd5f119",
+      "content_sha256": "3ab8590657345e08b3aac282398f982a715c8f9da08a832b4707d02226462243",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25051,7 +25135,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "ec41adf3b7d7be23dfd44c1cff77feaf4e3fff7c93b9b25791a1d28ccb9bda89",
+      "content_sha256": "11b6a124f9c2fc884432ca2c5b8810b1862b458cdf07151478b48a7786578474",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25082,7 +25166,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "fb6aa56e2c1b596526e1495dd3d0648c7cb2f036b0b5416c8b9b1c156eef7710",
+      "content_sha256": "d2f3e0751bb0dd299998ee32f00d2d4affb4e6b9f1682ee160934d07ed81df18",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25113,7 +25197,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "2e5ade12406d22417389f5a51b82aa9735435106cd393ee405f3510e991bbd3e",
+      "content_sha256": "6b0609c762d9f9fd9e2c411034f974adb2f992f89399b419d1e9ba7d73ee3257",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25873,7 +25957,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "b60e79edb1eec7dfeba522eac1b29b748db8b30ba47db2b3c51caf3f715ca740",
+      "content_sha256": "c5afaa6bb8bd87e341c96651efad4aed519997bfe6cba30c117e4a872e61b211",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -28365,7 +28449,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "fbe8bd942293999b2f3461c153398a5a8954182fddd626d6c91f468b3ad3a405",
+      "content_sha256": "a378037a7efdd53a80ed0b8290be2853db0394da2d967bfeec27057f4b5ccb08",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -28396,7 +28480,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "498a61bf753c24d2f3146f63e7cbb648499ad177b63bde03692c55411453f27b",
+      "content_sha256": "5970f95e8501254faf9fe093c0b2e95269f1abaa2980c9827ff1721477dd4532",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -34613,7 +34697,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "5df39ae6ec45c521f239b1e44543cbb148b613f18da0bc9df863ce2afbfb9a1b",
+      "content_sha256": "079c433cd2075ce35a87aa2e142a24b0fad4d6b603df516c60f294878b0cd5f1",
       "reviewed_rules": [
         "04§2 职责/应用Service及跨域",
         "04§3 控制体复杂度/例外适用边界",
@@ -35021,7 +35105,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "6f8fa0a7b56a4d67548b2dac8e715279976711e298aad8862aa8f5632adafd11",
+      "content_sha256": "c7cbb971da51cb523b46d56f4092f5bd44aac1a11c13f56095cc07142a8fb652",
       "reviewed_rules": [
         "04§2 职责/应用Service及跨域",
         "04§3 控制体复杂度/例外适用边界",
@@ -35160,7 +35244,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "a1493d681a83d3194e2dd52be35f7856439d353dfdb4739e091169804a2c587a",
+      "content_sha256": "da4e1b133fe2bba528d7ffc667b6f76d0e2d57ab7e5210d34b67449f7796f93b",
       "reviewed_rules": [
         "04§2 职责/应用Service及跨域",
         "04§3 控制体复杂度/例外适用边界",
@@ -37163,7 +37247,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "70393c3c8ce2e03d68cb9cb55ac9d2188d453873b469b7ad391648b822fe1926",
+      "content_sha256": "7320fa81c8cf0328e79ea67b06ac3c7b1552213ebc64e5c9b1364db3367790a7",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -37524,7 +37608,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "12add8fe6576f125198e80fd117a16a6f92b851375ac1b2dcfb511c3406437ec",
+      "content_sha256": "99ba7ade6f21614fb7c11100a0de86d00023f9c820022616d522dfe9df409e02",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -37623,7 +37707,7 @@
       "role": "后端 spectra-core / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "6096ce2acc2f96bfeb3fd7552897041b7bf93ed90d4eb8ef0412d716bcc74abd",
+      "content_sha256": "89da4dae2f1e2d416a3a024aaac42b8292f8ff14c0dd3cfebb3f53dd0be0651b",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -37690,7 +37774,7 @@
       "role": "后端 spectra-core / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "17aa4b4ceff49f1e51070459c5b07f709f9c5296abd4045f60d8c2e13a6175df",
+      "content_sha256": "58de774c0a08e9de391d56aee6eaf6d975ee743c9a75e49b8971c2472ae31edc",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39352,7 +39436,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "1491083841f3443d2e5e620a2a1e1fea99608df229ce230c37ee4da2e12b3bfd",
+      "content_sha256": "007a48ee848710a6912e34855098c32ed36ba67848239044ff6c2da0bbc5e33c",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39642,7 +39726,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "2d655ebe698ecce06f3fc85ac94b137aee6b5c60055373d1dd990c6e72e266d3",
+      "content_sha256": "05cc7a08a8314f8452bde2896dc19a58b54d10f68bbaeab1e9f7a6924fee36bd",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39750,7 +39834,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "98f25677eb63dfebdb98cc3bb8de9a9ba9b62cc439a40be8ce54fa72b667d9a6",
+      "content_sha256": "f2b483401e871d5cd232c434543fcb17749cf1fd165cf429722a75df06b34e95",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39856,7 +39940,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "stale",
-      "content_sha256": "b5035e9fcf1e3498e5ae84a9001d585e7c5f915ab64d28d5a93529118394b193",
+      "content_sha256": "0f4d16e00f9c35c88b9d42dea2eb176b579bbf5a6fd2dda19306cab55000a786",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -39916,7 +40000,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "stale",
-      "content_sha256": "e45222638a90f3b079edc8e8b0491615cc71e7396aaa7707a8fc51d136eef7c7",
+      "content_sha256": "5875f6072415650c00a4236a06fdfa02ce7526dcd520988b364f0afbc2b8f6b1",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -41729,7 +41813,7 @@
       "role": "B02 审计脱敏与同库事务真实 PostgreSQL 合成测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "234bc586e27b9e085946a7eda170f6c7e0791383369be8d26c803816076a6ad5",
+      "content_sha256": "cc7f0c583c985ddbeb2bfd2e5c4b636f6f1adc214c7163e4720f0ab7d5783c47",
       "reviewed_rules": [
         "04 §12 审计",
         "04 §13 真实依赖验证"
@@ -41739,11 +41823,12 @@
       ],
       "evidence_ids": [
         "EV-B02-DEPS-PORTS-20261010",
-        "EV-CYCLE-TEST-ENV-20261010"
+        "EV-CYCLE-TEST-ENV-20261010",
+        "EV-B02-BASE001-20261011"
       ],
-      "review_summary": "test 环境 devops00_spectra_db_test 中审计脱敏和事务 3/3 通过；历史 b02_test 证据保留。",
+      "review_summary": "test 环境专用 PostgreSQL 合成表中审计嵌套快照、reason、日志拒绝值和成功/失败事务 5/5 通过。",
       "review_limits": [
-        "未覆盖嵌套 Bean/List/record、实际 HTTP 及完整审计验收。"
+        "未运行真实 HTTP 或正式 sys_audit_event 写入。"
       ],
       "review_kind": "isolated_postgres_test_review",
       "impact_ids": [
@@ -42391,7 +42476,7 @@
       "role": "测试与夹具",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "f4d72c1db6df2aad67fa27f640b120bd1a0f6258f33d81d919acbcb2fb8f963f",
+      "content_sha256": "f894b7214f6be43408e78cf8a96537ac4c94df7d58c55b623484c530708b2930",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -62979,12 +63064,14 @@
       "impact": "改密等From内password/token/secret字段随后Jackson序列化可进入审计JSON；敏感嵌套bean需要验收。",
       "priority": "P1",
       "disposition": "required_fix",
-      "state": "in_progress",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
         "EV-BASE-001",
         "EV-B00-EXCEPTION-20261005",
-        "EV-B02-DEPS-PORTS-20261010"
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-B02-BASE001-20261011",
+        "EV-B02-BASE001-GATES-20261011"
       ],
       "impact_ids": [
         "IMP-BASE-001"
@@ -66494,18 +66581,20 @@
       "required_changes": [
         "Core改密/敏感From/审计保存与Web错误解释同步；暂缓OA/Workflow审计输入和统一响应也需消费回归。"
       ],
-      "deferred_boundary": "Core agent已协调不重复后端共享issue；Web无error_code消费已核对。",
-      "state": "pending",
+      "deferred_boundary": "OA/Workflow 共用 @Audit，Web 沿用既有审计字段；尚需真实 HTTP 逐入口回归。DIAG-BASE-010 的稳定错误码另行治理。",
+      "state": "in_progress",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
         "EV-BASE-001",
-        "EV-B02-DEPS-PORTS-20261010"
+        "EV-B02-DEPS-PORTS-20261010",
+        "EV-B02-BASE001-20261011",
+        "EV-B02-BASE001-GATES-20261011"
       ],
       "verification": [
-        "Core改密/敏感From/审计保存与Web错误解释同步；暂缓OA/Workflow审计输入和统一响应也需消费回归。"
+        "合成 PostgreSQL 的切面、嵌套快照、reason、事务与日志专项通过；Framework 校验日志和审计存储 503 单元测试通过；OA/Workflow 编译，Web 调用字段形状已核对。"
       ],
       "limits": [
-        "Core agent已协调不重复后端共享issue；Web无error_code消费已核对。"
+        "正式 sys_audit_event 写入、真实 HTTP/OA/Workflow/Web 审计消费未运行；DIAG-BASE-010 错误协议未完成。"
       ]
     },
     {
@@ -67879,6 +67968,223 @@
       "evidence_ids": ["EV-B02-FRAMEWORK-PMD-20261010"]
     },
     {
+      "id": "EX-B02-PMD-004",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditAspect.java",
+      "symbol": "AuditAspect.AuditAspect",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "6 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "审计切面需同时获取安全主体、审计写入与脱敏等独立协作者，构造器按 Spring 生命周期显式注入。",
+      "risk": "审计依赖增多可能掩盖写入、脱敏和事务边界。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-005",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/AuditConfiguration.java",
+      "symbol": "AuditConfiguration.auditAspect",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "6 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "Spring Bean 工厂方法逐项接收审计切面的六个独立协作者，保持装配关系可见。",
+      "risk": "装配变化可能漏掉审计脱敏或事务顺序。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-006",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginEmailProvider.java",
+      "symbol": "LoginEmailProvider.LoginEmailProvider",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "8 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "邮件验证码认证涉及验证码、失败锁定、身份与会话等独立安全事实源协作者，显式注入便于审查。",
+      "risk": "新增依赖可能模糊认证失败拒绝和状态消费顺序。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/security",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-007",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginSmsProvider.java",
+      "symbol": "LoginSmsProvider.LoginSmsProvider",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "8 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "短信验证码认证涉及验证码、失败锁定、身份与会话等独立安全事实源协作者，显式注入便于审查。",
+      "risk": "新增依赖可能模糊认证失败拒绝和状态消费顺序。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/security",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-008",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authentication/provider/LoginUsernamePasswordProvider.java",
+      "symbol": "LoginUsernamePasswordProvider.LoginUsernamePasswordProvider",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "6 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "密码认证的校验、身份和会话协作者由 Spring 分别管理，构造器保留明确的安全依赖。",
+      "risk": "依赖变化可能破坏登录失败锁定和凭证校验顺序。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/security",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-009",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentAuthorizationReferenceServiceImpl.java",
+      "symbol": "DepartmentAuthorizationReferenceServiceImpl.DepartmentAuthorizationReferenceServiceImpl",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "8 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "部门授权引用核对横跨多张授权关系表，持久化协作者按表职责显式注入。",
+      "risk": "新增映射器可能漏查角色或授权引用。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/security",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-010",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/security/authorization/service/impl/DepartmentRestructureServiceImpl.java",
+      "symbol": "DepartmentRestructureServiceImpl.DepartmentRestructureServiceImpl",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "17 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "部门重构需在单个事务中协调闭包、成员资格与授权引用，现有十七项依赖按职责显式可见，后续应优先审查职责拆分。",
+      "risk": "依赖数高，事务边界、授权校验和变更顺序容易遗漏。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/security",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-011",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/CacheManagementServiceImpl.java",
+      "symbol": "CacheManagementServiceImpl.CacheManagementServiceImpl",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "9 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "缓存管理需协调区域注册、失效与诊断等不同基础设施协作者，显式注入保留事实源边界。",
+      "risk": "新增依赖可能引入缓存故障时的不当降级。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/system",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-012",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorDiagnosticServiceImpl.java",
+      "symbol": "ServiceMonitorDiagnosticServiceImpl.ServiceMonitorDiagnosticServiceImpl",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "7 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "监控诊断聚合多种基础设施观测源，Spring 显式注入便于核对故障状态。",
+      "risk": "监控源增加可能掩盖不可用状态或扩大职责。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/system",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-013",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/system/service/impl/ServiceMonitorServiceSupport.java",
+      "symbol": "ServiceMonitorServiceSupport.ServiceMonitorServiceSupport",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "6 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "监控采样需同时获取指标、时间、环境和健康状态协作者，构造器保留显式装配。",
+      "risk": "采样依赖变化可能改变健康判定或指标口径。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/system",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-PMD-014",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/service/UploadVerificationWorker.java",
+      "symbol": "UploadVerificationWorker.UploadVerificationWorker",
+      "rule": "PMD.ExcessiveParameterList",
+      "measured_value": "6 Spring DI parameters; 1 symbol-level suppression",
+      "tool_version": "PMD 7.17.0",
+      "necessity": "上传验证分工依赖类型映射、存储与扫描协作者，显式注入便于核对拒绝与清理路径。",
+      "risk": "依赖变化可能遗漏上传失败清理或安全校验。",
+      "verification": "受影响模块 verify、完整后端测试和调用方检查；每次该构造器或装配签名变更时复核职责与参数清单。",
+      "owner_area": "spectra-core/upload",
+      "reevaluate_when": "构造器参数、Bean 装配职责或相关安全行为改变。",
+      "state": "active",
+      "evidence_ids": [
+        "EV-B02-STATIC-20261011"
+      ]
+    },
+    {
+      "id": "EX-B02-SPOTBUGS-001",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/JacksonAuditSanitizer.java",
+      "symbol": "com.devops00.spectra.core.audit.JacksonAuditSanitizer",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact class-and-rule filter for injected ObjectMapper",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "审计序列化必须使用应用统一配置的 Jackson ObjectMapper；它由 Spring 管理，按值克隆会切断配置一致性。",
+      "risk": "运行中修改共享 ObjectMapper 配置可能改变审计快照转换或脱敏结果。",
+      "verification": "审计脱敏成功和转换失败拒绝测试；每次 Jackson 配置或注入生命周期变化时复核。",
+      "owner_area": "spectra-core/audit",
+      "reevaluate_when": "ObjectMapper 配置或审计序列化边界改变。",
+      "state": "active",
+      "evidence_ids": ["EV-B02-STATIC-20261011"]
+    },
+    {
+      "id": "EX-B02-SPOTBUGS-002",
+      "path": "spectra-admin/spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/quartz/service/impl/QuartzJobManagementServiceImpl.java",
+      "symbol": "com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementServiceImpl",
+      "rule": "SpotBugs.EI_EXPOSE_REP2",
+      "measured_value": "1 exact class-and-rule filter for injected QuartzJobParameterValidator",
+      "tool_version": "SpotBugs 4.10.3.0",
+      "necessity": "Quartz 管理服务调用 Spring 持有的参数校验器，维持同一配置与生命周期；没有可安全复制的值对象。",
+      "risk": "校验器内部状态或依赖变化可能改变任务参数拒绝规则。",
+      "verification": "Quartz 参数校验专项与后端完整门禁；变更校验器依赖时复核。",
+      "owner_area": "spectra-core/quartz",
+      "reevaluate_when": "Quartz 参数校验器实现或 Spring 装配生命周期改变。",
+      "state": "active",
+      "evidence_ids": ["EV-B02-STATIC-20261011"]
+    },
+    {
       "id": "EX-B00-SPOTBUGS-002",
       "path": "spectra-admin/pom.xml",
       "symbol": "omitVisitors",
@@ -69173,6 +69479,36 @@
   ],
   "evidence": [
     {
+      "id": "EV-B02-STATIC-20261011",
+      "scope": "B02 后端 Checkstyle/PMD/SpotBugs 阻断收口与 Core 请求容器快照",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-DskipTests' '-Dspotless.ratchetFrom=origin/master' verify -> exit 0; five reactor modules, Core SpotBugs 0 unfiltered findings",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspectra.test.groups.exclude=' '-Dtest=*Test,!RegionServiceTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspotless.ratchetFrom=origin/master' '-Dspectra.test.real-deps=true' verify -> exit 0; eight reactor modules, 267 selected tests and all static gates passed",
+        "workspace: pwsh -NoProfile -File scripts/check-governance-exceptions.ps1 -RootPath . -LedgerPath docs/开发指南/工程治理/ledger.json -SourceRoot spectra-admin -SuppressionFile spectra-admin/config/spotbugs/exclude.xml -> exit 0; 99 exceptions and 1578 files scanned",
+        "spectra-admin/spectra-ui: codegraph explore on Core request records and Web online-user/import/notification callers -> both exit 0; stale indexed files reconciled with current source",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=RequestSnapshotTest,OnlineUserPageAssemblerTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspotless.ratchetFrom=origin/master' verify -> exit 0; final identity assertion, five selected tests and five-module static gates passed"
+      ],
+      "environment": "原生 Windows PowerShell 7.6；mise test 环境；Java 25 / Maven Wrapper 3.9.12；合成 PostgreSQL devops00_spectra_db_test 与 Redis DB 5；不读取私有配置或凭据，不使用业务数据",
+      "tool_versions": {
+        "java": "25",
+        "maven_wrapper": "3.9.12",
+        "checkstyle_plugin": "3.6.0",
+        "pmd": "7.17.0",
+        "spotbugs_plugin": "4.10.3.0",
+        "surefire": "3.5.6"
+      },
+      "checked_at": "2026-10-11",
+      "result": "passed",
+      "exit_code": 0,
+      "summary": "六条 Checkstyle 未使用导入、PMD 无用变量及三十条可变请求容器暴露已在源码修复；十一条固定装配参数和两条 Spring 协作者暴露按符号/类规则精确例外登记。Common 5、Framework 115、Core 88、Launch 59，共 267 项测试通过，OA/Workflow 编译和静态门禁通过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-11-B02后端静态门禁收口.md",
+        "spectra-admin/spectra-modules/spectra-core/target/surefire-reports/TEST-com.devops00.spectra.core.user.service.impl.RequestSnapshotTest.xml",
+        "spectra-admin/spectra-modules/spectra-core/target/spotbugsXml.xml"
+      ],
+      "limits": "全后端 verify 使用显式测试选择，RegionServiceTest 未运行；OA/Workflow 没有测试用例；两项 SpotBugs 过滤与十一项 PMD 方法抑制需按登记复评；真实 HTTP、双应用进程、Redis 实际停启和 B08 浏览器身份失效未验证。B02 仍 in_progress。"
+    },
+    {
       "id": "EV-B02-SORT-20261008",
       "scope": "DIAG-BASE-002 / IMP-BASE-005 / BC-BASE-008 排序子场景",
       "command_or_scenario": [
@@ -69749,6 +70085,40 @@
       "exit_codes": [1, 0, 1, 1, 0],
       "artifacts": ["docs/开发指南/工程治理/2026-10-10-B02会话并发配额验证.md"],
       "limits": "最终 Framework verify 与全后端 test 通过；标准全后端 verify 被 Workflow Surefire 阻断，命令级绕行后被 Core 八条 Checkstyle 阻断。Core 后续 PMD/SpotBugs、OA/Launch verify 及真实 HTTP/双应用进程均未通过或未运行，B02 保持 in_progress。"
+    },
+    {
+      "id": "EV-B02-BASE001-20261011",
+      "scope": "DIAG-BASE-001 / IMP-BASE-001 / BC-BASE-005 审计快照、说明和错误日志脱敏",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=AuditSanitizationTest,AuditTransactionPostgresTest,ExceptionResponseResolverConflictTest,CommonExceptionAdviceSensitiveLogTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' test -> exit 0，Framework 4/4、Core 11/11",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspectra.test.groups.exclude=' '-Dtest=*Test,!RegionServiceTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' test -> exit 0，Common 5/5、Framework 115/115、Core 84/84、Launch 59/59，共 263/263；OA/Workflow 编译通过",
+        "合成 PostgreSQL JSONB：改密 From、嵌套 Bean/Map/List/record、reason、成功同事务、审计失败回滚与业务失败独立记录均通过",
+        "合成日志与异常：审计写入失败不输出原始异常及敏感 suppressed，Bean Validation 拒绝值不进入日志；审计失败固定 503 且不打印栈"
+      ],
+      "environment": "原生 Windows PowerShell；mise Java 25 与 Maven Wrapper；私有 test 环境 PostgreSQL devops00_spectra_db_test、Redis DB 5；只使用合成表和合成秘密，不读取或输出连接凭据。",
+      "checked_at": "2026-10-11",
+      "result": "passed",
+      "exit_codes": [0, 0],
+      "artifacts": ["docs/开发指南/工程治理/2026-10-11-B02审计脱敏验证.md"],
+      "limits": "未通过真实 HTTP Controller 写入 spectra_core.sys_audit_event；OA/Workflow 无测试用例，Web 审计详情/导出未以真实数据运行。"
+    },
+    {
+      "id": "EV-B02-BASE001-GATES-20261011",
+      "scope": "DIAG-BASE-001 最终格式、Checkstyle、PMD 和 SpotBugs 门禁边界",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dspotless.ratchetFrom=origin/master' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> exit 0",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dspotless.ratchetFrom=origin/master' '-Dspectra.test.real-deps=true' verify -> initial exits 1 for test format and two added star imports; after corrections exit 1 with Common 5/5、Framework 115/115、Core 84/84 passed and six existing Core Checkstyle unused imports",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspectra.test.groups.exclude=' '-Dtest=*Test,!RegionServiceTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspotless.ratchetFrom=origin/master' '-Dcheckstyle.skip=true' '-Dspectra.test.real-deps=true' verify -> exit 1，Core PMD 13 violations，其中新引入对象比较 1 条已修正",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-DskipTests' '-Dcheckstyle.skip=true' '-Dspotless.ratchetFrom=origin/master' verify -> exit 1，Core PMD 最终仅剩十二条既有违规",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-DskipTests' '-Dcheckstyle.skip=true' '-Dpmd.skip=true' '-Dspotless.ratchetFrom=origin/master' verify -> exit 1，Common/Framework/Workflow SpotBugs 0，Core 三十三条落在未改动文件",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-DskipTests' '-Dspotless.ratchetFrom=origin/master' verify -> exit 1，Core Checkstyle 最终仅六条未改动文件的未使用导入"
+      ],
+      "environment": "原生 Windows PowerShell；mise Java 25 与 Maven Wrapper；测试命令使用私有 test 环境 PostgreSQL devops00_spectra_db_test 和 Redis DB 5；RegionServiceTest 手工导入夹具按既有边界排除。",
+      "checked_at": "2026-10-11",
+      "result": "failed",
+      "exit_codes": [0, 1, 1, 1, 1, 1, 1, 1],
+      "artifacts": ["docs/开发指南/工程治理/2026-10-11-B02审计脱敏验证.md"],
+      "limits": "完整后端 verify 未通过；现有 Workflow Surefire 配置、Core 六条 Checkstyle、十二条 PMD 和三十三条 SpotBugs 阻断，OA/Launch verify 未进入。命令级跳过检查只用于观察下游，不代表完整门禁通过。"
     },
     {
       "id": "EV-CYCLE-TEST-ENV-20261010",
@@ -71443,14 +71813,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1529,
+      "included": 1534,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 24
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Framework SpotBugs bounded refresh adds TokenDigestServiceTest and ResponseEncryptAdviceTest. BASE-006 bounded refresh adds SecuritySessionAdmissionStore and its evidence report, updating directly changed source, tests and knowledge digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Framework SpotBugs bounded refresh adds TokenDigestServiceTest and ResponseEncryptAdviceTest. BASE-006 bounded refresh adds SecuritySessionAdmissionStore and its evidence report, updating directly changed source, tests and knowledge digests. 2026-10-11 static gate refresh adds RequestSnapshotTest and the gate evidence report, updating directly changed source and knowledge digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -71460,7 +71830,7 @@
       "deferred_business": 438,
       "excluded": 22
     },
-    "refreshed_at": "2026-10-10"
+    "refreshed_at": "2026-10-11"
   },
   "diagnosis": {
     "phase": 2,
@@ -71758,13 +72128,13 @@
         "name": "审计脱敏",
         "status": "partially_executed",
         "necessary_acceptance": "改密From、嵌套bean/Map/List/record的password/token/secret不得进入JSONB、异常message或日志；成功审计与业务同事务。",
-        "boundary": "周期级 test 环境 devops00_spectra_db_test 已运行改密 From 和 Map 结果的成功脱敏、审计失败回滚及业务失败独立审计 3 项并通过；嵌套 Bean/List/record、实际 HTTP 和日志输出尚未覆盖。",
+        "boundary": "周期级 test 环境 devops00_spectra_db_test 的审计事务 5 项和结构化脱敏 6 项通过；嵌套 Bean/Map/List/record、reason、日志拒绝值、审计写入失败及成功/失败事务已有合成证据。真实 HTTP、正式审计表及 OA/Workflow 逐入口未运行。",
         "scenario": "改密From、嵌套bean/Map/List/record的password/token/secret不得进入JSONB、异常message或日志；成功审计与业务同事务。",
-        "state": "inconclusive",
+        "state": "partially_executed",
         "issue_ids": ["DIAG-BASE-001"],
         "impact_ids": ["IMP-BASE-001"],
-        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010", "EV-CYCLE-TEST-ENV-20261010"],
-        "required_environment": "合成 PostgreSQL 已运行；还需嵌套数据、日志和真实 HTTP 审计入口验证。"
+        "evidence_ids": ["EV-B02-DEPS-PORTS-20261010", "EV-CYCLE-TEST-ENV-20261010", "EV-B02-BASE001-20261011", "EV-B02-BASE001-GATES-20261011"],
+        "required_environment": "合成 PostgreSQL 已运行；还需真实 HTTP 审计入口、正式审计表和 OA/Workflow 逐入口验证。"
       },
       {
         "id": "BC-BASE-006",
