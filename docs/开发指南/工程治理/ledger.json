@@ -146,10 +146,11 @@
           "EV-B02-BASE006-GATES-20261010",
           "EV-B02-BASE001-20261011",
           "EV-B02-BASE001-GATES-20261011",
-          "EV-B02-STATIC-20261011"
+          "EV-B02-STATIC-20261011",
+          "EV-B02-CORE020-20261011"
         ],
         "state": "in_progress",
-  "progress_summary": "排序专项、BASE-001/003/004/005/006/007/018、CORE-019/034 和 Common 14 条 SpotBugs 均有专项证据。Core 六条未使用导入和 S3 无用变量已修复；Core 请求容器结构快照和分页选项已收口，11 条 Spring 装配 PMD 与 2 条 Spring 协作者 SpotBugs 按精确例外登记。mise test 环境下全后端八模块 verify 退出 0，选定测试 267/267，Checkstyle/PMD/SpotBugs 均通过；OA/Workflow 编译与静态检查通过但没有测试用例，RegionServiceTest 被显式排除。BASE-001 合成 PostgreSQL 事务/JSONB 与单元测试通过，真实 HTTP 和正式审计表仍未验证。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 停启恢复、测试 S3 操作、旧格式会话上线处置及 B08 浏览器身份失效未验收；其余 B02 问题仍需逐项处理，本批未满足 done_when。"
+  "progress_summary": "排序专项、BASE-001/003/004/005/006/007/018、CORE-019/020/034 和 Common 14 条 SpotBugs 均有专项证据。CORE-020 登录及运维清理统一身份摘要桶，真实测试 Redis 双连接并发专项通过，HTTP/双应用进程/实际停启待验证。Core 六条未使用导入和 S3 无用变量已修复；Core 请求容器结构快照和分页选项已收口，11 条 Spring 装配 PMD 与 2 条 Spring 协作者 SpotBugs 按精确例外登记。mise test 环境下全后端八模块 verify 退出 0，选定测试 271/271，Checkstyle/PMD/SpotBugs 均通过；OA/Workflow 编译与静态检查通过但没有测试用例，RegionServiceTest 被显式排除。BASE-001 合成 PostgreSQL 事务/JSONB 与单元测试通过，真实 HTTP 和正式审计表仍未验证。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 停启恢复、测试 S3 操作、旧格式会话上线处置及 B08 浏览器身份失效未验收；其余 B02 问题仍需逐项处理，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -448,6 +449,48 @@
     "shared_change_policy": "Whole-workspace direct and indirect impact analysis first; determine necessary consistency changes and verification, including affected deferred areas."
   },
   "coverage": [
+    {
+      "path": "docs/开发指南/工程治理/2026-10-11-B02登录失败身份桶验证.md",
+      "role": "B02 CORE-020 实现与验证证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "12eb31fcd053fd55199a79c56b4ecd7325b4c28726faa7dd66c95f11b9b0635e",
+      "reviewed_rules": ["04 §7 身份事实源", "04 §8 Redis", "04 §13 验证", "05 集中治理验收"],
+      "issue_ids": ["DIAG-CORE-020"],
+      "evidence_ids": ["EV-B02-CORE020-20261011"],
+      "review_summary": "记录登录、锁定、成功清理与运维清理共用身份摘要桶；双连接真实测试 Redis 竞争和全后端门禁通过。",
+      "review_limits": ["实际 HTTP、双应用进程和 Redis 停启恢复未运行；B02 未验收。"],
+      "review_kind": "documented_behavior_and_gate_evidence_review",
+      "impact_ids": ["IMP-CORE-005"]
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/authentication/service/impl/CoreLoginFailureRedisTest.java",
+      "role": "后端 spectra-core / 真实 Redis 身份桶竞争测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "6a4fcfe75eaa0c66c77c071bca14a1f776803e557d49caccf12a2691aec5c19b",
+      "reviewed_rules": ["04 §7 身份事实源", "04 §8 Redis", "04 §13 验证"],
+      "issue_ids": ["DIAG-CORE-020"],
+      "evidence_ids": ["EV-B02-CORE020-20261011"],
+      "review_summary": "独立 Redis 连接并发提交登录标识变体，核对共享计数、锁定阈值、跨连接管理清理和成功登录清理。",
+      "review_limits": ["双连接测试不是双应用进程；不覆盖真实 HTTP 或 Redis 停启。"],
+      "review_kind": "real_redis_behavior_test_review",
+      "impact_ids": ["IMP-CORE-005"]
+    },
+    {
+      "path": "spectra-admin/spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/system/service/impl/CacheManagementLoginFailureTest.java",
+      "role": "后端 spectra-core / 运维失败桶清理单元测试",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "e1d0601f76de29a955459dc52bb279e084974bb6ff07f1147bf6182cf1613e30",
+      "reviewed_rules": ["04 §7 身份事实源", "04 §13 验证"],
+      "issue_ids": ["DIAG-CORE-020"],
+      "evidence_ids": ["EV-B02-CORE020-20261011"],
+      "review_summary": "长邮箱、空白标识、确认校验与 Redis 清理失败边界。",
+      "review_limits": ["单元模拟不替代 HTTP 鉴权及真实断连恢复。"],
+      "review_kind": "service_unit_test_review",
+      "impact_ids": ["IMP-CORE-005"]
+    },
     {
       "path": "docs/开发指南/工程治理/2026-10-11-B02后端静态门禁收口.md",
       "role": "B02 后端静态质量门禁收口和验证证据",
@@ -3438,7 +3481,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "a9a02a51af26fb252f7879f7ed92c4894143a27079997a0a23e2db5bafb4934f",
+      "content_sha256": "ed84352cc6eb97e6a097c0abc1634f36c9bd7f5776510480e17bffdead586942",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3449,7 +3492,8 @@
         "DIAG-BASE-003",
         "DIAG-BASE-004",
         "DIAG-BASE-005",
-        "DIAG-BASE-006"
+        "DIAG-BASE-006",
+        "DIAG-CORE-020"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
@@ -3458,11 +3502,12 @@
         "EV-B02-BASE004-20261009",
         "EV-B02-CORE019-20261010",
         "EV-B02-BASE005-20261010",
-        "EV-B02-BASE006-20261010"
+        "EV-B02-BASE006-20261010",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 用户与权限；BASE-003 撤销、BASE-004 重放围栏、BASE-005 会话期限及 BASE-006 原子配额语义已同步；当前 Web 刷新失败清理本地会话，页面级验收仍归 B08。",
+      "review_summary": "# 用户与权限；BASE-003 撤销、BASE-004 重放围栏、BASE-005 会话期限及 BASE-006 原子配额语义已同步；CORE-020 登录失败身份桶及运维清理契约已同步；当前 Web 刷新失败清理本地会话，页面级验收仍归 B08。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4343,7 +4388,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "36e8e881cb9b5eb78e07d18019bb082d6366588811058169b2d950351df9b9e4",
+      "content_sha256": "ec795d0504bd4c7c954a05fdb338af3d9369e356e0d4bfaee85f2f6abbf4733b",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4373,7 +4418,7 @@
       ],
       "scope_reason": null,
       "impact_state": null,
-  "review_summary": "正式台账局部登记 BASE-001 审计脱敏的实现、合成 PostgreSQL/日志专项、全后端 263 项测试与 Core 静态门禁阻断；B02 保持进行中，本体使用自摘要置空后的 PowerShell 规范化 JSON 摘要。",
+  "review_summary": "正式台账局部登记 CORE-020 登录失败身份桶、双连接真实测试 Redis 专项和全后端 271 项测试；B02 保持进行中，本体使用自摘要置空后的 PowerShell 规范化 JSON 摘要。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4386,7 +4431,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "677ce114006b5d012e404c1656f9759a036bf2633c773279a8e8a00c0e3b9ef3",
+      "content_sha256": "79a6b3c0db85c0174b5b8b1e265b7c8245888e3a5dfd5d6736e299c403fd0828",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4416,11 +4461,12 @@
         "EV-B02-BASE006-20261010",
         "EV-B02-BASE006-GATES-20261010",
         "EV-B02-BASE001-20261011",
-        "EV-B02-BASE001-GATES-20261011"
+        "EV-B02-BASE001-GATES-20261011",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "工程治理台账索引；2026-10-11 局部登记 BASE-001 审计脱敏、全后端 263 项测试和 Core Checkstyle/PMD/SpotBugs 阻断，全局仍 in_progress。",
+      "review_summary": "工程治理台账索引；2026-10-11 局部登记 CORE-020 身份桶、真实 Redis 双连接专项及全后端 271 项测试；全局仍 in_progress。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -13502,7 +13548,7 @@
       "role": "后端 spectra-common / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "0c391a630c5959ad1a893cb3cbdb55c209e7b78bec63f41ef6ef4d3f7df6fe6a",
+      "content_sha256": "11cd15c023dd229dcd3c74ecf46b72f9262e9ed022b41896a47ce4d6b9be6b06",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -13517,11 +13563,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "认证生命周期端口。；公共接口/快照字段及方法空值、集合与调用责任已逐项阅读；实现的事务/授权/资源上限由Core与使用方验证。",
+      "review_summary": "认证生命周期端口；登录失败计数参数明确为已规范化身份摘要桶。实现的事务/授权/资源上限由 Core 与使用方验证。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -16715,7 +16762,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "e8604c90a36bc6dbd5b45586c2672655fb17c7c18700449d8c1cfa80563f2915",
+      "content_sha256": "e2f7dfd6229622a84027cb17361132d08b284b0027a16f9c5b566710297bf91b",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16726,11 +16773,12 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "登录失败计数与临时锁定窄端口。；Session生命周期/查询抽象逐项阅读，签发/刷新/撤销实现通过各对应Service审查；接口本身不提供原子一致性。",
+      "review_summary": "登录失败计数与临时锁定窄端口；参数明确为已规范化身份摘要桶。具体原子一致性由 Redis 存储实现和行为测试验证。",
       "review_limits": [
         "静态逐文件审查；未运行应用、数据库迁移或Redis并发行为。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -24677,13 +24725,14 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "完整核对本文件可执行控制流或字段/约束/映射声明及直接协作关系，关联本批诊断问题；版本、字段清空、授权边界和任务生命周期按职责分别核对。",
+      "review_summary": "当前 digest 对登录标识执行 trim、Locale.ROOT 小写并计算 SHA-256；登录链与运维定向清理均复用此函数。",
       "review_limits": [
-        "Java许可证/import/机械Javadoc省略；仅静态审查，未实际DB/Redis/HTTP、多实例或协议序列化验证。"
+        "源码规则已由 Core 单元与真实测试 Redis 双连接场景复验；实际 HTTP、双应用进程、Redis 停启及协议序列化未验证。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
@@ -25485,7 +25534,7 @@
       "role": "后端 spectra-core / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "cb8ebc12a8b46ff0af3f645652e345a6b43c65be15aa3252f7c4abb842cfa4ba",
+      "content_sha256": "dd6e2e783f9cc3281f1cb99c7d45825720b062e1d4a221534537bc9fae7f3c6d",
       "reviewed_rules": [
         "04§2",
         "04§4",
@@ -25501,13 +25550,14 @@
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "完整核对本文件可执行控制流或字段/约束/映射声明及直接协作关系，关联本批诊断问题；版本、字段清空、授权边界和任务生命周期按职责分别核对。",
+      "review_summary": "当前登录链在锁定检查、失败累加和成功清理三个入口使用同一 AuthenticationIdentifierHash.digest 身份桶；Core 单元和真实 Redis 双连接行为已验证。",
       "review_limits": [
-        "Java许可证/import/机械Javadoc省略；仅静态审查，未实际DB/Redis/HTTP、多实例或协议序列化验证。"
+        "实际 HTTP、双应用进程、Redis 停启和协议序列化未由本次测试覆盖；登录调用的其他独立治理问题仍待处理。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
       "impact_ids": [
@@ -32872,7 +32922,7 @@
       "role": "后端 spectra-core / 公共契约或内部实现",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "2af8a9199c9405a2a15e66542f18fb9a015b7779a300327d97d5c9670827799a",
+      "content_sha256": "8351cc3f18ec6cb0dbfe052f4622cf219e4b5a17b87bb0a35550cf0809e6617a",
       "reviewed_rules": [
         "04§4",
         "04§5",
@@ -32882,7 +32932,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-MODEL-001"
+        "EV-MODEL-001",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -34697,7 +34748,7 @@
       "role": "后端 spectra-core / service",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "079c433cd2075ce35a87aa2e142a24b0fad4d6b603df516c60f294878b0cd5f1",
+      "content_sha256": "e9123ed86770a18a1b7a29addbe8e9b87d18204eea6106bd47120dedf0b41171",
       "reviewed_rules": [
         "04§2 职责/应用Service及跨域",
         "04§3 控制体复杂度/例外适用边界",
@@ -34712,17 +34763,19 @@
       "issue_ids": [
         "DIAG-SYSTEM-001",
         "DIAG-BASE-009",
-        "DIAG-CORE-001"
+        "DIAG-CORE-001",
+        "DIAG-CORE-020"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-SYSTEM-READ-20261005"
+        "EV-SYSTEM-READ-20261005",
+        "EV-B02-CORE020-20261011"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "全读普通区域清理与安全端口隔离、confirmation/reason/target校验、保留当前Session和异常诊断UNAVAILABLE；未执行权限门禁补CORE001，operation生命周期SYSTEM001。",
+      "review_summary": "普通区域清理与安全端口隔离、confirmation/reason/target 校验、保留当前 Session 和异常诊断 UNAVAILABLE；CORE-020 运维定向清理已复用登录身份摘要函数，单元和真实 Redis 测试通过。权限门禁 CORE-001、operation 生命周期 SYSTEM-001 仍待治理。",
       "review_limits": [
-        "静态当前源文件控制体和声明读取；未运行数据库/Redis/JVM诊断文件生成/浏览器/质量门禁。",
+        "CORE-020 的真实测试 Redis 与全后端门禁已通过；本服务其他运维入口的 HTTP、诊断文件生成和浏览器行为未运行。",
         "未运行固定PMD复杂度测量，不能凭行数或人工阅读宣称数值阈值通过。"
       ],
       "review_kind": "source_responsibility_and_failure_path_review",
@@ -42049,11 +42102,12 @@
         "DIAG-CORE-034"
       ],
       "evidence_ids": [
-        "EV-B02-CORE034-20261009"
+        "EV-B02-CORE034-20261009",
+        "EV-B02-CORE020-20261011"
       ],
-      "review_summary": "7 项测试中 CORE-034 覆盖匿名用户 ID/登录名预读拒绝、显式系统身份限制、已登录范围保留及匿名/已认证并行隔离；既有三项登录身份桶测试不据此关闭 CORE-020。",
+      "review_summary": "7 项测试中 CORE-034 覆盖匿名访问、显式系统身份、已登录范围和并行隔离；登录身份桶单元场景随 CORE-020 真实 Redis 双连接与运维清理专项一并复验。",
       "review_limits": [
-        "无网络/数据库的单元边界；不证明 Core 实际 HTTP 登录或完整门禁。"
+        "本文件自身是无网络/数据库的单元边界；本轮完整门禁和另一个真实 Redis 专项通过，仍不证明 Core 实际 HTTP 登录。"
       ],
       "review_kind": "authorization_boundary_test_review",
       "impact_ids": [
@@ -65379,14 +65433,17 @@
       "impact": "空格/大小写变体分散账户猜测计数；规范身份桶与成功清理应统一。",
       "priority": "P1",
       "disposition": "集中整改并执行对应行为验证",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE020-20261011"
       ],
       "impact_ids": [
         "IMP-CORE-005"
-      ]
+      ],
+      "resolution": "当前 LoginServiceImpl 的锁定检查、失败累加及成功清理均使用 AuthenticationIdentifierHash.digest；本次让运维定向清理复用同一摘要函数，移除通用目标校验对空格、非 ASCII 和 128 字符以上标识的误拒绝。真实测试 Redis 双连接并发、阈值、跨连接清理及单元失败边界通过。",
+      "verification_record": "docs/开发指南/工程治理/2026-10-11-B02登录失败身份桶验证.md；实际 HTTP、双应用进程及 Redis 停启恢复尚未验证，CHECK-CORE-020 为部分执行。"
     },
     {
       "id": "DIAG-CORE-021",
@@ -67366,11 +67423,13 @@
       ],
       "direct": [
         "Core认证/用户导入/诊断/Quartz历史",
-        "Framework安全Redis失败桶/attempt store及TimeMapper"
+        "Framework安全Redis失败桶/attempt store及TimeMapper",
+        "Core 运维登录失败桶定向清理入口及 Common/Framework 失败计数端口"
       ],
       "indirect": [
         "Web用户导入进度、账号绑定、服务监控诊断下载",
-        "管理员安全策略与Root治理"
+        "管理员安全策略与Root治理",
+        "Web 登录与缓存维护请求继续提交原始身份，OA/Workflow 共用认证边界"
       ],
       "data_protocol_runtime": [
         "规范身份计数键",
@@ -67390,7 +67449,8 @@
       "state": "pending",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
-        "EV-CORE-001"
+        "EV-CORE-001",
+        "EV-B02-CORE020-20261011"
       ],
       "verification": [
         "身份空格大小写桶一致",
@@ -67400,7 +67460,7 @@
         "任务跨实例下载",
         "Quartz finish/abandon竞争"
       ],
-      "limits": []
+      "limits": ["CORE-020 的真实 Redis 双连接及全后端门禁已通过；HTTP、双应用进程和 Redis 实际停启未运行，其余 IMP-CORE-005 关联问题及行为场景仍待逐项治理。"]
     },
     {
       "id": "IMP-CORE-006",
@@ -69478,6 +69538,30 @@
     }
   ],
   "evidence": [
+    {
+      "id": "EV-B02-CORE020-20261011",
+      "scope": "DIAG-CORE-020 登录失败身份桶与运维定向清理",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dtest=AuthenticationBoundaryTest,CacheManagementLoginFailureTest,CoreLoginFailureRedisTest,SecurityCounterRedisTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' test -> first exit 1 for missing test fixture method; corrected; rerun exit 0, 19/19 selected tests",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-modules/spectra-core -am '-Dspotless.ratchetFrom=origin/master' com.diffplug.spotless:spotless-maven-plugin:3.9.0:check -> first exit 1 for new test formatting; corrected in source; full verify then passed Spotless",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspectra.test.groups.exclude=' '-Dtest=*Test,!RegionServiceTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspotless.ratchetFrom=origin/master' '-Dspectra.test.real-deps=true' verify -> exit 0; eight modules, 271/271 selected tests, Spotless/Checkstyle/PMD/SpotBugs passed",
+        "spectra-admin and spectra-ui: codegraph explore login, identity hash, failure store, cache management, Web AuthApi.login and CacheManagementApi.clearLoginFailure; current disk source reconciled with rg",
+        "workspace: pwsh -NoProfile -File scripts/check-governance-exceptions.ps1 -RootPath . -LedgerPath docs/开发指南/工程治理/ledger.json -SourceRoot spectra-admin -SuppressionFile spectra-admin/config/spotbugs/exclude.xml -> exit 0; 99 exceptions, 1582 files scanned"
+      ],
+      "environment": "原生 Windows PowerShell 7.6；mise test 环境；Java 25 / Maven Wrapper 3.9.12；专用合成 PostgreSQL devops00_spectra_db_test、Redis DB 5；真实 Redis 测试使用随机物理键前缀且只删除自身键；未读取私有配置或凭据，未使用真实业务数据",
+      "tool_versions": {"java": "25", "maven_wrapper": "3.9.12", "surefire": "3.5.6", "spotless": "3.9.0"},
+      "checked_at": "2026-10-11",
+      "result": "passed",
+      "exit_code": 0,
+      "summary": "登录、锁定检查、失败累加、成功清理和运维清理共用规范化 SHA-256 身份桶；双独立 Redis 连接并发变体共享计数，阈值锁定及跨连接清理通过；错误输入和 Redis 清理失败边界通过。",
+      "artifacts": [
+        "docs/开发指南/工程治理/2026-10-11-B02登录失败身份桶验证.md",
+        "spectra-admin/spectra-modules/spectra-core/target/surefire-reports/TEST-com.devops00.spectra.core.security.authentication.service.impl.CoreLoginFailureRedisTest.xml",
+        ".temp/b02/core020-targeted-rerun.log",
+        ".temp/b02/core020-full-gate.log"
+      ],
+      "limits": "测试为双 Redis 连接而非双应用进程；实际 HTTP、Redis 停启恢复未运行。全后端 verify 显式排除 RegionServiceTest，OA/Workflow 无测试用例；B02 保持 in_progress。"
+    },
     {
       "id": "EV-B02-STATIC-20261011",
       "scope": "B02 后端 Checkstyle/PMD/SpotBugs 阻断收口与 Core 请求容器快照",
@@ -71813,14 +71897,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1534,
+      "included": 1537,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 24
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Framework SpotBugs bounded refresh adds TokenDigestServiceTest and ResponseEncryptAdviceTest. BASE-006 bounded refresh adds SecuritySessionAdmissionStore and its evidence report, updating directly changed source, tests and knowledge digests. 2026-10-11 static gate refresh adds RequestSnapshotTest and the gate evidence report, updating directly changed source and knowledge digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Framework SpotBugs bounded refresh adds TokenDigestServiceTest and ResponseEncryptAdviceTest. BASE-006 bounded refresh adds SecuritySessionAdmissionStore and its evidence report, updating directly changed source, tests and knowledge digests. 2026-10-11 static gate refresh adds RequestSnapshotTest and the gate evidence report, updating directly changed source and knowledge digests. CORE-020 bounded refresh adds a real Redis test, cache-management unit test and evidence report, updating directly changed source and knowledge digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -72646,12 +72730,12 @@
         "issue_ids": [
           "DIAG-CORE-020"
         ],
-        "state": "not_run",
+        "state": "partially_executed",
         "scenario": "空格/大小写变体分散账户猜测计数；规范身份桶与成功清理应统一。",
-        "validation": "待隔离依赖/实际HTTP/并发/故障与多实例验证；现阶段仅静态源码",
-        "impact_ids": [],
-        "evidence_ids": [],
-        "required_environment": "待隔离依赖/实际HTTP/并发/故障与多实例验证；现阶段仅静态源码"
+        "validation": "真实测试 Redis DB 5 双独立连接并发变体、锁定阈值、跨连接运维清理和成功登录清理通过；长标识、空白/未确认、Redis 清理失败单测通过；全后端 271 项选定测试与质量门禁通过。",
+        "impact_ids": ["IMP-CORE-005"],
+        "evidence_ids": ["EV-B02-CORE020-20261011"],
+        "required_environment": "仍需实际 HTTP 登录与运维清理、双独立应用进程及真实 Redis 停启恢复；RegionServiceTest 和 OA/Workflow 行为测试未由此证据覆盖。"
       },
       {
         "id": "CHECK-CORE-021",
@@ -74236,9 +74320,9 @@
         "impact_ids": [
           "IMP-CORE-005"
         ],
-        "state": "not_run",
-        "evidence_ids": [],
-        "required_environment": "按实际职责准备隔离DB/Redis/外部Provider或直接MCP Playwright；静态诊断未执行"
+        "state": "partially_executed",
+        "evidence_ids": ["EV-B02-CORE020-20261011"],
+        "required_environment": "身份变体双连接真实 Redis 与 Core 单元场景已通过；仍需实际 HTTP、双应用进程和 IMP-CORE-005 其余关联场景。"
       },
       {
         "id": "BC-IMPACT-IMP-CORE-005-2",
