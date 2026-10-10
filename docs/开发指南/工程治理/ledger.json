@@ -23,7 +23,7 @@
     "unresolved_blockers": [
       "B00 retains its recorded completion. B02 sorting and BASE-003 revocation have isolated PostgreSQL/Redis evidence within their stated scopes; Redis fault recovery, two application processes and real HTTP/browser scenarios still require batch evidence, without inferring acceptance from fixture availability.",
       "Notification external provider result-unknown behavior and historical ciphertext rotation require a concrete recovery/data strategy before irreversible rollout.",
-      "mise 2026.10.4 still panics with exit 101 when the faulty global config is loaded. A Git-ignored spectra-admin/.miserc.local.toml now makes direct mise -E test exec -- work in the backend checkout; PostgreSQL devops00_spectra_db_test and Redis DB 5 tests ran. Three session TTL/login-time failures remain; the earlier two effective-Root count failures passed after CORE-019 changes, while full HTTP and static gates remain open."
+      "mise 2026.10.4 still panics with exit 101 when the faulty global config is loaded. A Git-ignored spectra-admin/.miserc.local.toml now makes direct mise -E test exec -- work in the backend checkout; PostgreSQL devops00_spectra_db_test and Redis DB 5 tests ran. The earlier Session TTL/login-time and effective-Root count failures passed after BASE-005/CORE-019 changes. BASE-006 has shared Redis reservation evidence; two application processes, actual Redis restart, full HTTP and backend static gates remain open."
     ],
     "batches": [
       {
@@ -141,10 +141,12 @@
           "EV-B02-FRAMEWORK-PMD-20261010",
           "EV-B02-FRAMEWORK-PMD-GATES-20261010",
           "EV-B02-FRAMEWORK-SPOTBUGS-20261010",
-          "EV-B02-FRAMEWORK-SPOTBUGS-GATES-20261010"
+          "EV-B02-FRAMEWORK-SPOTBUGS-GATES-20261010",
+          "EV-B02-BASE006-20261010",
+          "EV-B02-BASE006-GATES-20261010"
         ],
         "state": "in_progress",
-  "progress_summary": "排序专项、BASE-003/004/007/018、CORE-034、Common 14 条 SpotBugs 和 CORE-019 均有各自专项证据。BASE-005 已实现绝对/空闲期限、原登录时间继承、受控 Clock 及原子活动续期；test 环境 Redis DB 5 的会话专项和全后端测试通过，原先三项失败已消除。Framework 三条 AvoidStarImport 已修复；五条 PMD 发现中两条经撤销逻辑职责拆分消除，三条 Spring 装配/固定回调签名以定点例外登记；四条 SpotBugs 发现经线性排序字段校验、恒时摘要比较和加密建议三态修复。Framework 完整 verify 退出 0，SpotBugs 0，Framework 105/105；全后端测试阶段 250/250，OA/Workflow 编译通过。全后端标准 verify 被 Workflow 无测试引擎但有 excludedGroups 的 Surefire 配置阻断；命令级绕行后又被 Core 八条 Checkstyle 违规阻断，完整门禁未通过。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 断连恢复、测试 S3 操作、旧格式会话上线处置及 B08 浏览器身份失效未验收；BASE-006 等问题仍未整改，本批未满足 done_when。"
+  "progress_summary": "排序专项、BASE-003/004/005/006/007/018、CORE-019/034、Common 14 条 SpotBugs 均有专项证据。BASE-006 以 Redis Lua 原子预留及提交会话名额，双连接 REJECT_NEW 上限与跨客户端提交再检查、KICK_OLD 踢旧、ALLOW 同端、租约/围栏/无 TTL 拒绝和连接失败后健康连接恢复已验证。最终 Framework 完整 verify 退出 0，SpotBugs 0，Framework 113/113；全后端测试阶段 258/258，OA/Workflow 编译通过。全后端标准 verify 被 Workflow 无测试引擎但有 excludedGroups 的 Surefire 配置阻断；命令级绕行后又被 Core 八条 Checkstyle 违规阻断。真实 HTTP/Quartz/Workflow、双应用进程、实际 Redis 停启恢复、测试 S3 操作、旧格式会话上线处置及 B08 浏览器身份失效未验收；其余 B02 问题仍需逐项处理，本批未满足 done_when。"
       },
       {
         "id": "B03",
@@ -444,6 +446,20 @@
   },
   "coverage": [
     {
+      "path": "docs/开发指南/工程治理/2026-10-10-B02会话并发配额验证.md",
+      "role": "B02 会话并发配额专项执行证据",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "0d29fe0b36aad0b285bdba12144ae51186936beeface3565f4ae44bed09ac480",
+      "reviewed_rules": ["04§8", "04§13"],
+      "issue_ids": ["DIAG-BASE-006"],
+      "evidence_ids": ["EV-B02-BASE006-20261010", "EV-B02-BASE006-GATES-20261010"],
+      "review_summary": "记录原子名额预留、双连接竞争、故障拒绝、实际门禁退出码和未覆盖的进程/运行态边界。",
+      "review_limits": ["执行记录不证明两个应用进程、真实 Redis 停启、HTTP/B08 或整批 B02 已验收。"],
+      "review_kind": "document_structure_and_high_impact_claim_scan",
+      "impact_ids": ["IMP-BASE-003"]
+    },
+    {
       "path": "docs/开发指南/工程治理/2026-10-10-B02会话期限与活动时间验证.md",
       "role": "B02 会话期限专项执行证据",
       "scope": "included",
@@ -455,6 +471,20 @@
       "review_summary": "记录会话期限与活动时间实现、Framework 静态门禁修复、真实 Redis/全后端测试、跨项目调用和未验收边界。",
       "review_limits": ["执行记录不代表 HTTP、双应用进程、实际 Redis 断连恢复或完整门禁通过。"],
       "review_kind": "document_structure_and_high_impact_claim_scan",
+      "impact_ids": ["IMP-BASE-003"]
+    },
+    {
+      "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionAdmissionStore.java",
+      "role": "Framework Redis 原子会话名额预留与提交",
+      "scope": "included",
+      "state": "reviewed",
+      "content_sha256": "d5770cd7e06c5fd5ae22d87d160574d0065dcedcde9882992210451f55fff891",
+      "reviewed_rules": ["04§7", "04§8", "04§13"],
+      "issue_ids": ["DIAG-BASE-006"],
+      "evidence_ids": ["EV-B02-BASE006-20261010", "EV-B02-BASE006-GATES-20261010"],
+      "review_summary": "Lua 按用户总名额和客户端踢旧边界原子预留；提交检查租约、围栏及用户索引 TTL，异常与未知结果拒绝。",
+      "review_limits": ["隔离 Redis 双连接竞争已验证；两个应用进程与实际 Redis 停启未运行。"],
+      "review_kind": "isolated_redis_behavior_review",
       "impact_ids": ["IMP-BASE-003"]
     },
     {
@@ -3335,7 +3365,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "1c93a01d4cec8287d5ce71360bc269ad1e83f1f8854080dfb5f53a3cddff2f4c",
+      "content_sha256": "1bb8a1af99906e27ea48c79b787a1ce006eec28ddc08e27437b4dbf1a97f1427",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -3345,7 +3375,8 @@
       "issue_ids": [
         "DIAG-BASE-003",
         "DIAG-BASE-004",
-        "DIAG-BASE-005"
+        "DIAG-BASE-005",
+        "DIAG-BASE-006"
       ],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
@@ -3353,11 +3384,12 @@
         "EV-B02-BASE003-20261009",
         "EV-B02-BASE004-20261009",
         "EV-B02-CORE019-20261010",
-        "EV-B02-BASE005-20261010"
+        "EV-B02-BASE005-20261010",
+        "EV-B02-BASE006-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 用户与权限；BASE-003 撤销、BASE-004 重放围栏与 BASE-005 会话期限语义已同步，当前 Web 刷新失败清理本地会话；页面级验收仍归 B08。",
+      "review_summary": "# 用户与权限；BASE-003 撤销、BASE-004 重放围栏、BASE-005 会话期限及 BASE-006 原子配额语义已同步；当前 Web 刷新失败清理本地会话，页面级验收仍归 B08。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -4237,7 +4269,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "77207824bf5c7a32e058a512e9daeac844fc29c472d5eab3592ad8400067493f",
+      "content_sha256": "64748e6398327c9d12ff6d2947c3b9771f33cab40935c7bc7ef2ed64f276862c",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4278,7 +4310,7 @@
       "role": "知识库、工程标准与治理事实源",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "487d32bcf1718f8e1262b5f5b770c2759c10fe50f418c87b30c9a8913322c024",
+      "content_sha256": "ab60ac4e154893ec7efe8021f5fee62ed61023ae50a662d457ddcfef8f977855",
       "reviewed_rules": [
         "04§1",
         "04§4",
@@ -4304,11 +4336,13 @@
         "EV-B02-DEPS-PORTS-20261010",
         "EV-B02-CORE019-20261010",
         "EV-B02-BASE005-20261010",
-        "EV-B02-BASE005-GATES-20261010"
+        "EV-B02-BASE005-GATES-20261010",
+        "EV-B02-BASE006-20261010",
+        "EV-B02-BASE006-GATES-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "# 工程治理台账；2026-10-10 局部登记 BASE-005 专项、244 项全后端测试及完整 verify 的 Framework 既有静态阻断；全局仍 in_progress。",
+      "review_summary": "# 工程治理台账；2026-10-10 局部登记 BASE-006 双连接原子配额、Framework 113 项及全后端 258 项测试，完整后端 verify 仍受 Workflow/Core 既有门禁阻断；全局仍 in_progress。",
       "review_limits": [
         "文档结构检查与关键声明复核，不证明每项业务描述、历史报告或其中命令已经通过；实际源码和行为分别登记。"
       ],
@@ -16085,7 +16119,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "6694e4859081f5288dd630191b747921156b87c32a419dcc293a1035bc49ad08",
+      "content_sha256": "4c86bcc5b832e20e88e6e4bff8354f4e5901c74ed97cc9fff4f3b0c57e34231c",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16096,7 +16130,8 @@
       "issue_ids": [],
       "evidence_ids": [
         "EV-INVENTORY-20261003",
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE006-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
@@ -16899,7 +16934,7 @@
       "role": "后端 spectra-framework / security",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "2fc34e4041208343bdacf5eb1e1130d7f1036209160c724b78d2d747757e5f73",
+      "content_sha256": "ed697787013ba50a00d68cdf5c49da3768d7fc09eba0f5e2da97beca5963f567",
       "reviewed_rules": [
         "04 §2 职责与模块边界",
         "04 §3 复杂度/例外边界",
@@ -16919,11 +16954,12 @@
         "EV-BASE-001",
         "EV-B02-BASE003-20261009",
         "EV-B02-BASE004-20261009",
-        "EV-B02-BASE005-20261010"
+        "EV-B02-BASE005-20261010",
+        "EV-B02-BASE006-20261010"
       ],
       "scope_reason": null,
       "impact_state": null,
-      "review_summary": "BASE-003 保留有效 Refresh，BASE-004 核对 Family 围栏；BASE-005 现保存首次登录/活动时间并把 Access 与 Refresh 的 Redis TTL 限制在绝对、空闲及原始令牌期限内。max_sessions 竞态仍归 BASE-006。",
+      "review_summary": "BASE-003 保留有效 Refresh，BASE-004 核对 Family 围栏，BASE-005 限制会话期限；BASE-006 在写入前预留用户名额、提交时再核对租约/围栏，失败按摘要清理映射。",
       "review_limits": [
         "BASE-004 双连接交错及 TTL 隔离 Redis 专项通过；两个应用进程、断连恢复与实际业务入口未运行。",
         "已阅读声明、注解及全部可执行方法体；展示时省略许可证/重复Javadoc/import，模块import另以rg核查。",
@@ -17968,7 +18004,7 @@
       "role": "B02 安全会话隔离 Redis 合成测试",
       "scope": "included",
       "state": "reviewed",
-      "content_sha256": "f1de0481ddfccbee01389953b0cc00ae0133a8132ad9852be1b1e81b73a57ed1",
+      "content_sha256": "00892f9d957a01c939067547e27d74cb21d243fd5c4eb5fa43ee882aedea404f",
       "reviewed_rules": [
         "04 §8 安全 Redis 事实源",
         "04 §10 会话生命周期",
@@ -17978,7 +18014,8 @@
         "DIAG-BASE-003",
         "DIAG-BASE-004",
         "DIAG-BASE-007",
-        "DIAG-BASE-005"
+        "DIAG-BASE-005",
+        "DIAG-BASE-006"
       ],
       "evidence_ids": [
         "EV-B02-BASE003-20261009",
@@ -17990,9 +18027,11 @@
         "EV-B02-DEPS-PORTS-20261010",
         "EV-CYCLE-TEST-ENV-20261010",
         "EV-B02-BASE005-20261010",
-        "EV-B02-FRAMEWORK-SPOTBUGS-20261010"
+        "EV-B02-FRAMEWORK-SPOTBUGS-20261010",
+        "EV-B02-BASE006-20261010",
+        "EV-B02-BASE006-GATES-20261010"
       ],
-      "review_summary": "test 环境 Redis DB 5 的会话生命周期 30/30 通过，原 BASE-005 三项失败已消除，新增受控 Clock、双连接活动同步、索引/在线摘要续期、撤销读取竞争、映射不一致和损坏状态拒绝。历史 DB14 证据保留。",
+      "review_summary": "test 环境 Redis DB 5 的会话生命周期最终 38/38，通过双连接并发名额、跨客户端提交再检查、踢旧 Family、ALLOW 预留、故障拒绝及修复后的恢复；BASE-005 期限和活动续期回归保持通过。历史 DB14 证据保留。",
       "review_limits": [
         "两个独立连接不等于两个应用进程；实际 Redis 断连恢复与真实 HTTP 未运行。"
       ],
@@ -63096,12 +63135,12 @@
     },
     {
       "id": "DIAG-BASE-006",
-      "rule": "04 §8.1 安全Redis一致性",
+      "rule": "04 §8 安全Redis一致性",
       "locations": [
         {
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionIssueService.java",
           "symbol": "createToken",
-          "line": 114
+          "line": 120
         },
         {
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/concurrency/RejectNewSessionConcurrencyStrategy.java",
@@ -63112,20 +63151,29 @@
           "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/concurrency/KickOldSessionConcurrencyStrategy.java",
           "symbol": "enforce",
           "line": 71
+        },
+        {
+          "path": "spectra-admin/spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionAdmissionStore.java",
+          "symbol": "reserve/commit",
+          "line": 93
         }
       ],
       "finding": "并发策略先读取活动Access数量/撤销，再分散写Session；没有原子预留或按用户客户端一致性边界。",
       "impact": "并行登录可同时通过限制并生成超过max_sessions的会话；KICK_OLD行为存在遗漏刷新会话。",
       "priority": "P2",
       "disposition": "required_fix",
-      "state": "pending",
+      "state": "resolved",
       "exception_ids": [],
       "evidence_ids": [
-        "EV-BASE-001"
+        "EV-BASE-001",
+        "EV-B02-BASE006-20261010",
+        "EV-B02-BASE006-GATES-20261010"
       ],
       "impact_ids": [
         "IMP-BASE-003"
-      ]
+      ],
+      "resolution": "Redis Lua 原子预留已提交与待提交用户名额，并按客户端协调 KICK_OLD；提交再次核对租约、Family 围栏和索引 TTL，失败只清理本次摘要。隔离 Redis 双连接竞争与故障拒绝已通过，独立应用进程和实际 Redis 停启仍在 BC-BASE-001/IMP-BASE-003 跟踪。",
+      "verification_record": "docs/开发指南/工程治理/2026-10-10-B02会话并发配额验证.md"
     },
     {
       "id": "DIAG-BASE-007",
@@ -66546,7 +66594,7 @@
         "安全计数首次写入与 TTL 原子化；拒绝无 TTL、异常脚本返回和结果未知，验证竞争递增及窗口保持。",
         "Session 签发、读取和刷新遵守绝对/空闲与原始令牌期限，活动时间原子更新，验证双连接、撤销竞争及旧格式会话处置。"
       ],
-      "deferred_boundary": "BASE-003/004 已在隔离 Redis 验证撤销与双连接重放交错；BASE-007 集合 null/empty、BASE-018 计数 TTL 已有专项。BASE-005 在 test 环境 Redis DB 5 验证绝对/空闲期限、活动续期、原登录时间、双连接与撤销竞争，原三项失败消除。两个应用进程、实际 Redis 断连恢复、旧格式会话上线处置、真实 Core/Web 入口和 BASE-006 并发配额仍未验收；没有凭据输出。",
+  "deferred_boundary": "BASE-003/004 已在隔离 Redis 验证撤销与双连接重放交错；BASE-007 集合 null/empty、BASE-018 计数 TTL 已有专项。BASE-005 在 test 环境 Redis DB 5 验证期限与活动；BASE-006 验证双连接原子配额、踢旧、租约/围栏及模拟连接失败后的恢复。两个应用进程、实际 Redis 停启恢复、旧格式会话上线处置和真实 Core/Web 入口仍未验收；没有凭据输出。",
       "state": "in_progress",
       "analysis_state": "current_source_reviewed",
       "evidence_ids": [
@@ -66561,14 +66609,16 @@
         "EV-B02-BASE018-GATES-20261009",
         "EV-B02-DEPS-PORTS-20261010",
         "EV-B02-BASE005-20261010",
-        "EV-B02-BASE005-GATES-20261010"
+    "EV-B02-BASE005-GATES-20261010",
+    "EV-B02-BASE006-20261010",
+    "EV-B02-BASE006-GATES-20261010"
       ],
       "verification": [
         "真实隔离Redis测试并发重放、Access过期Refresh有效、ALLOW多客户端、多实例登录限制、Redis异常/null与正常empty。",
         "隔离 Redis DB12 的 BASE-018 计数专项 10 项通过；首次写入中断的前后结果和旧无 TTL 状态由合成故障注入验证。"
       ],
       "limits": [
-        "BASE-007 集合与 BASE-018 计数 TTL 已按当前源码和隔离 Redis 测试解决；两个独立应用进程、真实断连恢复、完整门禁与同影响下 BASE-005/006 仍待完成。"
+    "BASE-005/006/007/018 已有当前源码和隔离 Redis 专项；两个独立应用进程、真实 Redis 停启恢复、完整门禁与真实 Core/Web 入口仍待完成。"
       ]
     },
     {
@@ -69668,6 +69718,39 @@
       "limits": "Framework SpotBugs 已归零；全后端标准 verify 未通过。Core Checkstyle 后续 PMD/SpotBugs 与 OA/Launch verify 未运行，不能称 B02 或完整后端门禁通过。"
     },
     {
+      "id": "EV-B02-BASE006-20261010",
+      "scope": "DIAG-BASE-006 / IMP-BASE-003 / BC-BASE-001 安全 Session 并发名额预留",
+      "command_or_scenario": [
+        "spectra-admin: mise exec -- .\\mvnw.cmd -pl spectra-framework -am compile -DskipTests -> exit 0",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-framework -am test '-Dtest=SecuritySessionLifecycleRedisTest' -Dsurefire.failIfNoSpecifiedTests=false -Dspectra.test.real-deps=true -> exit 1; PowerShell/Maven 属性未全量加引号，改为加引号后复跑",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-framework -am test '-Dtest=SecuritySessionLifecycleRedisTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' -> final exit 0, 38/38",
+        "Redis DB 5: two independent connections race REJECT_NEW across clients, committed plus pending count never exceeds max_sessions; REJECT_NEW commit rechecks quota after a different-client ALLOW commit; KICK_OLD two-connection race leaves one refresh family; ALLOW same-client reservations coexist and block overlapping kick",
+        "Redis DB 5: lost client lease, Family replay fence, persistent user index and unavailable synthetic loopback connection fail closed; repaired TTL or healthy connection permits later issue; failed kick does not delete prior USER_CLIENT mapping"
+      ],
+      "environment": "原生 Windows PowerShell；mise Java 25 与 Maven Wrapper；私有 test 环境 PostgreSQL devops00_spectra_db_test、Redis DB 5；隔离前缀和合成用户，不读取或输出凭据，不使用业务数据。",
+      "checked_at": "2026-10-10",
+      "result": "passed",
+      "exit_codes": [0, 1, 0],
+      "artifacts": ["docs/开发指南/工程治理/2026-10-10-B02会话并发配额验证.md"],
+      "limits": "两个 Redis 连接与服务对象不等于两个应用进程；关闭端口后的健康连接恢复不等于真实 Redis 停启和就绪迁移。真实 HTTP/B08 浏览器未运行。"
+    },
+    {
+      "id": "EV-B02-BASE006-GATES-20261010",
+      "scope": "DIAG-BASE-006 最终 Framework 门禁与全后端检查边界",
+      "command_or_scenario": [
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd -pl spectra-framework -am '-Dspotless.ratchetFrom=origin/master' '-Dspectra.test.real-deps=true' verify -> first exit 1, 109 tests pass but new PMD excessive parameter list; signature reduced; final exit 0, Common 5/5, Framework 113/113, Spotless/Checkstyle/PMD pass and SpotBugs 0",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspotless.ratchetFrom=origin/master' '-Dspectra.test.real-deps=true' verify -> exit 1 at Workflow Surefire groups/excludedGroups without engine; run preceded final three focused cases",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspectra.test.groups.exclude=' '-Dtest=*Test,!RegionServiceTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspotless.ratchetFrom=origin/master' '-Dspectra.test.real-deps=true' verify -> exit 1 after Core 81/81 tests at eight existing Checkstyle violations; run preceded final three focused cases",
+        "spectra-admin: mise -E test exec -- .\\mvnw.cmd '-Dspectra.test.groups.exclude=' '-Dtest=*Test,!RegionServiceTest' '-Dsurefire.failIfNoSpecifiedTests=false' '-Dspectra.test.real-deps=true' test -> final exit 0, Common 5/5, Framework 113/113, Core 81/81, Launch 59/59, total 258/258; OA/Workflow compile, no tests"
+      ],
+      "environment": "原生 Windows PowerShell；mise Java 25、仓库 Maven Wrapper；test 环境 PostgreSQL 合成库与 Redis DB 5；手工行政区划导入夹具 RegionServiceTest 按既有边界排除。",
+      "checked_at": "2026-10-10",
+      "result": "failed",
+      "exit_codes": [1, 0, 1, 1, 0],
+      "artifacts": ["docs/开发指南/工程治理/2026-10-10-B02会话并发配额验证.md"],
+      "limits": "最终 Framework verify 与全后端 test 通过；标准全后端 verify 被 Workflow Surefire 阻断，命令级绕行后被 Core 八条 Checkstyle 阻断。Core 后续 PMD/SpotBugs、OA/Launch verify 及真实 HTTP/双应用进程均未通过或未运行，B02 保持 in_progress。"
+    },
+    {
       "id": "EV-CYCLE-TEST-ENV-20261010",
       "scope": "集中治理全周期后端 test 环境入口迁移与当前验证边界",
       "command_or_scenario": [
@@ -71360,14 +71443,14 @@
       }
     ],
     "scope_counts": {
-      "included": 1527,
+      "included": 1529,
       "shared_impact": 30,
       "deferred_business": 438,
       "excluded": 24
     },
     "pending_review_filter": "coverage where scope in [included, shared_impact] and state != reviewed",
     "pending_impact_filter": "coverage where scope == deferred_business and impact_state == pending_analysis",
-    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Framework SpotBugs bounded refresh adds TokenDigestServiceTest and ResponseEncryptAdviceTest and updates directly changed source, tests, and knowledge digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
+    "classification_limits": "2026-10-08 bounded refresh added 8 sorting files and recorded 38 current file digests. 2026-10-09 bounded BASE-003 refresh added the Redis test and evidence report. BASE-004 added the Lua store test and evidence report. BASE-007 registers the existing but previously omitted SecuritySessionStoreTest and adds its evidence report. BASE-018 registers the previously omitted SecurityRedisCounter and SecurityCounterRedisTest plus a new script-result test and evidence report. CORE-034 registers the previously omitted AuthenticationBoundaryTest, a system actor and focused test plus an evidence report; updates Common/Core knowledge and OA/Workflow public caller impact digests. 2026-10-10 test environment refresh enumerates the preexisting private .mise.test.toml and new local .miserc.local.toml without reading or hashing them. CORE-019 bounded refresh adds Common business conflict, Core Root conflict, Framework conflict test and the evidence report, then refreshes directly changed source/doc digests. Framework SpotBugs bounded refresh adds TokenDigestServiceTest and ResponseEncryptAdviceTest. BASE-006 bounded refresh adds SecuritySessionAdmissionStore and its evidence report, updating directly changed source, tests and knowledge digests. Other stale included files and deferred independent business still require their own review; this is not a fresh whole-workspace enumeration.",
     "content_digest_policy": "Actual reviewed content SHA256; deferred impact-only input uses impact_content_sha256; private/excluded input never hashed. Ledger self digest: PowerShell 7.6 ConvertFrom-Json -DateKind String / ConvertTo-Json -Depth 100 -Compress with self content_sha256 null.",
     "phase1_baseline": {
       "enumerated_at": "2026-10-03",
@@ -71537,7 +71620,7 @@
         "name": "Session原子性",
         "status": "partially_executed",
         "necessary_acceptance": "真实隔离Redis构造Refresh fence检查后并发重放再签发交错，验证所有新Access拒绝；同时测试多实例max_sessions。",
-      "boundary": "隔离 Redis 以两个独立连接和服务对象固定 claim、重放围栏、签发交错，已验证新 Access 拒绝；独立应用进程、断连恢复及 BASE-006 多实例 max_sessions 未执行。",
+      "boundary": "隔离 Redis 以两个独立连接和服务对象固定 claim、重放围栏、签发交错，已验证新 Access 拒绝；BASE-006 又验证双连接 REJECT_NEW 上限和 KICK_OLD 踢旧。独立应用进程及实际 Redis 停启恢复未执行。",
         "scenario": "真实隔离Redis构造Refresh fence检查后并发重放再签发交错，验证所有新Access拒绝；同时测试多实例max_sessions。",
       "state": "inconclusive",
       "issue_ids": [
@@ -71549,9 +71632,11 @@
       ],
       "evidence_ids": [
         "EV-B02-BASE004-20261009",
-        "EV-B02-BASE004-GATES-20261009"
+        "EV-B02-BASE004-GATES-20261009",
+        "EV-B02-BASE006-20261010",
+        "EV-B02-BASE006-GATES-20261010"
       ],
-      "required_environment": "隔离 Redis 双连接交错已运行；剩余两个独立应用进程、Redis 断连恢复、BASE-006 max_sessions 和完整后端门禁。",
+      "required_environment": "隔离 Redis 双连接交错及 max_sessions 已运行；剩余两个独立应用进程、实际 Redis 停启恢复和完整后端门禁。",
       "subchecks": [
         {
           "id": "BC-BASE-001-FAMILY-REPLAY",
@@ -71567,8 +71652,8 @@
         },
         {
           "id": "BC-BASE-001-MAX-SESSIONS",
-          "state": "not_run",
-          "evidence_ids": []
+          "state": "inconclusive",
+          "evidence_ids": ["EV-B02-BASE006-20261010"]
         }
       ]
       },
